@@ -15,11 +15,10 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.cas.TOP;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -30,7 +29,7 @@ public class DetailsPanel extends JPanel {
 
 	DocumentWindow documentWindow;
 	JTree tree;
-	DefaultTreeModel treeModel;
+	CoreferenceModel treeModel;
 	TreeNode<TOP> rootNode;
 	Map<Long, Mention> mentionCache;
 
@@ -40,7 +39,7 @@ public class DetailsPanel extends JPanel {
 
 		rootNode = new TreeNode<TOP>(null, "Add new entity");
 
-		treeModel = new DefaultTreeModel(rootNode);
+		treeModel = new CoreferenceModel(rootNode, documentWindow.getJcas(), documentWindow.getViewer());
 
 		tree = new JTree(treeModel);
 		tree.setVisibleRowCount(-1);
@@ -91,13 +90,21 @@ public class DetailsPanel extends JPanel {
 
 				try {
 					if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
-						((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, (PotentialAnnotation) info
-								.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor));
+						FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+						PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
+								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+						if (entity == null)
+							treeModel.addEntityMention(pa.getBegin(), pa.getEnd());
+						else
+							treeModel.addLink((Entity) entity, pa.getBegin(), pa.getEnd());
 
 					} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
-						((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, documentWindow,
-								(TreeNode<Mention>) info.getTransferable()
-										.getTransferData(NodeTransferable.dataFlavor));
+						FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+
+						TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
+								.getTransferData(NodeTransferable.dataFlavor);
+						treeModel.updateMention(m.getFeatureStructure(), null, (Entity) entity);
+
 					}
 
 				} catch (UnsupportedFlavorException e1) {
@@ -124,16 +131,6 @@ public class DetailsPanel extends JPanel {
 				@SuppressWarnings("unchecked")
 				TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
 				return new NodeTransferable<Mention>(tn);
-			}
-
-			@Override
-			protected void exportDone(JComponent c, Transferable t, int action) {
-				try {
-					treeModel.removeNodeFromParent((MutableTreeNode) t.getTransferData(null));
-				} catch (UnsupportedFlavorException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 
 		});

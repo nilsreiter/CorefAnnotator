@@ -63,12 +63,12 @@ public class CasTextView extends JPanel {
 
 	public void drawAnnotation(Mention a) {
 		Object hi = highlightMap.get(a);
-		hilit.removeHighlight(hi);
-		Object o;
+		if (hi != null)
+			hilit.removeHighlight(hi);
 		try {
-			o = hilit.addHighlight(a.getBegin(), a.getEnd(),
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
 					new UnderlinePainter(documentWindow.getColorMap().get(a.getEntity())));
-			highlightMap.put(a, o);
+			highlightMap.put(a, hi);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

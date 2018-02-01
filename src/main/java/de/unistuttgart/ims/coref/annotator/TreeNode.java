@@ -32,6 +32,7 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 		this.label = label;
 	}
 
+	@Deprecated
 	public void registerDrop(DefaultTreeModel treeModel, DocumentWindow dw, TreeNode<Mention> tn) {
 		Mention m = tn.getFeatureStructure();
 
@@ -51,6 +52,7 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 		treeModel.reload();
 	}
 
+	@Deprecated
 	public void registerDrop(DefaultTreeModel treeModel, PotentialAnnotation anno) {
 		if (getFeatureStructure() instanceof Entity) {
 			System.err.println("adding new mention to existing entity");
