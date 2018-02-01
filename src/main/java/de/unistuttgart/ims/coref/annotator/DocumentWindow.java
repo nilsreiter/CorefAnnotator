@@ -12,11 +12,13 @@ import java.io.InputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -141,6 +143,35 @@ public class DocumentWindow extends JFrame {
 		// View menu
 		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
+		viewMenu.addSeparator();
+
+		JRadioButtonMenuItem sortAlphaButton = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.cModel.entitySortOrder = EntitySortOrder.Alphabet;
+				viewer.cModel.resort();
+
+			}
+		});
+		sortAlphaButton.setSelected(true);
+
+		JRadioButtonMenuItem sortMentionsButton = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.cModel.entitySortOrder = EntitySortOrder.Mentions;
+				viewer.cModel.resort();
+			}
+		});
+		ButtonGroup grp = new ButtonGroup();
+		grp.add(sortMentionsButton);
+		grp.add(sortAlphaButton);
+
+		viewMenu.add(sortAlphaButton);
+		viewMenu.add(sortMentionsButton);
 
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem("About");

@@ -208,9 +208,11 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		renameAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
-		changeKeyAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
-		changeColorAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+		if (e.getNewLeadSelectionPath() != null) {
+			renameAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+			changeKeyAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+			changeColorAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+		}
 	}
 
 }

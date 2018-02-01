@@ -3,12 +3,16 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -34,8 +38,14 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
+	TreeNode<TOP> rootNode;
+
+	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
+
+	@SuppressWarnings("unchecked")
 	public CoreferenceModel(JCas jcas, CasTextView ctw) {
 		super(new TreeNode<TOP>(null, "Add new entity"));
+		this.rootNode = (TreeNode<TOP>) getRoot();
 		this.jcas = jcas;
 		this.textView = ctw;
 	}
@@ -67,7 +77,18 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		e.setLabel(covered);
 		e.addToIndexes();
 		EntityTreeNode tn = new EntityTreeNode(e, covered);
-		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), 0);
+
+		int ind = 0;
+		Comparator<TreeNode<Entity>> comparator = entitySortOrder.getComparator();
+		while (ind < this.rootNode.getChildCount()) {
+			@SuppressWarnings("unchecked")
+			TreeNode<Entity> node = (TreeNode<Entity>) rootNode.getChildAt(ind);
+			if (comparator.compare(tn, node) <= 0)
+				break;
+			ind++;
+		}
+
+		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), ind);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {
 			tn.setKeyCode(keyCodes[key]);
@@ -152,6 +173,21 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	public boolean isKeyUsed(int i) {
 		return keyMap.containsKey(i);
+	}
+
+	public void resort() {
+		int n = rootNode.getChildCount();
+		List<TreeNode<Entity>> children = new ArrayList<TreeNode<Entity>>(n);
+		for (int i = 0; i < n; i++) {
+			children.add((TreeNode<Entity>) rootNode.getChildAt(i));
+		}
+		children.sort(entitySortOrder.getComparator());
+		rootNode.removeAllChildren();
+		for (MutableTreeNode node : children) {
+			rootNode.add(node);
+		}
+		nodeChanged(rootNode);
+		nodeStructureChanged(rootNode);
 	}
 
 	public void reassignKey(char keyCode, Entity e) {
