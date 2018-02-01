@@ -29,13 +29,14 @@ public class CasTextView extends JPanel {
 	JTextArea textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
+	CoreferenceModel cModel;
 
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 
 	public CasTextView(DocumentWindow dw) {
 		super(new BorderLayout());
 		this.documentWindow = dw;
-
+		this.cModel = new CoreferenceModel(documentWindow.getJcas(), this);
 		this.textPane = new JTextArea();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -44,10 +45,9 @@ public class CasTextView extends JPanel {
 		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
 		textPane.setText(dw.getJcas().getCas().getDocumentText());
-
+		textPane.addKeyListener(cModel);
 		hilit = new DefaultHighlighter();
 		textPane.setHighlighter(hilit);
-
 		add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
 				BorderLayout.CENTER);
 		setVisible(true);
@@ -66,8 +66,7 @@ public class CasTextView extends JPanel {
 		if (hi != null)
 			hilit.removeHighlight(hi);
 		try {
-			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
-					new UnderlinePainter(documentWindow.getColorMap().get(a.getEntity())));
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), cModel.getPainter(a.getEntity()));
 			highlightMap.put(a, hi);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -75,13 +74,16 @@ public class CasTextView extends JPanel {
 		}
 	}
 
+	public JTextArea getTextPane() {
+		return textPane;
+	}
+
 	public void drawAnnotations() {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
 		for (Mention m : JCasUtil.select(getJCas(), Mention.class)) {
 			try {
-				Object o = hilit.addHighlight(m.getBegin(), m.getEnd(),
-						new UnderlinePainter(documentWindow.getColorMap().get(m.getEntity())));
+				Object o = hilit.addHighlight(m.getBegin(), m.getEnd(), cModel.getPainter(m.getEntity()));
 				highlightMap.put(m, o);
 			} catch (BadLocationException e) {
 				e.printStackTrace();

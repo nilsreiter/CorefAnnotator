@@ -7,7 +7,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public class ColorMap extends HashMap<Entity, Color> {
 
-	Color[] colors = new Color[] { Color.BLUE, Color.RED };
+	Color[] colors = new Color[] { Color.BLUE, Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.YELLOW };
 
 	private static final long serialVersionUID = 1L;
 

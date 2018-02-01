@@ -2,11 +2,14 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -14,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -21,10 +26,12 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.cas.TOP;
 
+import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class DetailsPanel extends JPanel {
+public class DetailsPanel extends JPanel implements TreeSelectionListener {
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
@@ -33,17 +40,22 @@ public class DetailsPanel extends JPanel {
 	TreeNode<TOP> rootNode;
 	Map<Long, Mention> mentionCache;
 
-	public DetailsPanel(DocumentWindow dw) {
+	AbstractAction renameAction;
+	AbstractAction changeKeyAction;
+
+	public DetailsPanel(DocumentWindow dw, CoreferenceModel cm) {
 		super(new BorderLayout());
 		documentWindow = dw;
 
 		rootNode = new TreeNode<TOP>(null, "Add new entity");
 
-		treeModel = new CoreferenceModel(rootNode, documentWindow.getJcas(), documentWindow.getViewer());
+		treeModel = cm;
 
 		tree = new JTree(treeModel);
+		tree.getSelectionModel().addTreeSelectionListener(this);
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
+		tree.setPreferredSize(new Dimension(200, 600));
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setTransferHandler(new TransferHandler() {
 
@@ -103,7 +115,7 @@ public class DetailsPanel extends JPanel {
 
 						TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
 								.getTransferData(NodeTransferable.dataFlavor);
-						treeModel.updateMention(m.getFeatureStructure(), null, (Entity) entity);
+						treeModel.updateMention(m.getFeatureStructure(), (Entity) entity);
 
 					}
 
@@ -137,6 +149,19 @@ public class DetailsPanel extends JPanel {
 		// listModel.addElement();
 		tree.setCellRenderer(new CellRenderer());
 		this.add(tree, BorderLayout.CENTER);
+
+		JPanel controls = new JPanel();
+
+		renameAction = new RenameEntityAction(treeModel, tree);
+		renameAction.setEnabled(false);
+
+		changeKeyAction = new ChangeKeyForEntityAction(treeModel, tree);
+		changeKeyAction.setEnabled(false);
+
+		controls.add(new JButton(renameAction));
+		controls.add(new JButton(changeKeyAction));
+		this.add(controls, BorderLayout.NORTH);
+
 	}
 
 	private void displayDropLocation(final String string) {
@@ -157,12 +182,16 @@ public class DetailsPanel extends JPanel {
 				boolean leaf, int row, boolean hasFocus) {
 			JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
-			if (value instanceof TreeNode && ((TreeNode) value).getFeatureStructure() instanceof Entity) {
-				Entity e = (Entity) ((TreeNode) value).getFeatureStructure();
+			if (value instanceof EntityTreeNode) {
+				EntityTreeNode etn = (EntityTreeNode) value;
+				Entity e = etn.getFeatureStructure();
+				s.setIcon(treeModel.getIcon(e));
 
-				if (documentWindow.getColorMap().containsKey(e)) {
-					s.setBackground(documentWindow.getColorMap().get(e));
-					s.setOpaque(true);
+				if (treeModel.getColorMap().containsKey(e)) {
+					// s.setBackground(treeModel.getColorMap().get(e));
+					s.setOpaque(false);
+					s.setText(s.getText() + " (" + (etn.getKeyCode()) + ")");
+
 				} else {
 					s.setOpaque(false);
 				}
@@ -173,6 +202,12 @@ public class DetailsPanel extends JPanel {
 			return s;
 		}
 
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		renameAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+		changeKeyAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
 	}
 
 }

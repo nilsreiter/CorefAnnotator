@@ -46,8 +46,6 @@ public class DocumentWindow extends JFrame {
 
 	CasTextView viewer;
 
-	ColorMap colorMap = new ColorMap();
-
 	// Window components
 	JMenuBar menuBar = new JMenuBar();
 	JMenu documentMenu;
@@ -108,7 +106,8 @@ public class DocumentWindow extends JFrame {
 
 		viewer = new CasTextView(this);
 		// assembly of the main view
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, new DetailsPanel(this));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer,
+				new DetailsPanel(this, viewer.cModel));
 		// JTabbedPane tabbedPane = new JTabbedPane();
 		// tabbedPane.add("Viewer", viewer);
 
@@ -206,10 +205,6 @@ public class DocumentWindow extends JFrame {
 
 	public Annotator getMainApplication() {
 		return mainApplication;
-	}
-
-	public ColorMap getColorMap() {
-		return colorMap;
 	}
 
 	public CasTextView getViewer() {
