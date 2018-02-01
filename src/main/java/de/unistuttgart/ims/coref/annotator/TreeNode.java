@@ -8,7 +8,6 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 
@@ -33,22 +32,22 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 		this.label = label;
 	}
 
-	public void registerDrop(DefaultTreeModel treeModel, JCas jcas, TreeNode<Mention> tn) {
+	public void registerDrop(DefaultTreeModel treeModel, DocumentWindow dw, TreeNode<Mention> tn) {
+		Mention m = tn.getFeatureStructure();
 
 		if (getFeatureStructure() instanceof Entity) {
-			Mention m = tn.getFeatureStructure();
 			m.setEntity((Entity) getFeatureStructure());
 			treeModel.insertNodeInto(tn, this, 0);
 		} else if (getFeatureStructure() == null) {
-			Mention m = tn.getFeatureStructure();
-			Entity e = new Entity(jcas);
+			Entity e = new Entity(dw.getJcas());
 			e.addToIndexes();
-			String s = jcas.getDocumentText().substring(m.getBegin(), m.getEnd());
+			String s = dw.getJcas().getDocumentText().substring(m.getBegin(), m.getEnd());
 			TreeNode<Entity> node = new TreeNode<Entity>(e, s);
 			treeModel.insertNodeInto(node, this, 0);
 			m.setEntity(e);
 			treeModel.insertNodeInto(tn, node, 0);
 		}
+		dw.getViewer().drawAnnotation(m);
 		treeModel.reload();
 	}
 

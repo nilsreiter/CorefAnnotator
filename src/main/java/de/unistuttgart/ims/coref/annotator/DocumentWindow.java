@@ -106,9 +106,9 @@ public class DocumentWindow extends JFrame {
 			logger.error(e.getMessage());
 		}
 
+		viewer = new CasTextView(this);
 		// assembly of the main view
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new CasTextView(this),
-				new DetailsPanel(this));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, new DetailsPanel(this));
 		// JTabbedPane tabbedPane = new JTabbedPane();
 		// tabbedPane.add("Viewer", viewer);
 
@@ -210,6 +210,10 @@ public class DocumentWindow extends JFrame {
 
 	public ColorMap getColorMap() {
 		return colorMap;
+	}
+
+	public CasTextView getViewer() {
+		return viewer;
 	}
 
 }

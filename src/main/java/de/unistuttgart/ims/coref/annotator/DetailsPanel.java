@@ -14,14 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.uima.jcas.cas.TOP;
 
+import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class DetailsPanel extends JPanel {
@@ -70,6 +71,7 @@ public class DetailsPanel extends JPanel {
 				return true;
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public boolean importData(TransferHandler.TransferSupport info) {
 				if (!info.isDrop()) {
@@ -85,14 +87,15 @@ public class DetailsPanel extends JPanel {
 
 				JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 				TreePath tp = dl.getPath();
+				tree.expandPath(tp);
+
 				try {
-					System.err.println(tp);
 					if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
 						((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, (PotentialAnnotation) info
 								.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor));
 
 					} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
-						((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, documentWindow.getJcas(),
+						((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, documentWindow,
 								(TreeNode<Mention>) info.getTransferable()
 										.getTransferData(NodeTransferable.dataFlavor));
 					}
@@ -135,7 +138,7 @@ public class DetailsPanel extends JPanel {
 
 		});
 		// listModel.addElement();
-
+		tree.setCellRenderer(new CellRenderer());
 		this.add(tree, BorderLayout.CENTER);
 	}
 
@@ -148,19 +151,29 @@ public class DetailsPanel extends JPanel {
 		});
 	}
 
-	class CellRenderer extends JLabel implements TreeCellRenderer {
+	class CellRenderer extends DefaultTreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
 				boolean leaf, int row, boolean hasFocus) {
-			JLabel lab = new JLabel();
+			JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
+					hasFocus);
+			if (value instanceof TreeNode && ((TreeNode) value).getFeatureStructure() instanceof Entity) {
+				Entity e = (Entity) ((TreeNode) value).getFeatureStructure();
 
-			lab.setText(value.toString());
-			lab.setBackground(documentWindow.getColorMap().get(value));
-			lab.setOpaque(true);
-			return lab;
+				if (documentWindow.getColorMap().containsKey(e)) {
+					s.setBackground(documentWindow.getColorMap().get(e));
+					s.setOpaque(true);
+				} else {
+					s.setOpaque(false);
+				}
+			} else {
+				s.setOpaque(false);
+			}
+
+			return s;
 		}
 
 	}

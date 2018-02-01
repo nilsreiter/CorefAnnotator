@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.datatransfer.Transferable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -15,6 +17,7 @@ import javax.swing.text.Highlighter;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
@@ -27,6 +30,8 @@ public class CasTextView extends JPanel {
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 
+	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+
 	public CasTextView(DocumentWindow dw) {
 		super(new BorderLayout());
 		this.documentWindow = dw;
@@ -34,6 +39,9 @@ public class CasTextView extends JPanel {
 		this.textPane = new JTextArea();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
+		textPane.setLineWrap(true);
+		textPane.setWrapStyleWord(true);
+		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
 		textPane.setText(dw.getJcas().getCas().getDocumentText());
 
@@ -53,12 +61,28 @@ public class CasTextView extends JPanel {
 		return documentWindow.getJcas();
 	}
 
+	public void drawAnnotation(Mention a) {
+		Object hi = highlightMap.get(a);
+		hilit.removeHighlight(hi);
+		Object o;
+		try {
+			o = hilit.addHighlight(a.getBegin(), a.getEnd(),
+					new UnderlinePainter(documentWindow.getColorMap().get(a.getEntity())));
+			highlightMap.put(a, o);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void drawAnnotations() {
 		hilit.removeAllHighlights();
+		highlightMap.clear();
 		for (Mention m : JCasUtil.select(getJCas(), Mention.class)) {
 			try {
-				hilit.addHighlight(m.getBegin(), m.getEnd(),
+				Object o = hilit.addHighlight(m.getBegin(), m.getEnd(),
 						new UnderlinePainter(documentWindow.getColorMap().get(m.getEntity())));
+				highlightMap.put(m, o);
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			}
@@ -89,6 +113,7 @@ public class CasTextView extends JPanel {
 
 		@Override
 		protected void exportDone(JComponent c, Transferable t, int action) {
+			// TODO: export an Annotation object
 			drawAnnotations();
 		}
 	}
