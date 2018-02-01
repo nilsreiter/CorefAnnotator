@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
@@ -156,6 +157,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		keyMap.put(keyCode, e);
 		entityMap.get(e).setKeyCode(keyCode);
 		this.nodeChanged(entityMap.get(e));
+	}
+
+	public void updateColor(Entity entity, Color newColor) {
+		colorMap.put(entity, newColor);
+		this.nodeChanged(entityMap.get(entity));
+		for (Mention m : entityMentionMap.get(entity))
+			textView.drawAnnotation(m);
 	}
 
 }

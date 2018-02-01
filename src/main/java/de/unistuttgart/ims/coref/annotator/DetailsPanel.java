@@ -26,6 +26,7 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.cas.TOP;
 
+import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -42,6 +43,7 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
+	AbstractAction changeColorAction;
 
 	public DetailsPanel(DocumentWindow dw, CoreferenceModel cm) {
 		super(new BorderLayout());
@@ -158,8 +160,12 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 		changeKeyAction = new ChangeKeyForEntityAction(treeModel, tree);
 		changeKeyAction.setEnabled(false);
 
+		changeColorAction = new ChangeColorForEntity(treeModel, tree);
+		changeColorAction.setEnabled(false);
+
 		controls.add(new JButton(renameAction));
 		controls.add(new JButton(changeKeyAction));
+		controls.add(new JButton(changeColorAction));
 		this.add(controls, BorderLayout.NORTH);
 
 	}
@@ -208,6 +214,7 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 	public void valueChanged(TreeSelectionEvent e) {
 		renameAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
 		changeKeyAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
+		changeColorAction.setEnabled(e.getNewLeadSelectionPath().getPathCount() == 2);
 	}
 
 }
