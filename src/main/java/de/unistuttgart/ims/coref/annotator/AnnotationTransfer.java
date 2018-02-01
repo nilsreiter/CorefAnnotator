@@ -5,21 +5,21 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-public class PotentialAnnotationTransfer implements Transferable {
+import org.apache.uima.jcas.tcas.Annotation;
 
-	public static DataFlavor dataFlavor = new DataFlavor(PotentialAnnotationTransfer.class, "PotentialAnnotation");
+public class AnnotationTransfer<T extends Annotation> implements Transferable {
+	public static DataFlavor dataFlavor = new DataFlavor(AnnotationTransfer.class, "Annotation");
 
-	int begin;
-	int end;
-	CasTextView textView;
+	T annotation;
+	TreeNode<T> treeNode;
 
-	public PotentialAnnotationTransfer(CasTextView tv, int begin, int end) {
-		this.textView = tv;
-		this.begin = begin;
-		this.end = end;
+	public AnnotationTransfer(T annotation, TreeNode<T> tn) {
+		this.annotation = annotation;
+		this.treeNode = tn;
 	}
 
 	@Override
+
 	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { dataFlavor };
 	}
@@ -31,7 +31,11 @@ public class PotentialAnnotationTransfer implements Transferable {
 
 	@Override
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		return new PotentialAnnotation(textView, begin, end);
+		return annotation;
+	}
+
+	public TreeNode<T> getTreeNode() {
+		return treeNode;
 	}
 
 }

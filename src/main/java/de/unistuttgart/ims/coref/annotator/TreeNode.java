@@ -1,10 +1,14 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 
@@ -13,27 +17,51 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode {
 
+	static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
+
 	private static final long serialVersionUID = 1L;
 
-	T featureStructure;
+	int featureStructureHash;
 
 	String label;
 
 	public TreeNode(T featureStructure, String label) {
-		this.featureStructure = featureStructure;
+		if (featureStructure != null) {
+			this.featureStructureHash = featureStructure.hashCode();
+			mentionCache.put(featureStructure.hashCode(), featureStructure);
+		}
 		this.label = label;
 	}
 
+	public void registerDrop(DefaultTreeModel treeModel, JCas jcas, TreeNode<Mention> tn) {
+
+		if (getFeatureStructure() instanceof Entity) {
+			Mention m = tn.getFeatureStructure();
+			m.setEntity((Entity) getFeatureStructure());
+			treeModel.insertNodeInto(tn, this, 0);
+		} else if (getFeatureStructure() == null) {
+			Mention m = tn.getFeatureStructure();
+			Entity e = new Entity(jcas);
+			e.addToIndexes();
+			String s = jcas.getDocumentText().substring(m.getBegin(), m.getEnd());
+			TreeNode<Entity> node = new TreeNode<Entity>(e, s);
+			treeModel.insertNodeInto(node, this, 0);
+			m.setEntity(e);
+			treeModel.insertNodeInto(tn, node, 0);
+		}
+		treeModel.reload();
+	}
+
 	public void registerDrop(DefaultTreeModel treeModel, PotentialAnnotation anno) {
-		if (featureStructure instanceof Entity) {
+		if (getFeatureStructure() instanceof Entity) {
 			System.err.println("adding new mention to existing entity");
 			Mention m = AnnotationFactory.createAnnotation(anno.getTextView().getJCas(), anno.getBegin(), anno.getEnd(),
 					Mention.class);
-			m.setEntity((Entity) featureStructure);
+			m.setEntity((Entity) getFeatureStructure());
 			TreeNode<Mention> mNode = new TreeNode<Mention>(m, null);
 			treeModel.insertNodeInto(mNode, this, 0);
 
-		} else if (featureStructure == null || featureStructure instanceof TOP) {
+		} else if (getFeatureStructure() == null || getFeatureStructure() instanceof TOP) {
 			System.err.println("new entity received");
 			Entity e = new Entity(anno.getTextView().getJCas());
 			e.addToIndexes();
@@ -52,11 +80,7 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 	}
 
 	public T getFeatureStructure() {
-		return featureStructure;
-	}
-
-	public void setFeatureStructure(T featureStructure) {
-		this.featureStructure = featureStructure;
+		return (T) mentionCache.get(featureStructureHash);
 	}
 
 	@Override
@@ -65,8 +89,8 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 	}
 
 	public String getLabel() {
-		if (this.featureStructure instanceof Annotation) {
-			Annotation a = (Annotation) this.featureStructure;
+		if (this.getFeatureStructure() instanceof Annotation) {
+			Annotation a = (Annotation) this.getFeatureStructure();
 			return a.getCoveredText();
 		}
 		return label;
