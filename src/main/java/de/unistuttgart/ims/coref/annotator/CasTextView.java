@@ -84,7 +84,7 @@ public class CasTextView extends JPanel {
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTextArea t = (JTextArea) comp;
-			return new AnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
+			return new PotentialAnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
 		}
 
 		@Override

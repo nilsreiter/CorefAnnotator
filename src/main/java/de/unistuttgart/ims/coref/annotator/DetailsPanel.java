@@ -6,42 +6,41 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 
-import org.apache.uima.fit.factory.AnnotationFactory;
-
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import org.apache.uima.jcas.cas.TOP;
 
 public class DetailsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
-	JList<DiscourseEntityEntry> list;
-	DefaultListModel<DiscourseEntityEntry> listModel;
+	JTree tree;
+	DefaultTreeModel treeModel;
+	TreeNode<TOP> rootNode;
 
 	public DetailsPanel(DocumentWindow dw) {
 		super(new BorderLayout());
 		documentWindow = dw;
 
-		listModel = new DefaultListModel<DiscourseEntityEntry>();
+		rootNode = new TreeNode<TOP>(null, "Add new entity");
 
-		list = new JList<DiscourseEntityEntry>(listModel);
-		list.setVisibleRowCount(-1);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setDropMode(DropMode.ON);
-		list.setCellRenderer(new CellRenderer());
-		list.setTransferHandler(new TransferHandler() {
+		treeModel = new DefaultTreeModel(rootNode);
+
+		tree = new JTree(treeModel);
+		tree.setVisibleRowCount(-1);
+		tree.setDropMode(DropMode.ON);
+		// list.setCellRenderer(new CellRenderer());
+		tree.setTransferHandler(new TransferHandler() {
 
 			/**
 			 * 
@@ -51,14 +50,17 @@ public class DetailsPanel extends JPanel {
 			@Override
 			public boolean canImport(TransferHandler.TransferSupport info) {
 				// we only import Strings
-				if (!info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 					return false;
 				}
 
-				JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();
-				if (dl.getIndex() == -1) {
+				JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+				if (dl.getPath() == null)
 					return false;
-				}
+				TreePath tp = dl.getPath();
+				if (tp.getPathCount() > 2)
+					return false;
+
 				return true;
 			}
 
@@ -69,16 +71,17 @@ public class DetailsPanel extends JPanel {
 				}
 
 				// Check for String flavor
-				if (!info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 					displayDropLocation("List doesn't accept a drop of this type.");
 					return false;
 				}
 
-				JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();
-				int index = dl.getIndex();
+				JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+				TreePath tp = dl.getPath();
 				try {
-					listModel.get(index).registerDrop((PotentialAnnotation) info.getTransferable()
-							.getTransferData(AnnotationTransfer.dataFlavor));
+					System.err.println(tp);
+					((TreeNode<?>) tp.getLastPathComponent()).registerDrop(treeModel, (PotentialAnnotation) info
+							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor));
 				} catch (UnsupportedFlavorException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -94,7 +97,7 @@ public class DetailsPanel extends JPanel {
 
 			@Override
 			public int getSourceActions(JComponent c) {
-				return LINK;
+				return MOVE;
 			}
 
 			@Override
@@ -103,24 +106,9 @@ public class DetailsPanel extends JPanel {
 			}
 
 		});
-		listModel.addElement(new DiscourseEntityEntry(null, "Add new entity") {
-			@Override
-			public void registerDrop(PotentialAnnotation anno) {
-				System.err.println("new entity received");
-				Entity e = new Entity(anno.getTextView().getJCas());
-				e.addToIndexes();
-				String s = anno.getTextView().getJCas().getDocumentText().substring(anno.getBegin(), anno.getEnd());
-				listModel.addElement(new DiscourseEntityEntry(e, s));
-				System.err.println(" added to model");
+		// listModel.addElement();
 
-				Mention m = AnnotationFactory.createAnnotation(anno.getTextView().getJCas(), anno.getBegin(),
-						anno.getEnd(), Mention.class);
-				m.setEntity(e);
-			}
-
-		});
-
-		this.add(list, BorderLayout.CENTER);
+		this.add(tree, BorderLayout.CENTER);
 	}
 
 	private void displayDropLocation(final String string) {
@@ -132,16 +120,17 @@ public class DetailsPanel extends JPanel {
 		});
 	}
 
-	class CellRenderer extends JLabel implements ListCellRenderer<DiscourseEntityEntry> {
+	class CellRenderer extends JLabel implements TreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Component getListCellRendererComponent(JList<? extends DiscourseEntityEntry> list,
-				DiscourseEntityEntry value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+				boolean leaf, int row, boolean hasFocus) {
 			JLabel lab = new JLabel();
-			lab.setText(value.getLabel());
-			lab.setBackground(documentWindow.getColorMap().get(value.getJcasRepresentation()));
+
+			lab.setText(value.toString());
+			lab.setBackground(documentWindow.getColorMap().get(value));
 			lab.setOpaque(true);
 			return lab;
 		}

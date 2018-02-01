@@ -1,11 +1,16 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.apache.uima.fit.factory.AnnotationFactory;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class DiscourseEntityEntry {
+@Deprecated
+public class DiscourseEntityEntry extends DefaultMutableTreeNode {
+
+	private static final long serialVersionUID = 1L;
 	Entity jcasRepresentation;
 	String label;
 
