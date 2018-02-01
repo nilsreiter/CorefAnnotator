@@ -35,6 +35,7 @@ public class CasTextView extends JPanel {
 
 	public CasTextView(DocumentWindow dw) {
 		super(new BorderLayout());
+		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
 		this.cModel = new CoreferenceModel(documentWindow.getJcas(), this);
 		this.textPane = new JTextArea();
@@ -48,7 +49,6 @@ public class CasTextView extends JPanel {
 		textPane.addKeyListener(cModel);
 
 		textPane.setFont(textPane.getFont().deriveFont(0, 13));
-		hilit = new DefaultHighlighter();
 		textPane.setHighlighter(hilit);
 		add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
 				BorderLayout.CENTER);

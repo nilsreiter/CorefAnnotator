@@ -13,6 +13,7 @@ import java.io.InputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,18 +26,24 @@ import javax.swing.UIManager;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.UIMAException;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
+
+import de.unistuttgart.ims.coref.annotator.uima.ImportQuaDramA;
 
 public class DocumentWindow extends JFrame {
 
@@ -72,6 +79,7 @@ public class DocumentWindow extends JFrame {
 		CAS cas = null;
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
+
 		} catch (UIMAException e1) {
 			logger.error(e1.getMessage());
 			e1.printStackTrace();
@@ -91,6 +99,12 @@ public class DocumentWindow extends JFrame {
 			e1.printStackTrace();
 			System.exit(1);
 		}
+		try {
+			SimplePipeline.runPipeline(jcas, AnalysisEngineFactory.createEngine(ImportQuaDramA.class));
+		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
+			e1.printStackTrace();
+		}
+
 		cas = jcas.getCas();
 
 		try {
@@ -119,6 +133,7 @@ public class DocumentWindow extends JFrame {
 		getContentPane().add(splitPane);
 		pack();
 		setVisible(true);
+		viewer.cModel.importExistingData();
 	}
 
 	protected void initialise() {
@@ -172,6 +187,16 @@ public class DocumentWindow extends JFrame {
 
 		viewMenu.add(sortAlphaButton);
 		viewMenu.add(sortMentionsButton);
+
+		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.cModel.entitySortOrder.descending = !viewer.cModel.entitySortOrder.descending;
+				viewer.cModel.resort();
+			}
+
+		}));
 
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem("About");

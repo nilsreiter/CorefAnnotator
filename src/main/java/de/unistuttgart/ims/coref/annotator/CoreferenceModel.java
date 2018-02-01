@@ -17,6 +17,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.fit.factory.AnnotationFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.tools.cvd.ColorIcon;
@@ -42,12 +43,24 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
 
+	boolean keepEmptyEntities = true;
+
 	@SuppressWarnings("unchecked")
 	public CoreferenceModel(JCas jcas, CasTextView ctw) {
 		super(new TreeNode<TOP>(null, "Add new entity"));
 		this.rootNode = (TreeNode<TOP>) getRoot();
 		this.jcas = jcas;
 		this.textView = ctw;
+
+	}
+
+	public void importExistingData() {
+		for (Entity e : JCasUtil.select(jcas, Entity.class)) {
+			addEntity(e);
+		}
+		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+			connect(m.getEntity(), m);
+		}
 	}
 
 	public void updateMention(Mention m, Entity newEntity) {
@@ -56,7 +69,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		this.removeNodeFromParent(mentionMap.get(m));
 		mentionMap.remove(m);
 		connect(newEntity, m);
-		if (entityMentionMap.get(oldEntity).isEmpty()) {
+		if (entityMentionMap.get(oldEntity).isEmpty() && !keepEmptyEntities) {
 			removeEntity(oldEntity);
 		}
 
