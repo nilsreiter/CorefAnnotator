@@ -28,7 +28,7 @@ public class RenameEntityAction extends CRAction {
 	public void actionPerformed(ActionEvent e) {
 		String name = JOptionPane.showInputDialog("Enter the new name:");
 		EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
-		etn.setLabel(name);
+		etn.getFeatureStructure().setLabel(name);
 		model.nodeChanged(etn);
 	}
 

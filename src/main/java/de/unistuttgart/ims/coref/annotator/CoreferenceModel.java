@@ -61,10 +61,12 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	}
 
 	public void addEntityMention(int begin, int end) {
+		String covered = jcas.getDocumentText().substring(begin, end);
 		Entity e = new Entity(jcas);
 		e.setColor(colorMap.getNextColor().getRGB());
+		e.setLabel(covered);
 		e.addToIndexes();
-		EntityTreeNode tn = new EntityTreeNode(e, jcas.getDocumentText().substring(begin, end));
+		EntityTreeNode tn = new EntityTreeNode(e, covered);
 		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), 0);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {

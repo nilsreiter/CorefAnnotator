@@ -20,4 +20,8 @@ public class EntityTreeNode extends TreeNode<Entity> {
 		this.keyCode = keyCode;
 	}
 
+	@Override
+	public String getLabel() {
+		return getFeatureStructure().getLabel();
+	}
 }
