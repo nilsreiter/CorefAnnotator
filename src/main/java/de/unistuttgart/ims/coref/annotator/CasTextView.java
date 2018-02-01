@@ -46,6 +46,8 @@ public class CasTextView extends JPanel {
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
 		textPane.setText(dw.getJcas().getCas().getDocumentText());
 		textPane.addKeyListener(cModel);
+
+		textPane.setFont(textPane.getFont().deriveFont(0, 13));
 		hilit = new DefaultHighlighter();
 		textPane.setHighlighter(hilit);
 		add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
@@ -123,4 +125,5 @@ public class CasTextView extends JPanel {
 	public DocumentWindow getDocumentWindow() {
 		return documentWindow;
 	}
+
 }

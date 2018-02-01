@@ -57,6 +57,7 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 		tree.getSelectionModel().addTreeSelectionListener(this);
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
+		tree.setLargeModel(true);
 		tree.setPreferredSize(new Dimension(200, 600));
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setTransferHandler(new TransferHandler() {
@@ -110,7 +111,8 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 						if (entity == null)
 							treeModel.addEntityMention(pa.getBegin(), pa.getEnd());
 						else
-							treeModel.addLink((Entity) entity, pa.getBegin(), pa.getEnd());
+							tp = treeModel.addLink((Entity) entity, pa.getBegin(), pa.getEnd());
+						tree.expandPath(tp);
 
 					} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
 						FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();

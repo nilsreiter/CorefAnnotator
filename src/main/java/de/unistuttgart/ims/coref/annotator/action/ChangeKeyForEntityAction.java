@@ -17,7 +17,7 @@ public class ChangeKeyForEntityAction extends CRAction {
 
 	public ChangeKeyForEntityAction(CoreferenceModel cm, JTree tree) {
 		super(cm);
-		putValue(Action.NAME, "Change shortcut");
+		putValue(Action.NAME, "Shortcut");
 
 		this.tree = tree;
 

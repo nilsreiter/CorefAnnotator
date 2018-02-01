@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,8 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -135,6 +138,10 @@ public class DocumentWindow extends JFrame {
 			documentMenu.setEnabled(segmentAnnotation != null);
 		}
 
+		// View menu
+		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
+		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
+
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem("About");
 		JMenuItem helpMenuItem = new JMenuItem("Help");
@@ -209,6 +216,44 @@ public class DocumentWindow extends JFrame {
 
 	public CasTextView getViewer() {
 		return viewer;
+	}
+
+	class ViewFontSizeDecreaseAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewFontSizeDecreaseAction() {
+			super();
+			putValue(Action.NAME, "Decrease Font Size");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int oldSize = viewer.getTextPane().getFont().getSize();
+			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize - 1));
+		}
+
+	}
+
+	class ViewFontSizeIncreaseAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewFontSizeIncreaseAction() {
+			super();
+			putValue(Action.NAME, "Increase Font Size");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int oldSize = viewer.getTextPane().getFont().getSize();
+			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
+		}
+
 	}
 
 }

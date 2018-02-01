@@ -19,7 +19,7 @@ public class RenameEntityAction extends CRAction {
 
 	public RenameEntityAction(CoreferenceModel cm, JTree tree) {
 		super(cm);
-		putValue(Action.NAME, "Rename entity");
+		putValue(Action.NAME, "Rename");
 
 		this.tree = tree;
 	}

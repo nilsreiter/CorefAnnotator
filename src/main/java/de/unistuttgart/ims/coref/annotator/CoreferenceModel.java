@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -96,9 +97,10 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	}
 
-	public void addLink(Entity e, int begin, int end) {
+	public TreePath addLink(Entity e, int begin, int end) {
 		Mention m = AnnotationFactory.createAnnotation(jcas, begin, end, Mention.class);
 		connect(e, m);
+		return new TreePath(this.getPathToRoot(mentionMap.get(m)));
 	}
 
 	public JCas getJcas() {

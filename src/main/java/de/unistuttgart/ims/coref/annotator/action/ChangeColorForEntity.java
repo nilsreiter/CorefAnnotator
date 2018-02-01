@@ -17,7 +17,7 @@ public class ChangeColorForEntity extends CRAction {
 
 	public ChangeColorForEntity(CoreferenceModel cm, JTree tree) {
 		super(cm);
-		putValue(Action.NAME, "Change color");
+		putValue(Action.NAME, "Color");
 
 		this.tree = tree;
 	}

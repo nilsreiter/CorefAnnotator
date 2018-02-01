@@ -49,7 +49,7 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		Color color = getColor();
 		g.setColor(color == null ? c.getSelectionColor() : color);
 
-		g2.setStroke(new BasicStroke(3));
+		g2.setStroke(new BasicStroke(2));
 		g2.drawLine(r.x, r.y + r.height, r.x + r.width, r.y + r.height);
 
 		return r;
