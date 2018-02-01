@@ -195,14 +195,8 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener {
 				Entity e = etn.getFeatureStructure();
 				s.setIcon(treeModel.getIcon(e));
 
-				if (treeModel.getColorMap().containsKey(e)) {
-					// s.setBackground(treeModel.getColorMap().get(e));
-					s.setOpaque(false);
-					s.setText(s.getText() + " (" + (etn.getKeyCode()) + ")");
+				s.setText(s.getText() + " (" + (etn.getKeyCode()) + ")");
 
-				} else {
-					s.setOpaque(false);
-				}
 			} else {
 				s.setOpaque(false);
 			}

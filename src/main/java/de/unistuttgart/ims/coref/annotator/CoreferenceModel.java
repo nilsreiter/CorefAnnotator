@@ -62,6 +62,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	public void addEntityMention(int begin, int end) {
 		Entity e = new Entity(jcas);
+		e.setColor(colorMap.getNextColor().getRGB());
 		e.addToIndexes();
 		EntityTreeNode tn = new EntityTreeNode(e, jcas.getDocumentText().substring(begin, end));
 		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), 0);
@@ -124,11 +125,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	}
 
 	public DefaultHighlighter.DefaultHighlightPainter getPainter(Entity e) {
-		return new UnderlinePainter(colorMap.get(e));
+		return new UnderlinePainter(new Color(e.getColor()));
 	}
 
 	public Icon getIcon(Entity e) {
-		return new ColorIcon(colorMap.get(e));
+		return new ColorIcon(new Color(e.getColor()));
 	}
 
 	@Override
@@ -142,6 +143,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 
 	}
 
+	@Deprecated
 	public ColorMap getColorMap() {
 		return colorMap;
 	}
@@ -162,7 +164,8 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	}
 
 	public void updateColor(Entity entity, Color newColor) {
-		colorMap.put(entity, newColor);
+		// colorMap.put(entity, newColor);
+		entity.setColor(newColor.getRGB());
 		this.nodeChanged(entityMap.get(entity));
 		for (Mention m : entityMentionMap.get(entity))
 			textView.drawAnnotation(m);

@@ -26,7 +26,7 @@ public class ChangeColorForEntity extends CRAction {
 	public void actionPerformed(ActionEvent e) {
 
 		EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
-		Color color = model.getColorMap().get(etn.getFeatureStructure());
+		Color color = new Color(etn.getFeatureStructure().getColor());
 
 		Color newColor = JColorChooser.showDialog(null, "Choose new color", color);
 		model.updateColor(etn.getFeatureStructure(), newColor);
