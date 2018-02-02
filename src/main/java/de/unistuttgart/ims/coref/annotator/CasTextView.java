@@ -10,12 +10,14 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.fit.util.JCasUtil;
@@ -29,7 +31,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
-	JTextArea textPane;
+	JTextPane textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 
@@ -39,11 +41,9 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		super(new BorderLayout());
 		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
-		this.textPane = new JTextArea();
+		this.textPane = new JTextPane();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
-		textPane.setLineWrap(true);
-		textPane.setWrapStyleWord(true);
 		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
 
@@ -76,7 +76,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		}
 	}
 
-	public JTextArea getTextPane() {
+	public JTextComponent getTextPane() {
 		return textPane;
 	}
 
