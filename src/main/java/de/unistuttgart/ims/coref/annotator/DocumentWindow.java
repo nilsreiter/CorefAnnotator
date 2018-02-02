@@ -7,6 +7,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -32,8 +36,9 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -44,7 +49,9 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
-import de.unistuttgart.ims.coref.annotator.uima.ImportQuaDramA;
+import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
+import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 
 public class DocumentWindow extends JFrame {
 
@@ -52,6 +59,7 @@ public class DocumentWindow extends JFrame {
 	private static final String HELP_MESSAGE = "Instructions for using Xmi Viewer";
 
 	JCas jcas;
+	File file;
 	static Logger logger = Annotator.logger;
 	Annotator mainApplication;
 
@@ -99,7 +107,33 @@ public class DocumentWindow extends JFrame {
 		mainApplication.close(this);
 	}
 
-	public void loadFile(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle) {
+	public void loadFile(File file, CoreferenceFlavor flavor) {
+		this.file = file;
+		try {
+			logger.info("Loading XMI document from {}.", file);
+			loadStream(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
+					file.getName(), flavor);
+		} catch (FileNotFoundException e) {
+			logger.warn("File {} not found.", file);
+			mainApplication.warnDialog("File " + file.getAbsolutePath() + " could not be found.", "File not found");
+			e.printStackTrace();
+		} catch (ResourceInitializationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public synchronized void saveCurrentFile() {
+		try {
+			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(file));
+		} catch (FileNotFoundException | SAXException e) {
+			e.printStackTrace();
+			mainApplication.warnDialog(e.getMessage(), e.toString());
+		}
+	}
+
+	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
+			CoreferenceFlavor flavor) {
 		// load type system and CAS
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
@@ -124,7 +158,7 @@ public class DocumentWindow extends JFrame {
 			System.exit(1);
 		}
 		try {
-			SimplePipeline.runPipeline(jcas, AnalysisEngineFactory.createEngine(ImportQuaDramA.class));
+			SimplePipeline.runPipeline(jcas, flavor.getAnalysisEngine());
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			e1.printStackTrace();
 		}
@@ -171,6 +205,13 @@ public class DocumentWindow extends JFrame {
 			documentMenu.setEnabled(segmentAnnotation != null);
 		}
 
+		// file menu
+		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(new FileSaveAction(this));
+		JMenu fileImportMenu = new JMenu("Import from ...");
+		fileMenu.add(fileImportMenu);
+		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+
 		// View menu
 		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
@@ -181,8 +222,8 @@ public class DocumentWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				viewer.cModel.entitySortOrder = EntitySortOrder.Alphabet;
-				viewer.cModel.resort();
+				cModel.entitySortOrder = EntitySortOrder.Alphabet;
+				cModel.resort();
 
 			}
 		});
@@ -193,8 +234,8 @@ public class DocumentWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				viewer.cModel.entitySortOrder = EntitySortOrder.Mentions;
-				viewer.cModel.resort();
+				cModel.entitySortOrder = EntitySortOrder.Mentions;
+				cModel.resort();
 			}
 		});
 		ButtonGroup grp = new ButtonGroup();
@@ -210,8 +251,8 @@ public class DocumentWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				viewer.cModel.entitySortOrder.descending = !viewer.cModel.entitySortOrder.descending;
-				viewer.cModel.resort();
+				cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
+				cModel.resort();
 			}
 
 		}));

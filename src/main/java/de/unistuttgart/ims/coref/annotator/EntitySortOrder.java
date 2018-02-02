@@ -30,6 +30,8 @@ public enum EntitySortOrder {
 				public int compare(TreeNode<Entity> o1, TreeNode<Entity> o2) {
 					String l1 = o1.getFeatureStructure().getLabel();
 					String l2 = o2.getFeatureStructure().getLabel();
+					if (l1 == null || l2 == null)
+						return 0;
 					return (isDescending() ? -1 : 1) * l1.compareTo(l2);
 				}
 			};

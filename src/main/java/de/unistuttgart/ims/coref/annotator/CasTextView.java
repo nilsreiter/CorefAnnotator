@@ -32,8 +32,6 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	JTextArea textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
-	@Deprecated
-	CoreferenceModel cModel;
 
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 
@@ -48,7 +46,6 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		textPane.setWrapStyleWord(true);
 		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
-		textPane.addKeyListener(cModel);
 
 		textPane.setFont(textPane.getFont().deriveFont(0, 13));
 		textPane.setHighlighter(hilit);
@@ -132,7 +129,8 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 	@Override
 	public void modelCreated(CoreferenceModel model) {
-		this.cModel = model;
+		textPane.addKeyListener(model);
+
 	}
 
 	@Override

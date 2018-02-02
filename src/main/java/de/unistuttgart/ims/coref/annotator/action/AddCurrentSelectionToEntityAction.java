@@ -17,9 +17,9 @@ public class AddCurrentSelectionToEntityAction extends CRAction {
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		int b = this.model.getTextView().getTextPane().getSelectionStart();
-		int e = this.model.getTextView().getTextPane().getSelectionEnd();
-		model.addNewMention(entity, b, e);
+		// int b = this.model.getTextView().getTextPane().getSelectionStart();
+		// int e = this.model.getTextView().getTextPane().getSelectionEnd();
+		// model.addNewMention(entity, b, e);
 	}
 
 }

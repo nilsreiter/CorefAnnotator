@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,7 +9,9 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -44,17 +45,41 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	Configuration configuration;
 
 	TypeSystemDescription typeSystemDescription;
+	@Deprecated
 	TypeDescription mentionType;
+	@Deprecated
 	TypeDescription entityType;
 
+	JFileChooser openDialog;
+
 	public static void main(String[] args) throws UIMAException {
+
 		Annotator a = new Annotator();
-		a.open(new File("src/test/resources/rjmw.0.xmi"));
+		a.open(new File("src/test/resources/rjmw.0.xmi"), CoreferenceFlavor.Default);
 	}
 
 	public Annotator() throws ResourceInitializationException {
 		this.initialiseConfiguration();
 		this.initialiseTypeSystem();
+		this.initialiseDialogs();
+
+	}
+
+	private void initialiseDialogs() {
+		openDialog = new JFileChooser();
+		openDialog.setMultiSelectionEnabled(true);
+		openDialog.setFileFilter(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().endsWith(".xmi");
+			}
+
+			@Override
+			public String getDescription() {
+				return "UIMA Xmi Files";
+			}
+		});
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {
@@ -107,7 +132,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	}
 
-	public synchronized DocumentWindow open(final File file) {
+	public synchronized DocumentWindow open(final File file, CoreferenceFlavor flavor) {
 		final DocumentWindow v = new DocumentWindow(this);
 
 		/*
@@ -115,18 +140,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		 * 
 		 * @Override public void run() {
 		 */
-		try {
-			logger.info("Loading XMI document from {}.", file);
-			v.loadFile(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
-					file.getName());
-		} catch (FileNotFoundException e) {
-			logger.warn("File {} not found.", file);
-			warnDialog("File " + file.getAbsolutePath() + " could not be found.", "File not found");
-			e.printStackTrace();
-		} catch (ResourceInitializationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		logger.info("Loading XMI document from {}.", file);
+		v.loadFile(file, flavor);
 		/*
 		 * } }.run();
 		 */
@@ -143,7 +158,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void openFiles(OpenFilesEvent e) {
 		for (Object file : e.getFiles()) {
 			if (file instanceof File) {
-				open((File) file);
+				open((File) file, CoreferenceFlavor.Default);
 			}
 		}
 	}
@@ -175,6 +190,20 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public void warnDialog(String message, String title) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
+	}
+
+	public void fileOpenDialog(CoreferenceFlavor flavor) {
+		int r = openDialog.showOpenDialog(null);
+		switch (r) {
+		case JFileChooser.APPROVE_OPTION:
+			for (File f : openDialog.getSelectedFiles()) {
+				open(f, flavor);
+			}
+			break;
+		default:
+			if (openFiles.isEmpty())
+				handleQuitRequestWith(null, null);
+		}
 	}
 
 }

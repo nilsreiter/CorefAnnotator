@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -27,8 +28,6 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	JCas jcas;
-	@Deprecated
-	CasTextView textView;
 	private static final long serialVersionUID = 1L;
 	Map<Entity, EntityTreeNode> entityMap = new HashMap<Entity, EntityTreeNode>();
 	Map<Mention, TreeNode<Mention>> mentionMap = new HashMap<Mention, TreeNode<Mention>>();
@@ -53,7 +52,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		super(new TreeNode<TOP>(null, "Add new entity"));
 		this.rootNode = (TreeNode<TOP>) getRoot();
 		this.jcas = jcas;
-		// this.textView = ctw;
 
 	}
 
@@ -146,19 +144,15 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		return jcas;
 	}
 
-	public CasTextView getTextView() {
-		return textView;
-	}
-
 	@Override
 	public void keyTyped(KeyEvent e) {
 		System.err.println("keychar: " + e.getKeyChar());
+		JTextArea ta = (JTextArea) e.getSource();
 		if (keyMap.containsKey(e.getKeyChar())) {
 			e.consume();
-			addNewMention(keyMap.get(e.getKeyChar()), textView.getTextPane().getSelectionStart(),
-					textView.getTextPane().getSelectionEnd());
+			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
 		} else if (e.getKeyChar() == 'n') {
-			addNewEntityMention(textView.getTextPane().getSelectionStart(), textView.getTextPane().getSelectionEnd());
+			addNewEntityMention(ta.getSelectionStart(), ta.getSelectionEnd());
 		}
 	}
 
@@ -224,7 +218,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		entity.setColor(newColor.getRGB());
 		this.nodeChanged(entityMap.get(entity));
 		for (Mention m : entityMentionMap.get(entity))
-			textView.drawAnnotation(m);
+			fireMentionChangedEvent(m);
 	}
 
 	public void fireMentionChangedEvent(Mention m) {

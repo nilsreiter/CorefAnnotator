@@ -231,16 +231,16 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 					if (entity == null)
-						treeModel.addNewEntityMention(pa.getBegin(), pa.getEnd());
+						((CoreferenceModel) tree.getModel()).addNewEntityMention(pa.getBegin(), pa.getEnd());
 					else
-						treeModel.addNewMention((Entity) entity, pa.getBegin(), pa.getEnd());
+						((CoreferenceModel) tree.getModel()).addNewMention((Entity) entity, pa.getBegin(), pa.getEnd());
 
 				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
 					FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
 
 					TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
-					treeModel.updateMention(m.getFeatureStructure(), (Entity) entity);
+					((CoreferenceModel) tree.getModel()).updateMention(m.getFeatureStructure(), (Entity) entity);
 
 				}
 
