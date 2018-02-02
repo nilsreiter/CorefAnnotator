@@ -52,6 +52,7 @@ import com.apple.eawt.QuitResponse;
 import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 
 public class DocumentWindow extends JFrame {
 
@@ -84,8 +85,8 @@ public class DocumentWindow extends JFrame {
 	public DocumentWindow(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
-		this.initialiseWindow();
 		this.initialiseMenu();
+		this.initialiseWindow();
 
 	}
 
@@ -211,6 +212,9 @@ public class DocumentWindow extends JFrame {
 		JMenu fileImportMenu = new JMenu("Import from ...");
 		fileMenu.add(fileImportMenu);
 		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+
+		// tools menu
+		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
 
 		// View menu
 		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
