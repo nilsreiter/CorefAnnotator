@@ -84,8 +84,8 @@ public class DocumentWindow extends JFrame {
 	public DocumentWindow(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
-		this.initialiseMenu();
 		this.initialiseWindow();
+		this.initialiseMenu();
 
 	}
 

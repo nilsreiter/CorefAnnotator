@@ -136,6 +136,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		mentionMap.put(m, tn);
 		int ind = 0;
 		while (ind < entityMap.get(e).getChildCount()) {
+			@SuppressWarnings("unchecked")
 			TreeNode<Mention> node = (TreeNode<Mention>) entityMap.get(e).getChildAt(ind);
 			if (node.getFeatureStructure().getBegin() > m.getBegin())
 				break;

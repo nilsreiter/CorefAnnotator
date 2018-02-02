@@ -1,11 +1,14 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.JColorChooser;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.EntityTreeNode;
@@ -18,7 +21,8 @@ public class ChangeColorForEntity extends CRAction {
 	public ChangeColorForEntity(CoreferenceModel cm, JTree tree) {
 		super(cm);
 		putValue(Action.NAME, "Color");
-
+		putValue(Action.ACCELERATOR_KEY,
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		this.tree = tree;
 	}
 
