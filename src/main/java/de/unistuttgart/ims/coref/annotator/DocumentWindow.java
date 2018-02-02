@@ -198,7 +198,7 @@ public class DocumentWindow extends JFrame {
 		JMenu helpMenu = new JMenu("Help");
 		JMenu viewMenu = new JMenu("View");
 		JMenu toolsMenu = new JMenu("Tools");
-		JMenu debugMenu = new JMenu("Debug");
+		// JMenu debugMenu = new JMenu("Debug");
 		windowsMenu = new JMenu("Windows");
 		if (segmentAnnotation != null) {
 			documentMenu = new JMenu("Document");
