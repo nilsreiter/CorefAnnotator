@@ -8,7 +8,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.unistuttgart.ims.coref.annotator.uima.ImportQuaDramA;
 
 public enum CoreferenceFlavor {
-	Default, QuaDramA, DKpro;
+	Default, QuaDramA, DKpro, AutoDetect;
 
 	public AnalysisEngine getAnalysisEngine() throws ResourceInitializationException {
 		switch (this) {

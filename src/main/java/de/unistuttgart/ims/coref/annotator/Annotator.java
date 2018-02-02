@@ -154,6 +154,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void close(DocumentWindow viewer) {
 		openFiles.remove(viewer);
 		viewer.dispose();
+		if (openFiles.isEmpty())
+			this.fileOpenDialog(CoreferenceFlavor.Default);
 	};
 
 	@Override
@@ -195,6 +197,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public void fileOpenDialog(CoreferenceFlavor flavor) {
+		openDialog.setDialogTitle("Open files using " + flavor.name() + " scheme");
 		int r = openDialog.showOpenDialog(null);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:

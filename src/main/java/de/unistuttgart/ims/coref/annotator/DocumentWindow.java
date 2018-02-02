@@ -206,12 +206,25 @@ public class DocumentWindow extends JFrame {
 			documentMenu.setEnabled(segmentAnnotation != null);
 		}
 
+		// Menu Items
+		JMenuItem aboutMenuItem = new JMenuItem("About");
+		JMenuItem helpMenuItem = new JMenuItem("Help");
+		JMenuItem exitMenuItem = new JMenuItem("Quit");
+		recentMenu = new JMenu("Open Recent");
+		JMenuItem closeMenuItem = new JMenuItem("Close");
+		closeMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
 		// file menu
 		fileMenu.add(new FileOpenAction(mainApplication));
+
 		fileMenu.add(new FileSaveAction(this));
 		JMenu fileImportMenu = new JMenu("Import from ...");
 		fileMenu.add(fileImportMenu);
 		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+
+		fileMenu.add(closeMenuItem);
+		fileMenu.add(exitMenuItem);
 
 		// tools menu
 		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
@@ -260,15 +273,6 @@ public class DocumentWindow extends JFrame {
 			}
 
 		}));
-
-		// Menu Items
-		JMenuItem aboutMenuItem = new JMenuItem("About");
-		JMenuItem helpMenuItem = new JMenuItem("Help");
-		JMenuItem exitMenuItem = new JMenuItem("Quit");
-		recentMenu = new JMenu("Open Recent");
-		JMenuItem closeMenuItem = new JMenuItem("Close");
-		closeMenuItem.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		menuBar.add(fileMenu);
 		menuBar.add(viewMenu);
