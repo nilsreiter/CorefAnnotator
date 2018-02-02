@@ -28,7 +28,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.tools.cvd.ColorIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
@@ -42,10 +41,6 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 
 	DocumentWindow documentWindow;
 	JTree tree;
-	@Deprecated
-	CoreferenceModel treeModel;
-	@Deprecated
-	TreeNode<TOP> rootNode;
 	Map<Long, Mention> mentionCache;
 
 	AbstractAction renameAction;
