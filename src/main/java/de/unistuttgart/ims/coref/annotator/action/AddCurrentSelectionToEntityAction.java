@@ -19,7 +19,7 @@ public class AddCurrentSelectionToEntityAction extends CRAction {
 	public void actionPerformed(ActionEvent evt) {
 		int b = this.model.getTextView().getTextPane().getSelectionStart();
 		int e = this.model.getTextView().getTextPane().getSelectionEnd();
-		model.addLink(entity, b, e);
+		model.addNewMention(entity, b, e);
 	}
 
 }

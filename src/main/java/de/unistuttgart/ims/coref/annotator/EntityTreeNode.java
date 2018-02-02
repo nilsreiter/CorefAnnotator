@@ -6,13 +6,13 @@ public class EntityTreeNode extends TreeNode<Entity> {
 
 	private static final long serialVersionUID = 1L;
 
-	char keyCode;
+	Character keyCode = null;
 
 	public EntityTreeNode(Entity featureStructure, String label) {
 		super(featureStructure, label);
 	}
 
-	public char getKeyCode() {
+	public Character getKeyCode() {
 		return keyCode;
 	}
 

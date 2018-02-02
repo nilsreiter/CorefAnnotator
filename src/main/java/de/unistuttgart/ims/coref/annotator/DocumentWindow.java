@@ -9,6 +9,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -27,7 +29,6 @@ import javax.swing.UIManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
@@ -56,18 +57,42 @@ public class DocumentWindow extends JFrame {
 
 	String segmentAnnotation = null;
 
-	CasTextView viewer;
+	// controller
+	CoreferenceModel cModel;
 
 	// Window components
+	CasTextView viewer;
+	DetailsPanel panel;
+
+	// Menu components
 	JMenuBar menuBar = new JMenuBar();
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
 
+	// Listeners
+	List<LoadingListener> loadingListeners = new LinkedList<LoadingListener>();
+
 	public DocumentWindow(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
-		this.initialise();
+		this.initialiseMenu();
+		this.initialiseWindow();
+
+	}
+
+	public void initialiseWindow() {
+		viewer = new CasTextView(this);
+		panel = new DetailsPanel(this);
+
+		loadingListeners.add(panel);
+		loadingListeners.add(viewer);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
+
+		getContentPane().add(splitPane);
+		pack();
+		setVisible(true);
 	}
 
 	protected void closeWindow(boolean quit) {
@@ -76,7 +101,6 @@ public class DocumentWindow extends JFrame {
 
 	public void loadFile(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle) {
 		// load type system and CAS
-		CAS cas = null;
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
 
@@ -104,8 +128,7 @@ public class DocumentWindow extends JFrame {
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			e1.printStackTrace();
 		}
-
-		cas = jcas.getCas();
+		this.fireJCasLoadedEvent();
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
@@ -123,20 +146,13 @@ public class DocumentWindow extends JFrame {
 			logger.error(e.getMessage());
 		}
 
-		viewer = new CasTextView(this);
-		// assembly of the main view
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer,
-				new DetailsPanel(this, viewer.cModel));
-		// JTabbedPane tabbedPane = new JTabbedPane();
-		// tabbedPane.add("Viewer", viewer);
-
-		getContentPane().add(splitPane);
-		pack();
-		setVisible(true);
-		viewer.cModel.importExistingData();
+		this.cModel = new CoreferenceModel(jcas);
+		this.cModel.addCoreferenceModelListener(viewer);
+		this.cModel.importExistingData();
+		this.fireModelCreatedEvent();
 	}
 
-	protected void initialise() {
+	protected void initialiseMenu() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -189,6 +205,8 @@ public class DocumentWindow extends JFrame {
 		viewMenu.add(sortMentionsButton);
 
 		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -310,6 +328,16 @@ public class DocumentWindow extends JFrame {
 			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
 		}
 
+	}
+
+	protected void fireModelCreatedEvent() {
+		for (LoadingListener ll : loadingListeners)
+			ll.modelCreated(cModel);
+	}
+
+	protected void fireJCasLoadedEvent() {
+		for (LoadingListener ll : loadingListeners)
+			ll.jcasLoaded(jcas);
 	}
 
 }

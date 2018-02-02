@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.datatransfer.Transferable;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.TransferHandler;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -21,7 +24,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class CasTextView extends JPanel {
+public class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener, TreeModelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,6 +32,7 @@ public class CasTextView extends JPanel {
 	JTextArea textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
+	@Deprecated
 	CoreferenceModel cModel;
 
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
@@ -37,7 +41,6 @@ public class CasTextView extends JPanel {
 		super(new BorderLayout());
 		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
-		this.cModel = new CoreferenceModel(documentWindow.getJcas(), this);
 		this.textPane = new JTextArea();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -45,7 +48,6 @@ public class CasTextView extends JPanel {
 		textPane.setWrapStyleWord(true);
 		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
-		textPane.setText(dw.getJcas().getCas().getDocumentText());
 		textPane.addKeyListener(cModel);
 
 		textPane.setFont(textPane.getFont().deriveFont(0, 13));
@@ -68,7 +70,8 @@ public class CasTextView extends JPanel {
 		if (hi != null)
 			hilit.removeHighlight(hi);
 		try {
-			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), cModel.getPainter(a.getEntity()));
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
+					new UnderlinePainter(new Color(a.getEntity().getColor())));
 			highlightMap.put(a, hi);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -84,13 +87,7 @@ public class CasTextView extends JPanel {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
 		for (Mention m : JCasUtil.select(getJCas(), Mention.class)) {
-			try {
-				Object o = hilit.addHighlight(m.getBegin(), m.getEnd(), cModel.getPainter(m.getEntity()));
-				highlightMap.put(m, o);
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
-
+			drawAnnotation(m);
 		}
 	}
 
@@ -124,6 +121,53 @@ public class CasTextView extends JPanel {
 
 	public DocumentWindow getDocumentWindow() {
 		return documentWindow;
+	}
+
+	@Override
+	public void jcasLoaded(JCas jcas) {
+		textPane.setEditable(true);
+		textPane.setText(jcas.getDocumentText());
+		textPane.setEditable(false);
+	}
+
+	@Override
+	public void modelCreated(CoreferenceModel model) {
+		this.cModel = model;
+	}
+
+	@Override
+	public void mentionAdded(Mention m) {
+		drawAnnotation(m);
+	}
+
+	@Override
+	public void mentionChanged(Mention m) {
+		drawAnnotation(m);
+	}
+
+	@Override
+	public void treeNodesChanged(TreeModelEvent e) {
+
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void treeNodesInserted(TreeModelEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void treeNodesRemoved(TreeModelEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void treeStructureChanged(TreeModelEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
