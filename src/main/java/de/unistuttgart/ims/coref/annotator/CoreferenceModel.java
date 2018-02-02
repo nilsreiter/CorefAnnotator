@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -26,7 +29,7 @@ import org.apache.uima.tools.cvd.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
+public class CoreferenceModel extends DefaultTreeModel implements KeyListener, TreeSelectionListener {
 	JCas jcas;
 	private static final long serialVersionUID = 1L;
 	Map<Entity, EntityTreeNode> entityMap = new HashMap<Entity, EntityTreeNode>();
@@ -35,7 +38,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
 
-	List<CoreferenceModelListener> listeners = new LinkedList<CoreferenceModelListener>();
+	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
 	int key = 0;
 
@@ -131,7 +134,15 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 		entityMentionMap.put(e, m);
 		TreeNode<Mention> tn = new TreeNode<Mention>(m, m.getCoveredText());
 		mentionMap.put(m, tn);
-		this.insertNodeInto(tn, entityMap.get(e), 0);
+		int ind = 0;
+		while (ind < entityMap.get(e).getChildCount()) {
+			TreeNode<Mention> node = (TreeNode<Mention>) entityMap.get(e).getChildAt(ind);
+			if (node.getFeatureStructure().getBegin() > m.getBegin())
+				break;
+			ind++;
+		}
+
+		this.insertNodeInto(tn, entityMap.get(e), ind);
 	}
 
 	public void addNewMention(Entity e, int begin, int end) {
@@ -222,22 +233,42 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	}
 
 	public void fireMentionChangedEvent(Mention m) {
-		for (CoreferenceModelListener l : listeners)
+		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionChanged(m);
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
-		for (CoreferenceModelListener l : listeners)
+		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionAdded(m);
+	}
 
+	public void fireMentionSelectedEvent(Mention m) {
+		for (CoreferenceModelListener l : crModelListeners)
+			l.mentionSelected(m);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
-		return listeners.add(e);
+		return crModelListeners.add(e);
 	}
 
 	public boolean removeCoreferenceModelListener(Object o) {
-		return listeners.remove(o);
+		return crModelListeners.remove(o);
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		TreePath tp = e.getNewLeadSelectionPath();
+		if (tp != null) {
+			if (tp.getPathCount() == 3) {
+				@SuppressWarnings("unchecked")
+				TreeNode<Mention> tn = (TreeNode<Mention>) tp.getLastPathComponent();
+				Mention m = tn.getFeatureStructure();
+				fireMentionSelectedEvent(m);
+			} else {
+				fireMentionSelectedEvent(null);
+			}
+		}
+
 	}
 
 }

@@ -6,4 +6,7 @@ public interface CoreferenceModelListener {
 	public void mentionAdded(Mention m);
 
 	public void mentionChanged(Mention m);
+
+	public void mentionSelected(Mention m);
+
 }

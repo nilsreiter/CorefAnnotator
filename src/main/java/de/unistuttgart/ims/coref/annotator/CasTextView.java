@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -26,7 +24,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener, TreeModelListener {
+public class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,6 +34,8 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	Highlighter.HighlightPainter painter;
 
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+
+	Object selectionHighlight = null;
 
 	public CasTextView(DocumentWindow dw) {
 		super(new BorderLayout());
@@ -144,28 +144,19 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	}
 
 	@Override
-	public void treeNodesChanged(TreeModelEvent e) {
-
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void treeNodesInserted(TreeModelEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void treeNodesRemoved(TreeModelEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void treeStructureChanged(TreeModelEvent e) {
-		// TODO Auto-generated method stub
-
+	public void mentionSelected(Mention m) {
+		if (m != null)
+			textPane.setCaretPosition(m.getEnd());
+		try {
+			if (selectionHighlight != null)
+				hilit.removeHighlight(selectionHighlight);
+			if (m != null)
+				selectionHighlight = hilit.addHighlight(m.getBegin(), m.getEnd(),
+						new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY));
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
