@@ -261,6 +261,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void removeMention(Mention m) {
+		@SuppressWarnings("unchecked")
 		TreeNode<Entity> parent = (TreeNode<Entity>) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));

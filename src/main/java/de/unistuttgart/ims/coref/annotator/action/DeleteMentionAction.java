@@ -24,6 +24,7 @@ public class DeleteMentionAction extends CRAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		@SuppressWarnings("unchecked")
 		TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
 		model.removeMention(tn.getFeatureStructure());
 	}

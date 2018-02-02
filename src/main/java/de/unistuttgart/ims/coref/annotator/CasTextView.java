@@ -119,7 +119,6 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 		@Override
 		public boolean canImport(TransferHandler.TransferSupport info) {
-			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
 
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 
