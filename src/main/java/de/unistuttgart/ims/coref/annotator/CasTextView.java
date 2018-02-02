@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.JTextArea;
 import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -29,7 +29,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
-	JTextPane textPane;
+	JTextArea textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 
@@ -41,7 +41,9 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		super(new BorderLayout());
 		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
-		this.textPane = new JTextPane();
+		this.textPane = new JTextArea();
+		this.textPane.setWrapStyleWord(true);
+		this.textPane.setLineWrap(true);
 		this.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -128,7 +130,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	}
 
 	@Override
-	public void modelCreated(CoreferenceModel model) {
+	public void modelCreated(CoreferenceModel model, DocumentWindow dw) {
 		textPane.addKeyListener(model);
 
 	}

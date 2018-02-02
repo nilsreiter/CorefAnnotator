@@ -5,5 +5,5 @@ import org.apache.uima.jcas.JCas;
 public interface LoadingListener {
 	public void jcasLoaded(JCas jcas);
 
-	public void modelCreated(CoreferenceModel model);
+	public void modelCreated(CoreferenceModel model, DocumentWindow documentWindow);
 }

@@ -10,10 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Icon;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -24,7 +22,6 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
-import org.apache.uima.tools.cvd.ColorIcon;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -163,35 +160,21 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		if (keyMap.containsKey(e.getKeyChar())) {
 			e.consume();
 			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
-		} else if (e.getKeyChar() == 'n') {
-			addNewEntityMention(ta.getSelectionStart(), ta.getSelectionEnd());
-		}
-	}
-
-	@Deprecated
-	public DefaultHighlighter.DefaultHighlightPainter getPainter(Entity e) {
-		return new UnderlinePainter(new Color(e.getColor()));
-	}
-
-	@Deprecated
-	public Icon getIcon(Entity e) {
-		return new ColorIcon(new Color(e.getColor()));
+		} /*
+			 * else if (e.getKeyChar() == 'n') {
+			 * addNewEntityMention(ta.getSelectionStart(),
+			 * ta.getSelectionEnd()); }
+			 */
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 
-	}
-
-	@Deprecated
-	public ColorMap getColorMap() {
-		return colorMap;
 	}
 
 	public boolean isKeyUsed(int i) {

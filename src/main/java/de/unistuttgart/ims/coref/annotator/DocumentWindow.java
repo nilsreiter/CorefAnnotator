@@ -29,6 +29,10 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.UIMAException;
@@ -49,14 +53,18 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
+import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportCRETAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportDKproAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 
-public class DocumentWindow extends JFrame {
+public class DocumentWindow extends JFrame implements CaretListener, TreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Xmi Viewer";
@@ -67,6 +75,12 @@ public class DocumentWindow extends JFrame {
 	Annotator mainApplication;
 
 	String segmentAnnotation = null;
+
+	// actions
+	NewEntityAction newEntityAction;
+	RenameEntityAction renameEntityAction;
+	ChangeKeyForEntityAction changeKeyForEntityAction;
+	ChangeColorForEntity changeColorForEntityAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -80,7 +94,7 @@ public class DocumentWindow extends JFrame {
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
-
+	JMenu entityMenu;
 	// Listeners
 	List<LoadingListener> loadingListeners = new LinkedList<LoadingListener>();
 
@@ -98,6 +112,7 @@ public class DocumentWindow extends JFrame {
 
 		loadingListeners.add(panel);
 		loadingListeners.add(viewer);
+		viewer.textPane.addCaretListener(panel);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
 
@@ -187,6 +202,19 @@ public class DocumentWindow extends JFrame {
 		this.cModel.addCoreferenceModelListener(viewer);
 		this.cModel.importExistingData();
 		this.fireModelCreatedEvent();
+		this.initialiseMenuAfterModelCreation();
+	}
+
+	protected void initialiseMenuAfterModelCreation() {
+		this.newEntityAction = new NewEntityAction(cModel, viewer.getTextPane());
+		this.changeColorForEntityAction = new ChangeColorForEntity(cModel, panel.tree);
+		this.changeKeyForEntityAction = new ChangeKeyForEntityAction(cModel, panel.tree);
+		this.renameEntityAction = new RenameEntityAction(cModel, panel.tree);
+
+		entityMenu.add(new JMenuItem(newEntityAction));
+		entityMenu.add(new JMenuItem(changeColorForEntityAction));
+		entityMenu.add(new JMenuItem(changeKeyForEntityAction));
+		entityMenu.add(new JMenuItem(renameEntityAction));
 	}
 
 	protected void initialiseMenu() {
@@ -201,6 +229,7 @@ public class DocumentWindow extends JFrame {
 		JMenu helpMenu = new JMenu("Help");
 		JMenu viewMenu = new JMenu("View");
 		JMenu toolsMenu = new JMenu("Tools");
+		entityMenu = new JMenu("Entities");
 		// JMenu debugMenu = new JMenu("Debug");
 		windowsMenu = new JMenu("Windows");
 		if (segmentAnnotation != null) {
@@ -279,6 +308,8 @@ public class DocumentWindow extends JFrame {
 		}));
 
 		menuBar.add(fileMenu);
+		menuBar.add(entityMenu);
+
 		menuBar.add(viewMenu);
 		menuBar.add(toolsMenu);
 		if (segmentAnnotation != null)
@@ -385,12 +416,24 @@ public class DocumentWindow extends JFrame {
 
 	protected void fireModelCreatedEvent() {
 		for (LoadingListener ll : loadingListeners)
-			ll.modelCreated(cModel);
+			ll.modelCreated(cModel, this);
 	}
 
 	protected void fireJCasLoadedEvent() {
 		for (LoadingListener ll : loadingListeners)
 			ll.jcasLoaded(jcas);
+	}
+
+	@Override
+	public void caretUpdate(CaretEvent e) {
+
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		this.changeColorForEntityAction.setEnabled(e.getPath().getPathCount() == 2);
+		this.changeKeyForEntityAction.setEnabled(e.getPath().getPathCount() == 2);
+		this.renameEntityAction.setEnabled(e.getPath().getPathCount() == 2);
 	}
 
 }

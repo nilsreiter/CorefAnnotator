@@ -3,8 +3,10 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Map;
 
@@ -16,8 +18,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -32,11 +37,13 @@ import org.apache.uima.tools.cvd.ColorIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeModelListener, LoadingListener {
+public class DetailsPanel extends JPanel
+		implements TreeSelectionListener, TreeModelListener, LoadingListener, CaretListener {
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
@@ -46,10 +53,12 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
 	AbstractAction changeColorAction;
+	AbstractAction newEntityAction;
 
 	JButton renameActionButton;
 	JButton changeKeyActionButton;
 	JButton changeColorActionButton;
+	JButton newEntityActionButton;
 
 	public DetailsPanel(DocumentWindow dw) {
 		super(new BorderLayout());
@@ -75,10 +84,15 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 
 		JPanel controls = new JPanel();
 
+		newEntityActionButton = new JButton("new");
+		newEntityActionButton.setEnabled(false);
+		newEntityActionButton.setMnemonic(KeyStroke
+				.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()).getKeyCode());
 		renameActionButton = new JButton("rename");
 		changeKeyActionButton = new JButton("change key");
 		changeColorActionButton = new JButton("rename");
 
+		controls.add(newEntityActionButton);
 		controls.add(renameActionButton);
 		controls.add(changeKeyActionButton);
 		controls.add(changeColorActionButton);
@@ -160,7 +174,7 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 	}
 
 	@Override
-	public void modelCreated(CoreferenceModel model) {
+	public void modelCreated(CoreferenceModel model, DocumentWindow dw) {
 		model.addTreeModelListener(this);
 
 		renameAction = new RenameEntityAction(model, tree);
@@ -174,6 +188,10 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 		changeColorAction = new ChangeColorForEntity(model, tree);
 		changeColorAction.setEnabled(false);
 		changeColorActionButton.setAction(changeColorAction);
+
+		newEntityAction = new NewEntityAction(model, dw.viewer.textPane);
+		newEntityAction.setEnabled(true);
+		newEntityActionButton.setAction(newEntityAction);
 
 		tree.setModel(model);
 		tree.addTreeSelectionListener(model);
@@ -268,6 +286,11 @@ public class DetailsPanel extends JPanel implements TreeSelectionListener, TreeM
 			return new NodeTransferable<Mention>(tn);
 		}
 
+	}
+
+	@Override
+	public void caretUpdate(CaretEvent e) {
+		newEntityAction.setEnabled(e.getDot() != e.getMark());
 	}
 
 }
