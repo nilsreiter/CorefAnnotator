@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.datatransfer.Transferable;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,6 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
 import javax.swing.event.TreeModelEvent;
@@ -42,9 +42,9 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
 		this.textPane = new JTextPane();
+		this.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
-		textPane.setSize(400, 600);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
 
 		textPane.setFont(textPane.getFont().deriveFont(0, 13));
@@ -105,7 +105,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 		@Override
 		public Transferable createTransferable(JComponent comp) {
-			JTextArea t = (JTextArea) comp;
+			JTextComponent t = (JTextComponent) comp;
 			return new PotentialAnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
 		}
 

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
@@ -147,7 +147,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 		System.err.println("keychar: " + e.getKeyChar());
-		JTextArea ta = (JTextArea) e.getSource();
+		JTextComponent ta = (JTextComponent) e.getSource();
 		if (keyMap.containsKey(e.getKeyChar())) {
 			e.consume();
 			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
