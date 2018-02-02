@@ -112,7 +112,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		loadingListeners.add(panel);
 		loadingListeners.add(viewer);
-		viewer.textPane.addCaretListener(panel);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
 

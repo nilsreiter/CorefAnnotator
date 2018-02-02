@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -29,7 +29,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow documentWindow;
-	JTextArea textPane;
+	JTextPane textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 
@@ -41,9 +41,9 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		super(new BorderLayout());
 		this.hilit = new DefaultHighlighter();
 		this.documentWindow = dw;
-		this.textPane = new JTextArea();
-		this.textPane.setWrapStyleWord(true);
-		this.textPane.setLineWrap(true);
+		this.textPane = new JTextPane();
+		// this.textPane.setWrapStyleWord(true);
+		// this.textPane.setLineWrap(true);
 		this.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -116,6 +116,29 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 			// TODO: export an Annotation object
 			drawAnnotations();
 		}
+
+		@Override
+		public boolean canImport(TransferHandler.TransferSupport info) {
+			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
+
+			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+
+			}
+			return false;
+		}
+
+		@Override
+		public boolean importData(TransferHandler.TransferSupport info) {
+			if (!info.isDrop()) {
+				return false;
+			}
+			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
+			dl.getDropPoint();
+
+			int index = dl.getIndex();
+			System.err.println(index);
+			return false;
+		}
 	}
 
 	public DocumentWindow getDocumentWindow() {
@@ -124,15 +147,14 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 	@Override
 	public void jcasLoaded(JCas jcas) {
-		textPane.setEditable(true);
-		textPane.setText(jcas.getDocumentText());
-		textPane.setEditable(false);
+		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
+
 	}
 
 	@Override
 	public void modelCreated(CoreferenceModel model, DocumentWindow dw) {
 		textPane.addKeyListener(model);
-
+		textPane.setCaretPosition(0);
 	}
 
 	@Override
@@ -143,6 +165,11 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	@Override
 	public void mentionChanged(Mention m) {
 		drawAnnotation(m);
+	}
+
+	@Override
+	public void mentionRemoved(Mention m) {
+		hilit.removeHighlight(highlightMap.get(m));
 	}
 
 	@Override

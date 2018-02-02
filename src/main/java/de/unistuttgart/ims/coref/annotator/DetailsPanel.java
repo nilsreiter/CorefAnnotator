@@ -3,10 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Toolkit;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Map;
 
@@ -18,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.CaretEvent;
@@ -37,6 +34,7 @@ import org.apache.uima.tools.cvd.ColorIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -54,11 +52,13 @@ public class DetailsPanel extends JPanel
 	AbstractAction changeKeyAction;
 	AbstractAction changeColorAction;
 	AbstractAction newEntityAction;
+	AbstractAction deleteMentionAction;
 
 	JButton renameActionButton;
 	JButton changeKeyActionButton;
 	JButton changeColorActionButton;
 	JButton newEntityActionButton;
+	JButton deleteMentionActionButton;
 
 	public DetailsPanel(DocumentWindow dw) {
 		super(new BorderLayout());
@@ -86,16 +86,16 @@ public class DetailsPanel extends JPanel
 
 		newEntityActionButton = new JButton("new");
 		newEntityActionButton.setEnabled(false);
-		newEntityActionButton.setMnemonic(KeyStroke
-				.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()).getKeyCode());
 		renameActionButton = new JButton("rename");
 		changeKeyActionButton = new JButton("change key");
 		changeColorActionButton = new JButton("rename");
+		deleteMentionActionButton = new JButton("delete mention");
 
 		controls.add(newEntityActionButton);
 		controls.add(renameActionButton);
 		controls.add(changeKeyActionButton);
 		controls.add(changeColorActionButton);
+		controls.add(deleteMentionActionButton);
 		this.add(controls, BorderLayout.NORTH);
 	}
 
@@ -141,7 +141,7 @@ public class DetailsPanel extends JPanel
 			renameAction.setEnabled(tp.getPathCount() == 2);
 			changeKeyAction.setEnabled(tp.getPathCount() == 2);
 			changeColorAction.setEnabled(tp.getPathCount() == 2);
-
+			deleteMentionAction.setEnabled(tp.getPathCount() == 3);
 		}
 	}
 
@@ -193,8 +193,14 @@ public class DetailsPanel extends JPanel
 		newEntityAction.setEnabled(true);
 		newEntityActionButton.setAction(newEntityAction);
 
+		deleteMentionAction = new DeleteMentionAction(model, tree);
+		deleteMentionAction.setEnabled(true);
+		deleteMentionActionButton.setAction(deleteMentionAction);
+
 		tree.setModel(model);
 		tree.addTreeSelectionListener(model);
+
+		dw.viewer.textPane.addCaretListener(this);
 
 	}
 

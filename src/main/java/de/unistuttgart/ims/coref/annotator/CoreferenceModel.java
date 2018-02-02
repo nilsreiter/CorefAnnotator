@@ -226,6 +226,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			l.mentionAdded(m);
 	}
 
+	public void fireMentionRemovedEvent(Mention m) {
+		for (CoreferenceModelListener l : crModelListeners)
+			l.mentionRemoved(m);
+	}
+
 	public void fireMentionSelectedEvent(Mention m) {
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionSelected(m);
@@ -253,6 +258,17 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			}
 		}
 
+	}
+
+	public void removeMention(Mention m) {
+		TreeNode<Entity> parent = (TreeNode<Entity>) mentionMap.get(m).getParent();
+		int index = parent.getIndex(mentionMap.get(m));
+		parent.remove(mentionMap.get(m));
+		nodesWereRemoved(parent, new int[] { index }, new Object[] { mentionMap.get(m) });
+		fireMentionRemovedEvent(m);
+		entityMentionMap.get(m.getEntity()).remove(m);
+		mentionMap.remove(m);
+		m.removeFromIndexes();
 	}
 
 }

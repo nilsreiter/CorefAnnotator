@@ -56,8 +56,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		Annotator a = new Annotator();
 		a.fileOpenDialog(CoreferenceFlavor.CRETA);
-		// a.open(new File("src/test/resources/rjmw.0.xmi"),
-		// CoreferenceFlavor.Default);
+		a.open(new File("src/test/resources/rjmw.0.xmi"), CoreferenceFlavor.QuaDramA);
 	}
 
 	public Annotator() throws ResourceInitializationException {
