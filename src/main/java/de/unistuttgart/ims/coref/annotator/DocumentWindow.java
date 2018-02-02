@@ -49,6 +49,8 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.action.FileImportCRETAAction;
+import de.unistuttgart.ims.coref.annotator.action.FileImportDKproAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -222,6 +224,8 @@ public class DocumentWindow extends JFrame {
 		JMenu fileImportMenu = new JMenu("Import from ...");
 		fileMenu.add(fileImportMenu);
 		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+		fileImportMenu.add(new FileImportDKproAction(mainApplication));
+		fileImportMenu.add(new FileImportCRETAAction(mainApplication));
 
 		fileMenu.add(closeMenuItem);
 		fileMenu.add(exitMenuItem);

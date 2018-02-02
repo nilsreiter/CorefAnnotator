@@ -4,10 +4,6 @@
 	<description/>
 	<version>1.2</version>
 	<vendor>Nils Reiter</vendor>
-	<imports>
-		<import name="desc.type.metadata_customized"/>
-		<import name="desc.type.coref"/>
-	</imports>
 	<types>
 		<typeDescription>
       <name>de.unistuttgart.ims.coref.annotator.api.Mention</name>

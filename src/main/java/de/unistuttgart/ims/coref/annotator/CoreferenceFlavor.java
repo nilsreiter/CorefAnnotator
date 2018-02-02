@@ -5,13 +5,19 @@ import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.uima.ImportCRETA;
+import de.unistuttgart.ims.coref.annotator.uima.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.uima.ImportQuaDramA;
 
 public enum CoreferenceFlavor {
-	Default, QuaDramA, DKpro, AutoDetect;
+	Default, QuaDramA, DKpro, CRETA, AutoDetect;
 
 	public AnalysisEngine getAnalysisEngine() throws ResourceInitializationException {
 		switch (this) {
+		case CRETA:
+			return AnalysisEngineFactory.createEngine(ImportCRETA.class);
+		case DKpro:
+			return AnalysisEngineFactory.createEngine(ImportDKpro.class);
 		case QuaDramA:
 			return AnalysisEngineFactory.createEngine(ImportQuaDramA.class);
 		default:
