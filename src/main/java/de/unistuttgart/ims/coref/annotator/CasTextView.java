@@ -14,8 +14,12 @@ import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.fit.util.JCasUtil;
@@ -32,7 +36,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	JTextPane textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
-
+	StyleContext styleContext = new StyleContext();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 
 	Object selectionHighlight = null;
@@ -48,12 +52,17 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler(this));
-
-		textPane.setFont(textPane.getFont().deriveFont(0, 13));
+		// textPane.setFont(textPane.getFont().deriveFont(0, 13));
 		textPane.setHighlighter(hilit);
+
 		add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
 				BorderLayout.CENTER);
-		setVisible(true);
+
+	}
+
+	protected void initStyles() {
+		Style speakerTagStyle = styleContext.addStyle("Speaker", null);
+		speakerTagStyle.addAttribute(StyleConstants.Bold, true);
 	}
 
 	public CAS getCAS() {
@@ -146,6 +155,14 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 	@Override
 	public void jcasLoaded(JCas jcas) {
+		/*
+		 * StringContent c = new StringContent(jcas.getDocumentText().length());
+		 * try { c.insertString(0, jcas.getDocumentText()); } catch
+		 * (BadLocationException e) { e.printStackTrace(); } JCasDocument
+		 * document = new JCasDocument(jcas);
+		 * textPane.setStyledDocument(document);
+		 */
+		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
 	}
@@ -185,6 +202,11 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void switchStyle(JCas jcas, StyleVariant sv) {
+		sv.style(jcas, textPane.getStyledDocument(), styleContext);
+
 	}
 
 }

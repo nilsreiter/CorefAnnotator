@@ -55,8 +55,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public static void main(String[] args) throws UIMAException {
 
 		Annotator a = new Annotator();
-		a.fileOpenDialog(CoreferenceFlavor.CRETA);
 		a.open(new File("src/test/resources/rjmw.0.xmi"), CoreferenceFlavor.QuaDramA);
+		// a.fileOpenDialog(CoreferenceFlavor.CRETA);
 	}
 
 	public Annotator() throws ResourceInitializationException {

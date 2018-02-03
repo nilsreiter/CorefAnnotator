@@ -180,6 +180,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 			e1.printStackTrace();
 		}
 		this.fireJCasLoadedEvent();
+		viewer.switchStyle(jcas, StyleVariant.select(flavor));
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
@@ -266,7 +267,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
 		viewMenu.addSeparator();
 
-		JRadioButtonMenuItem sortAlphaButton = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -276,9 +277,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 			}
 		});
-		sortAlphaButton.setSelected(true);
+		radio1.setSelected(true);
 
-		JRadioButtonMenuItem sortMentionsButton = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -288,11 +289,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 			}
 		});
 		ButtonGroup grp = new ButtonGroup();
-		grp.add(sortMentionsButton);
-		grp.add(sortAlphaButton);
+		grp.add(radio2);
+		grp.add(radio1);
 
-		viewMenu.add(sortAlphaButton);
-		viewMenu.add(sortMentionsButton);
+		viewMenu.add(radio1);
+		viewMenu.add(radio2);
 
 		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
 
@@ -305,6 +306,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 			}
 
 		}));
+
+		JMenu viewStyleMenu = new JMenu("Style");
+		grp = new ButtonGroup();
+		int i = 0;
+		for (StyleVariant sv : StyleVariant.values()) {
+			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(sv));
+			viewStyleMenu.add(radio1);
+			if ((i++) == 0)
+				radio1.setSelected(true);
+			grp.add(radio1);
+
+		}
+		viewMenu.add(viewStyleMenu);
 
 		menuBar.add(fileMenu);
 		menuBar.add(entityMenu);
@@ -409,6 +423,55 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		public void actionPerformed(ActionEvent e) {
 			int oldSize = viewer.getTextPane().getFont().getSize();
 			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
+		}
+
+	}
+
+	class ViewStyleQuaDramAAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewStyleQuaDramAAction() {
+			putValue(Action.NAME, "QuaDramA");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			viewer.switchStyle(jcas, StyleVariant.QuaDramA);
+		}
+
+	}
+
+	class ViewStyleSelectAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		StyleVariant styleVariant;
+
+		public ViewStyleSelectAction(StyleVariant style) {
+			putValue(Action.NAME, style.name());
+			styleVariant = style;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			viewer.switchStyle(jcas, styleVariant);
+
+		}
+
+	}
+
+	class ViewStyleDefaultAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewStyleDefaultAction() {
+			putValue(Action.NAME, "Default");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			viewer.switchStyle(jcas, StyleVariant.Default);
 		}
 
 	}
