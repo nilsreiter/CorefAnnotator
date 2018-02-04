@@ -137,8 +137,8 @@ public class DetailsPanel extends JPanel
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath tp = e.getNewLeadSelectionPath();
-		TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
 		if (tp != null) {
+			TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
 			renameAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
 			changeKeyAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
 			changeColorAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));

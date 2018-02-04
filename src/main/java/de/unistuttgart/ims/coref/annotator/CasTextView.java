@@ -192,22 +192,19 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 	@Override
 	public void mentionRemoved(Mention m) {
+		spanCounter.subtract(new Span(m));
 		hilit.removeHighlight(highlightMap.get(m));
 	}
 
 	@Override
 	public void mentionSelected(Mention m) {
-		if (m != null)
+		if (m != null) {
 			textPane.setCaretPosition(m.getEnd());
-		try {
-			if (selectionHighlight != null)
-				hilit.removeHighlight(selectionHighlight);
-			if (m != null)
-				selectionHighlight = hilit.addHighlight(m.getBegin(), m.getEnd(),
-						new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY));
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			textPane.setSelectionStart(m.getBegin());
+			textPane.setSelectionEnd(m.getEnd());
+		} else {
+			textPane.setSelectionStart(0);
+			textPane.setSelectionEnd(0);
 		}
 	}
 
