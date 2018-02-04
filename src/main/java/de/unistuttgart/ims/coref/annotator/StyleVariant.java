@@ -17,6 +17,8 @@ import de.unistuttgart.ims.drama.api.StageDirection;
 public enum StyleVariant {
 	Default, QuaDramA, CRETA_Bundestag;
 
+	static Style defaultStyle = null;
+
 	public static StyleVariant select(CoreferenceFlavor flavor) {
 		switch (flavor) {
 		case QuaDramA:
@@ -26,9 +28,17 @@ public enum StyleVariant {
 		}
 	}
 
+	public static Style getDefaultStyle() {
+		if (defaultStyle == null) {
+			defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+			defaultStyle.addAttribute(StyleConstants.LineSpacing, 5f);
+			defaultStyle.addAttribute(StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+		}
+		return defaultStyle;
+	}
+
 	public void style(JCas jcas, StyledDocument document, StyleContext styleContext) {
-		Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-		document.setCharacterAttributes(0, document.getLength(), defaultStyle, true);
+		document.setCharacterAttributes(0, document.getLength(), getDefaultStyle(), true);
 
 		switch (this) {
 		case QuaDramA:
@@ -43,22 +53,22 @@ public enum StyleVariant {
 	}
 
 	protected void styleCRETABundestag(JCas jcas, StyledDocument document, StyleContext styleContext) {
-		Style style = styleContext.addStyle("Stage", null);
+		Style style = styleContext.addStyle("Stage", getDefaultStyle());
 		style.addAttribute(StyleConstants.Italic, true);
 		style(jcas, document, style, Stage.class);
 	}
 
 	protected void styleQuaDramA(JCas jcas, StyledDocument document, StyleContext styleContext) {
 
-		Style style = styleContext.addStyle("Speaker", null);
+		Style style = styleContext.addStyle("Speaker", getDefaultStyle());
 		style.addAttribute(StyleConstants.Bold, true);
 		style(jcas, document, style, Speaker.class);
 
-		style = styleContext.addStyle("Stage direction", null);
+		style = styleContext.addStyle("Stage direction", getDefaultStyle());
 		style.addAttribute(StyleConstants.Italic, true);
 		style(jcas, document, style, StageDirection.class);
 
-		style = styleContext.addStyle("Header", null);
+		style = styleContext.addStyle("Header", getDefaultStyle());
 		style.addAttribute(StyleConstants.FontSize, 16);
 		style(jcas, document, style, Heading.class);
 

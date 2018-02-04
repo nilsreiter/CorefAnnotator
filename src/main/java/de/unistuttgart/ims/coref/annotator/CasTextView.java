@@ -26,6 +26,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import de.unistuttgart.ims.commons.Counter;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener {
@@ -38,6 +39,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 	Highlighter.HighlightPainter painter;
 	StyleContext styleContext = new StyleContext();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+	Counter<Span> spanCounter = new Counter<Span>();
 
 	Object selectionHighlight = null;
 
@@ -75,11 +77,16 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 
 	public void drawAnnotation(Mention a) {
 		Object hi = highlightMap.get(a);
-		if (hi != null)
+		Span span = new Span(a);
+		if (hi != null) {
 			hilit.removeHighlight(hi);
+			spanCounter.subtract(span);
+		}
 		try {
+			int n = spanCounter.get(span);
 			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
-					new UnderlinePainter(new Color(a.getEntity().getColor())));
+					new UnderlinePainter(new Color(a.getEntity().getColor()), n * 3));
+			spanCounter.add(span);
 			highlightMap.put(a, hi);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -123,7 +130,7 @@ public class CasTextView extends JPanel implements LoadingListener, CoreferenceM
 		@Override
 		protected void exportDone(JComponent c, Transferable t, int action) {
 			// TODO: export an Annotation object
-			drawAnnotations();
+			// drawAnnotations();
 		}
 
 		@Override

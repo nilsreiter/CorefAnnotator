@@ -14,8 +14,12 @@ import javax.swing.text.Position;
 import javax.swing.text.View;
 
 public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter {
-	public UnderlinePainter(Color color) {
+	int lineWidth = 3;
+	int downDistance = 0;
+
+	public UnderlinePainter(Color color, int distance) {
 		super(color);
+		this.downDistance = distance;
 	}
 
 	/**
@@ -49,8 +53,8 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		Color color = getColor();
 		g.setColor(color == null ? c.getSelectionColor() : color);
 
-		g2.setStroke(new BasicStroke(2));
-		g2.drawLine(r.x, r.y + r.height, r.x + r.width, r.y + r.height);
+		g2.setStroke(new BasicStroke(lineWidth));
+		g2.drawLine(r.x, r.y + r.height + downDistance, r.x + r.width, r.y + r.height + downDistance);
 
 		return r;
 	}
