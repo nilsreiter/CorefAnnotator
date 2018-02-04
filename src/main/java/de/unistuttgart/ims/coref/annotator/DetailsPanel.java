@@ -137,11 +137,12 @@ public class DetailsPanel extends JPanel
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath tp = e.getNewLeadSelectionPath();
+		TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
 		if (tp != null) {
-			renameAction.setEnabled(tp.getPathCount() == 2);
-			changeKeyAction.setEnabled(tp.getPathCount() == 2);
-			changeColorAction.setEnabled(tp.getPathCount() == 2);
-			deleteMentionAction.setEnabled(tp.getPathCount() == 3);
+			renameAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			changeKeyAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			changeColorAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			deleteMentionAction.setEnabled(selection.isLeaf());
 		}
 	}
 
@@ -216,13 +217,16 @@ public class DetailsPanel extends JPanel
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 			if (dl.getPath() == null)
 				return false;
+			TreePath treePath = dl.getPath();
+			TreeNode<?> selectedNode = (TreeNode<?>) treePath.getLastPathComponent();
 
+			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (dl.getPath().getPathCount() > 2)
+				if (selectedNode.isLeaf())
 					return false;
 			}
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-				if (dl.getPath().getPathCount() > 2)
+				if (selectedNode.isLeaf() || selectedNode.isRoot())
 					return false;
 			}
 
