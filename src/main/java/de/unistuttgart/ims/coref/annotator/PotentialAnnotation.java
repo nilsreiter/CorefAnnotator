@@ -3,9 +3,9 @@ package de.unistuttgart.ims.coref.annotator;
 public class PotentialAnnotation {
 	int begin;
 	int end;
-	CasTextView textView;
+	DocumentWindow.CasTextView textView;
 
-	public PotentialAnnotation(CasTextView textView, int begin, int end) {
+	public PotentialAnnotation(DocumentWindow.CasTextView textView, int begin, int end) {
 		this.begin = begin;
 		this.end = end;
 		this.textView = textView;
@@ -27,11 +27,11 @@ public class PotentialAnnotation {
 		this.end = end;
 	}
 
-	public CasTextView getTextView() {
+	public DocumentWindow.CasTextView getTextView() {
 		return textView;
 	}
 
-	public void setTextView(CasTextView textView) {
+	public void setTextView(DocumentWindow.CasTextView textView) {
 		this.textView = textView;
 	}
 }

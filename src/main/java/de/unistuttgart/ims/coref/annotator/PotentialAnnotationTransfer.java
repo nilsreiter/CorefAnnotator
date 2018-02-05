@@ -11,9 +11,9 @@ public class PotentialAnnotationTransfer implements Transferable {
 
 	int begin;
 	int end;
-	CasTextView textView;
+	DocumentWindow.CasTextView textView;
 
-	public PotentialAnnotationTransfer(CasTextView tv, int begin, int end) {
+	public PotentialAnnotationTransfer(DocumentWindow.CasTextView tv, int begin, int end) {
 		this.textView = tv;
 		this.begin = begin;
 		this.end = end;
