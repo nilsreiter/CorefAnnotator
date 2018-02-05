@@ -11,9 +11,9 @@ public class AnnotationTransfer<T extends Annotation> implements Transferable {
 	public static DataFlavor dataFlavor = new DataFlavor(AnnotationTransfer.class, "Annotation");
 
 	T annotation;
-	CATreeNode<T> treeNode;
+	CATreeNode treeNode;
 
-	public AnnotationTransfer(T annotation, CATreeNode<T> tn) {
+	public AnnotationTransfer(T annotation, CATreeNode tn) {
 		this.annotation = annotation;
 		this.treeNode = tn;
 	}
@@ -34,7 +34,7 @@ public class AnnotationTransfer<T extends Annotation> implements Transferable {
 		return annotation;
 	}
 
-	public CATreeNode<T> getTreeNode() {
+	public CATreeNode getTreeNode() {
 		return treeNode;
 	}
 

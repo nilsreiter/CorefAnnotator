@@ -21,7 +21,6 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -32,7 +31,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	JCas jcas;
 	private static final long serialVersionUID = 1L;
 	Map<Entity, EntityTreeNode> entityMap = new HashMap<Entity, EntityTreeNode>();
-	Map<Mention, CATreeNode<Mention>> mentionMap = new HashMap<Mention, CATreeNode<Mention>>();
+	Map<Mention, CATreeNode> mentionMap = new HashMap<Mention, CATreeNode>();
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
@@ -43,18 +42,17 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
-	CATreeNode<TOP> rootNode;
-	CATreeNode<TOP> groupRootNode;
+	CATreeNode rootNode;
+	CATreeNode groupRootNode;
 
 	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
 
 	boolean keepEmptyEntities = true;
 
-	@SuppressWarnings("unchecked")
 	public CoreferenceModel(JCas jcas) {
-		super(new CATreeNode<TOP>(null, "Add new entity"));
-		this.rootNode = (CATreeNode<TOP>) getRoot();
-		this.groupRootNode = new CATreeNode<TOP>(null, "Groups");
+		super(new CATreeNode(null, "Add new entity"));
+		this.rootNode = (CATreeNode) getRoot();
+		this.groupRootNode = new CATreeNode(null, "Groups");
 		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 
@@ -128,7 +126,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			ind++;
 		}
 
-		insertNodeInto(tn, (CATreeNode<?>) this.getRoot(), ind);
+		insertNodeInto(tn, (CATreeNode) this.getRoot(), ind);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {
 			tn.setKeyCode(keyCodes[key]);
@@ -158,11 +156,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
-		CATreeNode<Mention> tn = new CATreeNode<Mention>(m, m.getCoveredText());
+		CATreeNode tn = new CATreeNode(m, m.getCoveredText());
 		mentionMap.put(m, tn);
 		int ind = 0;
 		while (ind < entityMap.get(e).getChildCount()) {
-			CATreeNode<?> node = (CATreeNode<?>) entityMap.get(e).getChildAt(ind);
+			CATreeNode node = (CATreeNode) entityMap.get(e).getChildAt(ind);
 			if (node.getFeatureStructure() instanceof Entity
 					|| ((Annotation) node.getFeatureStructure()).getBegin() > m.getBegin())
 				break;
@@ -207,7 +205,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		eg.setMembers(arr);
 		eg.addToIndexes();
 
-		CATreeNode<Entity> gtn = addExistingEntity(eg);
+		CATreeNode gtn = addExistingEntity(eg);
 		this.insertNodeInto(new EntityTreeNode(e1), gtn, 0);
 		this.insertNodeInto(new EntityTreeNode(e2), gtn, 1);
 
@@ -249,7 +247,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		Annotation d = AnnotationFactory.createAnnotation(jcas, begin, end, Annotation.class);
 		m.setDiscontinuous(d);
 
-		insertNodeInto(new CATreeNode<Annotation>(d, "disc"), mentionMap.get(m), 0);
+		insertNodeInto(new CATreeNode(d, "disc"), mentionMap.get(m), 0);
 	}
 
 	public void resort() {
@@ -320,8 +318,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void removeMention(Mention m) {
-		@SuppressWarnings("unchecked")
-		CATreeNode<Entity> parent = (CATreeNode<Entity>) mentionMap.get(m).getParent();
+		CATreeNode parent = (CATreeNode) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));
 		// removeNodeFromParent(mentionMap.get(m));

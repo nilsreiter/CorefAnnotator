@@ -3,14 +3,12 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
-import org.apache.uima.cas.FeatureStructure;
-
-public class NodeTransferable<T extends FeatureStructure> implements Transferable {
+public class NodeTransferable implements Transferable {
 	public static DataFlavor dataFlavor = new DataFlavor(CATreeNode.class, "TreeNode");
 
-	CATreeNode<T> treeNode;
+	CATreeNode treeNode;
 
-	public NodeTransferable(CATreeNode<T> tn) {
+	public NodeTransferable(CATreeNode tn) {
 		this.treeNode = tn;
 	}
 

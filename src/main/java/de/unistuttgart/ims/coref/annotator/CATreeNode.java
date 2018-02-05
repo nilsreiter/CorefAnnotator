@@ -8,7 +8,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class CATreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode {
+public class CATreeNode extends DefaultMutableTreeNode {
 
 	static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
@@ -18,7 +18,7 @@ public class CATreeNode<T extends FeatureStructure> extends DefaultMutableTreeNo
 
 	String label;
 
-	public CATreeNode(T featureStructure, String label) {
+	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
 			this.featureStructureHash = featureStructure.hashCode();
 			mentionCache.put(featureStructure.hashCode(), featureStructure);

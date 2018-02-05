@@ -616,14 +616,14 @@ public class DocumentWindow extends JFrame
 			paths = tree.getSelectionPaths();
 			fs = new FeatureStructure[paths.length];
 			for (int i = 0; i < paths.length; i++)
-				fs[i] = ((CATreeNode<?>) paths[i].getLastPathComponent()).getFeatureStructure();
+				fs[i] = ((CATreeNode) paths[i].getLastPathComponent()).getFeatureStructure();
 		} catch (NullPointerException ex) {
 		}
 		renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		deleteAction.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity
-				&& ((CATreeNode<?>) ((javax.swing.tree.TreeNode) paths[0].getLastPathComponent()).getParent())
+				&& ((CATreeNode) ((javax.swing.tree.TreeNode) paths[0].getLastPathComponent()).getParent())
 						.isVirtual())));
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
@@ -698,7 +698,7 @@ public class DocumentWindow extends JFrame
 			if (dl.getPath() == null)
 				return false;
 			TreePath treePath = dl.getPath();
-			CATreeNode<?> selectedNode = (CATreeNode<?>) treePath.getLastPathComponent();
+			CATreeNode selectedNode = (CATreeNode) treePath.getLastPathComponent();
 			FeatureStructure fs = selectedNode.getFeatureStructure();
 
 			// new mention created in text view
@@ -714,7 +714,6 @@ public class DocumentWindow extends JFrame
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean importData(TransferHandler.TransferSupport info) {
 			if (!info.isDrop()) {
@@ -733,7 +732,7 @@ public class DocumentWindow extends JFrame
 
 			try {
 
-				FeatureStructure targetFs = ((CATreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+				FeatureStructure targetFs = ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure();
 				if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
@@ -744,13 +743,13 @@ public class DocumentWindow extends JFrame
 					else if (targetFs instanceof Mention)
 						cModel.addDiscontinuousToMention((Mention) targetFs, pa.getBegin(), pa.getEnd());
 				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
-					CATreeNode<?> object = (CATreeNode<?>) info.getTransferable()
+					CATreeNode object = (CATreeNode) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
 					if (targetFs instanceof EntityGroup) {
-						CATreeNode<Entity> etn = (CATreeNode<Entity>) object;
+						CATreeNode etn = object;
 						cModel.addToGroup((EntityGroup) targetFs, (Entity) etn.getFeatureStructure());
 					} else {
-						CATreeNode<Mention> m = (CATreeNode<Mention>) object;
+						CATreeNode m = object;
 						cModel.updateMention((Mention) m.getFeatureStructure(), (Entity) targetFs);
 					}
 				}
@@ -773,15 +772,14 @@ public class DocumentWindow extends JFrame
 			return MOVE | COPY;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTree tree = (JTree) comp;
-			CATreeNode<?> tn = (CATreeNode<?>) tree.getLastSelectedPathComponent();
+			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention)
-				return new NodeTransferable<Mention>((CATreeNode<Mention>) tn);
+				return new NodeTransferable(tn);
 			if (tn.getFeatureStructure() instanceof Entity)
-				return new NodeTransferable<Entity>((CATreeNode<Entity>) tn);
+				return new NodeTransferable(tn);
 			return null;
 		}
 
@@ -911,12 +909,12 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode<?> tn = (CATreeNode<?>) tree.getLastSelectedPathComponent();
+			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention)
 				cModel.removeMention((Mention) tn.getFeatureStructure());
 			else if (tn.getFeatureStructure() instanceof Entity) {
 				EntityTreeNode etn = (EntityTreeNode) tn;
-				FeatureStructure parentFs = ((CATreeNode<?>) etn.getParent()).getFeatureStructure();
+				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
 					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
 				}
@@ -936,8 +934,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			@SuppressWarnings("unchecked")
-			CATreeNode<Mention> tn = (CATreeNode<Mention>) tree.getLastSelectedPathComponent();
+			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			cModel.removeMention((Mention) tn.getFeatureStructure());
 		}
 
@@ -1034,11 +1031,10 @@ public class DocumentWindow extends JFrame
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent e) {
-			Entity e1 = (Entity) ((CATreeNode<Entity>) tree.getSelectionPaths()[0].getLastPathComponent())
+			Entity e1 = (Entity) ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent())
 					.getFeatureStructure();
-			Entity e2 = (Entity) ((CATreeNode<Entity>) tree.getSelectionPaths()[1].getLastPathComponent())
+			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
 			cModel.formGroup(e1, e2);
 		}
