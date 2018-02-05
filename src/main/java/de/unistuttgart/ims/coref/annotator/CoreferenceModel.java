@@ -21,9 +21,12 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.TOP;
+import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CoreferenceModel extends DefaultTreeModel implements KeyListener, TreeSelectionListener {
@@ -42,6 +45,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
 	TreeNode<TOP> rootNode;
+	TreeNode<TOP> groupRootNode;
 
 	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
 
@@ -51,6 +55,8 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	public CoreferenceModel(JCas jcas) {
 		super(new TreeNode<TOP>(null, "Add new entity"));
 		this.rootNode = (TreeNode<TOP>) getRoot();
+		this.groupRootNode = new TreeNode<TOP>(null, "Groups");
+		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 
 	}
@@ -113,14 +119,18 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		addNewMention(e, begin, end);
 	}
 
-	public void addExistingEntity(Entity e) {
+	public EntityTreeNode addExistingEntity(Entity e) {
 		EntityTreeNode tn = new EntityTreeNode(e, "");
-		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), 0);
+		if (e instanceof EntityGroup)
+			insertNodeInto(tn, groupRootNode, 0);
+		else
+			insertNodeInto(tn, rootNode, 0);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {
 			tn.setKeyCode(keyCodes[key]);
 			keyMap.put(keyCodes[key++], e);
 		}
+		return tn;
 	}
 
 	protected void connect(Entity e, Mention m) {
@@ -133,9 +143,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		mentionMap.put(m, tn);
 		int ind = 0;
 		while (ind < entityMap.get(e).getChildCount()) {
-			@SuppressWarnings("unchecked")
-			TreeNode<Mention> node = (TreeNode<Mention>) entityMap.get(e).getChildAt(ind);
-			if (node.getFeatureStructure().getBegin() > m.getBegin())
+			TreeNode<?> node = (TreeNode<?>) entityMap.get(e).getChildAt(ind);
+			if (node.getFeatureStructure() instanceof Entity
+					|| ((Annotation) node.getFeatureStructure()).getBegin() > m.getBegin())
 				break;
 			ind++;
 		}
@@ -147,6 +157,25 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		Mention m = AnnotationFactory.createAnnotation(jcas, begin, end, Mention.class);
 		connect(e, m);
 		fireMentionAddedEvent(m);
+	}
+
+	public void formGroup(Entity e1, Entity e2) {
+		FSArray arr = new FSArray(jcas, 2);
+		arr.set(0, e1);
+		arr.set(1, e2);
+		EntityGroup eg = new EntityGroup(jcas);
+		eg.setColor(colorMap.nextColor);
+		if (e1.getLabel() != null && e2.getLabel() != null)
+			eg.setLabel(e1.getLabel() + " and " + e2.getLabel());
+		else
+			eg.setLabel("A group");
+		eg.setMembers(arr);
+		eg.addToIndexes();
+
+		TreeNode<Entity> gtn = addExistingEntity(eg);
+		this.insertNodeInto(new EntityTreeNode(e1), gtn, 0);
+		this.insertNodeInto(new EntityTreeNode(e2), gtn, 1);
+
 	}
 
 	public JCas getJcas() {

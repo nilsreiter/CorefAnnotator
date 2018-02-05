@@ -2,7 +2,7 @@
 <typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
 	<name>Coref Annotator</name>
 	<description/>
-	<version>1.2</version>
+	<version>1.0</version>
 	<vendor>Nils Reiter</vendor>
 	<types>
 		<typeDescription>
@@ -31,6 +31,20 @@
           <name>Color</name>
           <description/>
           <rangeTypeName>uima.cas.Integer</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+  <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.EntityGroup</name>
+      <description/>
+      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Entity</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Members</name>
+          <description/>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+          <elementType>de.unistuttgart.ims.coref.annotator.api.Entity</elementType>
+          <multipleReferencesAllowed>false</multipleReferencesAllowed>
         </featureDescription>
       </features>
     </typeDescription>

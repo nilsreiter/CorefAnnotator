@@ -73,6 +73,7 @@ import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
@@ -115,6 +116,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction changeKeyAction;
 	AbstractAction changeColorAction;
 	AbstractAction deleteMentionAction;
+	AbstractAction formGroupAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -152,7 +154,7 @@ public class DocumentWindow extends JFrame
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
 		tree.setLargeModel(true);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new PanelTransferHandler());
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
@@ -173,7 +175,7 @@ public class DocumentWindow extends JFrame
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
-		this.setPreferredSize(new Dimension(500, 800));
+		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
@@ -192,11 +194,19 @@ public class DocumentWindow extends JFrame
 
 	protected void initialiseActions() {
 		this.renameAction = new RenameEntityAction();
-		this.changeColorAction = new ChangeColorForEntity();
 		this.newEntityAction = new NewEntityAction();
 		this.changeColorAction = new ChangeColorForEntity();
 		this.changeKeyAction = new ChangeKeyForEntityAction();
 		this.deleteMentionAction = new DeleteMentionAction();
+		this.formGroupAction = new FormEntityGroup();
+
+		// disable all at the beginning
+		newEntityAction.setEnabled(false);
+		renameAction.setEnabled(false);
+		changeKeyAction.setEnabled(false);
+		changeColorAction.setEnabled(false);
+		deleteMentionAction.setEnabled(false);
+		formGroupAction.setEnabled(false);
 	}
 
 	protected JMenu initialiseMenuView() {
@@ -290,6 +300,7 @@ public class DocumentWindow extends JFrame
 		entityMenu.add(new JMenuItem(newEntityAction));
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
+		entityMenu.add(new JMenuItem(formGroupAction));
 		return entityMenu;
 	}
 
@@ -562,7 +573,6 @@ public class DocumentWindow extends JFrame
 	protected void fireModelCreatedEvent() {
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
-		tree.addTreeSelectionListener(cModel);
 		textPane.addKeyListener(cModel);
 		textPane.setCaretPosition(0);
 
@@ -578,7 +588,8 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void caretUpdate(CaretEvent e) {
-
+		newEntityAction.setEnabled(
+				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
 	public void switchStyle(JCas jcas, StyleVariant sv) {
@@ -588,13 +599,38 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
+		int numberOfSelections = tree.getSelectionPaths().length;
 		TreePath tp = e.getNewLeadSelectionPath();
-		if (tp != null) {
-			TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
-			renameAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-			changeKeyAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-			changeColorAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-			deleteMentionAction.setEnabled(selection.isLeaf());
+		if (numberOfSelections == 0) {
+			renameAction.setEnabled(false);
+			changeKeyAction.setEnabled(false);
+			changeColorAction.setEnabled(false);
+			deleteMentionAction.setEnabled(false);
+			formGroupAction.setEnabled(false);
+		} else if (numberOfSelections == 1) {
+			formGroupAction.setEnabled(false);
+
+			if (tp != null) {
+				TreeNode<?> selection = (TreeNode<?>) tree.getSelectionPath().getLastPathComponent();
+
+				FeatureStructure fs = selection.getFeatureStructure();
+				renameAction.setEnabled(fs instanceof Entity);
+				changeKeyAction.setEnabled(fs instanceof Entity);
+				changeColorAction.setEnabled(fs instanceof Entity);
+				deleteMentionAction.setEnabled(fs instanceof Mention);
+				if (fs instanceof Mention)
+					mentionSelected((Mention) fs);
+			}
+		} else if (numberOfSelections == 2) {
+			renameAction.setEnabled(false);
+			changeKeyAction.setEnabled(false);
+			changeColorAction.setEnabled(false);
+			deleteMentionAction.setEnabled(false);
+
+			TreePath[] paths = tree.getSelectionPaths();
+			formGroupAction
+					.setEnabled(((TreeNode<?>) paths[0].getLastPathComponent()).getFeatureStructure() instanceof Entity
+							&& ((TreeNode<?>) paths[1].getLastPathComponent()).getFeatureStructure() instanceof Entity);
 		}
 	}
 
@@ -663,14 +699,15 @@ public class DocumentWindow extends JFrame
 				return false;
 			TreePath treePath = dl.getPath();
 			TreeNode<?> selectedNode = (TreeNode<?>) treePath.getLastPathComponent();
+			FeatureStructure fs = selectedNode.getFeatureStructure();
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (selectedNode.isLeaf())
+				if (fs instanceof Mention)
 					return false;
 			}
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-				if (selectedNode.isLeaf() || selectedNode.isRoot())
+				if (fs instanceof Mention || fs instanceof TOP)
 					return false;
 			}
 
@@ -700,16 +737,16 @@ public class DocumentWindow extends JFrame
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 					if (entity == null)
-						((CoreferenceModel) tree.getModel()).addNewEntityMention(pa.getBegin(), pa.getEnd());
+						cModel.addNewEntityMention(pa.getBegin(), pa.getEnd());
 					else
-						((CoreferenceModel) tree.getModel()).addNewMention((Entity) entity, pa.getBegin(), pa.getEnd());
+						cModel.addNewMention((Entity) entity, pa.getBegin(), pa.getEnd());
 
 				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
 					FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
 
 					TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
-					((CoreferenceModel) tree.getModel()).updateMention(m.getFeatureStructure(), (Entity) entity);
+					cModel.updateMention(m.getFeatureStructure(), (Entity) entity);
 
 				}
 
@@ -728,15 +765,19 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public int getSourceActions(JComponent c) {
-			return MOVE;
+			return MOVE | LINK;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTree tree = (JTree) comp;
-			@SuppressWarnings("unchecked")
-			TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
-			return new NodeTransferable<Mention>(tn);
+			TreeNode<?> tn = (TreeNode<?>) tree.getLastSelectedPathComponent();
+			if (tn.getFeatureStructure() instanceof Mention)
+				return new NodeTransferable<Mention>((TreeNode<Mention>) tn);
+			if (tn.getFeatureStructure() instanceof Entity)
+				return new NodeTransferable<Entity>((TreeNode<Entity>) tn);
+			return null;
 		}
 
 	}
@@ -943,6 +984,23 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			mainApplication.handleQuitRequestWith(new QuitEvent(), new QuitResponse());
+		}
+
+	}
+
+	class FormEntityGroup extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public FormEntityGroup() {
+			putValue(Action.NAME, "Form entity group");
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public void actionPerformed(ActionEvent e) {
+			Entity e1 = ((TreeNode<Entity>) tree.getSelectionPaths()[0].getLastPathComponent()).getFeatureStructure();
+			Entity e2 = ((TreeNode<Entity>) tree.getSelectionPaths()[1].getLastPathComponent()).getFeatureStructure();
+			cModel.formGroup(e1, e2);
 		}
 
 	}

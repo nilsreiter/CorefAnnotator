@@ -12,6 +12,10 @@ public class EntityTreeNode extends TreeNode<Entity> {
 		super(featureStructure, label);
 	}
 
+	public EntityTreeNode(Entity featureStructure) {
+		super(featureStructure, featureStructure.getLabel());
+	}
+
 	public Character getKeyCode() {
 		return keyCode;
 	}
