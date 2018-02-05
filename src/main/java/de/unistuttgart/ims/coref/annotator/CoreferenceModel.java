@@ -15,7 +15,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -98,6 +97,20 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		entityMentionMap.remove(e);
 	}
 
+	public void removeEntityFromGroup(EntityGroup eg, EntityTreeNode e) {
+		removeNodeFromParent(e);
+		FSArray oldArray = eg.getMembers();
+		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
+		for (int i = 0; i < oldArray.size() - 1; i++) {
+			if (eg.getMembers(i) == e.getFeatureStructure()) {
+				i--;
+			} else {
+				arr.set(i, eg.getMembers(i));
+			}
+		}
+		eg.setMembers(arr);
+	}
+
 	public void addNewEntityMention(int begin, int end) {
 		String covered = jcas.getDocumentText().substring(begin, end);
 		Entity e = new Entity(jcas);
@@ -107,10 +120,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		EntityTreeNode tn = new EntityTreeNode(e, covered);
 
 		int ind = 0;
-		Comparator<TreeNode<Entity>> comparator = entitySortOrder.getComparator();
+		Comparator<EntityTreeNode> comparator = entitySortOrder.getComparator();
 		while (ind < this.rootNode.getChildCount()) {
-			@SuppressWarnings("unchecked")
-			TreeNode<Entity> node = (TreeNode<Entity>) rootNode.getChildAt(ind);
+			EntityTreeNode node = (EntityTreeNode) rootNode.getChildAt(ind);
 			if (comparator.compare(tn, node) <= 0)
 				break;
 			ind++;
@@ -236,9 +248,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	@SuppressWarnings("unchecked")
 	public void resort() {
 		int n = rootNode.getChildCount();
-		List<TreeNode<Entity>> children = new ArrayList<TreeNode<Entity>>(n);
+		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);
 		for (int i = 0; i < n; i++) {
-			children.add((TreeNode<Entity>) rootNode.getChildAt(i));
+			children.add((EntityTreeNode) rootNode.getChildAt(i));
 		}
 		children.sort(entitySortOrder.getComparator());
 		rootNode.removeAllChildren();
@@ -298,17 +310,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		TreePath tp = e.getNewLeadSelectionPath();
-		if (tp != null) {
-			if (tp.getPathCount() == 3) {
-				@SuppressWarnings("unchecked")
-				TreeNode<Mention> tn = (TreeNode<Mention>) tp.getLastPathComponent();
-				Mention m = tn.getFeatureStructure();
-				fireMentionSelectedEvent(m);
-			} else {
-				fireMentionSelectedEvent(null);
-			}
-		}
 
 	}
 
@@ -317,6 +318,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		TreeNode<Entity> parent = (TreeNode<Entity>) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));
+		// removeNodeFromParent(mentionMap.get(m));
 		nodesWereRemoved(parent, new int[] { index }, new Object[] { mentionMap.get(m) });
 		fireMentionRemovedEvent(m);
 		entityMentionMap.get(m.getEntity()).remove(m);

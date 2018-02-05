@@ -38,7 +38,7 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 	 *            the editor
 	 * @param view
 	 *            View painting for
-	 * @return region drawing occured in
+	 * @return region drawing occurred in
 	 */
 	@Override
 	public Shape paintLayer(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c, View view) {
@@ -56,6 +56,7 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		g2.setStroke(new BasicStroke(lineWidth));
 		g2.drawLine(r.x, r.y + r.height + downDistance, r.x + r.width, r.y + r.height + downDistance);
 
+		r.setBounds(r.x - lineWidth, r.y, r.width + 2 * lineWidth, r.height + lineWidth + downDistance);
 		return r;
 	}
 

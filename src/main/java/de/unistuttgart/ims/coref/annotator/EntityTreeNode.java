@@ -25,6 +25,11 @@ public class EntityTreeNode extends TreeNode<Entity> {
 	}
 
 	@Override
+	public Entity getFeatureStructure() {
+		return (Entity) super.getFeatureStructure();
+	}
+
+	@Override
 	public String getLabel() {
 		return getFeatureStructure().getLabel();
 	}

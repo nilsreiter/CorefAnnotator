@@ -2,8 +2,6 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Comparator;
 
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-
 public enum EntitySortOrder {
 	Mentions, Alphabet;
 
@@ -13,21 +11,21 @@ public enum EntitySortOrder {
 		return descending;
 	}
 
-	public Comparator<TreeNode<Entity>> getComparator() {
+	public Comparator<EntityTreeNode> getComparator() {
 		switch (this) {
 		case Mentions:
-			return new Comparator<TreeNode<Entity>>() {
+			return new Comparator<EntityTreeNode>() {
 				@Override
-				public int compare(TreeNode<Entity> o1, TreeNode<Entity> o2) {
+				public int compare(EntityTreeNode o1, EntityTreeNode o2) {
 					int l1 = o1.getChildCount();
 					int l2 = o2.getChildCount();
 					return (isDescending() ? -1 : 1) * Integer.compare(l1, l2);
 				}
 			};
 		default:
-			return new Comparator<TreeNode<Entity>>() {
+			return new Comparator<EntityTreeNode>() {
 				@Override
-				public int compare(TreeNode<Entity> o1, TreeNode<Entity> o2) {
+				public int compare(EntityTreeNode o1, EntityTreeNode o2) {
 					if (o1.getFeatureStructure() == null && o2.getFeatureStructure() != null)
 						return 1;
 					if (o2.getFeatureStructure() == null && o1.getFeatureStructure() != null)
