@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -288,6 +289,7 @@ public class DocumentWindow extends JFrame
 		fileMenu.add(new FileOpenAction(mainApplication));
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(new FileSaveAction(this));
+		fileMenu.add(new FileSaveAsAction());
 		fileMenu.add(new JMenuItem(new CloseAction()));
 		fileMenu.add(new JMenuItem(new ExitAction()));
 
@@ -412,8 +414,12 @@ public class DocumentWindow extends JFrame
 	}
 
 	public synchronized void saveCurrentFile() {
+		saveToFile(file);
+	}
+
+	public synchronized void saveToFile(File f) {
 		try {
-			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(file));
+			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
 		} catch (FileNotFoundException | SAXException e) {
 			e.printStackTrace();
 			mainApplication.warnDialog(e.getMessage(), e.toString());
@@ -1003,6 +1009,35 @@ public class DocumentWindow extends JFrame
 			cModel.formGroup(e1, e2);
 		}
 
+	}
+
+	class FileSaveAsAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public FileSaveAsAction() {
+			putValue(Action.NAME, "Save as ...");
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
+					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
+			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
+			saveDialog.setFileFilter(XmiFileFilter.filter);
+			saveDialog.setDialogTitle("Save file as ...");
+			int r = saveDialog.showSaveDialog(DocumentWindow.this);
+			switch (r) {
+			case JFileChooser.APPROVE_OPTION:
+				File f = saveDialog.getSelectedFile();
+				saveToFile(f);
+				break;
+			default:
+			}
+
+		}
 	}
 
 }

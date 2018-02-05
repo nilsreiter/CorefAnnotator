@@ -65,8 +65,15 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 			addExistingEntity(e);
 		}
+		for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class)) {
+			for (int i = 0; i < eg.getMembers().size(); i++) {
+				this.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), entityMap.get(eg), 0);
+			}
+
+		}
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			connect(m.getEntity(), m);
+
 			fireMentionAddedEvent(m);
 		}
 	}
@@ -121,9 +128,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public EntityTreeNode addExistingEntity(Entity e) {
 		EntityTreeNode tn = new EntityTreeNode(e, "");
-		if (e instanceof EntityGroup)
+		if (e instanceof EntityGroup) {
 			insertNodeInto(tn, groupRootNode, 0);
-		else
+		} else
 			insertNodeInto(tn, rootNode, 0);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {
@@ -157,6 +164,10 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		Mention m = AnnotationFactory.createAnnotation(jcas, begin, end, Mention.class);
 		connect(e, m);
 		fireMentionAddedEvent(m);
+	}
+
+	public void addToGroup(EntityGroup eg, Entity e) {
+
 	}
 
 	public void formGroup(Entity e1, Entity e2) {

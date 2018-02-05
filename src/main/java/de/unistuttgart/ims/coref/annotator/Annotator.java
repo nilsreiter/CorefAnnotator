@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -69,18 +68,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	private void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(new FileFilter() {
-
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().endsWith(".xmi");
-			}
-
-			@Override
-			public String getDescription() {
-				return "UIMA Xmi Files";
-			}
-		});
+		openDialog.setFileFilter(XmiFileFilter.filter);
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {
