@@ -30,7 +30,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.tools.cvd.ColorIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
