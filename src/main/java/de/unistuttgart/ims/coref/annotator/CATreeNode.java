@@ -8,17 +8,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode {
+public class CATreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode {
 
 	static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
 	private static final long serialVersionUID = 1L;
 
-	int featureStructureHash;
+	transient int featureStructureHash;
 
 	String label;
 
-	public TreeNode(T featureStructure, String label) {
+	public CATreeNode(T featureStructure, String label) {
 		if (featureStructure != null) {
 			this.featureStructureHash = featureStructure.hashCode();
 			mentionCache.put(featureStructure.hashCode(), featureStructure);
@@ -45,6 +45,10 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public boolean isVirtual() {
+		return false;
 	}
 
 }

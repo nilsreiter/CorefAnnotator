@@ -32,7 +32,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	JCas jcas;
 	private static final long serialVersionUID = 1L;
 	Map<Entity, EntityTreeNode> entityMap = new HashMap<Entity, EntityTreeNode>();
-	Map<Mention, TreeNode<Mention>> mentionMap = new HashMap<Mention, TreeNode<Mention>>();
+	Map<Mention, CATreeNode<Mention>> mentionMap = new HashMap<Mention, CATreeNode<Mention>>();
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
@@ -43,8 +43,8 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
-	TreeNode<TOP> rootNode;
-	TreeNode<TOP> groupRootNode;
+	CATreeNode<TOP> rootNode;
+	CATreeNode<TOP> groupRootNode;
 
 	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
 
@@ -52,9 +52,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	@SuppressWarnings("unchecked")
 	public CoreferenceModel(JCas jcas) {
-		super(new TreeNode<TOP>(null, "Add new entity"));
-		this.rootNode = (TreeNode<TOP>) getRoot();
-		this.groupRootNode = new TreeNode<TOP>(null, "Groups");
+		super(new CATreeNode<TOP>(null, "Add new entity"));
+		this.rootNode = (CATreeNode<TOP>) getRoot();
+		this.groupRootNode = new CATreeNode<TOP>(null, "Groups");
 		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 
@@ -128,7 +128,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			ind++;
 		}
 
-		insertNodeInto(tn, (TreeNode<?>) this.getRoot(), ind);
+		insertNodeInto(tn, (CATreeNode<?>) this.getRoot(), ind);
 		entityMap.put(e, tn);
 		if (key < keyCodes.length) {
 			tn.setKeyCode(keyCodes[key]);
@@ -158,11 +158,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
-		TreeNode<Mention> tn = new TreeNode<Mention>(m, m.getCoveredText());
+		CATreeNode<Mention> tn = new CATreeNode<Mention>(m, m.getCoveredText());
 		mentionMap.put(m, tn);
 		int ind = 0;
 		while (ind < entityMap.get(e).getChildCount()) {
-			TreeNode<?> node = (TreeNode<?>) entityMap.get(e).getChildAt(ind);
+			CATreeNode<?> node = (CATreeNode<?>) entityMap.get(e).getChildAt(ind);
 			if (node.getFeatureStructure() instanceof Entity
 					|| ((Annotation) node.getFeatureStructure()).getBegin() > m.getBegin())
 				break;
@@ -207,7 +207,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		eg.setMembers(arr);
 		eg.addToIndexes();
 
-		TreeNode<Entity> gtn = addExistingEntity(eg);
+		CATreeNode<Entity> gtn = addExistingEntity(eg);
 		this.insertNodeInto(new EntityTreeNode(e1), gtn, 0);
 		this.insertNodeInto(new EntityTreeNode(e2), gtn, 1);
 
@@ -243,6 +243,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public boolean isKeyUsed(int i) {
 		return keyMap.containsKey(i);
+	}
+
+	public void addDiscontinuousToMention(Mention m, int begin, int end) {
+		Annotation d = AnnotationFactory.createAnnotation(jcas, begin, end, Annotation.class);
+		m.setDiscontinuous(d);
+
+		insertNodeInto(new CATreeNode<Annotation>(d, "disc"), mentionMap.get(m), 0);
 	}
 
 	public void resort() {
@@ -314,7 +321,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public void removeMention(Mention m) {
 		@SuppressWarnings("unchecked")
-		TreeNode<Entity> parent = (TreeNode<Entity>) mentionMap.get(m).getParent();
+		CATreeNode<Entity> parent = (CATreeNode<Entity>) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));
 		// removeNodeFromParent(mentionMap.get(m));

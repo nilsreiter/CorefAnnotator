@@ -1,8 +1,9 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 
-public class EntityTreeNode extends TreeNode<Entity> {
+public class EntityTreeNode extends CATreeNode<Entity> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,5 +33,10 @@ public class EntityTreeNode extends TreeNode<Entity> {
 	@Override
 	public String getLabel() {
 		return getFeatureStructure().getLabel();
+	}
+
+	@Override
+	public boolean isVirtual() {
+		return !(getFeatureStructure() instanceof EntityGroup);
 	}
 }

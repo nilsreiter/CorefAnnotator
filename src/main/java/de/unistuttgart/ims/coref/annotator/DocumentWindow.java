@@ -78,6 +78,8 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
+import org.kordamp.ikonli.dashicons.Dashicons;
+import org.kordamp.ikonli.swing.FontIcon;
 import org.xml.sax.SAXException;
 
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -117,7 +119,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
 	AbstractAction changeColorAction;
-	AbstractAction deleteAction;
+	DeleteAction deleteAction;
 	AbstractAction formGroupAction;
 
 	// controller
@@ -171,7 +173,8 @@ public class DocumentWindow extends JFrame
 		controls.add(new JButton(changeKeyAction));
 		controls.add(new JButton(changeColorAction));
 		controls.add(new JButton(deleteAction));
-		rightPanel.add(controls, BorderLayout.NORTH);
+		controls.add(new JButton(formGroupAction));
+		getContentPane().add(controls, BorderLayout.NORTH);
 
 		// initialise text view
 		JPanel leftPanel = new JPanel(new BorderLayout());
@@ -184,7 +187,7 @@ public class DocumentWindow extends JFrame
 		textPane.setHighlighter(hilit);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), BorderLayout.CENTER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
 		// split pane
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -613,14 +616,15 @@ public class DocumentWindow extends JFrame
 			paths = tree.getSelectionPaths();
 			fs = new FeatureStructure[paths.length];
 			for (int i = 0; i < paths.length; i++)
-				fs[i] = ((TreeNode<?>) paths[i].getLastPathComponent()).getFeatureStructure();
+				fs[i] = ((CATreeNode<?>) paths[i].getLastPathComponent()).getFeatureStructure();
 		} catch (NullPointerException ex) {
 		}
 		renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		deleteAction.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity
-				&& ((javax.swing.tree.TreeNode) paths[0].getLastPathComponent()).isLeaf())));
+				&& ((CATreeNode<?>) ((javax.swing.tree.TreeNode) paths[0].getLastPathComponent()).getParent())
+						.isVirtual())));
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
 
@@ -694,12 +698,12 @@ public class DocumentWindow extends JFrame
 			if (dl.getPath() == null)
 				return false;
 			TreePath treePath = dl.getPath();
-			TreeNode<?> selectedNode = (TreeNode<?>) treePath.getLastPathComponent();
+			CATreeNode<?> selectedNode = (CATreeNode<?>) treePath.getLastPathComponent();
 			FeatureStructure fs = selectedNode.getFeatureStructure();
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (fs instanceof Mention || fs instanceof EntityGroup || selectedNode == cModel.groupRootNode)
+				if (fs instanceof EntityGroup || selectedNode == cModel.groupRootNode)
 					return false;
 			}
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
@@ -729,24 +733,25 @@ public class DocumentWindow extends JFrame
 
 			try {
 
-				FeatureStructure target = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+				FeatureStructure targetFs = ((CATreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
 				if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					if (target == null)
+					if (targetFs == null)
 						cModel.addNewEntityMention(pa.getBegin(), pa.getEnd());
-					else
-						cModel.addNewMention((Entity) target, pa.getBegin(), pa.getEnd());
-
+					else if (targetFs instanceof Entity)
+						cModel.addNewMention((Entity) targetFs, pa.getBegin(), pa.getEnd());
+					else if (targetFs instanceof Mention)
+						cModel.addDiscontinuousToMention((Mention) targetFs, pa.getBegin(), pa.getEnd());
 				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
-					TreeNode<?> object = (TreeNode<?>) info.getTransferable()
+					CATreeNode<?> object = (CATreeNode<?>) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
-					if (target instanceof EntityGroup) {
-						TreeNode<Entity> etn = (TreeNode<Entity>) object;
-						cModel.addToGroup((EntityGroup) target, (Entity) etn.getFeatureStructure());
+					if (targetFs instanceof EntityGroup) {
+						CATreeNode<Entity> etn = (CATreeNode<Entity>) object;
+						cModel.addToGroup((EntityGroup) targetFs, (Entity) etn.getFeatureStructure());
 					} else {
-						TreeNode<Mention> m = (TreeNode<Mention>) object;
-						cModel.updateMention((Mention) m.getFeatureStructure(), (Entity) target);
+						CATreeNode<Mention> m = (CATreeNode<Mention>) object;
+						cModel.updateMention((Mention) m.getFeatureStructure(), (Entity) targetFs);
 					}
 				}
 
@@ -772,11 +777,11 @@ public class DocumentWindow extends JFrame
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTree tree = (JTree) comp;
-			TreeNode<?> tn = (TreeNode<?>) tree.getLastSelectedPathComponent();
+			CATreeNode<?> tn = (CATreeNode<?>) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention)
-				return new NodeTransferable<Mention>((TreeNode<Mention>) tn);
+				return new NodeTransferable<Mention>((CATreeNode<Mention>) tn);
 			if (tn.getFeatureStructure() instanceof Entity)
-				return new NodeTransferable<Entity>((TreeNode<Entity>) tn);
+				return new NodeTransferable<Entity>((CATreeNode<Entity>) tn);
 			return null;
 		}
 
@@ -793,6 +798,7 @@ public class DocumentWindow extends JFrame
 			putValue(Action.NAME, "Rename");
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TAG));
 
 		}
 
@@ -814,6 +820,8 @@ public class DocumentWindow extends JFrame
 			putValue(Action.NAME, "Color");
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_TEXTCOLOR));
+
 		}
 
 		@Override
@@ -834,6 +842,7 @@ public class DocumentWindow extends JFrame
 
 		public ChangeKeyForEntityAction() {
 			putValue(Action.NAME, "Shortcut");
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_KITCHENSINK));
 
 		}
 
@@ -849,7 +858,7 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class NewEntityAction extends AbstractAction {
+	class NewEntityAction extends MyAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -857,6 +866,8 @@ public class DocumentWindow extends JFrame
 			putValue(Action.NAME, "New");
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.PLUS));
+
 		}
 
 		@Override
@@ -881,40 +892,37 @@ public class DocumentWindow extends JFrame
 				s.setIcon(new ColorIcon(new Color(e.getColor())));
 				if (etn.getKeyCode() != null) {
 					s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
-				} else
+				} else if (!(etn.getParent() instanceof EntityTreeNode))
 					s.setText(s.getText() + " (" + etn.getChildCount() + ")");
-			} else {
-				s.setOpaque(false);
 			}
-
 			return s;
 		}
 
 	}
 
-	class DeleteAction extends AbstractAction {
+	class DeleteAction extends MyAction {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
 			putValue(Action.NAME, "Delete");
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TRASH));
 
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			TreeNode<?> tn = (TreeNode<?>) tree.getLastSelectedPathComponent();
+			CATreeNode<?> tn = (CATreeNode<?>) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention)
 				cModel.removeMention((Mention) tn.getFeatureStructure());
 			else if (tn.getFeatureStructure() instanceof Entity) {
 				EntityTreeNode etn = (EntityTreeNode) tn;
-				if (etn.isLeaf()) {
-					cModel.removeEntityFromGroup(
-							(EntityGroup) ((TreeNode<EntityGroup>) etn.getParent()).getFeatureStructure(),
-							(EntityTreeNode) tn);
+				FeatureStructure parentFs = ((CATreeNode<?>) etn.getParent()).getFeatureStructure();
+				if (parentFs instanceof EntityGroup) {
+					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
 				}
 			}
-
 		}
+
 	}
 
 	class DeleteMentionAction extends AbstractAction {
@@ -929,7 +937,7 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			@SuppressWarnings("unchecked")
-			TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
+			CATreeNode<Mention> tn = (CATreeNode<Mention>) tree.getLastSelectedPathComponent();
 			cModel.removeMention((Mention) tn.getFeatureStructure());
 		}
 
@@ -1017,15 +1025,20 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			putValue(Action.NAME, "Form entity group");
+			putValue(Action.NAME, "Group");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.GROUPS));
+
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent e) {
-			Entity e1 = (Entity) ((TreeNode<Entity>) tree.getSelectionPaths()[0].getLastPathComponent())
+			Entity e1 = (Entity) ((CATreeNode<Entity>) tree.getSelectionPaths()[0].getLastPathComponent())
 					.getFeatureStructure();
-			Entity e2 = (Entity) ((TreeNode<Entity>) tree.getSelectionPaths()[1].getLastPathComponent())
+			Entity e2 = (Entity) ((CATreeNode<Entity>) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
 			cModel.formGroup(e1, e2);
 		}
@@ -1059,6 +1072,13 @@ public class DocumentWindow extends JFrame
 			}
 
 		}
+	}
+
+	abstract class MyAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public void setEnabled() {
+		};
 	}
 
 }

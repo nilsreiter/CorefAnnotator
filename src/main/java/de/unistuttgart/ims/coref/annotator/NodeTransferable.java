@@ -6,11 +6,11 @@ import java.awt.datatransfer.Transferable;
 import org.apache.uima.cas.FeatureStructure;
 
 public class NodeTransferable<T extends FeatureStructure> implements Transferable {
-	public static DataFlavor dataFlavor = new DataFlavor(TreeNode.class, "TreeNode");
+	public static DataFlavor dataFlavor = new DataFlavor(CATreeNode.class, "TreeNode");
 
-	TreeNode<T> treeNode;
+	CATreeNode<T> treeNode;
 
-	public NodeTransferable(TreeNode<T> tn) {
+	public NodeTransferable(CATreeNode<T> tn) {
 		this.treeNode = tn;
 	}
 
