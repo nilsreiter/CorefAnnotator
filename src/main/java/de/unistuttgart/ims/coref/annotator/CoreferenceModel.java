@@ -245,7 +245,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		return keyMap.containsKey(i);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void resort() {
 		int n = rootNode.getChildCount();
 		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);

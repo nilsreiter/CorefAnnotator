@@ -26,7 +26,6 @@ public class TreeNode<T extends FeatureStructure> extends DefaultMutableTreeNode
 		this.label = label;
 	}
 
-	@SuppressWarnings("unchecked")
 	public FeatureStructure getFeatureStructure() {
 		return mentionCache.get(featureStructureHash);
 	}
