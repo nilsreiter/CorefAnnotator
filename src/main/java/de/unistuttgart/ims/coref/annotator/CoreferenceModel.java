@@ -281,14 +281,21 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	public void resort() {
 		int n = rootNode.getChildCount();
 		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);
+		List<CATreeNode> dontsort = new ArrayList<CATreeNode>(n);
+
 		for (int i = 0; i < n; i++) {
-			children.add((EntityTreeNode) rootNode.getChildAt(i));
+			if (rootNode.getChildAt(i) instanceof EntityTreeNode)
+				children.add((EntityTreeNode) rootNode.getChildAt(i));
+			else
+				dontsort.add((CATreeNode) rootNode.getChildAt(i));
 		}
 		children.sort(entitySortOrder.getComparator());
 		rootNode.removeAllChildren();
 		for (MutableTreeNode node : children) {
 			rootNode.add(node);
 		}
+		for (MutableTreeNode node : dontsort)
+			rootNode.add(node);
 		nodeChanged(rootNode);
 		nodeStructureChanged(rootNode);
 	}
