@@ -13,6 +13,7 @@ import javax.swing.KeyStroke;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.EntityTreeNode;
 
+@Deprecated
 public class ChangeColorForEntity extends CRAction {
 
 	private static final long serialVersionUID = 1L;

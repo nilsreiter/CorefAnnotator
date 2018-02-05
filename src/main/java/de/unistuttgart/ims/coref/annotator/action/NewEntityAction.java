@@ -10,6 +10,7 @@ import javax.swing.text.JTextComponent;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 
+@Deprecated
 public class NewEntityAction extends CRAction {
 
 	private static final long serialVersionUID = 1L;

@@ -59,11 +59,11 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	public SearchPanel(DocumentWindow xdw, Configuration configuration) {
 		setTitle("Search");
 		documentWindow = xdw;
-		text = xdw.getViewer().getTextPane().getText();
+		text = xdw.textPane.getText();
 
-		hilit = xdw.getViewer().getTextPane().getHighlighter();
+		hilit = xdw.textPane.getHighlighter();
 		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
-		xdw.getViewer().getTextPane().setHighlighter(hilit);
+		xdw.textPane.setHighlighter(hilit);
 
 		lm = new DefaultListModel<SearchResult>();
 		getContentPane().add(createSearchPanel(), BorderLayout.PAGE_START);
@@ -163,7 +163,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	public void valueChanged(ListSelectionEvent e) {
 
 		SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
-		documentWindow.getViewer().getTextPane().setCaretPosition(result.getEnd());
+		documentWindow.textPane.setCaretPosition(result.getEnd());
 	}
 
 	class SearchResult {

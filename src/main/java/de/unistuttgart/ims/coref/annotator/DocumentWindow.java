@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,7 +44,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -87,21 +87,16 @@ import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.commons.Counter;
-import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
-import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.DeleteMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportCRETAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportDKproAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
-import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeSelectionListener {
+public class DocumentWindow extends JFrame implements CaretListener, TreeSelectionListener, TreeModelListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Xmi Viewer";
@@ -114,17 +109,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	String segmentAnnotation = null;
 
 	// actions
-	NewEntityAction newEntityAction;
-	RenameEntityAction renameEntityAction;
-	ChangeKeyForEntityAction changeKeyForEntityAction;
-	ChangeColorForEntity changeColorForEntityAction;
+	AbstractAction newEntityAction;
+	AbstractAction renameAction;
+	AbstractAction changeKeyAction;
+	AbstractAction changeColorAction;
+	AbstractAction deleteMentionAction;
 
 	// controller
 	CoreferenceModel cModel;
 
 	// Window components
 	CasTextView viewer;
-	DetailsPanel panel;
+	JPanel panel;
+	JTree tree;
+	JTextPane textPane;
+	Highlighter hilit;
+	Highlighter.HighlightPainter painter;
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -138,16 +138,40 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	public DocumentWindow(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
+		this.initialiseActions();
 		this.initialiseMenu();
 		this.initialiseWindow();
 
 	}
 
 	public void initialiseWindow() {
-		viewer = new CasTextView(this);
-		panel = new DetailsPanel();
+		// initialise panel
+		panel = new JPanel(new BorderLayout());
+		tree = new JTree();
+		tree.setVisibleRowCount(-1);
+		tree.setDragEnabled(true);
+		tree.setLargeModel(true);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.setTransferHandler(new PanelTransferHandler());
+		tree.setCellRenderer(new CellRenderer());
+		tree.addTreeSelectionListener(this);
 
-		loadingListeners.add(panel);
+		panel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+
+		JPanel controls = new JPanel();
+
+		controls.add(new JButton(newEntityAction));
+		controls.add(new JButton(renameAction));
+		controls.add(new JButton(changeKeyAction));
+		controls.add(new JButton(changeColorAction));
+		controls.add(new JButton(deleteMentionAction));
+		panel.add(controls, BorderLayout.NORTH);
+
+		// intialise text view
+		viewer = new CasTextView();
+
+		// loadingListeners.add(panel);
 		loadingListeners.add(viewer);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
@@ -155,6 +179,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		getContentPane().add(splitPane);
 		pack();
 		setVisible(true);
+	}
+
+	protected void initialiseActions() {
+		this.renameAction = new RenameEntityAction();
+		this.changeColorAction = new ChangeColorForEntity();
+		this.newEntityAction = new NewEntityAction();
+		this.changeColorAction = new ChangeColorForEntity();
+		this.changeKeyAction = new ChangeKeyForEntityAction();
+		this.deleteMentionAction = new DeleteMentionAction();
+
 	}
 
 	protected void closeWindow(boolean quit) {
@@ -243,15 +277,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	}
 
 	protected void initialiseMenuAfterModelCreation() {
-		this.newEntityAction = new NewEntityAction(cModel, viewer.getTextPane());
-		this.changeColorForEntityAction = new ChangeColorForEntity(cModel, panel.tree);
-		this.changeKeyForEntityAction = new ChangeKeyForEntityAction(cModel, panel.tree);
-		this.renameEntityAction = new RenameEntityAction(cModel, panel.tree);
 
-		entityMenu.add(new JMenuItem(newEntityAction));
-		entityMenu.add(new JMenuItem(changeColorForEntityAction));
-		entityMenu.add(new JMenuItem(changeKeyForEntityAction));
-		entityMenu.add(new JMenuItem(renameEntityAction));
 	}
 
 	protected void initialiseMenu() {
@@ -357,6 +383,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		}
 		viewMenu.add(viewStyleMenu);
 
+		// entity menu
+		entityMenu.add(new JMenuItem(renameAction));
+		entityMenu.add(new JMenuItem(newEntityAction));
+		entityMenu.add(new JMenuItem(changeColorAction));
+		entityMenu.add(new JMenuItem(changeKeyAction));
+
 		menuBar.add(fileMenu);
 		menuBar.add(entityMenu);
 
@@ -439,8 +471,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int oldSize = viewer.getTextPane().getFont().getSize();
-			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize - 1));
+			int oldSize = textPane.getFont().getSize();
+			textPane.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize - 1));
 		}
 
 	}
@@ -458,8 +490,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int oldSize = viewer.getTextPane().getFont().getSize();
-			viewer.getTextPane().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
+			int oldSize = textPane.getFont().getSize();
+			textPane.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
 		}
 
 	}
@@ -514,6 +546,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	}
 
 	protected void fireModelCreatedEvent() {
+		cModel.addTreeModelListener(this);
+		tree.setModel(cModel);
+		tree.addTreeSelectionListener(cModel);
+
+		textPane.addCaretListener(this);
+
 		for (LoadingListener ll : loadingListeners)
 			ll.modelCreated(cModel, this);
 	}
@@ -530,28 +568,53 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		this.changeColorForEntityAction.setEnabled(e.getPath().getPathCount() == 2);
-		this.changeKeyForEntityAction.setEnabled(e.getPath().getPathCount() == 2);
-		this.renameEntityAction.setEnabled(e.getPath().getPathCount() == 2);
+		TreePath tp = e.getNewLeadSelectionPath();
+		if (tp != null) {
+			TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
+			renameAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			changeKeyAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			changeColorAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
+			deleteMentionAction.setEnabled(selection.isLeaf());
+		}
+	}
+
+	@Override
+	public void treeNodesInserted(TreeModelEvent e) {
+		tree.expandPath(e.getTreePath());
+	}
+
+	@Override
+	public void treeNodesChanged(TreeModelEvent e) {
+		tree.expandPath(e.getTreePath());
+
+	}
+
+	@Override
+	public void treeNodesRemoved(TreeModelEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void treeStructureChanged(TreeModelEvent e) {
+		tree.expandPath(e.getTreePath());
+
 	}
 
 	class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener {
 
 		private static final long serialVersionUID = 1L;
 
-		JTextPane textPane;
-		Highlighter hilit;
-		Highlighter.HighlightPainter painter;
 		StyleContext styleContext = new StyleContext();
 		Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 		Counter<Span> spanCounter = new Counter<Span>();
 
 		Object selectionHighlight = null;
 
-		public CasTextView(DocumentWindow dw) {
+		public CasTextView() {
 			super(new BorderLayout());
-			this.hilit = new DefaultHighlighter();
-			this.textPane = new JTextPane();
+			hilit = new DefaultHighlighter();
+			textPane = new JTextPane();
 			// this.textPane.setWrapStyleWord(true);
 			// this.textPane.setLineWrap(true);
 			this.setPreferredSize(new Dimension(500, 800));
@@ -590,65 +653,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 			}
 		}
 
-		public JTextComponent getTextPane() {
-			return textPane;
-		}
-
 		public void drawAnnotations() {
 			hilit.removeAllHighlights();
 			highlightMap.clear();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				drawAnnotation(m);
-			}
-		}
-
-		class TextViewTransferHandler extends TransferHandler {
-
-			private static final long serialVersionUID = 1L;
-
-			CasTextView textView;
-
-			public TextViewTransferHandler(CasTextView tv) {
-				textView = tv;
-			}
-
-			@Override
-			public int getSourceActions(JComponent comp) {
-				return TransferHandler.LINK;
-			}
-
-			@Override
-			public Transferable createTransferable(JComponent comp) {
-				JTextComponent t = (JTextComponent) comp;
-				return new PotentialAnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
-			}
-
-			@Override
-			protected void exportDone(JComponent c, Transferable t, int action) {
-				// TODO: export an Annotation object
-				// drawAnnotations();
-			}
-
-			@Override
-			public boolean canImport(TransferHandler.TransferSupport info) {
-
-				if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-
-				}
-				return false;
-			}
-
-			@Override
-			public boolean importData(TransferHandler.TransferSupport info) {
-				if (!info.isDrop()) {
-					return false;
-				}
-				JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-				dl.getDropPoint();
-
-				int index = dl.getIndex();
-				System.err.println(index);
-				return false;
 			}
 		}
 
@@ -707,267 +716,274 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		}
 	}
 
-	class DetailsPanel extends JPanel
-			implements TreeSelectionListener, TreeModelListener, LoadingListener, CaretListener {
+	class PanelTransferHandler extends TransferHandler {
+
+		/**
+		 * 
+		 */
 		private static final long serialVersionUID = 1L;
 
-		JTree tree;
-		Map<Long, Mention> mentionCache;
-
-		AbstractAction renameAction;
-		AbstractAction changeKeyAction;
-		AbstractAction changeColorAction;
-		AbstractAction newEntityAction;
-		AbstractAction deleteMentionAction;
-
-		JButton renameActionButton;
-		JButton changeKeyActionButton;
-		JButton changeColorActionButton;
-		JButton newEntityActionButton;
-		JButton deleteMentionActionButton;
-
-		public DetailsPanel() {
-			super(new BorderLayout());
-
-			this.initialiseUi();
-
-		}
-
-		protected void initialiseUi() {
-			tree = new JTree();
-			tree.getSelectionModel().addTreeSelectionListener(this);
-			tree.setVisibleRowCount(-1);
-			tree.setDragEnabled(true);
-			tree.setLargeModel(true);
-			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-			tree.setTransferHandler(new PanelTransferHandler());
-			tree.setCellRenderer(new CellRenderer());
-
-			add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
-
-			JPanel controls = new JPanel();
-
-			newEntityActionButton = new JButton("new");
-			newEntityActionButton.setEnabled(false);
-			renameActionButton = new JButton("rename");
-			changeKeyActionButton = new JButton("change key");
-			changeColorActionButton = new JButton("rename");
-			deleteMentionActionButton = new JButton("delete mention");
-
-			controls.add(newEntityActionButton);
-			controls.add(renameActionButton);
-			controls.add(changeKeyActionButton);
-			controls.add(changeColorActionButton);
-			controls.add(deleteMentionActionButton);
-			this.add(controls, BorderLayout.NORTH);
-		}
-
-		private void displayDropLocation(final String string) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(null, string);
-				}
-			});
-		}
-
-		class CellRenderer extends DefaultTreeCellRenderer {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
-					boolean leaf, int row, boolean hasFocus) {
-				JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
-						hasFocus);
-				if (value instanceof EntityTreeNode) {
-					EntityTreeNode etn = (EntityTreeNode) value;
-					Entity e = etn.getFeatureStructure();
-					s.setIcon(new ColorIcon(new Color(e.getColor())));
-					if (etn.getKeyCode() != null) {
-						s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
-					} else
-						s.setText(s.getText() + " (" + etn.getChildCount() + ")");
-				} else {
-					s.setOpaque(false);
-				}
-
-				return s;
-			}
-
-		}
-
 		@Override
-		public void valueChanged(TreeSelectionEvent e) {
-			TreePath tp = e.getNewLeadSelectionPath();
-			if (tp != null) {
-				TreeNode<?> selection = (TreeNode<?>) tp.getLastPathComponent();
-				renameAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-				changeKeyAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-				changeColorAction.setEnabled(!(selection.isLeaf() || selection.isRoot()));
-				deleteMentionAction.setEnabled(selection.isLeaf());
-			}
-		}
+		public boolean canImport(TransferHandler.TransferSupport info) {
+			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+			if (dl.getPath() == null)
+				return false;
+			TreePath treePath = dl.getPath();
+			TreeNode<?> selectedNode = (TreeNode<?>) treePath.getLastPathComponent();
 
-		@Override
-		public void treeNodesInserted(TreeModelEvent e) {
-			tree.expandPath(e.getTreePath());
-		}
-
-		@Override
-		public void treeNodesChanged(TreeModelEvent e) {
-			tree.expandPath(e.getTreePath());
-
-		}
-
-		@Override
-		public void treeNodesRemoved(TreeModelEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void treeStructureChanged(TreeModelEvent e) {
-			tree.expandPath(e.getTreePath());
-
-		}
-
-		@Override
-		public void jcasLoaded(JCas jcas) {
-
-		}
-
-		@Override
-		public void modelCreated(CoreferenceModel model, DocumentWindow dw) {
-			model.addTreeModelListener(this);
-
-			renameAction = new RenameEntityAction(model, tree);
-			renameAction.setEnabled(false);
-			renameActionButton.setAction(renameAction);
-
-			changeKeyAction = new ChangeKeyForEntityAction(model, tree);
-			changeKeyAction.setEnabled(false);
-			changeKeyActionButton.setAction(changeKeyAction);
-
-			changeColorAction = new ChangeColorForEntity(model, tree);
-			changeColorAction.setEnabled(false);
-			changeColorActionButton.setAction(changeColorAction);
-
-			newEntityAction = new NewEntityAction(model, dw.viewer.textPane);
-			newEntityAction.setEnabled(true);
-			newEntityActionButton.setAction(newEntityAction);
-
-			deleteMentionAction = new DeleteMentionAction(model, tree);
-			deleteMentionAction.setEnabled(true);
-			deleteMentionActionButton.setAction(deleteMentionAction);
-
-			tree.setModel(model);
-			tree.addTreeSelectionListener(model);
-
-			dw.viewer.textPane.addCaretListener(this);
-
-		}
-
-		class PanelTransferHandler extends TransferHandler {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean canImport(TransferHandler.TransferSupport info) {
-				JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
-				if (dl.getPath() == null)
+			// new mention created in text view
+			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+				if (selectedNode.isLeaf())
 					return false;
-				TreePath treePath = dl.getPath();
-				TreeNode<?> selectedNode = (TreeNode<?>) treePath.getLastPathComponent();
-
-				// new mention created in text view
-				if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-					if (selectedNode.isLeaf())
-						return false;
-				}
-				if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-					if (selectedNode.isLeaf() || selectedNode.isRoot())
-						return false;
-				}
-
-				return true;
+			}
+			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (selectedNode.isLeaf() || selectedNode.isRoot())
+					return false;
 			}
 
+			return true;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean importData(TransferHandler.TransferSupport info) {
+			if (!info.isDrop()) {
+				return false;
+			}
+
+			// Check for String flavor
+			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
+					&& !info.isDataFlavorSupported(NodeTransferable.dataFlavor)) {
+				return false;
+			}
+
+			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
+			TreePath tp = dl.getPath();
+			tree.expandPath(tp);
+
+			try {
+				if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
+					FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
+							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+					if (entity == null)
+						((CoreferenceModel) tree.getModel()).addNewEntityMention(pa.getBegin(), pa.getEnd());
+					else
+						((CoreferenceModel) tree.getModel()).addNewMention((Entity) entity, pa.getBegin(), pa.getEnd());
+
+				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
+					FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
+
+					TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
+							.getTransferData(NodeTransferable.dataFlavor);
+					((CoreferenceModel) tree.getModel()).updateMention(m.getFeatureStructure(), (Entity) entity);
+
+				}
+
+			} catch (UnsupportedFlavorException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return true;
+		}
+
+		@Override
+		public int getSourceActions(JComponent c) {
+			return MOVE;
+		}
+
+		@Override
+		public Transferable createTransferable(JComponent comp) {
+			JTree tree = (JTree) comp;
 			@SuppressWarnings("unchecked")
-			@Override
-			public boolean importData(TransferHandler.TransferSupport info) {
-				if (!info.isDrop()) {
-					return false;
-				}
-
-				// Check for String flavor
-				if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
-						&& !info.isDataFlavorSupported(NodeTransferable.dataFlavor)) {
-					displayDropLocation("List doesn't accept a drop of this type.");
-					return false;
-				}
-
-				JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
-				TreePath tp = dl.getPath();
-				tree.expandPath(tp);
-
-				try {
-					if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
-						FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
-						PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
-								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-						if (entity == null)
-							((CoreferenceModel) tree.getModel()).addNewEntityMention(pa.getBegin(), pa.getEnd());
-						else
-							((CoreferenceModel) tree.getModel()).addNewMention((Entity) entity, pa.getBegin(),
-									pa.getEnd());
-
-					} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
-						FeatureStructure entity = ((TreeNode<?>) tp.getLastPathComponent()).getFeatureStructure();
-
-						TreeNode<Mention> m = (TreeNode<Mention>) info.getTransferable()
-								.getTransferData(NodeTransferable.dataFlavor);
-						((CoreferenceModel) tree.getModel()).updateMention(m.getFeatureStructure(), (Entity) entity);
-
-					}
-
-				} catch (UnsupportedFlavorException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				return true;
-			}
-
-			@Override
-			public int getSourceActions(JComponent c) {
-				return MOVE;
-			}
-
-			@Override
-			public Transferable createTransferable(JComponent comp) {
-				JTree tree = (JTree) comp;
-				@SuppressWarnings("unchecked")
-				TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
-				return new NodeTransferable<Mention>(tn);
-			}
-
-		}
-
-		@Override
-		public void caretUpdate(CaretEvent e) {
-			newEntityAction.setEnabled(e.getDot() != e.getMark());
+			TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
+			return new NodeTransferable<Mention>(tn);
 		}
 
 	}
+
+	class RenameEntityAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public RenameEntityAction() {
+			putValue(Action.NAME, "Rename");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String name = JOptionPane.showInputDialog("Enter the new name:");
+			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
+			etn.getFeatureStructure().setLabel(name);
+			cModel.nodeChanged(etn);
+		}
+
+	}
+
+	class ChangeColorForEntity extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ChangeColorForEntity() {
+			putValue(Action.NAME, "Color");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
+			Color color = new Color(etn.getFeatureStructure().getColor());
+
+			Color newColor = JColorChooser.showDialog(null, "Choose new color", color);
+			cModel.updateColor(etn.getFeatureStructure(), newColor);
+		}
+
+	}
+
+	class ChangeKeyForEntityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ChangeKeyForEntityAction() {
+			putValue(Action.NAME, "Shortcut");
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String key = JOptionPane.showInputDialog("Enter the new key");
+			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
+
+			char keyCode = key.charAt(0);
+			System.err.println(KeyEvent.getKeyText(keyCode) + " " + keyCode);
+			cModel.reassignKey(keyCode, etn.getFeatureStructure());
+		}
+
+	}
+
+	class NewEntityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public NewEntityAction() {
+			putValue(Action.NAME, "New");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cModel.addNewEntityMention(textPane.getSelectionStart(), textPane.getSelectionEnd());
+		}
+
+	}
+
+	class CellRenderer extends DefaultTreeCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+				boolean leaf, int row, boolean hasFocus) {
+			JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
+					hasFocus);
+			if (value instanceof EntityTreeNode) {
+				EntityTreeNode etn = (EntityTreeNode) value;
+				Entity e = etn.getFeatureStructure();
+				s.setIcon(new ColorIcon(new Color(e.getColor())));
+				if (etn.getKeyCode() != null) {
+					s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
+				} else
+					s.setText(s.getText() + " (" + etn.getChildCount() + ")");
+			} else {
+				s.setOpaque(false);
+			}
+
+			return s;
+		}
+
+	}
+
+	class DeleteMentionAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public DeleteMentionAction() {
+			putValue(Action.NAME, "Delete");
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			@SuppressWarnings("unchecked")
+			TreeNode<Mention> tn = (TreeNode<Mention>) tree.getLastSelectedPathComponent();
+			cModel.removeMention(tn.getFeatureStructure());
+		}
+
+	}
+
+	class TextViewTransferHandler extends TransferHandler {
+
+		private static final long serialVersionUID = 1L;
+
+		CasTextView textView;
+
+		public TextViewTransferHandler(CasTextView tv) {
+			textView = tv;
+		}
+
+		@Override
+		public int getSourceActions(JComponent comp) {
+			return TransferHandler.LINK;
+		}
+
+		@Override
+		public Transferable createTransferable(JComponent comp) {
+			JTextComponent t = (JTextComponent) comp;
+			return new PotentialAnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
+		}
+
+		@Override
+		protected void exportDone(JComponent c, Transferable t, int action) {
+			// TODO: export an Annotation object
+			// drawAnnotations();
+		}
+
+		@Override
+		public boolean canImport(TransferHandler.TransferSupport info) {
+
+			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+
+			}
+			return false;
+		}
+
+		@Override
+		public boolean importData(TransferHandler.TransferSupport info) {
+			if (!info.isDrop()) {
+				return false;
+			}
+			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
+			dl.getDropPoint();
+
+			int index = dl.getIndex();
+			System.err.println(index);
+			return false;
+		}
+	}
+
 }

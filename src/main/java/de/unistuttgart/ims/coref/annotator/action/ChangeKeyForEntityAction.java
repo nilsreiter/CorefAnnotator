@@ -10,6 +10,7 @@ import javax.swing.JTree;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.EntityTreeNode;
 
+@Deprecated
 public class ChangeKeyForEntityAction extends CRAction {
 
 	private static final long serialVersionUID = 1L;

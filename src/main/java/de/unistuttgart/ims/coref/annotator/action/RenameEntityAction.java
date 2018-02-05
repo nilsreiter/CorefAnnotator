@@ -12,6 +12,7 @@ import javax.swing.KeyStroke;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.EntityTreeNode;
 
+@Deprecated
 public class RenameEntityAction extends CRAction {
 
 	/**
