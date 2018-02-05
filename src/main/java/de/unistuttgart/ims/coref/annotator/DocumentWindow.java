@@ -122,8 +122,6 @@ public class DocumentWindow extends JFrame
 	CoreferenceModel cModel;
 
 	// Window components
-	JPanel viewer;
-	JPanel panel;
 	JTree tree;
 	JTextPane textPane;
 	Highlighter hilit;
@@ -135,7 +133,6 @@ public class DocumentWindow extends JFrame
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
-	JMenu entityMenu;
 
 	// Listeners
 	List<LoadingListener> loadingListeners = new LinkedList<LoadingListener>();
@@ -149,9 +146,13 @@ public class DocumentWindow extends JFrame
 
 	}
 
+	/*
+	 * Initialisation
+	 */
+
 	public void initialiseWindow() {
 		// initialise panel
-		panel = new JPanel(new BorderLayout());
+		JPanel rightPanel = new JPanel(new BorderLayout());
 		tree = new JTree();
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
@@ -161,7 +162,7 @@ public class DocumentWindow extends JFrame
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
 
-		panel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
 		JPanel controls = new JPanel();
@@ -171,11 +172,10 @@ public class DocumentWindow extends JFrame
 		controls.add(new JButton(changeKeyAction));
 		controls.add(new JButton(changeColorAction));
 		controls.add(new JButton(deleteMentionAction));
-		panel.add(controls, BorderLayout.NORTH);
+		rightPanel.add(controls, BorderLayout.NORTH);
 
-		// intialise text view
-
-		viewer = new JPanel(new BorderLayout());
+		// initialise text view
+		JPanel leftPanel = new JPanel(new BorderLayout());
 		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
 		this.setPreferredSize(new Dimension(500, 800));
@@ -184,10 +184,11 @@ public class DocumentWindow extends JFrame
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.setHighlighter(hilit);
 
-		viewer.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), BorderLayout.CENTER);
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
+		// split pane
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
 
 		getContentPane().add(splitPane);
 		pack();
@@ -201,7 +202,160 @@ public class DocumentWindow extends JFrame
 		this.changeColorAction = new ChangeColorForEntity();
 		this.changeKeyAction = new ChangeKeyForEntityAction();
 		this.deleteMentionAction = new DeleteMentionAction();
+	}
 
+	protected JMenu initialiseMenuView() {
+		JMenu viewMenu = new JMenu("View");
+		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
+		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
+		viewMenu.addSeparator();
+
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cModel.entitySortOrder = EntitySortOrder.Alphabet;
+				cModel.resort();
+
+			}
+		});
+		radio1.setSelected(true);
+
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cModel.entitySortOrder = EntitySortOrder.Mentions;
+				cModel.resort();
+			}
+		});
+		ButtonGroup grp = new ButtonGroup();
+		grp.add(radio2);
+		grp.add(radio1);
+
+		viewMenu.add(radio1);
+		viewMenu.add(radio2);
+
+		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
+				cModel.resort();
+			}
+
+		}));
+
+		JMenu viewStyleMenu = new JMenu("Style");
+		grp = new ButtonGroup();
+		int i = 0;
+		for (StyleVariant sv : StyleVariant.values()) {
+			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(sv));
+			viewStyleMenu.add(radio1);
+			if ((i++) == 0)
+				radio1.setSelected(true);
+			grp.add(radio1);
+
+		}
+		viewMenu.add(viewStyleMenu);
+		return viewMenu;
+
+	}
+
+	protected JMenu initialiseMenuTools() {
+		JMenu toolsMenu = new JMenu("Tools");
+		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
+
+		return toolsMenu;
+	}
+
+	protected JMenu initialiseMenuFile() {
+		JMenu fileImportMenu = new JMenu("Import from ...");
+		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+		fileImportMenu.add(new FileImportDKproAction(mainApplication));
+		fileImportMenu.add(new FileImportCRETAAction(mainApplication));
+
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(fileImportMenu);
+		fileMenu.add(new FileSaveAction(this));
+		fileMenu.add(new JMenuItem(new CloseAction()));
+		fileMenu.add(new JMenuItem(new ExitAction()));
+
+		return fileMenu;
+	}
+
+	protected JMenu initialiseMenuEntity() {
+		JMenu entityMenu = new JMenu("Entities");
+		entityMenu.add(new JMenuItem(renameAction));
+		entityMenu.add(new JMenuItem(newEntityAction));
+		entityMenu.add(new JMenuItem(changeColorAction));
+		entityMenu.add(new JMenuItem(changeKeyAction));
+		return entityMenu;
+	}
+
+	protected void initialiseMenu() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			logger.error("Could not set look and feel {}.", e.getMessage());
+		}
+
+		// top level menus
+		JMenu helpMenu = new JMenu("Help");
+		// JMenu debugMenu = new JMenu("Debug");
+		windowsMenu = new JMenu("Windows");
+		if (segmentAnnotation != null) {
+			documentMenu = new JMenu("Document");
+			documentMenu.setEnabled(segmentAnnotation != null);
+		}
+
+		// Menu Items
+		JMenuItem aboutMenuItem = new JMenuItem("About");
+		JMenuItem helpMenuItem = new JMenuItem("Help");
+		recentMenu = new JMenu("Open Recent");
+
+		menuBar.add(initialiseMenuFile());
+		menuBar.add(initialiseMenuEntity());
+		menuBar.add(initialiseMenuView());
+		menuBar.add(initialiseMenuTools());
+		if (segmentAnnotation != null)
+			menuBar.add(documentMenu);
+		menuBar.add(windowsMenu);
+		menuBar.add(helpMenu);
+
+		setJMenuBar(menuBar);
+
+		// window events
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				mainApplication.close((DocumentWindow) e.getSource());
+			}
+		});
+
+		// Event Handlling of "About" Menu Item
+		aboutMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				mainApplication.handleAbout(new AboutEvent());
+			}
+		});
+
+		// Event Handlling of "Help" Menu Item
+		helpMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				JOptionPane.showMessageDialog(DocumentWindow.this, HELP_MESSAGE, "Annotation Viewer Help",
+						JOptionPane.PLAIN_MESSAGE);
+			}
+		});
+
+		logger.info("Initialised window.");
 	}
 
 	protected void closeWindow(boolean quit) {
@@ -313,177 +467,6 @@ public class DocumentWindow extends JFrame
 		this.cModel.addCoreferenceModelListener(this);
 		this.cModel.importExistingData();
 		this.fireModelCreatedEvent();
-		this.initialiseMenuAfterModelCreation();
-	}
-
-	protected void initialiseMenuAfterModelCreation() {
-
-	}
-
-	protected void initialiseMenu() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			logger.error("Could not set look and feel {}.", e.getMessage());
-		}
-
-		// top level menus
-		JMenu fileMenu = new JMenu("File");
-		JMenu helpMenu = new JMenu("Help");
-		JMenu viewMenu = new JMenu("View");
-		JMenu toolsMenu = new JMenu("Tools");
-		entityMenu = new JMenu("Entities");
-		// JMenu debugMenu = new JMenu("Debug");
-		windowsMenu = new JMenu("Windows");
-		if (segmentAnnotation != null) {
-			documentMenu = new JMenu("Document");
-			documentMenu.setEnabled(segmentAnnotation != null);
-		}
-
-		// Menu Items
-		JMenuItem aboutMenuItem = new JMenuItem("About");
-		JMenuItem helpMenuItem = new JMenuItem("Help");
-		JMenuItem exitMenuItem = new JMenuItem("Quit");
-		recentMenu = new JMenu("Open Recent");
-		JMenuItem closeMenuItem = new JMenuItem("Close");
-		closeMenuItem.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		// file menu
-		fileMenu.add(new FileOpenAction(mainApplication));
-
-		fileMenu.add(new FileSaveAction(this));
-		JMenu fileImportMenu = new JMenu("Import from ...");
-		fileMenu.add(fileImportMenu);
-		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
-		fileImportMenu.add(new FileImportDKproAction(mainApplication));
-		fileImportMenu.add(new FileImportCRETAAction(mainApplication));
-
-		fileMenu.add(closeMenuItem);
-		fileMenu.add(exitMenuItem);
-
-		// tools menu
-		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
-
-		// View menu
-		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
-		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
-		viewMenu.addSeparator();
-
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder = EntitySortOrder.Alphabet;
-				cModel.resort();
-
-			}
-		});
-		radio1.setSelected(true);
-
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder = EntitySortOrder.Mentions;
-				cModel.resort();
-			}
-		});
-		ButtonGroup grp = new ButtonGroup();
-		grp.add(radio2);
-		grp.add(radio1);
-
-		viewMenu.add(radio1);
-		viewMenu.add(radio2);
-
-		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
-				cModel.resort();
-			}
-
-		}));
-
-		JMenu viewStyleMenu = new JMenu("Style");
-		grp = new ButtonGroup();
-		int i = 0;
-		for (StyleVariant sv : StyleVariant.values()) {
-			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(sv));
-			viewStyleMenu.add(radio1);
-			if ((i++) == 0)
-				radio1.setSelected(true);
-			grp.add(radio1);
-
-		}
-		viewMenu.add(viewStyleMenu);
-
-		// entity menu
-		entityMenu.add(new JMenuItem(renameAction));
-		entityMenu.add(new JMenuItem(newEntityAction));
-		entityMenu.add(new JMenuItem(changeColorAction));
-		entityMenu.add(new JMenuItem(changeKeyAction));
-
-		menuBar.add(fileMenu);
-		menuBar.add(entityMenu);
-
-		menuBar.add(viewMenu);
-		menuBar.add(toolsMenu);
-		if (segmentAnnotation != null)
-			menuBar.add(documentMenu);
-		menuBar.add(windowsMenu);
-		menuBar.add(helpMenu);
-
-		setJMenuBar(menuBar);
-
-		// window events
-		this.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				mainApplication.close((DocumentWindow) e.getSource());
-			}
-		});
-
-		// Event Handlling of "Quit" Menu Item
-		exitMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				mainApplication.handleQuitRequestWith(new QuitEvent(), new QuitResponse());
-			}
-		});
-
-		// Event Handlling of "Close" Menu Item
-		closeMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				// savePreferences();
-				closeWindow(false);
-			}
-		});
-
-		// Event Handlling of "About" Menu Item
-		aboutMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				mainApplication.handleAbout(new AboutEvent());
-			}
-		});
-
-		// Event Handlling of "Help" Menu Item
-		helpMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				JOptionPane.showMessageDialog(DocumentWindow.this, HELP_MESSAGE, "Annotation Viewer Help",
-						JOptionPane.PLAIN_MESSAGE);
-			}
-		});
-
-		logger.info("Initialised window.");
 	}
 
 	public JCas getJcas() {
@@ -937,6 +920,40 @@ public class DocumentWindow extends JFrame
 			System.err.println(index);
 			return false;
 		}
+	}
+
+	class CloseAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public CloseAction() {
+			putValue(Action.NAME, "Close");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			closeWindow(false);
+		}
+
+	}
+
+	class ExitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ExitAction() {
+			putValue(Action.NAME, "Quit");
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			mainApplication.handleQuitRequestWith(new QuitEvent(), new QuitResponse());
+		}
+
 	}
 
 }
