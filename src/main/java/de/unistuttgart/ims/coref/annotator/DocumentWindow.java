@@ -628,8 +628,10 @@ public class DocumentWindow extends JFrame
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
 
-		if (num > 0 && fs[0] instanceof Mention)
+		if (num == 1 && fs[0] instanceof Mention)
 			mentionSelected((Mention) fs[0]);
+		else
+			mentionSelected(null);
 
 	}
 
