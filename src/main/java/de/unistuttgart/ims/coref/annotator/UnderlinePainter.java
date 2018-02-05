@@ -17,9 +17,17 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 	int lineWidth = 3;
 	int downDistance = 0;
 
+	boolean dotted = false;
+
 	public UnderlinePainter(Color color, int distance) {
 		super(color);
 		this.downDistance = distance;
+	}
+
+	public UnderlinePainter(Color color, int distance, boolean dotted) {
+		super(color);
+		this.downDistance = distance;
+		this.dotted = dotted;
 	}
 
 	/**
@@ -53,7 +61,8 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		Color color = getColor();
 		g.setColor(color == null ? c.getSelectionColor() : color);
 
-		g2.setStroke(new BasicStroke(lineWidth));
+		g2.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f,
+				(dotted ? new float[] { lineWidth * 3 } : null), 0));
 		g2.drawLine(r.x, r.y + r.height + downDistance, r.x + r.width, r.y + r.height + downDistance);
 
 		r.setBounds(r.x - lineWidth, r.y, r.width + 2 * lineWidth, r.height + lineWidth + downDistance);

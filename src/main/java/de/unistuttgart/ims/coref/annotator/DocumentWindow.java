@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -93,6 +94,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -374,7 +376,7 @@ public class DocumentWindow extends JFrame
 		mainApplication.close(this);
 	}
 
-	public void drawAnnotation(Mention a) {
+	public void drawAnnotation(Annotation a, Color c, boolean dotted) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
@@ -383,21 +385,29 @@ public class DocumentWindow extends JFrame
 		}
 		try {
 			int n = spanCounter.get(span);
-			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
-					new UnderlinePainter(new Color(a.getEntity().getColor()), n * 3));
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
 			spanCounter.add(span);
 			highlightMap.put(a, hi);
+
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	public void drawMention(Mention m) {
+		drawAnnotation(m, new Color(m.getEntity().getColor()), false);
+		if (m.getDiscontinuous() != null)
+			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true);
+	}
+
 	public void drawAnnotations() {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			drawAnnotation(m);
+			drawAnnotation(m, new Color(m.getEntity().getColor()), false);
+			if (m.getDiscontinuous() != null)
+				drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true);
 		}
 	}
 
@@ -628,8 +638,8 @@ public class DocumentWindow extends JFrame
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
 
-		if (num == 1 && fs[0] instanceof Mention)
-			mentionSelected((Mention) fs[0]);
+		if (num == 1 && (fs[0] instanceof Mention) || fs[0] instanceof DetachedMentionPart)
+			mentionSelected((Annotation) fs[0]);
 		else
 			mentionSelected(null);
 
@@ -659,7 +669,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	@Override
-	public void mentionSelected(Mention m) {
+	public void mentionSelected(Annotation m) {
 		if (m != null) {
 			textPane.setCaretPosition(m.getEnd());
 			textPane.setSelectionStart(m.getBegin());
@@ -672,18 +682,21 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void mentionAdded(Mention m) {
-		drawAnnotation(m);
+		drawMention(m);
 	}
 
 	@Override
 	public void mentionChanged(Mention m) {
-		drawAnnotation(m);
+		drawMention(m);
 	}
 
 	@Override
 	public void mentionRemoved(Mention m) {
 		spanCounter.subtract(new Span(m));
 		hilit.removeHighlight(highlightMap.get(m));
+
+		spanCounter.subtract(new Span(m.getDiscontinuous()));
+		hilit.removeHighlight(highlightMap.get(m.getDiscontinuous()));
 
 	}
 
@@ -708,8 +721,9 @@ public class DocumentWindow extends JFrame
 				if (fs instanceof EntityGroup || selectedNode == cModel.groupRootNode)
 					return false;
 			}
+			// move existing mention
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-				if (fs instanceof Mention || fs instanceof TOP)
+				if (fs instanceof TOP)
 					return false;
 			}
 
@@ -722,7 +736,7 @@ public class DocumentWindow extends JFrame
 				return false;
 			}
 
-			// Check for String flavor
+			// Check for flavor
 			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
 					&& !info.isDataFlavorSupported(NodeTransferable.dataFlavor)) {
 				return false;
@@ -731,11 +745,12 @@ public class DocumentWindow extends JFrame
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 			TreePath tp = dl.getPath();
 			tree.expandPath(tp);
+			DataFlavor dataFlavor = info.getTransferable().getTransferDataFlavors()[0];
 
 			try {
 
 				FeatureStructure targetFs = ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure();
-				if (info.getTransferable().getTransferDataFlavors()[0] == PotentialAnnotationTransfer.dataFlavor) {
+				if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 					if (targetFs == null)
@@ -744,15 +759,19 @@ public class DocumentWindow extends JFrame
 						cModel.addNewMention((Entity) targetFs, pa.getBegin(), pa.getEnd());
 					else if (targetFs instanceof Mention)
 						cModel.addDiscontinuousToMention((Mention) targetFs, pa.getBegin(), pa.getEnd());
-				} else if (info.getTransferable().getTransferDataFlavors()[0] == NodeTransferable.dataFlavor) {
+				} else if (dataFlavor == NodeTransferable.dataFlavor) {
 					CATreeNode object = (CATreeNode) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
-					if (targetFs instanceof EntityGroup) {
-						CATreeNode etn = object;
-						cModel.addToGroup((EntityGroup) targetFs, (Entity) etn.getFeatureStructure());
-					} else {
-						CATreeNode m = object;
-						cModel.updateMention((Mention) m.getFeatureStructure(), (Entity) targetFs);
+					FeatureStructure droppedFs = object.getFeatureStructure();
+					if (targetFs instanceof EntityGroup && droppedFs instanceof Entity) {
+						cModel.addToGroup((EntityGroup) targetFs, (Entity) droppedFs);
+					} else if (targetFs instanceof Entity && droppedFs instanceof Mention) {
+						cModel.updateMention((Mention) droppedFs, (Entity) targetFs);
+					} else if (targetFs instanceof Mention && droppedFs instanceof DetachedMentionPart) {
+						System.err.println("!!");
+						DetachedMentionPart dmp = cModel.removeDiscontinuousMentionPart(
+								(Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
+						cModel.addDiscontinuousToMention((Mention) targetFs, dmp);
 					}
 				}
 
@@ -778,9 +797,9 @@ public class DocumentWindow extends JFrame
 		public Transferable createTransferable(JComponent comp) {
 			JTree tree = (JTree) comp;
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
-			if (tn.getFeatureStructure() instanceof Mention)
-				return new NodeTransferable(tn);
-			if (tn.getFeatureStructure() instanceof Entity)
+
+			if (tn.getFeatureStructure() instanceof Entity || tn.getFeatureStructure() instanceof Mention
+					|| tn.getFeatureStructure() instanceof DetachedMentionPart)
 				return new NodeTransferable(tn);
 			return null;
 		}

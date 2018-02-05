@@ -18,7 +18,7 @@
       <featureDescription>
           <name>Discontinuous</name>
           <description/>
-          <rangeTypeName>uima.tcas.Annotation</rangeTypeName>
+          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart</rangeTypeName>
         </featureDescription>
       </features>
     </typeDescription>
@@ -52,6 +52,11 @@
           <multipleReferencesAllowed>false</multipleReferencesAllowed>
         </featureDescription>
       </features>
+    </typeDescription>
+  <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart</name>
+      <description/>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
     </typeDescription>
   </types>
 </typeSystemDescription>
