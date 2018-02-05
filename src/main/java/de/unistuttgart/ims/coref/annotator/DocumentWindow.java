@@ -57,8 +57,6 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -96,7 +94,8 @@ import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeSelectionListener, TreeModelListener {
+public class DocumentWindow extends JFrame
+		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Xmi Viewer";
@@ -107,6 +106,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	Annotator mainApplication;
 
 	String segmentAnnotation = null;
+
+	// storing and caching
+	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+	Counter<Span> spanCounter = new Counter<Span>();
 
 	// actions
 	AbstractAction newEntityAction;
@@ -119,12 +122,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	CoreferenceModel cModel;
 
 	// Window components
-	CasTextView viewer;
+	JPanel viewer;
 	JPanel panel;
 	JTree tree;
 	JTextPane textPane;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
+	StyleContext styleContext = new StyleContext();
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -132,6 +136,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	JMenu recentMenu;
 	JMenu windowsMenu;
 	JMenu entityMenu;
+
 	// Listeners
 	List<LoadingListener> loadingListeners = new LinkedList<LoadingListener>();
 
@@ -169,10 +174,18 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		panel.add(controls, BorderLayout.NORTH);
 
 		// intialise text view
-		viewer = new CasTextView();
 
-		// loadingListeners.add(panel);
-		loadingListeners.add(viewer);
+		viewer = new JPanel(new BorderLayout());
+		hilit = new DefaultHighlighter();
+		textPane = new JTextPane();
+		this.setPreferredSize(new Dimension(500, 800));
+		textPane.setDragEnabled(true);
+		textPane.setEditable(false);
+		textPane.setTransferHandler(new TextViewTransferHandler());
+		textPane.setHighlighter(hilit);
+
+		viewer.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), BorderLayout.CENTER);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, panel);
 
@@ -193,6 +206,33 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 	protected void closeWindow(boolean quit) {
 		mainApplication.close(this);
+	}
+
+	public void drawAnnotation(Mention a) {
+		Object hi = highlightMap.get(a);
+		Span span = new Span(a);
+		if (hi != null) {
+			hilit.removeHighlight(hi);
+			spanCounter.subtract(span);
+		}
+		try {
+			int n = spanCounter.get(span);
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
+					new UnderlinePainter(new Color(a.getEntity().getColor()), n * 3));
+			spanCounter.add(span);
+			highlightMap.put(a, hi);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void drawAnnotations() {
+		hilit.removeAllHighlights();
+		highlightMap.clear();
+		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+			drawAnnotation(m);
+		}
 	}
 
 	public void loadFile(File file, CoreferenceFlavor flavor) {
@@ -251,7 +291,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 			e1.printStackTrace();
 		}
 		this.fireJCasLoadedEvent();
-		viewer.switchStyle(jcas, StyleVariant.select(flavor));
+		switchStyle(jcas, StyleVariant.select(flavor));
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
@@ -270,7 +310,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		}
 
 		this.cModel = new CoreferenceModel(jcas);
-		this.cModel.addCoreferenceModelListener(viewer);
+		this.cModel.addCoreferenceModelListener(this);
 		this.cModel.importExistingData();
 		this.fireModelCreatedEvent();
 		this.initialiseMenuAfterModelCreation();
@@ -454,10 +494,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		return mainApplication;
 	}
 
-	public CasTextView getViewer() {
-		return viewer;
-	}
-
 	class ViewFontSizeDecreaseAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -506,7 +542,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			viewer.switchStyle(jcas, StyleVariant.QuaDramA);
+			switchStyle(jcas, StyleVariant.QuaDramA);
 		}
 
 	}
@@ -524,7 +560,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			viewer.switchStyle(jcas, styleVariant);
+			switchStyle(jcas, styleVariant);
 
 		}
 
@@ -540,7 +576,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			viewer.switchStyle(jcas, StyleVariant.Default);
+			switchStyle(jcas, StyleVariant.Default);
 		}
 
 	}
@@ -549,6 +585,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
 		tree.addTreeSelectionListener(cModel);
+		textPane.addKeyListener(cModel);
+		textPane.setCaretPosition(0);
 
 		textPane.addCaretListener(this);
 
@@ -557,12 +595,20 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 	}
 
 	protected void fireJCasLoadedEvent() {
+		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
+		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
+
 		for (LoadingListener ll : loadingListeners)
 			ll.jcasLoaded(jcas);
 	}
 
 	@Override
 	public void caretUpdate(CaretEvent e) {
+
+	}
+
+	public void switchStyle(JCas jcas, StyleVariant sv) {
+		sv.style(jcas, textPane.getStyledDocument(), styleContext);
 
 	}
 
@@ -601,119 +647,32 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 	}
 
-	class CasTextView extends JPanel implements LoadingListener, CoreferenceModelListener {
-
-		private static final long serialVersionUID = 1L;
-
-		StyleContext styleContext = new StyleContext();
-		Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-		Counter<Span> spanCounter = new Counter<Span>();
-
-		Object selectionHighlight = null;
-
-		public CasTextView() {
-			super(new BorderLayout());
-			hilit = new DefaultHighlighter();
-			textPane = new JTextPane();
-			// this.textPane.setWrapStyleWord(true);
-			// this.textPane.setLineWrap(true);
-			this.setPreferredSize(new Dimension(500, 800));
-			textPane.setDragEnabled(true);
-			textPane.setEditable(false);
-			textPane.setTransferHandler(new TextViewTransferHandler(this));
-			// textPane.setFont(textPane.getFont().deriveFont(0, 13));
-			textPane.setHighlighter(hilit);
-
-			add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS), BorderLayout.CENTER);
-
+	@Override
+	public void mentionSelected(Mention m) {
+		if (m != null) {
+			textPane.setCaretPosition(m.getEnd());
+			textPane.setSelectionStart(m.getBegin());
+			textPane.setSelectionEnd(m.getEnd());
+		} else {
+			textPane.setSelectionStart(0);
+			textPane.setSelectionEnd(0);
 		}
+	}
 
-		protected void initStyles() {
-			Style speakerTagStyle = styleContext.addStyle("Speaker", null);
-			speakerTagStyle.addAttribute(StyleConstants.Bold, true);
-		}
+	@Override
+	public void mentionAdded(Mention m) {
+		drawAnnotation(m);
+	}
 
-		public void drawAnnotation(Mention a) {
-			Object hi = highlightMap.get(a);
-			Span span = new Span(a);
-			if (hi != null) {
-				hilit.removeHighlight(hi);
-				spanCounter.subtract(span);
-			}
-			try {
-				int n = spanCounter.get(span);
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(),
-						new UnderlinePainter(new Color(a.getEntity().getColor()), n * 3));
-				spanCounter.add(span);
-				highlightMap.put(a, hi);
-			} catch (BadLocationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	@Override
+	public void mentionChanged(Mention m) {
+		drawAnnotation(m);
+	}
 
-		public void drawAnnotations() {
-			hilit.removeAllHighlights();
-			highlightMap.clear();
-			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				drawAnnotation(m);
-			}
-		}
-
-		@Override
-		public void jcasLoaded(JCas jcas) {
-			/*
-			 * StringContent c = new
-			 * StringContent(jcas.getDocumentText().length()); try {
-			 * c.insertString(0, jcas.getDocumentText()); } catch
-			 * (BadLocationException e) { e.printStackTrace(); } JCasDocument
-			 * document = new JCasDocument(jcas);
-			 * textPane.setStyledDocument(document);
-			 */
-			textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
-			textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
-
-		}
-
-		@Override
-		public void modelCreated(CoreferenceModel model, DocumentWindow dw) {
-			textPane.addKeyListener(model);
-			textPane.setCaretPosition(0);
-		}
-
-		@Override
-		public void mentionAdded(Mention m) {
-			drawAnnotation(m);
-		}
-
-		@Override
-		public void mentionChanged(Mention m) {
-			drawAnnotation(m);
-		}
-
-		@Override
-		public void mentionRemoved(Mention m) {
-			spanCounter.subtract(new Span(m));
-			hilit.removeHighlight(highlightMap.get(m));
-		}
-
-		@Override
-		public void mentionSelected(Mention m) {
-			if (m != null) {
-				textPane.setCaretPosition(m.getEnd());
-				textPane.setSelectionStart(m.getBegin());
-				textPane.setSelectionEnd(m.getEnd());
-			} else {
-				textPane.setSelectionStart(0);
-				textPane.setSelectionEnd(0);
-			}
-		}
-
-		public void switchStyle(JCas jcas, StyleVariant sv) {
-			sv.style(jcas, textPane.getStyledDocument(), styleContext);
-
-		}
+	@Override
+	public void mentionRemoved(Mention m) {
+		spanCounter.subtract(new Span(m));
+		hilit.removeHighlight(highlightMap.get(m));
 	}
 
 	class PanelTransferHandler extends TransferHandler {
@@ -940,12 +899,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 
 		private static final long serialVersionUID = 1L;
 
-		CasTextView textView;
-
-		public TextViewTransferHandler(CasTextView tv) {
-			textView = tv;
-		}
-
 		@Override
 		public int getSourceActions(JComponent comp) {
 			return TransferHandler.LINK;
@@ -954,7 +907,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeSelecti
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTextComponent t = (JTextComponent) comp;
-			return new PotentialAnnotationTransfer(textView, t.getSelectionStart(), t.getSelectionEnd());
+			return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
 
 		@Override

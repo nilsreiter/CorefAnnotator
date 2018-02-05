@@ -1,14 +1,16 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import javax.swing.text.JTextComponent;
+
 public class PotentialAnnotation {
 	int begin;
 	int end;
-	DocumentWindow.CasTextView textView;
+	JTextComponent textPane;
 
-	public PotentialAnnotation(DocumentWindow.CasTextView textView, int begin, int end) {
+	public PotentialAnnotation(JTextComponent textPane, int begin, int end) {
 		this.begin = begin;
 		this.end = end;
-		this.textView = textView;
+		this.textPane = textPane;
 	}
 
 	public int getBegin() {
@@ -27,11 +29,11 @@ public class PotentialAnnotation {
 		this.end = end;
 	}
 
-	public DocumentWindow.CasTextView getTextView() {
-		return textView;
+	public JTextComponent getTextView() {
+		return textPane;
 	}
 
-	public void setTextView(DocumentWindow.CasTextView textView) {
-		this.textView = textView;
+	public void setTextView(JTextComponent textPane) {
+		this.textPane = textPane;
 	}
 }

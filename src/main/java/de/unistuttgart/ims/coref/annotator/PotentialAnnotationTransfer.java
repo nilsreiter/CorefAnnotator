@@ -5,15 +5,17 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
+import javax.swing.text.JTextComponent;
+
 public class PotentialAnnotationTransfer implements Transferable {
 
 	public static DataFlavor dataFlavor = new DataFlavor(PotentialAnnotationTransfer.class, "PotentialAnnotation");
 
 	int begin;
 	int end;
-	DocumentWindow.CasTextView textView;
+	JTextComponent textView;
 
-	public PotentialAnnotationTransfer(DocumentWindow.CasTextView tv, int begin, int end) {
+	public PotentialAnnotationTransfer(JTextComponent tv, int begin, int end) {
 		this.textView = tv;
 		this.begin = begin;
 		this.end = end;
