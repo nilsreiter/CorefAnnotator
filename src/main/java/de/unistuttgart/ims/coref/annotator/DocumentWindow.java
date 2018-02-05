@@ -20,8 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -98,7 +96,7 @@ public class DocumentWindow extends JFrame
 		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
-	private static final String HELP_MESSAGE = "Instructions for using Xmi Viewer";
+	private static final String HELP_MESSAGE = "Instructions for using Coref Annotator";
 
 	JCas jcas;
 	File file;
@@ -133,9 +131,6 @@ public class DocumentWindow extends JFrame
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
-
-	// Listeners
-	List<LoadingListener> loadingListeners = new LinkedList<LoadingListener>();
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -573,16 +568,12 @@ public class DocumentWindow extends JFrame
 
 		textPane.addCaretListener(this);
 
-		for (LoadingListener ll : loadingListeners)
-			ll.modelCreated(cModel, this);
 	}
 
 	protected void fireJCasLoadedEvent() {
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
-		for (LoadingListener ll : loadingListeners)
-			ll.jcasLoaded(jcas);
 	}
 
 	@Override
