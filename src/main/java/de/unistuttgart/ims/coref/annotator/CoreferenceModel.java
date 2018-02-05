@@ -167,7 +167,19 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void addToGroup(EntityGroup eg, Entity e) {
+		// UIMA stuff
+		FSArray oldArr = eg.getMembers();
+		FSArray arr = new FSArray(jcas, eg.getMembers().size() + 1);
+		int i = 0;
+		for (; i < eg.getMembers().size(); i++) {
+			arr.set(i, eg.getMembers(i));
+		}
+		arr.set(i, e);
+		eg.setMembers(arr);
+		oldArr.removeFromIndexes();
 
+		// tree stuff
+		insertNodeInto(new EntityTreeNode(e), entityMap.get(eg), 0);
 	}
 
 	public void formGroup(Entity e1, Entity e2) {
