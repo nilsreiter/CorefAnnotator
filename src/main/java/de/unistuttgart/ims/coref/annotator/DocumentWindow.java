@@ -165,6 +165,7 @@ public class DocumentWindow extends JFrame
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
 
+		rightPanel.setPreferredSize(new Dimension(200, 800));
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
@@ -217,32 +218,34 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected JMenu initialiseMenuView() {
-		JMenu viewMenu = new JMenu("View");
+		JMenu viewMenu = new JMenu(Annotator.getString("menu.view"));
 		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
 		viewMenu.addSeparator();
 
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new AbstractAction("Sort alphabetically") {
-			private static final long serialVersionUID = 1L;
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
+				new AbstractAction(Annotator.getString("action.sort_alpha")) {
+					private static final long serialVersionUID = 1L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder = EntitySortOrder.Alphabet;
-				cModel.resort();
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						cModel.entitySortOrder = EntitySortOrder.Alphabet;
+						cModel.resort();
 
-			}
-		});
+					}
+				});
 		radio1.setSelected(true);
 
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(new AbstractAction("Sort by mentions") {
-			private static final long serialVersionUID = 1L;
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(
+				new AbstractAction(Annotator.getString("action.sort_mentions")) {
+					private static final long serialVersionUID = 1L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder = EntitySortOrder.Mentions;
-				cModel.resort();
-			}
-		});
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						cModel.entitySortOrder = EntitySortOrder.Mentions;
+						cModel.resort();
+					}
+				});
 		ButtonGroup grp = new ButtonGroup();
 		grp.add(radio2);
 		grp.add(radio1);
@@ -250,7 +253,7 @@ public class DocumentWindow extends JFrame
 		viewMenu.add(radio1);
 		viewMenu.add(radio2);
 
-		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction("Revert sort order") {
+		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction(Annotator.getString("action.sort_revert")) {
 
 			private static final long serialVersionUID = 1L;
 
@@ -262,7 +265,7 @@ public class DocumentWindow extends JFrame
 
 		}));
 
-		JMenu viewStyleMenu = new JMenu("Style");
+		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
 		grp = new ButtonGroup();
 		int i = 0;
 		for (StyleVariant sv : StyleVariant.values()) {
@@ -279,19 +282,19 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected JMenu initialiseMenuTools() {
-		JMenu toolsMenu = new JMenu("Tools");
+		JMenu toolsMenu = new JMenu(Annotator.getString("menu.tools"));
 		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
 
 		return toolsMenu;
 	}
 
 	protected JMenu initialiseMenuFile() {
-		JMenu fileImportMenu = new JMenu("Import from ...");
+		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.importfrom"));
 		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
 		fileImportMenu.add(new FileImportDKproAction(mainApplication));
 		fileImportMenu.add(new FileImportCRETAAction(mainApplication));
 
-		JMenu fileMenu = new JMenu("File");
+		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(new FileSaveAction(this));
@@ -621,24 +624,27 @@ public class DocumentWindow extends JFrame
 	public void valueChanged(TreeSelectionEvent e) {
 		int num = tree.getSelectionCount();
 		TreePath[] paths = new TreePath[num];
+		CATreeNode[] nodes = new CATreeNode[num];
 		FeatureStructure[] fs = new FeatureStructure[num];
 		try {
 			paths = tree.getSelectionPaths();
+
 			fs = new FeatureStructure[paths.length];
-			for (int i = 0; i < paths.length; i++)
-				fs[i] = ((CATreeNode) paths[i].getLastPathComponent()).getFeatureStructure();
+			for (int i = 0; i < paths.length; i++) {
+				nodes[i] = (CATreeNode) paths[i].getLastPathComponent();
+				fs[i] = nodes[i].getFeatureStructure();
+			}
 		} catch (NullPointerException ex) {
 		}
 		renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-		deleteAction.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity
-				&& ((CATreeNode) ((javax.swing.tree.TreeNode) paths[0].getLastPathComponent()).getParent())
-						.isVirtual())));
+		deleteAction
+				.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
 
-		if (num == 1 && (fs[0] instanceof Mention) || fs[0] instanceof DetachedMentionPart)
+		if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
 			mentionSelected((Annotation) fs[0]);
 		else
 			mentionSelected(null);
@@ -692,11 +698,12 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void mentionRemoved(Mention m) {
+		if (m.getDiscontinuous() != null) {
+			spanCounter.subtract(new Span(m.getDiscontinuous()));
+			hilit.removeHighlight(highlightMap.get(m.getDiscontinuous()));
+		}
 		spanCounter.subtract(new Span(m));
 		hilit.removeHighlight(highlightMap.get(m));
-
-		spanCounter.subtract(new Span(m.getDiscontinuous()));
-		hilit.removeHighlight(highlightMap.get(m.getDiscontinuous()));
 
 	}
 
@@ -814,7 +821,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public RenameEntityAction() {
-			putValue(Action.NAME, "Rename");
+			putValue(Action.NAME, Annotator.getString("action.rename"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TAG));
@@ -836,7 +843,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public ChangeColorForEntity() {
-			putValue(Action.NAME, "Color");
+			putValue(Action.NAME, Annotator.getString("action.set_color"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_TEXTCOLOR));
@@ -860,7 +867,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
-			putValue(Action.NAME, "Shortcut");
+			putValue(Action.NAME, Annotator.getString("action.set_shortcut"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_KITCHENSINK));
 
 		}
@@ -882,7 +889,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public NewEntityAction() {
-			putValue(Action.NAME, "New");
+			putValue(Action.NAME, Annotator.getString("action.new"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.PLUS));
@@ -923,7 +930,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			putValue(Action.NAME, "Delete");
+			putValue(Action.NAME, Annotator.getString("action.delete", getLocale()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TRASH));
 
 		}
@@ -938,25 +945,10 @@ public class DocumentWindow extends JFrame
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
 					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
+				} else if (cModel.entityMentionMap.get(etn.getFeatureStructure()).isEmpty()) {
+					cModel.removeEntity(etn.getFeatureStructure());
 				}
 			}
-		}
-
-	}
-
-	class DeleteMentionAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public DeleteMentionAction() {
-			putValue(Action.NAME, "Delete");
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
-			cModel.removeMention((Mention) tn.getFeatureStructure());
 		}
 
 	}
@@ -1009,7 +1001,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public CloseAction() {
-			putValue(Action.NAME, "Close");
+			putValue(Action.NAME, Annotator.getString("action.close"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -1026,7 +1018,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public ExitAction() {
-			putValue(Action.NAME, "Quit");
+			putValue(Action.NAME, Annotator.getString("action.quit"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -1043,7 +1035,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			putValue(Action.NAME, "Group");
+			putValue(Action.NAME, Annotator.getString("action.group"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -1067,7 +1059,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public FileSaveAsAction() {
-			putValue(Action.NAME, "Save as ...");
+			putValue(Action.NAME, Annotator.getString("action.save_as"));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
@@ -196,6 +198,16 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			if (openFiles.isEmpty())
 				handleQuitRequestWith(null, null);
 		}
+	}
+
+	public static String getString(String key) {
+		return getString(key, Locale.GERMAN);
+	}
+
+	public static String getString(String key, Locale locale) {
+		ResourceBundle words = ResourceBundle.getBundle("locales/strings", locale);
+
+		return words.getString(key);
 	}
 
 }
