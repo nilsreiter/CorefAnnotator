@@ -8,17 +8,19 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
-import de.unistuttgart.ims.drama.api.Heading;
-import de.unistuttgart.ims.drama.api.Speaker;
-import de.unistuttgart.ims.drama.api.StageDirection;
 
 public class QuaDramAPlugin implements IOPlugin, StylePlugin {
+
+	private static final String TYPE_SPEAKER = "de.unistuttgart.ims.drama.api.Speaker";
+	private static final String TYPE_STAGEDIRECTION = "de.unistuttgart.ims.drama.api.StageDirection";
+	private static final String TYPE_HEADING = "de.unistuttgart.ims.drama.api.Heading";
 
 	@Override
 	public String getDescription() {
@@ -41,20 +43,20 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 	}
 
 	@Override
-	public Map<Style, Class<? extends Annotation>> getStyles(StyleContext styleContext, Style defaultStyle) {
-		Map<Style, Class<? extends Annotation>> map = new HashMap<Style, Class<? extends Annotation>>();
+	public Map<Style, Type> getStyles(TypeSystem ts, StyleContext styleContext, Style defaultStyle) {
+		Map<Style, Type> map = new HashMap<Style, Type>();
 
 		Style style = styleContext.addStyle("Speaker", defaultStyle);
 		style.addAttribute(StyleConstants.Bold, true);
-		map.put(style, Speaker.class);
+		map.put(style, ts.getType(TYPE_SPEAKER));
 
 		style = styleContext.addStyle("Stage direction", defaultStyle);
 		style.addAttribute(StyleConstants.Italic, true);
-		map.put(style, StageDirection.class);
+		map.put(style, ts.getType(TYPE_STAGEDIRECTION));
 
 		style = styleContext.addStyle("Header", defaultStyle);
 		style.addAttribute(StyleConstants.FontSize, 16);
-		map.put(style, Heading.class);
+		map.put(style, ts.getType(TYPE_HEADING));
 
 		return map;
 	}

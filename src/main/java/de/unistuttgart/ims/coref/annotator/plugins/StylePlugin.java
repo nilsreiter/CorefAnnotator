@@ -5,11 +5,12 @@ import java.util.Map;
 import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 
-import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
 
 public interface StylePlugin {
 	String getName();
 
-	Map<Style, Class<? extends Annotation>> getStyles(StyleContext context, Style defaultStyle);
+	Map<Style, Type> getStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle);
 
 }
