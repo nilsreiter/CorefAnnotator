@@ -42,7 +42,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
@@ -171,7 +171,7 @@ public class DocumentWindow extends JFrame
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
-		JPanel controls = new JPanel();
+		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
 		controls.add(new JButton(newEntityAction));
 		controls.add(new JButton(renameAction));
@@ -179,7 +179,7 @@ public class DocumentWindow extends JFrame
 		controls.add(new JButton(changeColorAction));
 		controls.add(new JButton(deleteAction));
 		controls.add(new JButton(formGroupAction));
-		controls.add(new JToggleButton(flagMentionAction));
+		controls.add(new JButton(flagMentionAction));
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -652,11 +652,15 @@ public class DocumentWindow extends JFrame
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
 		flagMentionAction.setEnabled(num == 1 && fs[0] instanceof Mention);
-		if (num == 1 && fs[0] instanceof Mention)
+		if (num == 1 && fs[0] instanceof Mention) {
+			flagMentionAction.putValue(Action.LARGE_ICON_KEY,
+					(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
+							? FontIcon.of(Material.LABEL) : FontIcon.of(Material.LABEL_OUTLINE)));
 			flagMentionAction.putValue(Action.NAME,
 					(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
 							? Annotator.getString("action.unflag_mention")
 							: Annotator.getString("action.flag_mention")));
+		}
 		if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
 			mentionSelected((Annotation) fs[0]);
 		else
@@ -950,11 +954,13 @@ public class DocumentWindow extends JFrame
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
 				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT))
-					s.setIcon(FontIcon.of(Material.FLAG));
+					s.setIcon(FontIcon.of(Material.LABEL));
 				else
 					s.setIcon(FontIcon.of(Material.PERSON_PIN));
 			} else if (cModel != null && catn == cModel.groupRootNode)
 				s.setIcon(FontIcon.of(Material.GROUP_WORK));
+			else if (cModel != null && catn == cModel.rootNode)
+				s.setIcon(FontIcon.of(Material.PERSON_ADD));
 			return s;
 		}
 
@@ -1125,7 +1131,7 @@ public class DocumentWindow extends JFrame
 
 		public ToggleFlagMention() {
 			putValue(Action.NAME, Annotator.getString("action.flag_mention"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.FLAG));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL_OUTLINE));
 
 		}
 
@@ -1134,6 +1140,11 @@ public class DocumentWindow extends JFrame
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
+			if (getValue(Action.LARGE_ICON_KEY) == FontIcon.of(Material.LABEL))
+				putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL_OUTLINE));
+			else
+				putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL));
+
 		}
 
 	}
