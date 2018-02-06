@@ -12,4 +12,6 @@ public interface IOPlugin {
 
 	AnalysisEngineDescription getExporter() throws ResourceInitializationException;
 
+	StylePlugin getStylePlugin();
+
 }

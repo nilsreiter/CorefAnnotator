@@ -6,7 +6,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugins.io.quadrama.QuaDramAPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
 
 public class FileImportQuaDramAAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;

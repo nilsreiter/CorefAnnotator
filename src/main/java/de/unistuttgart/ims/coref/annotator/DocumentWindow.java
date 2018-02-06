@@ -58,6 +58,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -98,6 +99,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class DocumentWindow extends JFrame
 		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
@@ -274,16 +276,18 @@ public class DocumentWindow extends JFrame
 
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
 		grp = new ButtonGroup();
-		int i = 0;
 
-		for (StyleVariant sv : StyleVariant.values()) {
-			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(sv));
-			viewStyleMenu.add(radio1);
-			if ((i++) == 0)
-				radio1.setSelected(true);
-			grp.add(radio1);
+		for (Class<? extends StylePlugin> plugin : mainApplication.getPluginManager().getStylePlugins()) {
+			try {
+				radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(plugin.newInstance()));
+				viewStyleMenu.add(radio1);
+				grp.add(radio1);
+			} catch (InstantiationException | IllegalAccessException e1) {
+				e1.printStackTrace();
+			}
 
 		}
+
 		viewMenu.add(viewStyleMenu);
 		return viewMenu;
 
@@ -299,7 +303,7 @@ public class DocumentWindow extends JFrame
 	protected JMenu initialiseMenuFile() {
 		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.importfrom"));
 
-		for (Class<? extends IOPlugin> pluginClass : mainApplication.getPluginManager().getImportPlugins()) {
+		for (Class<? extends IOPlugin> pluginClass : mainApplication.getPluginManager().getIOPlugins()) {
 			try {
 				IOPlugin plugin = pluginClass.newInstance();
 				if (plugin.getImporter() != null)
@@ -498,7 +502,8 @@ public class DocumentWindow extends JFrame
 			e1.printStackTrace();
 		}
 		this.fireJCasLoadedEvent();
-		// switchStyle(jcas, StyleVariant.select(flavor));
+		if (flavor.getStylePlugin() != null)
+			switchStyle(jcas, flavor.getStylePlugin());
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
@@ -568,29 +573,14 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class ViewStyleQuaDramAAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ViewStyleQuaDramAAction() {
-			putValue(Action.NAME, "QuaDramA");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			switchStyle(jcas, StyleVariant.QuaDramA);
-		}
-
-	}
-
 	class ViewStyleSelectAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
-		StyleVariant styleVariant;
+		StylePlugin styleVariant;
 
-		public ViewStyleSelectAction(StyleVariant style) {
-			putValue(Action.NAME, style.name());
+		public ViewStyleSelectAction(StylePlugin style) {
+			putValue(Action.NAME, style.getName());
 			styleVariant = style;
 		}
 
@@ -598,21 +588,6 @@ public class DocumentWindow extends JFrame
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(jcas, styleVariant);
 
-		}
-
-	}
-
-	class ViewStyleDefaultAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ViewStyleDefaultAction() {
-			putValue(Action.NAME, "Default");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			switchStyle(jcas, StyleVariant.Default);
 		}
 
 	}
@@ -639,8 +614,13 @@ public class DocumentWindow extends JFrame
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
-	public void switchStyle(JCas jcas, StyleVariant sv) {
-		sv.style(jcas, textPane.getStyledDocument(), styleContext);
+	public void switchStyle(JCas jcas, StylePlugin sv) {
+		Map<Style, Class<? extends Annotation>> styles = sv.getStyles(styleContext, StyleVariant.getDefaultStyle());
+		for (Style style : styles.keySet()) {
+			StyleVariant.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+		}
+
+		// sv.style(jcas, textPane.getStyledDocument(), styleContext);
 
 	}
 

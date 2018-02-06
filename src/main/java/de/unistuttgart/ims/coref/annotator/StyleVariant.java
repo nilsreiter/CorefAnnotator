@@ -19,6 +19,7 @@ public enum StyleVariant {
 
 	static Style defaultStyle = null;
 
+	@Deprecated
 	public static StyleVariant select(CoreferenceFlavor flavor) {
 		switch (flavor) {
 		case QuaDramA:
@@ -37,6 +38,8 @@ public enum StyleVariant {
 		return defaultStyle;
 	}
 
+	@Deprecated
+
 	public void style(JCas jcas, StyledDocument document, StyleContext styleContext) {
 		document.setCharacterAttributes(0, document.getLength(), getDefaultStyle(), true);
 
@@ -52,12 +55,14 @@ public enum StyleVariant {
 		}
 	}
 
+	@Deprecated
 	protected void styleCRETABundestag(JCas jcas, StyledDocument document, StyleContext styleContext) {
 		Style style = styleContext.addStyle("Stage", getDefaultStyle());
 		style.addAttribute(StyleConstants.Italic, true);
 		style(jcas, document, style, Stage.class);
 	}
 
+	@Deprecated
 	protected void styleQuaDramA(JCas jcas, StyledDocument document, StyleContext styleContext) {
 
 		Style style = styleContext.addStyle("Speaker", getDefaultStyle());
@@ -75,7 +80,7 @@ public enum StyleVariant {
 		return;
 	}
 
-	private void style(JCas jcas, StyledDocument document, Style style, Class<? extends Annotation> anno) {
+	public static void style(JCas jcas, StyledDocument document, Style style, Class<? extends Annotation> anno) {
 		for (Annotation a : JCasUtil.select(jcas, anno))
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
 	}

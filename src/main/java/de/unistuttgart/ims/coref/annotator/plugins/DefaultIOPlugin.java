@@ -33,4 +33,9 @@ public class DefaultIOPlugin implements IOPlugin {
 		return plugin;
 	}
 
+	@Override
+	public StylePlugin getStylePlugin() {
+		return null;
+	}
+
 }

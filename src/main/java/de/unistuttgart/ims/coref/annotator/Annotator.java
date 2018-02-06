@@ -38,7 +38,7 @@ import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.io.quadrama.QuaDramAPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
