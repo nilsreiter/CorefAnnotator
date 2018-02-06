@@ -6,6 +6,7 @@ import javax.swing.tree.TreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
+import org.apache.uima.jcas.cas.StringArray;
 
 public class Util {
 	public static String toString(TreeModel tm) {
@@ -22,6 +23,50 @@ public class Util {
 			b.append(toString(tn.getChildAt(j), level + 1));
 		}
 		return b.toString();
+
+	}
+
+	public static boolean contains(StringArray array, String s) {
+		if (array == null)
+			return false;
+		for (int i = 0; i < array.size(); i++)
+			if (array.get(i).equals(s))
+				return true;
+		return false;
+	}
+
+	public static StringArray removeFrom(JCas jcas, StringArray arr, String fs) {
+		int i = 0, j = 0;
+		StringArray nArr = null;
+		int oldSize = arr == null ? 0 : arr.size();
+		nArr = new StringArray(jcas, oldSize - 1);
+		for (; i < oldSize; i++, j++) {
+			if (!arr.get(i).equals(fs))
+				nArr.set(j, arr.get(i));
+			else
+				j--;
+		}
+
+		return nArr;
+	}
+
+	public static StringArray addTo(JCas jcas, StringArray arr, String fs) {
+		int i = 0;
+		StringArray nArr;
+		int oldSize = arr == null ? 0 : arr.size();
+		if (arr != null) {
+			nArr = new StringArray(jcas, oldSize + 1);
+			for (; i < oldSize; i++) {
+				nArr.set(i, arr.get(i));
+			}
+		} else {
+			nArr = new StringArray(jcas, 1);
+		}
+		nArr.set(i, fs);
+		if (arr != null)
+			arr.removeFromIndexes();
+		nArr.addToIndexes();
+		return nArr;
 
 	}
 
