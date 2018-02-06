@@ -615,9 +615,9 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void switchStyle(JCas jcas, StylePlugin sv) {
-		Map<Style, Class<? extends Annotation>> styles = sv.getStyles(styleContext, StyleVariant.getDefaultStyle());
+		Map<Style, Class<? extends Annotation>> styles = sv.getStyles(styleContext, StyleManager.getDefaultStyle());
 		for (Style style : styles.keySet()) {
-			StyleVariant.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+			StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 		}
 
 		// sv.style(jcas, textPane.getStyledDocument(), styleContext);

@@ -14,13 +14,13 @@ import de.unistuttgart.ims.drama.api.Heading;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.drama.api.StageDirection;
 
-public enum StyleVariant {
+public enum StyleManager {
 	Default, QuaDramA, CRETA_Bundestag;
 
 	static Style defaultStyle = null;
 
 	@Deprecated
-	public static StyleVariant select(CoreferenceFlavor flavor) {
+	public static StyleManager select(CoreferenceFlavor flavor) {
 		switch (flavor) {
 		case QuaDramA:
 			return QuaDramA;
