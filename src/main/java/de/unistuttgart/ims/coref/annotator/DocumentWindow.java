@@ -822,6 +822,7 @@ public class DocumentWindow extends JFrame
 
 		public RenameEntityAction() {
 			putValue(Action.NAME, Annotator.getString("action.rename"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.rename.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TAG));
@@ -844,6 +845,7 @@ public class DocumentWindow extends JFrame
 
 		public ChangeColorForEntity() {
 			putValue(Action.NAME, Annotator.getString("action.set_color"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_color.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_TEXTCOLOR));
@@ -869,6 +871,7 @@ public class DocumentWindow extends JFrame
 
 		public ChangeKeyForEntityAction() {
 			putValue(Action.NAME, Annotator.getString("action.set_shortcut"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_shortcut.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_KITCHENSINK));
 
 		}
@@ -891,6 +894,7 @@ public class DocumentWindow extends JFrame
 
 		public NewEntityAction() {
 			putValue(Action.NAME, Annotator.getString("action.new"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.new.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.PLUS));
@@ -932,6 +936,7 @@ public class DocumentWindow extends JFrame
 
 		public DeleteAction() {
 			putValue(Action.NAME, Annotator.getString("action.delete"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TRASH));
 
 		}
@@ -1037,6 +1042,7 @@ public class DocumentWindow extends JFrame
 
 		public FormEntityGroup() {
 			putValue(Action.NAME, Annotator.getString("action.group"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.group.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
