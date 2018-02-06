@@ -20,7 +20,7 @@ public class ShowSearchPanelAction extends AbstractAction {
 
 	public ShowSearchPanelAction(Annotator mainApplication, DocumentWindow dw) {
 		super();
-		putValue(Action.NAME, "Search");
+		putValue(Action.NAME, Annotator.getString("action.search"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		this.mainApplication = mainApplication;

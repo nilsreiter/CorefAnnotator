@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class FileSaveAction extends AbstractAction {
@@ -17,7 +18,7 @@ public class FileSaveAction extends AbstractAction {
 	DocumentWindow documentWindow;
 
 	public FileSaveAction(DocumentWindow dw) {
-		putValue(Action.NAME, "Save");
+		putValue(Action.NAME, Annotator.getString("action.save"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		documentWindow = dw;

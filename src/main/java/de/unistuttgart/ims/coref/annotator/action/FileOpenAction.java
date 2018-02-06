@@ -18,7 +18,7 @@ public class FileOpenAction extends AbstractAction {
 	Annotator mainApplication;
 
 	public FileOpenAction(Annotator mApplication) {
-		putValue(Action.NAME, "Open");
+		putValue(Action.NAME, Annotator.getString("action.open"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mainApplication = mApplication;

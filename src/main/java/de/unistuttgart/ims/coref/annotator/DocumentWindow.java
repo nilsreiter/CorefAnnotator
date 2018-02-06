@@ -306,7 +306,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		JMenu entityMenu = new JMenu("Entities");
+		JMenu entityMenu = new JMenu(Annotator.getString("menu.entities"));
 		entityMenu.add(new JMenuItem(renameAction));
 		entityMenu.add(new JMenuItem(newEntityAction));
 		entityMenu.add(new JMenuItem(changeColorAction));
@@ -323,18 +323,18 @@ public class DocumentWindow extends JFrame
 		}
 
 		// top level menus
-		JMenu helpMenu = new JMenu("Help");
+		JMenu helpMenu = new JMenu(Annotator.getString("menu.help"));
 		// JMenu debugMenu = new JMenu("Debug");
-		windowsMenu = new JMenu("Windows");
+		windowsMenu = new JMenu(Annotator.getString("menu.windows"));
 		if (segmentAnnotation != null) {
-			documentMenu = new JMenu("Document");
+			documentMenu = new JMenu(Annotator.getString("menu.document"));
 			documentMenu.setEnabled(segmentAnnotation != null);
 		}
 
 		// Menu Items
-		JMenuItem aboutMenuItem = new JMenuItem("About");
-		JMenuItem helpMenuItem = new JMenuItem("Help");
-		recentMenu = new JMenu("Open Recent");
+		JMenuItem aboutMenuItem = new JMenuItem(Annotator.getString("menu.file.about"));
+		JMenuItem helpMenuItem = new JMenuItem(Annotator.getString("menu.help.help"));
+		recentMenu = new JMenu(Annotator.getString("menu.file.open_recent"));
 
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(initialiseMenuEntity());
@@ -512,7 +512,7 @@ public class DocumentWindow extends JFrame
 
 		public ViewFontSizeDecreaseAction() {
 			super();
-			putValue(Action.NAME, "Decrease Font Size");
+			putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
@@ -531,7 +531,7 @@ public class DocumentWindow extends JFrame
 
 		public ViewFontSizeIncreaseAction() {
 			super();
-			putValue(Action.NAME, "Increase Font Size");
+			putValue(Action.NAME, Annotator.getString("action.view.increase_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
@@ -830,7 +830,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String name = JOptionPane.showInputDialog("Enter the new name:");
+			String name = JOptionPane.showInputDialog(Annotator.getString("dialog.rename_entity.prompt"));
 			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
 			etn.getFeatureStructure().setLabel(name);
 			cModel.nodeChanged(etn);
@@ -856,7 +856,8 @@ public class DocumentWindow extends JFrame
 			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
 			Color color = new Color(etn.getFeatureStructure().getColor());
 
-			Color newColor = JColorChooser.showDialog(null, "Choose new color", color);
+			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
+					Annotator.getString("dialog.change_color.prompt"), color);
 			cModel.updateColor(etn.getFeatureStructure(), newColor);
 		}
 
@@ -874,7 +875,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String key = JOptionPane.showInputDialog("Enter the new key");
+			String key = JOptionPane.showInputDialog(Annotator.getString("dialog.change_key.prompt"));
 			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
 
 			char keyCode = key.charAt(0);
@@ -930,7 +931,7 @@ public class DocumentWindow extends JFrame
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			putValue(Action.NAME, Annotator.getString("action.delete", getLocale()));
+			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TRASH));
 
 		}
@@ -1070,7 +1071,7 @@ public class DocumentWindow extends JFrame
 			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 			saveDialog.setFileFilter(XmiFileFilter.filter);
-			saveDialog.setDialogTitle("Save file as ...");
+			saveDialog.setDialogTitle(Annotator.getString("dialog.save_as.title"));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
