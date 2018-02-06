@@ -22,8 +22,7 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Plugin that provides an importer and style.";
 	}
 
 	@Override
