@@ -42,6 +42,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
@@ -123,6 +124,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction changeColorAction;
 	DeleteAction deleteAction;
 	AbstractAction formGroupAction;
+	ToggleFlagMention flagMentionAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -170,14 +172,18 @@ public class DocumentWindow extends JFrame
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
 		JPanel controls = new JPanel();
-
+		controls.setFocusable(false);
 		controls.add(new JButton(newEntityAction));
 		controls.add(new JButton(renameAction));
 		controls.add(new JButton(changeKeyAction));
 		controls.add(new JButton(changeColorAction));
 		controls.add(new JButton(deleteAction));
 		controls.add(new JButton(formGroupAction));
+		controls.add(new JToggleButton(flagMentionAction));
 		getContentPane().add(controls, BorderLayout.NORTH);
+
+		for (Component comp : controls.getComponents())
+			comp.setFocusable(false);
 
 		// initialise text view
 		JPanel leftPanel = new JPanel(new BorderLayout());
@@ -207,6 +213,7 @@ public class DocumentWindow extends JFrame
 		this.changeKeyAction = new ChangeKeyForEntityAction();
 		this.deleteAction = new DeleteAction();
 		this.formGroupAction = new FormEntityGroup();
+		this.flagMentionAction = new ToggleFlagMention();
 
 		// disable all at the beginning
 		newEntityAction.setEnabled(false);
@@ -215,6 +222,7 @@ public class DocumentWindow extends JFrame
 		changeColorAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
+		flagMentionAction.setEnabled(false);
 	}
 
 	protected JMenu initialiseMenuView() {
@@ -643,7 +651,12 @@ public class DocumentWindow extends JFrame
 				.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
 
 		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
-
+		flagMentionAction.setEnabled(num == 1 && fs[0] instanceof Mention);
+		if (num == 1 && fs[0] instanceof Mention)
+			flagMentionAction.putValue(Action.NAME,
+					(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
+							? Annotator.getString("action.unflag_mention")
+							: Annotator.getString("action.flag_mention")));
 		if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
 			mentionSelected((Annotation) fs[0]);
 		else
@@ -694,6 +707,9 @@ public class DocumentWindow extends JFrame
 	@Override
 	public void mentionChanged(Mention m) {
 		drawMention(m);
+		flagMentionAction.putValue(Action.NAME, (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT)
+				? Annotator.getString("action.unflag_mention") : Annotator.getString("action.flag_mention")));
+
 	}
 
 	@Override
@@ -917,15 +933,25 @@ public class DocumentWindow extends JFrame
 				boolean leaf, int row, boolean hasFocus) {
 			JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
+			CATreeNode catn = null;
+			if (value instanceof CATreeNode)
+				catn = (CATreeNode) value;
 			if (value instanceof EntityTreeNode) {
 				EntityTreeNode etn = (EntityTreeNode) value;
 				Entity e = etn.getFeatureStructure();
-				s.setIcon(new ColorIcon(new Color(e.getColor())));
+				s.setIcon(FontIcon.of(Dashicons.FORMAT_GALLERY, new Color(e.getColor())));
 				if (etn.getKeyCode() != null) {
 					s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
 				} else if (!(etn.getParent() instanceof EntityTreeNode))
 					s.setText(s.getText() + " (" + etn.getChildCount() + ")");
-			}
+			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
+				Mention m = (Mention) catn.getFeatureStructure();
+				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT))
+					s.setIcon(FontIcon.of(Dashicons.FLAG));
+				else
+					s.setIcon(FontIcon.of(Dashicons.FORMAT_IMAGE));
+			} else if (cModel != null && catn == cModel.groupRootNode)
+				s.setIcon(FontIcon.of(Dashicons.GROUPS));
 			return s;
 		}
 
@@ -1088,6 +1114,25 @@ public class DocumentWindow extends JFrame
 			}
 
 		}
+	}
+
+	class ToggleFlagMention extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleFlagMention() {
+			putValue(Action.NAME, Annotator.getString("action.flag_mention"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.FLAG));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
+			Mention m = (Mention) tn.getFeatureStructure();
+			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
+		}
+
 	}
 
 	abstract class MyAction extends AbstractAction {

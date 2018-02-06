@@ -20,6 +20,12 @@
           <description/>
           <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart</rangeTypeName>
         </featureDescription>
+      <featureDescription>
+          <name>Flags</name>
+          <description/>
+          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+          <multipleReferencesAllowed>false</multipleReferencesAllowed>
+        </featureDescription>
       </features>
     </typeDescription>
     <typeDescription>
