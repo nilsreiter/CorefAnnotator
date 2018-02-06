@@ -615,14 +615,15 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void switchStyle(JCas jcas, StylePlugin sv) {
-		Map<Style, org.apache.uima.cas.Type> styles = sv.getStyles(jcas.getTypeSystem(), styleContext,
+		if (sv.getBaseStyle() != null)
+			StyleManager.style(textPane.getStyledDocument(), sv.getBaseStyle());
+		else
+			StyleManager.style(textPane.getStyledDocument(), StyleManager.getDefaultStyle());
+		Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
 				StyleManager.getDefaultStyle());
 		for (Style style : styles.keySet()) {
 			StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 		}
-
-		// sv.style(jcas, textPane.getStyledDocument(), styleContext);
-
 	}
 
 	@Override

@@ -11,6 +11,8 @@ import org.apache.uima.cas.TypeSystem;
 public interface StylePlugin {
 	String getName();
 
-	Map<Style, Type> getStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle);
+	Style getBaseStyle();
+
+	Map<Style, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle);
 
 }

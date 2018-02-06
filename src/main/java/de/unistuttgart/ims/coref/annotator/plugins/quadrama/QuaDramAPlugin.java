@@ -43,7 +43,7 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 	}
 
 	@Override
-	public Map<Style, Type> getStyles(TypeSystem ts, StyleContext styleContext, Style defaultStyle) {
+	public Map<Style, Type> getSpanStyles(TypeSystem ts, StyleContext styleContext, Style defaultStyle) {
 		Map<Style, Type> map = new HashMap<Style, Type>();
 
 		Style style = styleContext.addStyle("Speaker", defaultStyle);
@@ -64,6 +64,11 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 	@Override
 	public StylePlugin getStylePlugin() {
 		return this;
+	}
+
+	@Override
+	public Style getBaseStyle() {
+		return null;
 	}
 
 }

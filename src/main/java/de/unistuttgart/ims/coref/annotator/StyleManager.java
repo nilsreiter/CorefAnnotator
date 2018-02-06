@@ -29,6 +29,10 @@ public class StyleManager {
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
 	}
 
+	public static void style(StyledDocument document, Style style) {
+		document.setCharacterAttributes(0, document.getLength(), style, true);
+	}
+
 	public static void style(JCas jcas, StyledDocument document, Style style, Type anno) {
 		for (Annotation a : jcas.getAnnotationIndex(anno))
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
