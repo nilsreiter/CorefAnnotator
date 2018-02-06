@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.uima;
+package de.unistuttgart.ims.coref.annotator.plugins.io.dkpro;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;

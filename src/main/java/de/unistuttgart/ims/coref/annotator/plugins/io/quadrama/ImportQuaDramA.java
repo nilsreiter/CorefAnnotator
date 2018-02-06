@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.uima;
+package de.unistuttgart.ims.coref.annotator.plugins.io.quadrama;
 
 import java.util.HashMap;
 import java.util.Map;

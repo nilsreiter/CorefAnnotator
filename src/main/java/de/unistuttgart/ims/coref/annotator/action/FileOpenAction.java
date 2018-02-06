@@ -9,7 +9,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CoreferenceFlavor;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 
 public class FileOpenAction extends AbstractAction {
 
@@ -26,7 +26,7 @@ public class FileOpenAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.fileOpenDialog(CoreferenceFlavor.Default);
+		mainApplication.fileOpenDialog(DefaultIOPlugin.getInstance());
 
 	}
 }

@@ -25,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 
 import com.apple.eawt.AboutHandler;
@@ -38,6 +37,10 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.io.quadrama.QuaDramAPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
 	static final Logger logger = LogManager.getLogger(Annotator.class);
@@ -46,21 +49,20 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	Configuration configuration;
 
 	TypeSystemDescription typeSystemDescription;
-	@Deprecated
-	TypeDescription mentionType;
-	@Deprecated
-	TypeDescription entityType;
+
+	PluginManager pluginManager = new PluginManager();
 
 	JFileChooser openDialog;
 
 	public static void main(String[] args) throws UIMAException {
 
 		Annotator a = new Annotator();
-		a.open(new File("src/test/resources/rjmw.0.xmi"), CoreferenceFlavor.QuaDramA);
+		a.open(new File("src/test/resources/rjmw.0.xmi"), new QuaDramAPlugin());
 		// a.fileOpenDialog(CoreferenceFlavor.CRETA);
 	}
 
 	public Annotator() throws ResourceInitializationException {
+		this.pluginManager.init();
 		this.initialiseConfiguration();
 		this.initialiseTypeSystem();
 		this.initialiseDialogs();
@@ -75,8 +77,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
-		mentionType = typeSystemDescription.getType(de.unistuttgart.ims.drama.api.Mention.class.getName());
-		entityType = typeSystemDescription.getType(de.unistuttgart.ims.drama.api.DiscourseEntity.class.getName());
 	}
 
 	protected void initialiseConfiguration() {
@@ -123,7 +123,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	}
 
-	public synchronized DocumentWindow open(final File file, CoreferenceFlavor flavor) {
+	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
 		final DocumentWindow v = new DocumentWindow(this);
 
 		/*
@@ -144,14 +144,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openFiles.remove(viewer);
 		viewer.dispose();
 		if (openFiles.isEmpty())
-			this.fileOpenDialog(CoreferenceFlavor.Default);
+			this.fileOpenDialog(new DefaultIOPlugin());
 	};
 
 	@Override
 	public void openFiles(OpenFilesEvent e) {
 		for (Object file : e.getFiles()) {
 			if (file instanceof File) {
-				open((File) file, CoreferenceFlavor.Default);
+				open((File) file, new DefaultIOPlugin());
 			}
 		}
 	}
@@ -185,8 +185,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
 	}
 
-	public void fileOpenDialog(CoreferenceFlavor flavor) {
-		openDialog.setDialogTitle("Open files using " + flavor.name() + " scheme");
+	public void fileOpenDialog(IOPlugin flavor) {
+		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		int r = openDialog.showOpenDialog(null);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
@@ -208,6 +208,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		ResourceBundle words = ResourceBundle.getBundle("locales/strings", locale);
 
 		return words.getString(key);
+	}
+
+	public PluginManager getPluginManager() {
+		return pluginManager;
 	}
 
 }

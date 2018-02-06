@@ -6,21 +6,23 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CoreferenceFlavor;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
-public class FileImportDKproAction extends AbstractAction {
+public class FileImportAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 
 	Annotator mainApplication;
+	IOPlugin plugin;
 
-	public FileImportDKproAction(Annotator mApplication) {
-		putValue(Action.NAME, "DKpro");
+	public FileImportAction(Annotator mApplication, IOPlugin plugin) {
+		putValue(Action.NAME, plugin.getName());
 		mainApplication = mApplication;
+		this.plugin = plugin;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.fileOpenDialog(CoreferenceFlavor.DKpro);
+		mainApplication.fileOpenDialog(plugin);
 
 	}
 }

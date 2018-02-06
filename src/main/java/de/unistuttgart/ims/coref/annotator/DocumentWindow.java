@@ -89,9 +89,7 @@ import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.commons.Counter;
-import de.unistuttgart.ims.coref.annotator.action.FileImportCRETAAction;
-import de.unistuttgart.ims.coref.annotator.action.FileImportDKproAction;
-import de.unistuttgart.ims.coref.annotator.action.FileImportQuaDramAAction;
+import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -99,6 +97,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 public class DocumentWindow extends JFrame
 		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
@@ -276,6 +275,7 @@ public class DocumentWindow extends JFrame
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
 		grp = new ButtonGroup();
 		int i = 0;
+
 		for (StyleVariant sv : StyleVariant.values()) {
 			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(sv));
 			viewStyleMenu.add(radio1);
@@ -298,9 +298,25 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuFile() {
 		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.importfrom"));
-		fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
-		fileImportMenu.add(new FileImportDKproAction(mainApplication));
-		fileImportMenu.add(new FileImportCRETAAction(mainApplication));
+
+		for (Class<? extends IOPlugin> pluginClass : mainApplication.getPluginManager().getImportPlugins()) {
+			try {
+				IOPlugin plugin = pluginClass.newInstance();
+				if (plugin.getImporter() != null)
+					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (ResourceInitializationException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		// fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
+		// fileImportMenu.add(new FileImportDKproAction(mainApplication));
+		// fileImportMenu.add(new FileImportCRETAAction(mainApplication));
 
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
@@ -422,7 +438,7 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	public void loadFile(File file, CoreferenceFlavor flavor) {
+	public void loadFile(File file, IOPlugin flavor) {
 		this.file = file;
 		try {
 			logger.info("Loading XMI document from {}.", file);
@@ -452,7 +468,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
-			CoreferenceFlavor flavor) {
+			IOPlugin flavor) {
 		// load type system and CAS
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
@@ -477,12 +493,12 @@ public class DocumentWindow extends JFrame
 			System.exit(1);
 		}
 		try {
-			SimplePipeline.runPipeline(jcas, flavor.getAnalysisEngine());
+			SimplePipeline.runPipeline(jcas, flavor.getImporter());
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			e1.printStackTrace();
 		}
 		this.fireJCasLoadedEvent();
-		switchStyle(jcas, StyleVariant.select(flavor));
+		// switchStyle(jcas, StyleVariant.select(flavor));
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
