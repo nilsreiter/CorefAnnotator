@@ -80,7 +80,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
-import org.kordamp.ikonli.dashicons.Dashicons;
+import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.xml.sax.SAXException;
 
@@ -841,7 +841,7 @@ public class DocumentWindow extends JFrame
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.rename.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TAG));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EDIT));
 
 		}
 
@@ -864,7 +864,7 @@ public class DocumentWindow extends JFrame
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_color.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_TEXTCOLOR));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.COLOR_LENS));
 
 		}
 
@@ -888,7 +888,7 @@ public class DocumentWindow extends JFrame
 		public ChangeKeyForEntityAction() {
 			putValue(Action.NAME, Annotator.getString("action.set_shortcut"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_shortcut.tooltip"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.EDITOR_KITCHENSINK));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.KEYBOARD));
 
 		}
 
@@ -913,7 +913,7 @@ public class DocumentWindow extends JFrame
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.new.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.PLUS));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.PERSON_ADD));
 
 		}
 
@@ -939,7 +939,10 @@ public class DocumentWindow extends JFrame
 			if (value instanceof EntityTreeNode) {
 				EntityTreeNode etn = (EntityTreeNode) value;
 				Entity e = etn.getFeatureStructure();
-				s.setIcon(FontIcon.of(Dashicons.FORMAT_GALLERY, new Color(e.getColor())));
+				if (e instanceof EntityGroup)
+					s.setIcon(FontIcon.of(Material.GROUP, new Color(e.getColor())));
+				else
+					s.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
 				if (etn.getKeyCode() != null) {
 					s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
 				} else if (!(etn.getParent() instanceof EntityTreeNode))
@@ -947,11 +950,11 @@ public class DocumentWindow extends JFrame
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
 				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT))
-					s.setIcon(FontIcon.of(Dashicons.FLAG));
+					s.setIcon(FontIcon.of(Material.FLAG));
 				else
-					s.setIcon(FontIcon.of(Dashicons.FORMAT_IMAGE));
+					s.setIcon(FontIcon.of(Material.PERSON_PIN));
 			} else if (cModel != null && catn == cModel.groupRootNode)
-				s.setIcon(FontIcon.of(Dashicons.GROUPS));
+				s.setIcon(FontIcon.of(Material.GROUP_WORK));
 			return s;
 		}
 
@@ -963,7 +966,7 @@ public class DocumentWindow extends JFrame
 		public DeleteAction() {
 			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.TRASH));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
 
 		}
 
@@ -1072,7 +1075,7 @@ public class DocumentWindow extends JFrame
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.GROUPS));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.GROUP));
 
 		}
 
@@ -1122,7 +1125,7 @@ public class DocumentWindow extends JFrame
 
 		public ToggleFlagMention() {
 			putValue(Action.NAME, Annotator.getString("action.flag_mention"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Dashicons.FLAG));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.FLAG));
 
 		}
 
