@@ -160,9 +160,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		} else
 			insertNodeInto(tn, rootNode, 0);
 		entityMap.put(e, tn);
-		if (key < keyCodes.length) {
-			tn.setKeyCode(keyCodes[key]);
-			keyMap.put(keyCodes[key++], e);
+		if (e.getKey() != null) {
+			tn.setKeyCode(e.getKey().charAt(0));
+			keyMap.put(e.getKey().charAt(0), e);
 		}
 		return tn;
 	}
@@ -314,11 +314,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		Entity old = keyMap.get(keyCode);
 		if (old != null) {
 			entityMap.get(old).setKeyCode(Character.MIN_VALUE);
-			this.nodeChanged(entityMap.get(old));
+			old.setKey(null);
+			nodeChanged(entityMap.get(old));
 		}
 		keyMap.put(keyCode, e);
 		entityMap.get(e).setKeyCode(keyCode);
-		this.nodeChanged(entityMap.get(e));
+		e.setKey(String.valueOf(keyCode));
+		nodeChanged(entityMap.get(e));
 	}
 
 	public void updateColor(Entity entity, Color newColor) {

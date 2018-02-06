@@ -72,6 +72,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
@@ -100,6 +101,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 
 public class DocumentWindow extends JFrame
 		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
@@ -497,12 +499,20 @@ public class DocumentWindow extends JFrame
 			System.exit(1);
 		}
 		try {
-			SimplePipeline.runPipeline(jcas, flavor.getImporter());
+			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
+					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			e1.printStackTrace();
 		}
 		this.fireJCasLoadedEvent();
-		if (flavor.getStylePlugin() != null)
+		Meta meta = JCasUtil.selectSingle(jcas, Meta.class);
+		if (meta.getStylePlugin() != null)
+			try {
+				switchStyle(jcas, ((Class<StylePlugin>) Class.forName(meta.getStylePlugin())).newInstance());
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		else if (flavor.getStylePlugin() != null)
 			switchStyle(jcas, flavor.getStylePlugin());
 
 		try {
@@ -621,9 +631,11 @@ public class DocumentWindow extends JFrame
 			StyleManager.style(textPane.getStyledDocument(), StyleManager.getDefaultStyle());
 		Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
 				StyleManager.getDefaultStyle());
-		for (Style style : styles.keySet()) {
-			StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
-		}
+		if (styles != null)
+			for (Style style : styles.keySet()) {
+				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+			}
+		JCasUtil.selectSingle(jcas, Meta.class).setStylePlugin(sv.getClass().getName());
 	}
 
 	@Override
