@@ -37,8 +37,6 @@ import javax.swing.text.View;
 
 import org.apache.commons.configuration2.Configuration;
 
-import de.unistuttgart.ims.commons.Counter;
-
 public class SearchPanel extends JFrame implements DocumentListener, ListSelectionListener, WindowListener {
 	final static Color HILIT_COLOR = Color.black;
 
