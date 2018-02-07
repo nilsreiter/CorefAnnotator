@@ -5,6 +5,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.reflections.Reflections;
 
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -26,6 +28,14 @@ public class PluginManager {
 
 	public Set<Class<? extends StylePlugin>> getStylePlugins() {
 		return stylePlugins;
+	}
+
+	public IOPlugin getDefaultIOPlugin() {
+		return new DefaultIOPlugin();
+	}
+
+	public StylePlugin getDefaultStylePlugin() {
+		return new DefaultStylePlugin();
 	}
 
 }

@@ -98,6 +98,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
@@ -305,13 +306,16 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected JMenu initialiseMenuFile() {
-		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.importfrom"));
+		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.import_from"));
+		JMenu fileExportMenu = new JMenu(Annotator.getString("menu.file.export_as"));
 
 		for (Class<? extends IOPlugin> pluginClass : mainApplication.getPluginManager().getIOPlugins()) {
 			try {
 				IOPlugin plugin = pluginClass.newInstance();
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
+				if (plugin.getExporter() != null)
+					fileExportMenu.add(new FileExportAction(plugin));
 			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
 				logger.catching(e);
 			}
@@ -327,6 +331,7 @@ public class DocumentWindow extends JFrame
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(new FileSaveAction(this));
 		fileMenu.add(new FileSaveAsAction());
+		fileMenu.add(fileExportMenu);
 		fileMenu.add(new JMenuItem(new CloseAction()));
 		fileMenu.add(new JMenuItem(new ExitAction()));
 
@@ -445,7 +450,8 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void loadFile(File file, IOPlugin flavor) {
-		this.file = file;
+		if (flavor instanceof DefaultIOPlugin)
+			this.file = file;
 		try {
 			logger.info("Loading XMI document from {}.", file);
 			loadStream(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
@@ -459,13 +465,16 @@ public class DocumentWindow extends JFrame
 	}
 
 	public synchronized void saveCurrentFile() {
-		saveToFile(file);
+		if (file != null)
+			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin());
 	}
 
-	public synchronized void saveToFile(File f) {
+	public synchronized void saveToFile(File f, IOPlugin plugin) {
 		try {
+			SimplePipeline.runPipeline(jcas, plugin.getExporter());
 			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
-		} catch (FileNotFoundException | SAXException e) {
+		} catch (FileNotFoundException | SAXException | AnalysisEngineProcessException
+				| ResourceInitializationException e) {
 			logger.catching(e);
 			mainApplication.warnDialog(e.getMessage(), e.toString());
 		}
@@ -1100,6 +1109,34 @@ public class DocumentWindow extends JFrame
 
 	}
 
+	class FileExportAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		IOPlugin plugin;
+
+		public FileExportAction(IOPlugin plugin) {
+			putValue(Action.NAME, plugin.getName());
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
+			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
+			saveDialog.setFileFilter(XmiFileFilter.filter);
+			saveDialog.setDialogTitle(Annotator.getString("dialog.export_as.title"));
+			int r = saveDialog.showSaveDialog(DocumentWindow.this);
+			switch (r) {
+			case JFileChooser.APPROVE_OPTION:
+				File f = saveDialog.getSelectedFile();
+				saveToFile(f, plugin);
+				break;
+			default:
+			}
+		}
+
+	}
+
 	class FileSaveAsAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1121,7 +1158,7 @@ public class DocumentWindow extends JFrame
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
 				File f = saveDialog.getSelectedFile();
-				saveToFile(f);
+				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin());
 				break;
 			default:
 			}
