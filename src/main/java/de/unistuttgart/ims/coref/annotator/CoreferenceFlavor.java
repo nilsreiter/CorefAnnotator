@@ -9,6 +9,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.creta.webanno.ImportCRETA;
 import de.unistuttgart.ims.coref.annotator.plugins.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.quadrama.ImportQuaDramA;
 
+@Deprecated
 public enum CoreferenceFlavor {
 	Default, QuaDramA, DKpro, CRETA, AutoDetect;
 

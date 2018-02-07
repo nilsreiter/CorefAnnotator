@@ -4,6 +4,7 @@ import javax.swing.AbstractAction;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 
+@Deprecated
 public abstract class CRAction extends AbstractAction {
 
 	/**
