@@ -508,7 +508,9 @@ public class DocumentWindow extends JFrame
 		Meta meta = JCasUtil.selectSingle(jcas, Meta.class);
 		if (meta.getStylePlugin() != null)
 			try {
-				switchStyle(jcas, ((Class<StylePlugin>) Class.forName(meta.getStylePlugin())).newInstance());
+				Object o = Class.forName(meta.getStylePlugin()).newInstance();
+				if (o instanceof StylePlugin)
+					switchStyle(jcas, (StylePlugin) o);
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 				e1.printStackTrace();
 			}
