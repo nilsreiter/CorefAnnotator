@@ -52,9 +52,9 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	boolean keepEmptyEntities = true;
 
 	public CoreferenceModel(JCas jcas) {
-		super(new CATreeNode(null, "Add new entity"));
+		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
-		this.groupRootNode = new CATreeNode(null, "Groups");
+		this.groupRootNode = new CATreeNode(null, Annotator.getString("tree.groups"));
 		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 
