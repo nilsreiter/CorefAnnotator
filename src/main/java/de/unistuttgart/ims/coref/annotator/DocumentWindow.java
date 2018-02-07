@@ -206,6 +206,7 @@ public class DocumentWindow extends JFrame
 		getContentPane().add(splitPane);
 		pack();
 		setVisible(true);
+		Annotator.logger.info("Window initialised.");
 	}
 
 	protected void initialiseActions() {
@@ -225,6 +226,8 @@ public class DocumentWindow extends JFrame
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
 		flagMentionAction.setEnabled(false);
+		Annotator.logger.info("Actions initialised.");
+
 	}
 
 	protected JMenu initialiseMenuView() {
@@ -401,7 +404,7 @@ public class DocumentWindow extends JFrame
 			}
 		});
 
-		logger.info("Initialised window.");
+		logger.info("Initialised menu bar.");
 	}
 
 	protected void closeWindow(boolean quit) {
@@ -471,6 +474,7 @@ public class DocumentWindow extends JFrame
 		} catch (FileNotFoundException | SAXException e) {
 			e.printStackTrace();
 			mainApplication.warnDialog(e.getMessage(), e.toString());
+			logger.warn("Exception while saving: {}", e.getMessage());
 		}
 	}
 

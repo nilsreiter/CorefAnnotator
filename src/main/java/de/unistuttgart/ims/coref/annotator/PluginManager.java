@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.reflections.Reflections;
 
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -15,7 +16,8 @@ public class PluginManager {
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugins");
 		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
 		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
-
+		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
+		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins, ','));
 	}
 
 	public Set<Class<? extends IOPlugin>> getIOPlugins() {

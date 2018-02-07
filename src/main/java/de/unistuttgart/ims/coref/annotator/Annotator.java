@@ -37,13 +37,13 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
-	static final Logger logger = LogManager.getLogger(Annotator.class);
+	public static final Logger logger = LogManager.getLogger(Annotator.class);
 	Set<DocumentWindow> openFiles = new HashSet<DocumentWindow>();
 
 	Configuration configuration;
@@ -131,7 +131,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		 * 
 		 * @Override public void run() {
 		 */
-		logger.info("Loading XMI document from {}.", file);
+		// logger.info("Loading XMI document from {}.", file);
 		v.loadFile(file, flavor);
 		/*
 		 * } }.run();
