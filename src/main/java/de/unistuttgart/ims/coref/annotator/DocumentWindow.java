@@ -192,6 +192,7 @@ public class DocumentWindow extends JFrame
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
+		textPane.setSelectionColor(Color.RED);
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -711,6 +712,7 @@ public class DocumentWindow extends JFrame
 	public void mentionSelected(Annotation m) {
 		if (m != null) {
 			textPane.setCaretPosition(m.getEnd());
+			textPane.setSelectionColor(Color.red);
 			textPane.setSelectionStart(m.getBegin());
 			textPane.setSelectionEnd(m.getEnd());
 		} else {
