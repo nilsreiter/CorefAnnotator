@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
 	<Properties>
-		<Property name="filename">${user.home}/.SimpleXmiViewer.log</Property>
-		<Property name="loggername">de.unistuttgart.ims.annotationviewer.SimpleXmiViewer</Property>
+		<Property name="filename">${user.home}/.CorefAnnotator.log</Property>
+		<Property name="loggername">de.unistuttgart.ims.coref.annotator.Annotator</Property>
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
