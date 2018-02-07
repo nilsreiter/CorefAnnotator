@@ -287,7 +287,7 @@ public class DocumentWindow extends JFrame
 				viewStyleMenu.add(radio1);
 				grp.add(radio1);
 			} catch (InstantiationException | IllegalAccessException e1) {
-				e1.printStackTrace();
+				logger.catching(e1);
 			}
 
 		}
@@ -312,12 +312,8 @@ public class DocumentWindow extends JFrame
 				IOPlugin plugin = pluginClass.newInstance();
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ResourceInitializationException e) {
-				e.printStackTrace();
+			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
+				logger.catching(e);
 			}
 
 		}
@@ -354,14 +350,15 @@ public class DocumentWindow extends JFrame
 			logger.error("Could not set look and feel {}.", e.getMessage());
 		}
 
-		// top level menus
-		JMenu helpMenu = new JMenu(Annotator.getString("menu.help"));
+		// TODO: Disabled for the moment
+		// JMenu helpMenu = new JMenu(Annotator.getString("menu.help"));
 		// JMenu debugMenu = new JMenu("Debug");
-		windowsMenu = new JMenu(Annotator.getString("menu.windows"));
-		if (segmentAnnotation != null) {
-			documentMenu = new JMenu(Annotator.getString("menu.document"));
-			documentMenu.setEnabled(segmentAnnotation != null);
-		}
+
+		// windowsMenu = new JMenu(Annotator.getString("menu.windows"));
+		// if (segmentAnnotation != null) {
+		// documentMenu = new JMenu(Annotator.getString("menu.document"));
+		// documentMenu.setEnabled(segmentAnnotation != null);
+		// }
 
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem(Annotator.getString("menu.file.about"));
@@ -372,10 +369,10 @@ public class DocumentWindow extends JFrame
 		menuBar.add(initialiseMenuEntity());
 		menuBar.add(initialiseMenuView());
 		menuBar.add(initialiseMenuTools());
-		if (segmentAnnotation != null)
-			menuBar.add(documentMenu);
-		menuBar.add(windowsMenu);
-		menuBar.add(helpMenu);
+		// if (segmentAnnotation != null)
+		// menuBar.add(documentMenu);
+		// menuBar.add(windowsMenu);
+		// menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
 
@@ -427,8 +424,7 @@ public class DocumentWindow extends JFrame
 			textPane.repaint();
 
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.catching(e);
 		}
 	}
 
@@ -455,12 +451,10 @@ public class DocumentWindow extends JFrame
 			loadStream(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
 					file.getName(), flavor);
 		} catch (FileNotFoundException e) {
-			logger.warn("File {} not found.", file);
+			logger.catching(e);
 			mainApplication.warnDialog("File " + file.getAbsolutePath() + " could not be found.", "File not found");
-			e.printStackTrace();
 		} catch (ResourceInitializationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.catching(e);
 		}
 	}
 
@@ -472,9 +466,8 @@ public class DocumentWindow extends JFrame
 		try {
 			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
 		} catch (FileNotFoundException | SAXException e) {
-			e.printStackTrace();
+			logger.catching(e);
 			mainApplication.warnDialog(e.getMessage(), e.toString());
-			logger.warn("Exception while saving: {}", e.getMessage());
 		}
 	}
 
@@ -485,29 +478,22 @@ public class DocumentWindow extends JFrame
 			jcas = JCasFactory.createJCas(typeSystemDescription);
 
 		} catch (UIMAException e1) {
-			logger.error(e1.getMessage());
-			e1.printStackTrace();
+			logger.catching(e1);
 			System.exit(1);
 		}
 		try {
 			logger.info("Deserialising input stream.");
 			XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-		} catch (SAXException e1) {
-			logger.error(e1.getMessage());
-
-			e1.printStackTrace();
-			System.exit(1);
-		} catch (IOException e1) {
-			logger.error(e1.getMessage());
-
-			e1.printStackTrace();
+		} catch (SAXException | IOException e1) {
+			logger.catching(e1);
 			System.exit(1);
 		}
 		try {
+			logger.info("Applying importer from {}", flavor.getClass().getName());
 			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
 					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
-			e1.printStackTrace();
+			logger.catching(e1);
 		}
 		this.fireJCasLoadedEvent();
 		Meta meta = JCasUtil.selectSingle(jcas, Meta.class);
@@ -517,7 +503,7 @@ public class DocumentWindow extends JFrame
 				if (o instanceof StylePlugin)
 					switchStyle(jcas, (StylePlugin) o);
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-				e1.printStackTrace();
+				logger.catching(e1);
 			}
 		else if (flavor.getStylePlugin() != null)
 			switchStyle(jcas, flavor.getStylePlugin());
@@ -535,7 +521,7 @@ public class DocumentWindow extends JFrame
 			else
 				setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
 		} catch (CASRuntimeException e) {
-			logger.error(e.getMessage());
+			logger.catching(e);
 		}
 
 		this.cModel = new CoreferenceModel(jcas);
@@ -632,6 +618,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void switchStyle(JCas jcas, StylePlugin sv) {
+		Annotator.logger.info("Switching to style {}", sv.getClass().getName());
 		if (sv.getBaseStyle() != null)
 			StyleManager.style(textPane.getStyledDocument(), sv.getBaseStyle());
 		else
