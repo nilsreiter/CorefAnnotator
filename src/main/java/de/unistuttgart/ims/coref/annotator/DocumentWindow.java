@@ -413,7 +413,7 @@ public class DocumentWindow extends JFrame
 		mainApplication.close(this);
 	}
 
-	public void drawAnnotation(Annotation a, Color c, boolean dotted) {
+	public void drawAnnotation(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
@@ -426,7 +426,8 @@ public class DocumentWindow extends JFrame
 			spanCounter.add(span);
 			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
-			textPane.repaint();
+			if (repaint)
+				textPane.repaint();
 
 		} catch (BadLocationException e) {
 			logger.catching(e);
@@ -434,19 +435,21 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void drawMention(Mention m) {
-		drawAnnotation(m, new Color(m.getEntity().getColor()), false);
+		drawAnnotation(m, new Color(m.getEntity().getColor()), false, true);
 		if (m.getDiscontinuous() != null)
-			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true);
+			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 	}
 
 	public void drawAnnotations() {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			drawAnnotation(m, new Color(m.getEntity().getColor()), false);
+			drawAnnotation(m, new Color(m.getEntity().getColor()), false, false);
 			if (m.getDiscontinuous() != null)
-				drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true);
+				drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+
 		}
+		textPane.repaint();
 	}
 
 	public void loadFile(File file, IOPlugin flavor) {
