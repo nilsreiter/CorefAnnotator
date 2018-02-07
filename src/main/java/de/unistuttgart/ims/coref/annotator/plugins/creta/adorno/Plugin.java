@@ -26,7 +26,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return null;
+		return AnalysisEngineFactory.createEngineDescription(Exporter.class);
 	}
 
 	@Override

@@ -18,16 +18,14 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class Importer extends JCasAnnotator_ImplBase {
 
-	private static final String mentionTypeName = "de.unistuttgart.ims.type.CoRefEntity";
-
 	ColorMap colorMap = new ColorMap();
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 		Map<String, Entity> entityMap = new HashMap<String, Entity>();
 
-		Type mentionType = jcas.getTypeSystem().getType(mentionTypeName);
-		Feature entityFeature = mentionType.getFeatureByBaseName("coref");
+		Type mentionType = jcas.getTypeSystem().getType(Constants.mentionTypeName);
+		Feature entityFeature = mentionType.getFeatureByBaseName(Constants.entityNameFeatureName);
 
 		AnnotationIndex<Annotation> idx = jcas.getAnnotationIndex(mentionType);
 		for (Annotation a : idx) {
