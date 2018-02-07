@@ -90,7 +90,6 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitResponse;
 
-import de.unistuttgart.ims.commons.Counter;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -118,7 +117,7 @@ public class DocumentWindow extends JFrame
 
 	// storing and caching
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-	Counter<Span> spanCounter = new Counter<Span>();
+	RangedCounter spanCounter = new RangedCounter();
 
 	// actions
 	AbstractAction newEntityAction;
@@ -417,10 +416,12 @@ public class DocumentWindow extends JFrame
 			spanCounter.subtract(span);
 		}
 		try {
-			int n = spanCounter.get(span);
+			int n = spanCounter.getMax(span);
 			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
 			spanCounter.add(span);
 			highlightMap.put(a, hi);
+			// TODO: this is overkill, but didn't work otherwise
+			textPane.repaint();
 
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
