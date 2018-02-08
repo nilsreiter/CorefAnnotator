@@ -1354,7 +1354,7 @@ public class DocumentWindow extends JFrame
 				if (textPane.getBounds().contains(e.getPoint())) {
 					int offset = textPane.viewToModel(e.getPoint());
 					Collection<Mention> mentions = cModel.getMentions(offset);
-					textPopupMenu.add("Entities");
+					textPopupMenu.add(Annotator.getString("menu.entities"));
 					for (Mention m : mentions) {
 						StringBuilder b = new StringBuilder();
 						b.append(m.getAddress());
@@ -1380,20 +1380,15 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 	}
 
@@ -1423,7 +1418,7 @@ public class DocumentWindow extends JFrame
 		Mention m;
 
 		public ShowMentionInTreeAction(Mention m) {
-			putValue(Action.NAME, "Show in tree");
+			putValue(Action.NAME, Annotator.getString("action.show_mention_in_tree"));
 			this.m = m;
 		}
 
