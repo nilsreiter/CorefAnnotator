@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +56,8 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -111,7 +114,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 
 public class DocumentWindow extends JFrame
-		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener, MouseListener {
+		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Coref Annotator";
@@ -155,6 +158,7 @@ public class DocumentWindow extends JFrame
 	JMenu recentMenu;
 	JMenu windowsMenu;
 	JPopupMenu treePopupMenu;
+	JPopupMenu textPopupMenu;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -170,6 +174,18 @@ public class DocumentWindow extends JFrame
 	 */
 
 	public void initialiseWindow() {
+		// popup
+		treePopupMenu = new JPopupMenu();
+		treePopupMenu.add(this.renameAction);
+		treePopupMenu.add(this.changeKeyAction);
+		treePopupMenu.add(this.changeColorAction);
+		treePopupMenu.add(this.deleteAction);
+		treePopupMenu.add(new JCheckBoxMenuItem(this.flagMentionAction));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleGenericEntity));
+
+		textPopupMenu = new JPopupMenu();
+		textPopupMenu.addPopupMenuListener(new PopupListener());
+
 		// initialise panel
 		JPanel rightPanel = new JPanel(new BorderLayout());
 		tree = new JTree();
@@ -180,7 +196,7 @@ public class DocumentWindow extends JFrame
 		tree.setTransferHandler(new PanelTransferHandler());
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
-		tree.addMouseListener(this);
+		tree.addMouseListener(new TreeMouseListener());
 
 		// selectionDetailPanel = new JLabel();
 		// selectionDetailPanel.setPreferredSize(new Dimension(200, 100));
@@ -221,18 +237,10 @@ public class DocumentWindow extends JFrame
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.setHighlighter(hilit);
+		textPane.addMouseListener(new TextMouseListener());
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
-
-		// popup
-		treePopupMenu = new JPopupMenu();
-		treePopupMenu.add(this.renameAction);
-		treePopupMenu.add(this.changeKeyAction);
-		treePopupMenu.add(this.changeColorAction);
-		treePopupMenu.add(this.deleteAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.flagMentionAction));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleGenericEntity));
 
 		// split pane
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -1078,6 +1086,26 @@ public class DocumentWindow extends JFrame
 
 	}
 
+	class DeleteMentionAction extends MyAction {
+		private static final long serialVersionUID = 1L;
+
+		Mention m;
+
+		public DeleteMentionAction(Mention m) {
+			putValue(Action.NAME, Annotator.getString("action.delete"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
+			this.m = m;
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cModel.removeMention(m);
+		}
+
+	}
+
 	class TextViewTransferHandler extends TransferHandler {
 
 		private static final long serialVersionUID = 1L;
@@ -1285,37 +1313,129 @@ public class DocumentWindow extends JFrame
 		};
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e)) {
-			int row = tree.getClosestRowForLocation(e.getX(), e.getY());
-			tree.setSelectionRow(row);
-			treePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+	class TreeMouseListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (SwingUtilities.isRightMouseButton(e)) {
+				int row = tree.getClosestRowForLocation(e.getX(), e.getY());
+				tree.setSelectionRow(row);
+				treePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+
+		}
+
+	}
+
+	class TextMouseListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (SwingUtilities.isRightMouseButton(e)) {
+				if (textPane.getBounds().contains(e.getPoint())) {
+					int offset = textPane.viewToModel(e.getPoint());
+					Collection<Mention> mentions = cModel.getMentions(offset);
+					textPopupMenu.add("Entities");
+					for (Mention m : mentions) {
+						StringBuilder b = new StringBuilder();
+						b.append(m.getAddress());
+						if (m.getEntity().getLabel() != null)
+							b.append(": ").append(m.getEntity().getLabel());
+
+						JMenu mentionMenu = new JMenu(b.toString());
+						mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
+						Action a = new ShowMentionInTreeAction(m);
+						mentionMenu.add(a);
+						mentionMenu.add(new DeleteMentionAction(m));
+						textPopupMenu.add(mentionMenu);
+					}
+					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+
 		}
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
+	class PopupListener implements PopupMenuListener {
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			((JPopupMenu) e.getSource()).removeAll();
+
+		}
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent e) {
+
+		}
 
 	}
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+	class ShowMentionInTreeAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		Mention m;
+
+		public ShowMentionInTreeAction(Mention m) {
+			putValue(Action.NAME, "Show in tree");
+			this.m = m;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CATreeNode node = cModel.mentionMap.get(m);
+			Object[] path = cModel.getPathToRoot(node);
+			TreePath tp = new TreePath(path);
+			tree.setSelectionPath(tp);
+			tree.scrollPathToVisible(tp);
+
+		}
 
 	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

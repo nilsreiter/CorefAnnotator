@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
-
+	RangedHashSetValuedHashMap<Mention> charposMentionMap = new RangedHashSetValuedHashMap<Mention>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
 	int key = 0;
@@ -298,6 +299,10 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		fireMentionChangedEvent(m);
 	}
 
+	public Collection<Mention> getMentions(int position) {
+		return this.charposMentionMap.get(position);
+	}
+
 	public void resort() {
 		int n = rootNode.getChildCount();
 		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);
@@ -347,11 +352,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
+		this.charposMentionMap.add(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionAdded(m);
 	}
 
 	public void fireMentionRemovedEvent(Mention m) {
+		this.charposMentionMap.remove(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionRemoved(m);
 	}
