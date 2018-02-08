@@ -280,16 +280,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		System.err.println("keychar: " + e.getKeyChar());
 		JTextComponent ta = (JTextComponent) e.getSource();
 		if (keyMap.containsKey(e.getKeyChar())) {
 			e.consume();
 			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
-		} /*
-			 * else if (e.getKeyChar() == 'n') {
-			 * addNewEntityMention(ta.getSelectionStart(),
-			 * ta.getSelectionEnd()); }
-			 */
+		}
 	}
 
 	@Override
