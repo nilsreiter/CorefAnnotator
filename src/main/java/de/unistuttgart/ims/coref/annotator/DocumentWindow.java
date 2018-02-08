@@ -12,6 +12,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -40,6 +42,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -47,6 +50,7 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -107,7 +111,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 
 public class DocumentWindow extends JFrame
-		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
+		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Coref Annotator";
@@ -150,6 +154,7 @@ public class DocumentWindow extends JFrame
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
+	JPopupMenu treePopupMenu;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -175,6 +180,7 @@ public class DocumentWindow extends JFrame
 		tree.setTransferHandler(new PanelTransferHandler());
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
+		tree.addMouseListener(this);
 
 		// selectionDetailPanel = new JLabel();
 		// selectionDetailPanel.setPreferredSize(new Dimension(200, 100));
@@ -218,6 +224,15 @@ public class DocumentWindow extends JFrame
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+
+		// popup
+		treePopupMenu = new JPopupMenu();
+		treePopupMenu.add(this.renameAction);
+		treePopupMenu.add(this.changeKeyAction);
+		treePopupMenu.add(this.changeColorAction);
+		treePopupMenu.add(this.deleteAction);
+		treePopupMenu.add(new JCheckBoxMenuItem(this.flagMentionAction));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleGenericEntity));
 
 		// split pane
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -1268,6 +1283,39 @@ public class DocumentWindow extends JFrame
 
 		public void setEnabled() {
 		};
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (SwingUtilities.isRightMouseButton(e)) {
+			int row = tree.getClosestRowForLocation(e.getX(), e.getY());
+			tree.setSelectionRow(row);
+			treePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
