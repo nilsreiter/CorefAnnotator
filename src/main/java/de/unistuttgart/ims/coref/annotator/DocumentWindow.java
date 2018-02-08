@@ -1040,7 +1040,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention)
 				cModel.removeMention((Mention) tn.getFeatureStructure());
-			else if (tn.getFeatureStructure() instanceof Entity) {
+			else if (tn.getFeatureStructure() instanceof EntityGroup) {
+				cModel.removeEntityGroup((EntityGroup) tn.getFeatureStructure());
+			} else if (tn.getFeatureStructure() instanceof Entity) {
 				EntityTreeNode etn = (EntityTreeNode) tn;
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
@@ -1514,7 +1516,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			changeColorAction.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
-			deleteAction.setEnabled(isSingle() && (isMention() || (isEntity() && isLeaf())));
+			deleteAction.setEnabled(isSingle() && (isMention() || isEntityGroup() || (isEntity() && isLeaf())));
 			formGroupAction.setEnabled(isDouble() && isEntity());
 
 			toggleMentionDifficult.setEnabled(isSingle() && isMention());

@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -123,6 +125,16 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		if (k != null)
 			keyMap.remove(k.charAt(0));
 		entityMentionMap.remove(e);
+	}
+
+	public void removeEntityGroup(EntityGroup eg) {
+		Set<Mention> mentions = new HashSet<Mention>(entityMentionMap.get(eg));
+		for (Mention m : mentions) {
+			removeMention(m);
+		}
+		removeNodeFromParent(entityMap.get(eg));
+		eg.removeFromIndexes();
+
 	}
 
 	public void removeEntityFromGroup(EntityGroup eg, EntityTreeNode e) {
@@ -387,7 +399,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		CATreeNode parent = (CATreeNode) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));
-		// removeNodeFromParent(mentionMap.get(m));
 		nodesWereRemoved(parent, new int[] { index }, new Object[] { mentionMap.get(m) });
 		fireMentionRemovedEvent(m);
 		entityMentionMap.get(m.getEntity()).remove(m);
