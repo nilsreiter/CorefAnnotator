@@ -10,7 +10,6 @@ import org.apache.uima.jcas.cas.StringArray;
 
 public class Util {
 	public static String toString(TreeModel tm) {
-
 		return toString((TreeNode) tm.getRoot(), 0);
 	}
 

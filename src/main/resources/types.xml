@@ -48,6 +48,12 @@
           <description/>
           <rangeTypeName>uima.cas.String</rangeTypeName>
         </featureDescription>
+      <featureDescription>
+          <name>Flags</name>
+          <description/>
+          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+          <multipleReferencesAllowed>true</multipleReferencesAllowed>
+        </featureDescription>
       </features>
     </typeDescription>
   <typeDescription>

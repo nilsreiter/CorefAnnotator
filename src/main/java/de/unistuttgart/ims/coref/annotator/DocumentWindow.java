@@ -25,6 +25,8 @@ import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -61,6 +63,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -128,6 +131,7 @@ public class DocumentWindow extends JFrame
 	DeleteAction deleteAction;
 	AbstractAction formGroupAction;
 	ToggleFlagMention flagMentionAction;
+	ToggleGenericEntity toggleGenericEntity;
 
 	// controller
 	CoreferenceModel cModel;
@@ -138,6 +142,8 @@ public class DocumentWindow extends JFrame
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 	StyleContext styleContext = new StyleContext();
+	JLabel selectionDetailPanel;
+	JPanel statusBar;
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -170,10 +176,15 @@ public class DocumentWindow extends JFrame
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(this);
 
+		// selectionDetailPanel = new JLabel();
+		// selectionDetailPanel.setPreferredSize(new Dimension(200, 100));
+
 		rightPanel.setPreferredSize(new Dimension(200, 800));
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+		// rightPanel.add(selectionDetailPanel, BorderLayout.SOUTH);
 
+		// tool bar
 		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
 		controls.add(new JButton(newEntityAction));
@@ -187,6 +198,12 @@ public class DocumentWindow extends JFrame
 
 		for (Component comp : controls.getComponents())
 			comp.setFocusable(false);
+
+		// status bar
+		statusBar = new JPanel();
+		statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
+		statusBar.setOpaque(true);
+		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
 		// initialise text view
 		JPanel leftPanel = new JPanel(new BorderLayout());
@@ -219,6 +236,7 @@ public class DocumentWindow extends JFrame
 		this.deleteAction = new DeleteAction();
 		this.formGroupAction = new FormEntityGroup();
 		this.flagMentionAction = new ToggleFlagMention();
+		this.toggleGenericEntity = new ToggleGenericEntity();
 
 		// disable all at the beginning
 		newEntityAction.setEnabled(false);
@@ -346,6 +364,7 @@ public class DocumentWindow extends JFrame
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
+		entityMenu.add(new JCheckBoxMenuItem(toggleGenericEntity));
 		return entityMenu;
 	}
 
@@ -664,6 +683,12 @@ public class DocumentWindow extends JFrame
 		renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
 		changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
+		toggleGenericEntity.setEnabled(num == 1 && fs[0] instanceof Entity);
+		if (toggleGenericEntity.isEnabled())
+			toggleGenericEntity.putValue(Action.SELECTED_KEY,
+					Util.contains(((Entity) fs[0]).getFlags(), Constants.ENTITY_FLAG_GENERIC));
+		else
+			toggleGenericEntity.putValue(Action.SELECTED_KEY, false);
 		deleteAction
 				.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
 
@@ -682,6 +707,14 @@ public class DocumentWindow extends JFrame
 			mentionSelected((Annotation) fs[0]);
 		else
 			mentionSelected(null);
+
+		if (num == 1) {
+			if (fs[0] instanceof Entity) {
+				Entity entity = (Entity) fs[0];
+				if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC))
+					statusBar.add(new JLabel("Generic"));
+			}
+		}
 
 	}
 
@@ -946,15 +979,27 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class CellRenderer extends DefaultTreeCellRenderer {
+	class CellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
+		/**
+		 * 
+		 */
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
 				boolean leaf, int row, boolean hasFocus) {
-			JLabel s = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
+			// TODO: split up the code in multiple classes
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			panel.setOpaque(false);
+			JLabel lab1 = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
+			panel.add(lab1);
+			panel.add(Box.createRigidArea(new Dimension(5, 5)));
+			String stringValue = tree.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
+
+			lab1.setText(stringValue);
 			CATreeNode catn = null;
 			if (value instanceof CATreeNode)
 				catn = (CATreeNode) value;
@@ -962,24 +1007,30 @@ public class DocumentWindow extends JFrame
 				EntityTreeNode etn = (EntityTreeNode) value;
 				Entity e = etn.getFeatureStructure();
 				if (e instanceof EntityGroup)
-					s.setIcon(FontIcon.of(Material.GROUP, new Color(e.getColor())));
+					lab1.setIcon(FontIcon.of(Material.GROUP, new Color(e.getColor())));
 				else
-					s.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
+					lab1.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
 				if (etn.getKeyCode() != null) {
-					s.setText(etn.getKeyCode() + ": " + s.getText() + " (" + etn.getChildCount() + ")");
+					lab1.setText(etn.getKeyCode() + ": " + e.getLabel() + " (" + etn.getChildCount() + ")");
 				} else if (!(etn.getParent() instanceof EntityTreeNode))
-					s.setText(s.getText() + " (" + etn.getChildCount() + ")");
+					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
+				if (Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
+					JLabel l = new JLabel("Generic");
+					l.setIcon(FontIcon.of(Material.CLOUD));
+					panel.add(l);
+				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
 				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT))
-					s.setIcon(FontIcon.of(Material.LABEL));
+					lab1.setIcon(FontIcon.of(Material.LABEL));
 				else
-					s.setIcon(FontIcon.of(Material.PERSON_PIN));
+					lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
 			} else if (cModel != null && catn == cModel.groupRootNode)
-				s.setIcon(FontIcon.of(Material.GROUP_WORK));
+				lab1.setIcon(FontIcon.of(Material.GROUP_WORK));
 			else if (cModel != null && catn == cModel.rootNode)
-				s.setIcon(FontIcon.of(Material.PERSON_ADD));
-			return s;
+				lab1.setIcon(FontIcon.of(Material.PERSON_ADD));
+
+			return panel;
 		}
 
 	}
@@ -1169,6 +1220,23 @@ public class DocumentWindow extends JFrame
 			}
 
 		}
+	}
+
+	class ToggleGenericEntity extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ToggleGenericEntity() {
+			putValue(Action.NAME, Annotator.getString("action.flag_entity_generic"));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
+			Entity entity = (Entity) tn.getFeatureStructure();
+			cModel.toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+
+		}
+
 	}
 
 	class ToggleFlagMention extends AbstractAction {

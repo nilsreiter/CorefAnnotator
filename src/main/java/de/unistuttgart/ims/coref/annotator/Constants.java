@@ -1,6 +1,8 @@
 package de.unistuttgart.ims.coref.annotator;
 
 public class Constants {
-	public static String MENTION_FLAG_DIFFICULT = "difficult";
-	public static String MENTION_FLAG_AMBIGUOUS = "ambiguous";
+	public static String MENTION_FLAG_DIFFICULT = "Difficult";
+	public static String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
+
+	public static String ENTITY_FLAG_GENERIC = "Generic";
 }

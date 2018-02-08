@@ -87,6 +87,16 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		fireMentionSelectedEvent(m);
 	}
 
+	public void toggleFlagEntity(Entity m, String flag) {
+		if (Util.contains(m.getFlags(), flag)) {
+			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
+		} else
+			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
+		nodeChanged(mentionMap.get(m));
+		// fireMentionChangedEvent(m);
+		// fireMentionSelectedEvent(m);
+	}
+
 	public void updateMention(Mention m, Entity newEntity) {
 		// remove mention from old entity
 		Entity oldEntity = m.getEntity();
