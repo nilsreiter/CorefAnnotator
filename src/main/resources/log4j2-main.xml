@@ -9,7 +9,7 @@
 		 	<ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
-		<File fileName="${sys:user.home}/.SimpleXmiViewer.log" append="true" name="File">
+		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</File>
 	</Appenders>
