@@ -4,6 +4,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
@@ -100,6 +101,20 @@ public class Util {
 
 	public static boolean isAmbiguous(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
+	}
+
+	public static Meta getMeta(JCas jcas) {
+		if (!JCasUtil.exists(jcas, Meta.class)) {
+			Meta m = new Meta(jcas);
+			m.addToIndexes();
+			return m;
+		}
+		try {
+			return JCasUtil.selectSingle(jcas, Meta.class);
+		} catch (IllegalArgumentException e) {
+			Annotator.logger.catching(e);
+			return null;
+		}
 	}
 
 }

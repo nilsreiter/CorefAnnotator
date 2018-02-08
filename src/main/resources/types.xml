@@ -76,7 +76,7 @@
       <supertypeName>uima.tcas.Annotation</supertypeName>
     </typeDescription>
   <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.Meta</name>
+      <name>de.unistuttgart.ims.coref.annotator.api.Meta</name>
       <description/>
       <supertypeName>uima.cas.TOP</supertypeName>
       <features>

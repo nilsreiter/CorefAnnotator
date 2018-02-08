@@ -534,7 +534,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			logger.catching(e1);
 		}
 		this.fireJCasLoadedEvent();
-		Meta meta = JCasUtil.selectSingle(jcas, Meta.class);
+		Meta meta = Util.getMeta(jcas);
 		if (meta.getStylePlugin() != null)
 			try {
 				Object o = Class.forName(meta.getStylePlugin()).newInstance();
@@ -707,7 +707,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			for (Style style : styles.keySet()) {
 				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 			}
-		JCasUtil.selectSingle(jcas, Meta.class).setStylePlugin(sv.getClass().getName());
+		Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
 	}
 
 	@Override
