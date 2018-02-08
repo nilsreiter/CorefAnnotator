@@ -148,6 +148,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	ToggleEntityGeneric toggleEntityGeneric;
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
+	AbstractAction fileSaveAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -281,6 +282,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.toggleEntityGeneric = new ToggleEntityGeneric();
 		this.sortByAlpha = new SortTreeByAlpha();
 		this.sortByMentions = new SortTreeByMentions();
+		this.fileSaveAction = new FileSaveAction(this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -352,7 +354,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
 		fileMenu.add(fileImportMenu);
-		fileMenu.add(new FileSaveAction(this));
+		fileMenu.add(fileSaveAction);
 		fileMenu.add(new FileSaveAsAction());
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(new JMenuItem(new CloseAction()));
@@ -500,6 +502,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	public void loadFile(File file, IOPlugin flavor) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
+		else
+			this.fileSaveAction.setEnabled(false);
 		try {
 			logger.info("Loading XMI document from {}.", file);
 			progressBar.setValue(10);
