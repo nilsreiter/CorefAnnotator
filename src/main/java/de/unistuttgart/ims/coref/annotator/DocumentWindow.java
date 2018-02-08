@@ -551,14 +551,25 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public synchronized void saveToFile(File f, IOPlugin plugin) {
-		try {
-			SimplePipeline.runPipeline(jcas, plugin.getExporter());
-			XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
-		} catch (FileNotFoundException | SAXException | AnalysisEngineProcessException
-				| ResourceInitializationException e) {
-			logger.catching(e);
-			mainApplication.warnDialog(e.getMessage(), e.toString());
-		}
+		progressBar.setValue(0);
+		progressBar.setVisible(true);
+
+		new SwingWorker<Object, Object>() {
+
+			@Override
+			protected Object doInBackground() throws Exception {
+				SimplePipeline.runPipeline(jcas, plugin.getExporter());
+				XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
+				return new Object();
+			}
+
+			@Override
+			protected void done() {
+				progressBar.setValue(1000);
+				progressBar.setVisible(false);
+			}
+
+		}.execute();
 	}
 
 	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
