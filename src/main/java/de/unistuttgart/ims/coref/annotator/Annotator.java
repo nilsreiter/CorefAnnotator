@@ -276,7 +276,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public static String getString(String key) {
-		return getString(key, Locale.GERMAN);
+		return getString(key);
 	}
 
 	public static String getString(String key, Locale locale) {
