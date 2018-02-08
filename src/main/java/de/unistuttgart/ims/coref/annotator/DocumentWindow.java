@@ -113,8 +113,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 
-public class DocumentWindow extends JFrame
-		implements CaretListener, TreeSelectionListener, TreeModelListener, CoreferenceModelListener {
+public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final String HELP_MESSAGE = "Instructions for using Coref Annotator";
@@ -195,7 +194,7 @@ public class DocumentWindow extends JFrame
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new PanelTransferHandler());
 		tree.setCellRenderer(new CellRenderer());
-		tree.addTreeSelectionListener(this);
+		tree.addTreeSelectionListener(new MyTreeSelectionListener());
 		tree.addMouseListener(new TreeMouseListener());
 
 		// selectionDetailPanel = new JLabel();
@@ -685,60 +684,6 @@ public class DocumentWindow extends JFrame
 				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 			}
 		JCasUtil.selectSingle(jcas, Meta.class).setStylePlugin(sv.getClass().getName());
-	}
-
-	@Override
-	public void valueChanged(TreeSelectionEvent e) {
-		int num = tree.getSelectionCount();
-		TreePath[] paths = new TreePath[num];
-		CATreeNode[] nodes = new CATreeNode[num];
-		FeatureStructure[] fs = new FeatureStructure[num];
-		try {
-			paths = tree.getSelectionPaths();
-
-			fs = new FeatureStructure[paths.length];
-			for (int i = 0; i < paths.length; i++) {
-				nodes[i] = (CATreeNode) paths[i].getLastPathComponent();
-				fs[i] = nodes[i].getFeatureStructure();
-			}
-		} catch (NullPointerException ex) {
-		}
-		renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-		changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-		changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-		toggleGenericEntity.setEnabled(num == 1 && fs[0] instanceof Entity);
-		if (toggleGenericEntity.isEnabled())
-			toggleGenericEntity.putValue(Action.SELECTED_KEY,
-					Util.contains(((Entity) fs[0]).getFlags(), Constants.ENTITY_FLAG_GENERIC));
-		else
-			toggleGenericEntity.putValue(Action.SELECTED_KEY, false);
-		deleteAction
-				.setEnabled(num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
-
-		formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
-		flagMentionAction.setEnabled(num == 1 && fs[0] instanceof Mention);
-		if (num == 1 && fs[0] instanceof Mention) {
-			flagMentionAction.putValue(Action.LARGE_ICON_KEY,
-					(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
-							? FontIcon.of(Material.LABEL) : FontIcon.of(Material.LABEL_OUTLINE)));
-			flagMentionAction.putValue(Action.NAME,
-					(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
-							? Annotator.getString("action.unflag_mention")
-							: Annotator.getString("action.flag_mention")));
-		}
-		if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
-			mentionSelected((Annotation) fs[0]);
-		else
-			mentionSelected(null);
-
-		if (num == 1) {
-			if (fs[0] instanceof Entity) {
-				Entity entity = (Entity) fs[0];
-				if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC))
-					statusBar.add(new JLabel("Generic"));
-			}
-		}
-
 	}
 
 	@Override
@@ -1432,6 +1377,63 @@ public class DocumentWindow extends JFrame
 			tree.setSelectionPath(tp);
 			tree.scrollPathToVisible(tp);
 
+		}
+
+	}
+
+	class MyTreeSelectionListener implements TreeSelectionListener {
+
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			int num = tree.getSelectionCount();
+			TreePath[] paths = new TreePath[num];
+			CATreeNode[] nodes = new CATreeNode[num];
+			FeatureStructure[] fs = new FeatureStructure[num];
+			try {
+				paths = tree.getSelectionPaths();
+
+				fs = new FeatureStructure[paths.length];
+				for (int i = 0; i < paths.length; i++) {
+					nodes[i] = (CATreeNode) paths[i].getLastPathComponent();
+					fs[i] = nodes[i].getFeatureStructure();
+				}
+			} catch (NullPointerException ex) {
+			}
+			renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
+			changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
+			changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
+			toggleGenericEntity.setEnabled(num == 1 && fs[0] instanceof Entity);
+			if (toggleGenericEntity.isEnabled())
+				toggleGenericEntity.putValue(Action.SELECTED_KEY,
+						Util.contains(((Entity) fs[0]).getFlags(), Constants.ENTITY_FLAG_GENERIC));
+			else
+				toggleGenericEntity.putValue(Action.SELECTED_KEY, false);
+			deleteAction.setEnabled(
+					num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
+
+			formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
+			flagMentionAction.setEnabled(num == 1 && fs[0] instanceof Mention);
+			if (num == 1 && fs[0] instanceof Mention) {
+				flagMentionAction.putValue(Action.LARGE_ICON_KEY,
+						(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
+								? FontIcon.of(Material.LABEL) : FontIcon.of(Material.LABEL_OUTLINE)));
+				flagMentionAction.putValue(Action.NAME,
+						(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
+								? Annotator.getString("action.unflag_mention")
+								: Annotator.getString("action.flag_mention")));
+			}
+			if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
+				mentionSelected((Annotation) fs[0]);
+			else
+				mentionSelected(null);
+
+			if (num == 1) {
+				if (fs[0] instanceof Entity) {
+					Entity entity = (Entity) fs[0];
+					if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC))
+						statusBar.add(new JLabel("Generic"));
+				}
+			}
 		}
 
 	}
