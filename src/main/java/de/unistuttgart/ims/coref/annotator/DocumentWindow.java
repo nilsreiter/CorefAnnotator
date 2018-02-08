@@ -376,10 +376,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
-		fileMenu.add(fileImportMenu);
+		fileMenu.add(fileImportMenu, FontIcon.of(Material.FLIGHT_LAND));
 		fileMenu.add(new FileSaveAction(this));
 		fileMenu.add(new FileSaveAsAction());
-		fileMenu.add(fileExportMenu);
+		fileMenu.add(fileExportMenu, FontIcon.of(Material.FLIGHT_TAKEOFF));
 		fileMenu.add(new JMenuItem(new CloseAction()));
 		fileMenu.add(new JMenuItem(new ExitAction()));
 
@@ -1215,6 +1215,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.save_as"));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SAVE));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.SAVE));
 
 		}
 
