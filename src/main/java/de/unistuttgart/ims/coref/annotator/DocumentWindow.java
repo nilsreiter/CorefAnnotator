@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -45,6 +47,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -53,6 +56,7 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -156,6 +160,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JPanel statusBar;
+	JProgressBar progressBar;
+	JSplitPane splitPane;
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -171,6 +177,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.initialiseActions();
 		this.initialiseMenu();
 		this.initialiseWindow();
+		this.setVisible(true);
 
 	}
 
@@ -178,7 +185,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	 * Initialisation
 	 */
 
-	public void initialiseWindow() {
+	protected void initialiseWindow() {
 		// popup
 		treePopupMenu = new JPopupMenu();
 		treePopupMenu.add(this.renameAction);
@@ -209,7 +216,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		rightPanel.setPreferredSize(new Dimension(200, 800));
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		// rightPanel.add(selectionDetailPanel, BorderLayout.SOUTH);
 
 		// tool bar
@@ -228,10 +235,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			comp.setFocusable(false);
 
 		// status bar
+		progressBar = new JProgressBar();
+		progressBar.setMaximum(100);
+		progressBar.setMinimum(0);
+
 		statusBar = new JPanel();
 		statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
-		// statusBar.setOpaque(true);
-		statusBar.add(new JLabel("status bar"));
+		statusBar.add(progressBar);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
 		// initialise text view
@@ -245,16 +255,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.setHighlighter(hilit);
 		textPane.addMouseListener(new TextMouseListener());
-
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		// split pane
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+		splitPane.setVisible(false);
+		splitPane.setDividerLocation(500);
 		getContentPane().add(splitPane);
+
+		setPreferredSize(new Dimension(700, 800));
 		pack();
-		setVisible(true);
 		Annotator.logger.info("Window initialised.");
 	}
 
@@ -485,6 +496,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			this.file = file;
 		try {
 			logger.info("Loading XMI document from {}.", file);
+			progressBar.setValue(10);
+			logger.debug("Setting loading progress to {}", 10);
 			loadStream(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
 					file.getName(), flavor);
 		} catch (FileNotFoundException e) {
@@ -513,61 +526,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
 			IOPlugin flavor) {
-		// load type system and CAS
-		try {
-			jcas = JCasFactory.createJCas(typeSystemDescription);
 
-		} catch (UIMAException e1) {
-			logger.catching(e1);
-			System.exit(1);
-		}
-		try {
-			logger.info("Deserialising input stream.");
-			XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-		} catch (SAXException | IOException e1) {
-			logger.catching(e1);
-			System.exit(1);
-		}
-		try {
-			logger.info("Applying importer from {}", flavor.getClass().getName());
-			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
-					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
-		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
-			logger.catching(e1);
-		}
-		this.fireJCasLoadedEvent();
-		Meta meta = Util.getMeta(jcas);
-		if (meta.getStylePlugin() != null)
-			try {
-				Object o = Class.forName(meta.getStylePlugin()).newInstance();
-				if (o instanceof StylePlugin)
-					switchStyle(jcas, (StylePlugin) o);
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-				logger.catching(e1);
-			}
-		else if (flavor.getStylePlugin() != null)
-			switchStyle(jcas, flavor.getStylePlugin());
+		LoadAndImport lai = new LoadAndImport(inputStream, typeSystemDescription, flavor);
+		lai.execute();
 
-		try {
-			Feature titleFeature = jcas.getTypeSystem()
-					.getFeatureByFullName(mainApplication.getConfiguration().getString("General.windowTitleFeature"));
-			if (titleFeature != null)
-				try {
-					setTitle(jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature)
-							+ (windowTitle != null ? " (" + windowTitle + ")" : ""));
-				} catch (Exception e) {
-					setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
-				}
-			else
-				setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
-		} catch (CASRuntimeException e) {
-			logger.catching(e);
-		}
-
-		this.cModel = new CoreferenceModel(jcas);
-		this.cModel.addCoreferenceModelListener(this);
-		this.cModel.importExistingData();
-		this.fireModelCreatedEvent();
 	}
 
 	public JCas getJcas() {
@@ -680,15 +642,48 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setModel(cModel);
 		textPane.addKeyListener(cModel);
 		textPane.setCaretPosition(0);
-
 		textPane.addCaretListener(this);
-
+		progressBar.setValue(100);
+		logger.debug("Setting loading progress to {}", 100);
+		splitPane.setVisible(true);
+		progressBar.setVisible(false);
 	}
 
 	protected void fireJCasLoadedEvent() {
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
+		String windowTitle = (file != null ? file.getName() : "");
+		Meta meta = Util.getMeta(jcas);
+		if (meta.getStylePlugin() != null)
+			try {
+				Object o = Class.forName(meta.getStylePlugin()).newInstance();
+				if (o instanceof StylePlugin)
+					switchStyle(jcas, (StylePlugin) o);
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+				logger.catching(e1);
+			}
+		else// if (flavor.getStylePlugin() != null)
+			// switchStyle(jcas, flavor.getStylePlugin());
+
+			try {
+				Feature titleFeature = jcas.getTypeSystem().getFeatureByFullName(
+						mainApplication.getConfiguration().getString("General.windowTitleFeature"));
+				if (titleFeature != null)
+					try {
+						setTitle(jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature)
+								+ (windowTitle != null ? " (" + windowTitle + ")" : ""));
+					} catch (Exception e) {
+						setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
+					}
+				else
+					setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
+			} catch (CASRuntimeException e) {
+				logger.catching(e);
+			}
+
+		InitializeModel im = new InitializeModel(jcas);
+		im.execute();
 	}
 
 	@Override
@@ -1573,6 +1568,116 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			else
 				mentionSelected(null);
 
+		}
+
+	}
+
+	class InitializeModel extends SwingWorker<CoreferenceModel, Integer> {
+
+		JCas jcas;
+
+		public InitializeModel(JCas jcas) {
+			this.jcas = jcas;
+		}
+
+		@Override
+		protected CoreferenceModel doInBackground() throws Exception {
+			CoreferenceModel cModel;
+			cModel = new CoreferenceModel(jcas);
+			cModel.addCoreferenceModelListener(DocumentWindow.this);
+
+			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
+				cModel.addExistingEntity(e);
+			}
+			publish(60);
+			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class)) {
+				for (int i = 0; i < eg.getMembers().size(); i++) {
+					cModel.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), cModel.entityMap.get(eg), 0);
+				}
+
+			}
+			publish(70);
+			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+				cModel.connect(m.getEntity(), m);
+
+				cModel.fireMentionAddedEvent(m);
+			}
+			publish(75);
+			return cModel;
+		}
+
+		@Override
+		protected void done() {
+			try {
+				cModel = get();
+				fireModelCreatedEvent();
+			} catch (InterruptedException | ExecutionException e) {
+				logger.catching(e);
+			}
+		}
+
+		@Override
+		protected void process(List<Integer> chunks) {
+			for (Integer i : chunks) {
+				progressBar.setValue(i);
+			}
+		}
+
+	}
+
+	class LoadAndImport extends SwingWorker<JCas, Object> {
+		InputStream inputStream;
+		TypeSystemDescription typeSystemDescription;
+		IOPlugin flavor;
+
+		public LoadAndImport(InputStream inputStream, TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
+			this.inputStream = inputStream;
+			this.typeSystemDescription = typeSystemDescription;
+			this.flavor = flavor;
+		}
+
+		@Override
+		protected JCas doInBackground() throws Exception {
+			JCas jcas = null;
+
+			try {
+				jcas = JCasFactory.createJCas(typeSystemDescription);
+			} catch (UIMAException e1) {
+				logger.catching(e1);
+				return null;
+			}
+			try {
+				logger.info("Deserialising input stream.");
+				XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
+				progressBar.setValue(25);
+				logger.debug("Setting loading progress to {}", 50);
+
+			} catch (SAXException | IOException e1) {
+				logger.catching(e1);
+				System.exit(1);
+			}
+			try {
+				logger.info("Applying importer from {}", flavor.getClass().getName());
+				SimplePipeline.runPipeline(jcas, flavor.getImporter(),
+						AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
+				progressBar.setValue(50);
+				logger.debug("Setting loading progress to {}", 80);
+
+			} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
+				logger.catching(e1);
+			}
+
+			return jcas;
+		}
+
+		@Override
+		protected void done() {
+			try {
+				jcas = this.get();
+				fireJCasLoadedEvent();
+			} catch (InterruptedException | ExecutionException e) {
+				logger.catching(e);
+			}
 		}
 
 	}

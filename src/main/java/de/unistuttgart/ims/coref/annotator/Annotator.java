@@ -1,5 +1,8 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,8 +14,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -53,10 +61,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	JFileChooser openDialog;
 
+	JFrame opening;
+
 	public static void main(String[] args) throws UIMAException {
 
 		Annotator a = new Annotator();
-		a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
+		a.showOpening();
+		// a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
 	}
 
 	public Annotator() throws ResourceInitializationException {
@@ -71,6 +82,39 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(XmiFileFilter.filter);
+
+		opening = new JFrame();
+		opening.getContentPane().setLayout(new BoxLayout(opening.getContentPane(), BoxLayout.Y_AXIS));
+		opening.setSize(new Dimension(200, 200));
+		opening.setLocationRelativeTo(null);
+		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
+			try {
+				IOPlugin p = plugin.newInstance();
+				if (p.getImporter() != null) {
+					opening.getContentPane().add(new JButton(new AbstractAction(p.getName()) {
+
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							fileOpenDialog(opening, p);
+						}
+					}));
+				}
+			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		opening.getContentPane().add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				handleQuitRequestWith(null, null);
+			}
+		}));
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {
@@ -122,18 +166,17 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
-		final DocumentWindow v = new DocumentWindow(this);
+		DocumentWindow v = new DocumentWindow(this);
+		v.setVisible(true);
 
-		/*
-		 * new Thread() {
-		 * 
-		 * @Override public void run() {
-		 */
-		// logger.info("Loading XMI document from {}.", file);
-		v.loadFile(file, flavor);
-		/*
-		 * } }.run();
-		 */
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				v.loadFile(file, flavor);
+			}
+		};
+
+		SwingUtilities.invokeLater(runnable);
 		openFiles.add(v);
 		return v;
 	}
@@ -142,7 +185,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openFiles.remove(viewer);
 		viewer.dispose();
 		if (openFiles.isEmpty())
-			this.fileOpenDialog(new DefaultIOPlugin());
+			this.showOpening();
 	};
 
 	@Override
@@ -183,9 +226,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
 	}
 
-	public void fileOpenDialog(IOPlugin flavor) {
+	public void showOpening() {
+		this.opening.setVisible(true);
+	}
+
+	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
-		int r = openDialog.showOpenDialog(null);
+		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
@@ -193,8 +240,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			}
 			break;
 		default:
-			if (openFiles.isEmpty())
-				handleQuitRequestWith(null, null);
+			showOpening();
 		}
 	}
 

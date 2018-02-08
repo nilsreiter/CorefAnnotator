@@ -63,6 +63,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	}
 
+	@Deprecated
 	public void importExistingData() {
 		for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 			addExistingEntity(e);
