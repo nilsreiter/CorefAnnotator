@@ -1,7 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -41,14 +42,13 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.OpenFilesEvent;
 import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
-
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-
 import com.apple.eawt.OpenFilesHandler;
 import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
+
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
@@ -86,12 +86,36 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openDialog.setFileFilter(XmiFileFilter.filter);
 
 		opening = new JFrame();
-		opening.setSize(new Dimension(200, 200));
+		opening.setLocationRelativeTo(null);
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setAlignmentY(Component.CENTER_ALIGNMENT);
+		panel.add(new JLabel("Default"));
+		panel.add(new JButton(new AbstractAction("Open") {
 
-		opening.setLocationRelativeTo(null);
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				fileOpenDialog(opening, pluginManager.getDefaultIOPlugin());
+			}
+
+		}));
+		panel.add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				handleQuitRequestWith(null, null);
+			}
+		}));
+
+		opening.getContentPane().add(panel, BorderLayout.WEST);
+
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.add(new JLabel("Importer"));
 		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
 			try {
 				IOPlugin p = plugin.newInstance();
@@ -107,20 +131,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					}));
 				}
 			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.catching(e);
 			}
 		}
-		panel.add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleQuitRequestWith(null, null);
-			}
-		}));
-		opening.setContentPane(panel);
+		opening.getContentPane().add(panel, BorderLayout.EAST);
+		opening.pack();
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {

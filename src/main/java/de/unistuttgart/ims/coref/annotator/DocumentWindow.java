@@ -267,6 +267,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		setPreferredSize(new Dimension(700, 800));
 		pack();
+		this.setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
 	}
 
