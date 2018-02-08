@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
@@ -40,13 +41,14 @@ import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.OpenFilesEvent;
 import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
+
+import de.unistuttgart.ims.coref.annotator.plugin.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
+
 import com.apple.eawt.OpenFilesHandler;
 import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
-
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
@@ -78,20 +80,23 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	}
 
-	private void initialiseDialogs() {
+	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(XmiFileFilter.filter);
 
 		opening = new JFrame();
-		opening.getContentPane().setLayout(new BoxLayout(opening.getContentPane(), BoxLayout.Y_AXIS));
 		opening.setSize(new Dimension(200, 200));
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
 		opening.setLocationRelativeTo(null);
 		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
 			try {
 				IOPlugin p = plugin.newInstance();
 				if (p.getImporter() != null) {
-					opening.getContentPane().add(new JButton(new AbstractAction(p.getName()) {
+					panel.add(new JButton(new AbstractAction(p.getName()) {
 
 						private static final long serialVersionUID = 1L;
 
@@ -106,7 +111,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				e.printStackTrace();
 			}
 		}
-		opening.getContentPane().add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
+		panel.add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
 
 			private static final long serialVersionUID = 1L;
 
@@ -115,6 +120,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				handleQuitRequestWith(null, null);
 			}
 		}));
+		opening.setContentPane(panel);
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {

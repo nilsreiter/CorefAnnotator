@@ -5,10 +5,10 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.reflections.Reflections;
 
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.DefaultStylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.StylePlugin;
 
 public class PluginManager {
 	Set<Class<? extends IOPlugin>> ioPlugins;

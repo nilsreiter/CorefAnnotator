@@ -9,7 +9,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.DefaultIOPlugin;
 
 public class FileOpenAction extends AbstractAction {
 
