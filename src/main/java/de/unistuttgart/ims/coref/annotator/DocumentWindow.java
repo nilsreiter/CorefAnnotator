@@ -659,7 +659,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
-		String windowTitle = (file != null ? file.getName() : "");
 		Meta meta = Util.getMeta(jcas);
 		if (meta.getStylePlugin() != null)
 			try {
@@ -669,24 +668,25 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 				logger.catching(e1);
 			}
-		else// if (flavor.getStylePlugin() != null)
-			// switchStyle(jcas, flavor.getStylePlugin());
+		// else if (flavor.getStylePlugin() != null)
+		// switchStyle(jcas, flavor.getStylePlugin());
 
-			try {
-				Feature titleFeature = jcas.getTypeSystem().getFeatureByFullName(
-						mainApplication.getConfiguration().getString("General.windowTitleFeature"));
-				if (titleFeature != null)
-					try {
-						setTitle(jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature)
-								+ (windowTitle != null ? " (" + windowTitle + ")" : ""));
-					} catch (Exception e) {
-						setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
-					}
-				else
-					setTitle((windowTitle != null ? " (" + windowTitle + ")" : ""));
-			} catch (CASRuntimeException e) {
-				logger.catching(e);
-			}
+		try {
+			Feature titleFeature = jcas.getTypeSystem()
+					.getFeatureByFullName(mainApplication.getConfiguration().getString("General.windowTitleFeature"));
+			String fileName = (file != null ? file.getName() : Annotator.getString("windowtitle.new_file"));
+			if (titleFeature != null)
+				try {
+					setTitle(jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature)
+							+ (fileName != null ? " (" + fileName + ")" : ""));
+				} catch (Exception e) {
+					setTitle((fileName != null ? " (" + fileName + ")" : ""));
+				}
+			else
+				setTitle((fileName != null ? " (" + fileName + ")" : ""));
+		} catch (CASRuntimeException e) {
+			logger.catching(e);
+		}
 
 		InitializeModel im = new InitializeModel(jcas);
 		im.execute();
