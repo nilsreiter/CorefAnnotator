@@ -802,7 +802,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (fs instanceof EntityGroup || selectedNode == cModel.groupRootNode)
+				if (selectedNode == cModel.groupRootNode)
 					return false;
 			}
 			// move existing mention
