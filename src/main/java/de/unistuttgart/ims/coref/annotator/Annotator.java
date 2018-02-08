@@ -118,6 +118,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				handleQuitRequestWith(null, null);
 			}
 		}));
+		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
 
 		opening.getContentPane().add(panel, BorderLayout.WEST);
 

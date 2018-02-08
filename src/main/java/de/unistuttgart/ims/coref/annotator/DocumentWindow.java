@@ -246,6 +246,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		statusBar = new JPanel();
 		statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
+		statusBar.add(new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
+				+ Annotator.class.getPackage().getImplementationVersion()));
 		statusBar.add(progressBar);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
