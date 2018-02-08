@@ -479,6 +479,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 	}
 
+	public void drawMention(Mention m, boolean repaint) {
+		drawAnnotation(m, new Color(m.getEntity().getColor()), false, false);
+		if (m.getDiscontinuous() != null)
+			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+	}
+
 	public void drawAnnotations() {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
@@ -1600,8 +1606,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				cModel.connect(m.getEntity(), m);
 
-				cModel.fireMentionAddedEvent(m);
+				drawMention(m, false);
+				cModel.charposMentionMap.add(m);
 			}
+			textPane.repaint();
 			publish(75);
 			return cModel;
 		}
