@@ -141,6 +141,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	ToggleMentionDifficult toggleMentionDifficult;
 	ToggleMentionAmbiguous toggleMentionAmbiguous;
 	ToggleEntityGeneric toggleEntityGeneric;
+	AbstractAction sortByAlpha;
+	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 
 	// controller
 	CoreferenceModel cModel;
@@ -264,8 +266,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.toggleMentionDifficult = new ToggleMentionDifficult();
 		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous();
 		this.toggleEntityGeneric = new ToggleEntityGeneric();
+		this.sortByAlpha = new SortTreeByAlpha();
+		this.sortByMentions = new SortTreeByMentions();
 
-		// disable all at the beginning
+		// disable some at the beginning
 		newEntityAction.setEnabled(false);
 		renameAction.setEnabled(false);
 		changeKeyAction.setEnabled(false);
@@ -285,51 +289,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
 		viewMenu.addSeparator();
 
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
-				new AbstractAction(Annotator.getString("action.sort_alpha")) {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						cModel.entitySortOrder = EntitySortOrder.Alphabet;
-						cModel.resort();
-
-					}
-				});
-		radio1.setSelected(true);
-
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(
-				new AbstractAction(Annotator.getString("action.sort_mentions")) {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						cModel.entitySortOrder = EntitySortOrder.Mentions;
-						cModel.resort();
-					}
-				});
-		ButtonGroup grp = new ButtonGroup();
-		grp.add(radio2);
-		grp.add(radio1);
-
-		viewMenu.add(radio1);
-		viewMenu.add(radio2);
-
-		viewMenu.add(new JCheckBoxMenuItem(new AbstractAction(Annotator.getString("action.sort_revert")) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
-				cModel.resort();
-			}
-
-		}));
-
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
-		grp = new ButtonGroup();
-
+		ButtonGroup grp = new ButtonGroup();
+		JRadioButtonMenuItem radio1;
 		for (Class<? extends StylePlugin> plugin : mainApplication.getPluginManager().getStylePlugins()) {
 			try {
 				radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(plugin.newInstance()));
@@ -376,10 +338,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
-		fileMenu.add(fileImportMenu, FontIcon.of(Material.FLIGHT_LAND));
+		fileMenu.add(fileImportMenu);
 		fileMenu.add(new FileSaveAction(this));
 		fileMenu.add(new FileSaveAsAction());
-		fileMenu.add(fileExportMenu, FontIcon.of(Material.FLIGHT_TAKEOFF));
+		fileMenu.add(fileExportMenu);
 		fileMenu.add(new JMenuItem(new CloseAction()));
 		fileMenu.add(new JMenuItem(new ExitAction()));
 
@@ -394,6 +356,21 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
 		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
+
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
+		radio1.setSelected(true);
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.sortByMentions);
+		ButtonGroup grp = new ButtonGroup();
+		grp.add(radio2);
+		grp.add(radio1);
+
+		entityMenu.addSeparator();
+
+		entityMenu.add(radio1);
+		entityMenu.add(radio2);
+
+		entityMenu.add(new JCheckBoxMenuItem(this.sortDescending));
+
 		return entityMenu;
 	}
 
@@ -608,6 +585,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EXPOSURE_NEG_1));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.EXPOSURE_NEG_1));
+
 		}
 
 		@Override
@@ -627,6 +607,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.view.increase_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EXPOSURE_PLUS_1));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.EXPOSURE_PLUS_1));
 		}
 
 		@Override
@@ -652,6 +634,41 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(jcas, styleVariant);
 
+		}
+
+	}
+
+	class SortTreeByAlpha extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SortTreeByAlpha() {
+			putValue(Action.NAME, Annotator.getString("action.sort_alpha"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SORT_BY_ALPHA));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.SORT_BY_ALPHA));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cModel.entitySortOrder = EntitySortOrder.Alphabet;
+			cModel.resort();
+		}
+
+	}
+
+	class SortTreeByMentions extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SortTreeByMentions() {
+			putValue(Action.NAME, Annotator.getString("action.sort_mentions"));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cModel.entitySortOrder = EntitySortOrder.Mentions;
+			cModel.entitySortOrder.descending = true;
+			cModel.resort();
 		}
 
 	}
@@ -1235,6 +1252,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			default:
 			}
 
+		}
+	}
+
+	class ToggleEntitySortOrder extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleEntitySortOrder() {
+			putValue(Action.NAME, Annotator.getString("action.sort_revert"));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
+			cModel.resort();
 		}
 	}
 
