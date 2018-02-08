@@ -5,7 +5,7 @@ import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
-import de.unistuttgart.ims.coref.annotator.Meta;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
 
 public class EnsureMeta extends JCasAnnotator_ImplBase {
 

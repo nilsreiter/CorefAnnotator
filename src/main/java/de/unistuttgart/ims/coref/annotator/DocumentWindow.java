@@ -110,6 +110,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -229,7 +230,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// status bar
 		statusBar = new JPanel();
 		statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
-		statusBar.setOpaque(true);
+		// statusBar.setOpaque(true);
+		statusBar.add(new JLabel("status bar"));
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
 		// initialise text view

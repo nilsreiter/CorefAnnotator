@@ -11,6 +11,7 @@ import org.apache.uima.jcas.cas.StringArray;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
 
 public class Util {
 	public static String toString(TreeModel tm) {
