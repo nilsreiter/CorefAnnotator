@@ -58,6 +58,7 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 
 				}
 		}
+		entityFeature = speakerType.getFeatureByBaseName(Constants.SPEAKER_ENTITY_FEATURE_NAME);
 
 		idx = jcas.getAnnotationIndex(speakerType);
 		for (Annotation qm : idx) {

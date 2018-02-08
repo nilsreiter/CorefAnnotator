@@ -7,6 +7,7 @@ public class Constants {
 
 	public static final String ENTITY_LABEL_FEATURE_NAME = "DisplayName";
 	public static final String MENTION_ENTITY_FEATURE_NAME = "Entity";
+	public static final String SPEAKER_ENTITY_FEATURE_NAME = "CastFigure";
 
 	public static final String TYPE_SPEAKER = "de.unistuttgart.ims.drama.api.Speaker";
 	public static final String TYPE_STAGEDIRECTION = "de.unistuttgart.ims.drama.api.StageDirection";
