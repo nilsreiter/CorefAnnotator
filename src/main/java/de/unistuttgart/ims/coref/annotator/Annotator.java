@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -87,7 +89,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		opening = new JFrame();
 		opening.setLocationRelativeTo(null);
-
+		opening.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				opening.dispose();
+				handleQuitRequestWith(null, null);
+			}
+		});
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.add(new JLabel("Default"));
