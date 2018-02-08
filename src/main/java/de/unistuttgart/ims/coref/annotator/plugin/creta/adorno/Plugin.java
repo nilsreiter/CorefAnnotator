@@ -4,8 +4,8 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugin.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class Plugin implements IOPlugin {
 

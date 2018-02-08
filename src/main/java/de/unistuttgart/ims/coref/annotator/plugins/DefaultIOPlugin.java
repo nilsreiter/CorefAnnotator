@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugin;
+package de.unistuttgart.ims.coref.annotator.plugins;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;

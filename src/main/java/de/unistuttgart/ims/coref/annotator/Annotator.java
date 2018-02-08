@@ -42,8 +42,8 @@ import com.apple.eawt.AppEvent.OpenFilesEvent;
 import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 
-import de.unistuttgart.ims.coref.annotator.plugin.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 import com.apple.eawt.OpenFilesHandler;
 import com.apple.eawt.PreferencesHandler;

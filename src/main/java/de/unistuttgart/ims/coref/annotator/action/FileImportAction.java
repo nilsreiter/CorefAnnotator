@@ -6,7 +6,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 public class FileImportAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;

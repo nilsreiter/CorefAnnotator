@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugin;
+package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.util.Map;
 
