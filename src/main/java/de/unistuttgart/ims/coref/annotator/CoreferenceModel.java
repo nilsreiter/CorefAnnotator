@@ -162,9 +162,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		int ind = 0;
 		Comparator<EntityTreeNode> comparator = entitySortOrder.getComparator();
 		while (ind < this.rootNode.getChildCount()) {
+			CATreeNode n = (CATreeNode) rootNode.getChildAt(ind);
+			if (n.getFeatureStructure() == null)
+				break;
 			EntityTreeNode node = (EntityTreeNode) rootNode.getChildAt(ind);
 			if (comparator.compare(tn, node) <= 0)
 				break;
+
 			ind++;
 		}
 
