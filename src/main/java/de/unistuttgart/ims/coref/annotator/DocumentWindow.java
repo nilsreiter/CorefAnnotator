@@ -772,14 +772,16 @@ public class DocumentWindow extends JFrame
 			textPane.setSelectionStart(m.getBegin());
 			textPane.setSelectionEnd(m.getEnd());
 		} else {
-			textPane.setSelectionStart(0);
-			textPane.setSelectionEnd(0);
+			textPane.setSelectionEnd(textPane.getSelectionStart());
 		}
 	}
 
 	@Override
 	public void mentionAdded(Mention m) {
 		drawMention(m);
+
+		textPane.setCaretPosition(m.getBegin());
+
 	}
 
 	@Override
@@ -1123,8 +1125,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		protected void exportDone(JComponent c, Transferable t, int action) {
-			// TODO: export an Annotation object
-			// drawAnnotations();
+
 		}
 
 		@Override
@@ -1364,6 +1365,7 @@ public class DocumentWindow extends JFrame
 						JMenu mentionMenu = new JMenu(b.toString());
 						mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
 						Action a = new ShowMentionInTreeAction(m);
+						mentionMenu.add(m.getCoveredText());
 						mentionMenu.add(a);
 						mentionMenu.add(new DeleteMentionAction(m));
 						textPopupMenu.add(mentionMenu);
