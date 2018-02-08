@@ -7,6 +7,10 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
+/**
+ * TODO: Compile without access to java classes
+ *
+ */
 public class DKproPlugin implements IOPlugin {
 
 	@Override
