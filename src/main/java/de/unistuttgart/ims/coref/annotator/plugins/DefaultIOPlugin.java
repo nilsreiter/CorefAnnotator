@@ -31,7 +31,7 @@ public class DefaultIOPlugin implements IOPlugin {
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(XmiReader.class, XmiReader.PARAM_LENIENT, true,
-				XmiReader.PARAM_ADD_DOCUMENT_METADATA, true, XmiReader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
+				XmiReader.PARAM_ADD_DOCUMENT_METADATA, false, XmiReader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
 	}
 
 	@Override
