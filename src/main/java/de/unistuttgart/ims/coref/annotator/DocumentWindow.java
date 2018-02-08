@@ -306,7 +306,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
 		ButtonGroup grp = new ButtonGroup();
-		JRadioButtonMenuItem radio1;
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
+				new ViewStyleSelectAction(mainApplication.getPluginManager().getDefaultStylePlugin()));
+		radio1.setSelected(true);
+		viewStyleMenu.add(radio1);
+		grp.add(radio1);
 		for (Class<? extends StylePlugin> plugin : mainApplication.getPluginManager().getStylePlugins()) {
 			try {
 				radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(plugin.newInstance()));
@@ -317,7 +321,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 
 		}
-
 		viewMenu.add(viewStyleMenu);
 		return viewMenu;
 
