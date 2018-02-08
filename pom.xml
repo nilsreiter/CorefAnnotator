@@ -118,29 +118,44 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>sh.tak.appbundler</groupId>
-				<artifactId>appbundle-maven-plugin</artifactId>
-				<version>1.2.0</version>
-				<configuration>
-					<mainClass>de.unistuttgart.ims.coref.annotator.Annotator</mainClass>
-					<dictionaryFile>MyInfo.plist</dictionaryFile>
-					<bundleName>${project.name}</bundleName>
-					<buildDirectory>${project.build.directory}</buildDirectory>
-					<generateDiskImageFile>true</generateDiskImageFile>
-					<diskImageFile>${project.name}-${project.version}</diskImageFile>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>release</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>sh.tak.appbundler</groupId>
+						<artifactId>appbundle-maven-plugin</artifactId>
+						<version>1.2.0</version>
+						<configuration>
+							<mainClass>de.unistuttgart.ims.coref.annotator.Annotator</mainClass>
+							<dictionaryFile>MyInfo.plist</dictionaryFile>
+							<bundleName>${project.name}</bundleName>
+							<buildDirectory>${project.build.directory}</buildDirectory>
+							<generateDiskImageFile>true</generateDiskImageFile>
+							<diskImageFile>${project.name}-${project.version}</diskImageFile>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>bundle</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
@@ -230,9 +245,9 @@
 			<version>${version.dkpro}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.kordamp.ikonli</groupId>
-		    <artifactId>ikonli-material-pack</artifactId>
-    		<version>2.1.1</version>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-material-pack</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
@@ -246,9 +261,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.reflections</groupId>
-    		<artifactId>reflections</artifactId>
-    		<version>0.9.11</version>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
