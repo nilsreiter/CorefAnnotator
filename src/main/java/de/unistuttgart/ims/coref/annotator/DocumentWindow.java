@@ -974,6 +974,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.PERSON_ADD));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.PERSON_ADD));
 
 		}
 
