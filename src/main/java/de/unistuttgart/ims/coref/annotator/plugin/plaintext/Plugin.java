@@ -19,12 +19,12 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
-		return "plain text";
+		return "Plain text";
 	}
 
 	@Override
 	public String getName() {
-		return "plain text";
+		return "Plain text";
 	}
 
 	@Override
