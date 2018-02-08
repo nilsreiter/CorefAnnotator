@@ -118,8 +118,10 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	public void removeEntity(Entity e) {
 		removeNodeFromParent(entityMap.get(e));
 		e.removeFromIndexes();
-		int k = entityMap.remove(e).getKeyCode();
-		keyMap.remove(k);
+		entityMap.remove(e);
+		String k = e.getKey();
+		if (k != null)
+			keyMap.remove(k.charAt(0));
 		entityMentionMap.remove(e);
 	}
 

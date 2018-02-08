@@ -96,6 +96,10 @@ public class Util {
 
 	public static boolean isDifficult(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
-
 	}
+
+	public static boolean isAmbiguous(Mention m) {
+		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
+	}
+
 }

@@ -72,6 +72,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -138,6 +139,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	DeleteAction deleteAction;
 	AbstractAction formGroupAction;
 	ToggleMentionDifficult toggleMentionDifficult;
+	ToggleMentionAmbiguous toggleMentionAmbiguous;
 	ToggleEntityGeneric toggleEntityGeneric;
 
 	// controller
@@ -181,6 +183,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.deleteAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 
 		textPopupMenu = new JPopupMenu();
@@ -259,6 +262,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.deleteAction = new DeleteAction();
 		this.formGroupAction = new FormEntityGroup();
 		this.toggleMentionDifficult = new ToggleMentionDifficult();
+		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous();
 		this.toggleEntityGeneric = new ToggleEntityGeneric();
 
 		// disable all at the beginning
@@ -269,6 +273,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
 		toggleMentionDifficult.setEnabled(false);
+		toggleMentionAmbiguous.setEnabled(false);
+		toggleEntityGeneric.setEnabled(false);
 		Annotator.logger.info("Actions initialised.");
 
 	}
@@ -733,8 +739,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void mentionChanged(Mention m) {
 		drawMention(m);
-		toggleMentionDifficult.putValue(Action.SELECTED_KEY, Util.isDifficult(m));
-
 	}
 
 	@Override
@@ -792,7 +796,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 			TreePath tp = dl.getPath();
-			tree.expandPath(tp);
+			tree.expandPath(tp.getParentPath());
 			DataFlavor dataFlavor = info.getTransferable().getTransferDataFlavors()[0];
 
 			try {
@@ -969,7 +973,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			JLabel lab1 = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
 			panel.add(lab1);
-			panel.add(Box.createRigidArea(new Dimension(5, 5)));
 			String stringValue = tree.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
 
 			lab1.setText(stringValue);
@@ -990,16 +993,24 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
 					JLabel l = new JLabel(Annotator.getString("entity.flag.generic"));
 					l.setIcon(FontIcon.of(Material.CLOUD));
+					panel.add(Box.createRigidArea(new Dimension(5, 5)));
 					panel.add(l);
 				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
-				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT)) {
+				if (Util.isDifficult(m)) {
 					JLabel l = new JLabel(Annotator.getString("mention.flag.difficult"));
 					l.setIcon(FontIcon.of(Material.WARNING));
+					panel.add(Box.createRigidArea(new Dimension(5, 5)));
 					panel.add(l);
-
 				}
+				if (Util.isAmbiguous(m)) {
+					JLabel l = new JLabel(Annotator.getString("mention.flag.ambiguous"));
+					l.setIcon(FontIcon.of(Material.SHARE));
+					panel.add(Box.createRigidArea(new Dimension(5, 5)));
+					panel.add(l);
+				}
+
 				lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
 			} else if (cModel != null && catn == cModel.groupRootNode)
 				lab1.setIcon(FontIcon.of(Material.GROUP_WORK));
@@ -1019,6 +1030,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
 			putValue(Action.SMALL_ICON, FontIcon.of(Material.DELETE));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
+					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		}
 
@@ -1040,6 +1053,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	@Deprecated
 	class DeleteMentionAction extends MyAction {
 		private static final long serialVersionUID = 1L;
 
@@ -1263,6 +1277,27 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	class ToggleMentionAmbiguous extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleMentionAmbiguous() {
+			putValue(Action.NAME, Annotator.getString("action.flag_mention_ambiguous"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SHARE));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.SHARE));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
+			Mention m = (Mention) tn.getFeatureStructure();
+			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
+
+		}
+
+	}
+
 	abstract class MyAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -1321,7 +1356,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 						JMenu mentionMenu = new JMenu(b.toString());
 						mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
 						Action a = new ShowMentionInTreeAction(m);
-						mentionMenu.add(m.getCoveredText());
+						mentionMenu.add('"' + m.getCoveredText() + '"');
 						mentionMenu.add(a);
 						mentionMenu.add(new DeleteMentionAction(m));
 						textPopupMenu.add(mentionMenu);
@@ -1452,6 +1487,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			return (fs[0] instanceof EntityGroup);
 		}
 
+		private boolean isLeaf() {
+			for (TreeNode n : nodes)
+				if (!n.isLeaf())
+					return false;
+			return true;
+		}
+
 		private Entity getEntity(int i) {
 			return (Entity) fs[i];
 		}
@@ -1472,11 +1514,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			changeColorAction.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
-			deleteAction.setEnabled(isSingle() && (isMention() || isEntity()));
-
+			deleteAction.setEnabled(isSingle() && (isMention() || (isEntity() && isLeaf())));
 			formGroupAction.setEnabled(isDouble() && isEntity());
+
 			toggleMentionDifficult.setEnabled(isSingle() && isMention());
 			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
+					isSingle() && isMention() && Util.isDifficult(getMention(0)));
+
+			toggleMentionAmbiguous.setEnabled(isSingle() && isMention());
+			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isDifficult(getMention(0)));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
