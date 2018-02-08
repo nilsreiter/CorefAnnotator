@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.creta.adorno;
+package de.unistuttgart.ims.coref.annotator.plugin.creta.adorno;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;

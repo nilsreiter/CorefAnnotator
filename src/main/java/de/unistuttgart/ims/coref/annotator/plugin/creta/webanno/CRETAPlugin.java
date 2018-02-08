@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.dkpro;
+package de.unistuttgart.ims.coref.annotator.plugin.creta.webanno;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -7,11 +7,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugin.StylePlugin;
 
-/**
- * TODO: Compile without access to java classes
- *
- */
-public class DKproPlugin implements IOPlugin {
+public class CRETAPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
@@ -20,12 +16,12 @@ public class DKproPlugin implements IOPlugin {
 
 	@Override
 	public String getName() {
-		return "DKpro";
+		return "CRETA/WebAnno";
 	}
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(ImportDKpro.class);
+		return AnalysisEngineFactory.createEngineDescription(ImportCRETA.class);
 	}
 
 	@Override

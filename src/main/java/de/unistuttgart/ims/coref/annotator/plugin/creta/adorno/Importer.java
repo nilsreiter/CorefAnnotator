@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.creta.adorno;
+package de.unistuttgart.ims.coref.annotator.plugin.creta.adorno;
 
 import java.util.HashMap;
 import java.util.Map;

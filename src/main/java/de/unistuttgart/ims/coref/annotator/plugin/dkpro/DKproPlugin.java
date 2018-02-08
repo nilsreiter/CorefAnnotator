@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.creta.adorno;
+package de.unistuttgart.ims.coref.annotator.plugin.dkpro;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -7,26 +7,30 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.unistuttgart.ims.coref.annotator.plugin.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugin.StylePlugin;
 
-public class Plugin implements IOPlugin {
+/**
+ * TODO: Compile without access to java classes
+ *
+ */
+public class DKproPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
-		return "Importer for Adorno annotations done in CRETAnno";
+		return null;
 	}
 
 	@Override
 	public String getName() {
-		return "CRETA/Adorno";
+		return "DKpro";
 	}
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(Importer.class);
+		return AnalysisEngineFactory.createEngineDescription(ImportDKpro.class);
 	}
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(Exporter.class);
+		return null;
 	}
 
 	@Override

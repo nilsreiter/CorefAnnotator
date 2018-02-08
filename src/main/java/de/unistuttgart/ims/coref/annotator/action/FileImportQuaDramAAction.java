@@ -6,7 +6,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QuaDramAPlugin;
 
 @Deprecated
 public class FileImportQuaDramAAction extends AbstractAction {

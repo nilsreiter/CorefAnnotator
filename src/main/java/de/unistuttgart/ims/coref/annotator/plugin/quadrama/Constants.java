@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.quadrama;
+package de.unistuttgart.ims.coref.annotator.plugin.quadrama;
 
 public class Constants {
 	public static final String PLUGIN_NAME = "QuaDramA";

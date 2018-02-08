@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.creta.webanno;
+package de.unistuttgart.ims.coref.annotator.plugin.creta.webanno;
 
 import java.util.Collection;
 import java.util.HashMap;
