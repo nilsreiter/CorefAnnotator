@@ -471,6 +471,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		mainApplication.close(this);
 	}
 
+	public void undrawAnnotation(Annotation a) {
+		Object hi = highlightMap.get(a);
+		Span span = new Span(a);
+		if (hi != null)
+			hilit.removeHighlight(hi);
+		if (span != null)
+			spanCounter.subtract(span);
+	}
+
 	public void drawAnnotation(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
@@ -496,6 +505,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		drawAnnotation(m, new Color(m.getEntity().getColor()), false, true);
 		if (m.getDiscontinuous() != null)
 			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
+
 	}
 
 	public void drawMention(Mention m, boolean repaint) {
@@ -740,13 +750,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath());
+		tree.repaint(tree.getPathBounds(e.getTreePath()));
 	}
 
 	@Override
 	public void treeNodesChanged(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath());
-
+		tree.repaint(tree.getPathBounds(e.getTreePath()));
 	}
 
 	@Override
@@ -758,7 +767,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void treeStructureChanged(TreeModelEvent e) {
 		tree.expandPath(e.getTreePath());
-
 	}
 
 	@Override
@@ -841,7 +849,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 			TreePath tp = dl.getPath();
-			tree.expandPath(tp.getParentPath());
+			// tree.expandPath(tp.getParentPath());
 			DataFlavor dataFlavor = info.getTransferable().getTransferDataFlavors()[0];
 
 			try {
@@ -1088,6 +1096,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				cModel.removeMention((Mention) tn.getFeatureStructure());
 			else if (tn.getFeatureStructure() instanceof EntityGroup) {
 				cModel.removeEntityGroup((EntityGroup) tn.getFeatureStructure());
+			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
+				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
+				Mention m = (Mention) ((CATreeNode) tn.getParent()).getFeatureStructure();
+				undrawAnnotation(dmp);
+				cModel.removeDetachedMentionPart(m, dmp);
 			} else if (tn.getFeatureStructure() instanceof Entity) {
 				EntityTreeNode etn = (EntityTreeNode) tn;
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
@@ -1310,6 +1323,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.flag_entity_generic"));
 			putValue(Action.LARGE_ICON_KEY, getIcon());
 			putValue(Action.SMALL_ICON, getIcon());
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.flag_entity_generic.tooltip"));
 		}
 
 		@Override
@@ -1333,6 +1347,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.flag_mention_difficult"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.WARNING));
 			putValue(Action.SMALL_ICON, FontIcon.of(Material.WARNING));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.flag_mention_difficult.tooltip"));
 
 		}
 
@@ -1602,7 +1617,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			changeColorAction.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
-			deleteAction.setEnabled(isSingle() && (isMention() || isEntityGroup() || (isEntity() && isLeaf())));
+			deleteAction.setEnabled(isSingle()
+					&& (isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf())));
 			formGroupAction.setEnabled(isDouble() && isEntity());
 
 			toggleMentionDifficult.setEnabled(isSingle() && isMention());

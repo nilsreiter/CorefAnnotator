@@ -319,8 +319,17 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		insertNodeInto(mentionMap.get(dmp), mentionMap.get(m), 0);
 	}
 
+	public void removeDetachedMentionPart(Mention m, DetachedMentionPart dmp) {
+		m.setDiscontinuous(null);
+		removeNodeFromParent(mentionMap.get(dmp));
+		mentionMap.remove(dmp);
+		dmp.removeFromIndexes();
+		fireMentionChangedEvent(m);
+	}
+
 	public void addDiscontinuousToMention(Mention m, int begin, int end) {
 		DetachedMentionPart d = AnnotationFactory.createAnnotation(jcas, begin, end, DetachedMentionPart.class);
+
 		m.setDiscontinuous(d);
 		CATreeNode node = new CATreeNode(d, d.getCoveredText());
 		mentionMap.put(d, node);
