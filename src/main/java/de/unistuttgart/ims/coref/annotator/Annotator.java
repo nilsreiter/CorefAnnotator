@@ -39,7 +39,6 @@ import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
@@ -57,8 +56,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public static void main(String[] args) throws UIMAException {
 
 		Annotator a = new Annotator();
-		a.open(new File("src/test/resources/rjmw.0.xmi"), new QuaDramAPlugin());
-		// a.fileOpenDialog(CoreferenceFlavor.CRETA);
+		a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
 	}
 
 	public Annotator() throws ResourceInitializationException {

@@ -698,18 +698,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public void switchStyle(JCas jcas, StylePlugin sv) {
-		Annotator.logger.info("Switching to style {}", sv.getClass().getName());
-		if (sv.getBaseStyle() != null)
-			StyleManager.style(textPane.getStyledDocument(), sv.getBaseStyle());
-		else
-			StyleManager.style(textPane.getStyledDocument(), StyleManager.getDefaultStyle());
-		Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
-				StyleManager.getDefaultStyle());
-		if (styles != null)
-			for (Style style : styles.keySet()) {
-				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
-			}
-		Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+		try {
+			Annotator.logger.info("Switching to style {}", sv.getClass().getName());
+			if (sv.getBaseStyle() != null)
+				StyleManager.style(textPane.getStyledDocument(), sv.getBaseStyle());
+			else
+				StyleManager.style(textPane.getStyledDocument(), StyleManager.getDefaultStyle());
+			Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
+					StyleManager.getDefaultStyle());
+			if (styles != null)
+				for (Style style : styles.keySet()) {
+					StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+				}
+			Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+		} catch (NullPointerException e) {
+			logger.catching(e);
+		}
 	}
 
 	@Override
