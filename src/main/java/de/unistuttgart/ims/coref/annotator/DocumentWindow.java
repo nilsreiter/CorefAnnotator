@@ -1251,7 +1251,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
+			JFileChooser saveDialog;
+			if (file == null)
+				saveDialog = new JFileChooser();
+			else
+				saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 			saveDialog.setFileFilter(XmiFileFilter.filter);
 			saveDialog.setDialogTitle(Annotator.getString("dialog.save_as.title"));
