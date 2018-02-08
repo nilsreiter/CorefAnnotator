@@ -21,6 +21,7 @@
 				<version>2.8.1</version>  <!-- change this to the latest version -->
 				<executions>
 					<execution>
+						<id>1</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>  <!-- this is the only goal -->
@@ -41,6 +42,7 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>2</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>  <!-- this is the only goal -->
