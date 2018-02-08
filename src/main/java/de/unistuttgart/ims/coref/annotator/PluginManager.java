@@ -15,7 +15,7 @@ public class PluginManager {
 	Set<Class<? extends StylePlugin>> stylePlugins;
 
 	public void init() {
-		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugins");
+		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
 		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
 		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
 		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
