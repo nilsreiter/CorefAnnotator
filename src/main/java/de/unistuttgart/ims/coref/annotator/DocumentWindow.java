@@ -1380,26 +1380,26 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
-				if (textPane.getBounds().contains(e.getPoint())) {
-					int offset = textPane.viewToModel(e.getPoint());
-					Collection<Mention> mentions = cModel.getMentions(offset);
-					textPopupMenu.add(Annotator.getString("menu.entities"));
-					for (Mention m : mentions) {
-						StringBuilder b = new StringBuilder();
-						b.append(m.getAddress());
-						if (m.getEntity().getLabel() != null)
-							b.append(": ").append(m.getEntity().getLabel());
+				logger.debug("Right-clicked in text at " + e.getPoint());
+				int offset = textPane.viewToModel(e.getPoint());
+				Collection<Mention> mentions = cModel.getMentions(offset);
+				textPopupMenu.add(Annotator.getString("menu.entities"));
+				for (Mention m : mentions) {
+					StringBuilder b = new StringBuilder();
+					b.append(m.getAddress());
+					if (m.getEntity().getLabel() != null)
+						b.append(": ").append(m.getEntity().getLabel());
 
-						JMenu mentionMenu = new JMenu(b.toString());
-						mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
-						Action a = new ShowMentionInTreeAction(m);
-						mentionMenu.add('"' + m.getCoveredText() + '"');
-						mentionMenu.add(a);
-						mentionMenu.add(new DeleteMentionAction(m));
-						textPopupMenu.add(mentionMenu);
-					}
-					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+					JMenu mentionMenu = new JMenu(b.toString());
+					mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
+					Action a = new ShowMentionInTreeAction(m);
+					mentionMenu.add('"' + m.getCoveredText() + '"');
+					mentionMenu.add(a);
+					mentionMenu.add(new DeleteMentionAction(m));
+					textPopupMenu.add(mentionMenu);
 				}
+				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+
 			}
 		}
 
