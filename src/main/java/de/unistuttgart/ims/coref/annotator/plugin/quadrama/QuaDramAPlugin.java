@@ -13,10 +13,10 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
-public class QuaDramAPlugin implements IOPlugin, StylePlugin {
+public class QuaDramAPlugin extends DefaultIOPlugin implements StylePlugin {
 
 	@Override
 	public String getDescription() {

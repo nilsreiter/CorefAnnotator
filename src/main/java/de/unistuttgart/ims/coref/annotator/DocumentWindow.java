@@ -17,8 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,15 +79,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.uima.UIMAException;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.impl.XmiCasSerializer;
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -100,7 +93,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
-import org.xml.sax.SAXException;
 
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
@@ -118,7 +110,6 @@ import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
-import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 
 public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
 
@@ -533,18 +524,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			this.file = file;
 		else
 			this.fileSaveAction.setEnabled(false);
+
+		LoadAndImport lai;
 		try {
-			logger.info("Loading XMI document from {}.", file);
-			progressBar.setValue(10);
-			logger.debug("Setting loading progress to {}", 10);
-			loadStream(new FileInputStream(file), TypeSystemDescriptionFactory.createTypeSystemDescription(),
-					file.getName(), flavor);
-		} catch (FileNotFoundException e) {
-			logger.catching(e);
-			mainApplication.warnDialog("File " + file.getAbsolutePath() + " could not be found.", "File not found");
+			lai = new LoadAndImport(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
+			lai.execute();
 		} catch (ResourceInitializationException e) {
 			logger.catching(e);
 		}
+
 	}
 
 	public synchronized void saveCurrentFile() {
@@ -577,7 +565,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
 			IOPlugin flavor) {
 
-		LoadAndImport lai = new LoadAndImport(inputStream, typeSystemDescription, flavor);
+		LoadAndImport lai = new LoadAndImport(this, inputStream, typeSystemDescription, flavor);
 		lai.execute();
 
 	}
@@ -1716,63 +1704,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		protected void process(List<Integer> chunks) {
 			for (Integer i : chunks) {
 				progressBar.setValue(i);
-			}
-		}
-
-	}
-
-	class LoadAndImport extends SwingWorker<JCas, Object> {
-		InputStream inputStream;
-		TypeSystemDescription typeSystemDescription;
-		IOPlugin flavor;
-
-		public LoadAndImport(InputStream inputStream, TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
-			this.inputStream = inputStream;
-			this.typeSystemDescription = typeSystemDescription;
-			this.flavor = flavor;
-		}
-
-		@Override
-		protected JCas doInBackground() throws Exception {
-			JCas jcas = null;
-
-			try {
-				jcas = JCasFactory.createJCas(typeSystemDescription);
-			} catch (UIMAException e1) {
-				logger.catching(e1);
-				return null;
-			}
-			try {
-				logger.info("Deserialising input stream.");
-				XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-				progressBar.setValue(25);
-				logger.debug("Setting loading progress to {}", 50);
-
-			} catch (SAXException | IOException e1) {
-				logger.catching(e1);
-				System.exit(1);
-			}
-			try {
-				logger.info("Applying importer from {}", flavor.getClass().getName());
-				SimplePipeline.runPipeline(jcas, flavor.getImporter(),
-						AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
-				progressBar.setValue(50);
-				logger.debug("Setting loading progress to {}", 80);
-
-			} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
-				logger.catching(e1);
-			}
-
-			return jcas;
-		}
-
-		@Override
-		protected void done() {
-			try {
-				jcas = this.get();
-				fireJCasLoadedEvent();
-			} catch (InterruptedException | ExecutionException e) {
-				logger.catching(e);
 			}
 		}
 

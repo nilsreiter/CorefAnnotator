@@ -4,14 +4,14 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
  * TODO: Compile without access to java classes
  *
  */
-public class DKproPlugin implements IOPlugin {
+public class DKproPlugin extends DefaultIOPlugin {
 
 	@Override
 	public String getDescription() {
