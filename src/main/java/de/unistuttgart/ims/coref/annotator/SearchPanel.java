@@ -250,7 +250,8 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 			chartFrame.setVisible(false);
 			chartFrame.dispose();
 		}
-		hilit.removeAllHighlights();
+		for (Object o : highlights)
+			hilit.removeHighlight(o);
 		dispose();
 
 	}
