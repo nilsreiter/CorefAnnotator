@@ -1081,6 +1081,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				lab1.setIcon(FontIcon.of(Material.GROUP_WORK));
 			else if (cModel != null && catn == cModel.rootNode)
 				lab1.setIcon(FontIcon.of(Material.PERSON_ADD));
+			else if (cModel != null && catn.getFeatureStructure() instanceof DetachedMentionPart)
+				lab1.setIcon(FontIcon.of(Material.CHILD_FRIENDLY));
 
 			return panel;
 		}
@@ -1459,20 +1461,33 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (SwingUtilities.isRightMouseButton(e)) {
 				logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
-				Collection<Mention> mentions = cModel.getMentions(offset);
+				Collection<Annotation> mentions = cModel.getMentions(offset);
 				textPopupMenu.add(Annotator.getString("menu.entities"));
-				for (Mention m : mentions) {
+				for (Annotation anno : mentions) {
 					StringBuilder b = new StringBuilder();
-					b.append(m.getAddress());
+					b.append(anno.getAddress());
+					Mention m = null;
+					DetachedMentionPart dmp = null;
+					if (anno instanceof Mention) {
+						m = (Mention) anno;
+						dmp = m.getDiscontinuous();
+					} else if (anno instanceof DetachedMentionPart) {
+						dmp = (DetachedMentionPart) anno;
+						m = dmp.getMention();
+					}
+					String surf = m.getCoveredText();
+					if (dmp != null)
+						surf += " [,] " + dmp.getCoveredText();
 					if (m.getEntity().getLabel() != null)
 						b.append(": ").append(m.getEntity().getLabel());
 
 					JMenu mentionMenu = new JMenu(b.toString());
 					mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
 					Action a = new ShowMentionInTreeAction(m);
-					mentionMenu.add('"' + m.getCoveredText() + '"');
+					mentionMenu.add('"' + surf + '"');
 					mentionMenu.add(a);
 					mentionMenu.add(new DeleteMentionAction(m));
+
 					textPopupMenu.add(mentionMenu);
 				}
 				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());

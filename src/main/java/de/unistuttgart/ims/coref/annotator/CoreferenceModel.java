@@ -42,7 +42,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
-	RangedHashSetValuedHashMap<Mention> charposMentionMap = new RangedHashSetValuedHashMap<Mention>();
+	RangedHashSetValuedHashMap<Annotation> charposMentionMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
 	int key = 0;
@@ -329,15 +329,16 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public void addDiscontinuousToMention(Mention m, int begin, int end) {
 		DetachedMentionPart d = AnnotationFactory.createAnnotation(jcas, begin, end, DetachedMentionPart.class);
-
+		d.setMention(m);
 		m.setDiscontinuous(d);
+		charposMentionMap.add(d);
 		CATreeNode node = new CATreeNode(d, d.getCoveredText());
 		mentionMap.put(d, node);
 		insertNodeInto(node, mentionMap.get(m), 0);
 		fireMentionChangedEvent(m);
 	}
 
-	public Collection<Mention> getMentions(int position) {
+	public Collection<Annotation> getMentions(int position) {
 		return this.charposMentionMap.get(position);
 	}
 
