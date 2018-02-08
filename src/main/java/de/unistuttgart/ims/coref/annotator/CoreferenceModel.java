@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -31,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class CoreferenceModel extends DefaultTreeModel implements KeyListener, TreeSelectionListener {
 	JCas jcas;
@@ -54,12 +56,15 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	boolean keepEmptyEntities = true;
 
-	public CoreferenceModel(JCas jcas) {
+	Configuration configuration;
+
+	public CoreferenceModel(JCas jcas, Configuration configuration) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
 		this.groupRootNode = new CATreeNode(null, Annotator.getString("tree.groups"));
 		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
+		this.configuration = configuration;
 
 	}
 
@@ -224,7 +229,12 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void addNewMention(Entity e, int begin, int end) {
-		Mention m = AnnotationFactory.createAnnotation(jcas, begin, end, Mention.class);
+		Mention m = new Mention(jcas);
+		m.setBegin(begin);
+		m.setEnd(end);
+		if (configuration.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+			m = AnnotationUtil.trim(m);
+		m.addToIndexes();
 		connect(e, m);
 		fireMentionAddedEvent(m);
 	}

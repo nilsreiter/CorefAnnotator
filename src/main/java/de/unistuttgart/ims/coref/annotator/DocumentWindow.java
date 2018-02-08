@@ -149,6 +149,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction;
+	AbstractAction toggleTrimWhitespace;
 
 	// controller
 	CoreferenceModel cModel;
@@ -171,6 +172,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JMenu windowsMenu;
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
+
+	// Settings
+	boolean trimWhitespace = true;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -284,6 +288,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByAlpha = new SortTreeByAlpha();
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
+		this.toggleTrimWhitespace = new ToggleTrimWhitespace();
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -324,6 +329,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 		viewMenu.add(viewStyleMenu);
 		return viewMenu;
+
+	}
+
+	protected JMenu initialiseMenuSettings() {
+		JMenu menu = new JMenu(Annotator.getString("menu.settings"));
+		menu.add(new JCheckBoxMenuItem(toggleTrimWhitespace));
+		return menu;
 
 	}
 
@@ -419,6 +431,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		menuBar.add(initialiseMenuEntity());
 		menuBar.add(initialiseMenuView());
 		menuBar.add(initialiseMenuTools());
+		menuBar.add(initialiseMenuSettings());
 		// if (segmentAnnotation != null)
 		// menuBar.add(documentMenu);
 		// menuBar.add(windowsMenu);
@@ -1328,7 +1341,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
-
 		}
 
 	}
@@ -1350,6 +1362,26 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
 
+		}
+
+	}
+
+	class ToggleTrimWhitespace extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleTrimWhitespace() {
+			putValue(Action.NAME, Annotator.getString("action.toggle.trim_whitespace"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.trim_whitespace.tooltip"));
+			putValue(Action.SELECTED_KEY,
+					mainApplication.getConfiguration().getBoolean(Constants.CFG_TRIM_WHITESPACE, true));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean old = mainApplication.getConfiguration().getBoolean(Constants.CFG_TRIM_WHITESPACE, true);
+			mainApplication.getConfiguration().setProperty(Constants.CFG_TRIM_WHITESPACE, !old);
+			putValue(Action.SELECTED_KEY, !old);
 		}
 
 	}
@@ -1601,7 +1633,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		protected CoreferenceModel doInBackground() throws Exception {
 			CoreferenceModel cModel;
-			cModel = new CoreferenceModel(jcas);
+			cModel = new CoreferenceModel(jcas, mainApplication.getConfiguration());
 			cModel.addCoreferenceModelListener(DocumentWindow.this);
 
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
