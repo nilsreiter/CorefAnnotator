@@ -8,6 +8,9 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 
+import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.Mention;
+
 public class Util {
 	public static String toString(TreeModel tm) {
 		return toString((TreeNode) tm.getRoot(), 0);
@@ -84,6 +87,15 @@ public class Util {
 		arr.removeFromIndexes();
 		nArr.addToIndexes();
 		return nArr;
+
+	}
+
+	public static boolean isGeneric(Entity e) {
+		return Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC);
+	}
+
+	public static boolean isDifficult(Mention m) {
+		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
 
 	}
 }

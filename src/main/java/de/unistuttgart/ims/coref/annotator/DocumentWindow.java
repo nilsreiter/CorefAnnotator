@@ -31,6 +31,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
@@ -136,8 +137,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction changeColorAction;
 	DeleteAction deleteAction;
 	AbstractAction formGroupAction;
-	ToggleFlagMention flagMentionAction;
-	ToggleGenericEntity toggleGenericEntity;
+	ToggleMentionDifficult toggleMentionDifficult;
+	ToggleEntityGeneric toggleEntityGeneric;
 
 	// controller
 	CoreferenceModel cModel;
@@ -179,8 +180,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.deleteAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.flagMentionAction));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleGenericEntity));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -214,7 +215,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		controls.add(new JButton(changeColorAction));
 		controls.add(new JButton(deleteAction));
 		controls.add(new JButton(formGroupAction));
-		controls.add(new JButton(flagMentionAction));
+		controls.add(new JButton(toggleMentionDifficult));
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -257,8 +258,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.changeKeyAction = new ChangeKeyForEntityAction();
 		this.deleteAction = new DeleteAction();
 		this.formGroupAction = new FormEntityGroup();
-		this.flagMentionAction = new ToggleFlagMention();
-		this.toggleGenericEntity = new ToggleGenericEntity();
+		this.toggleMentionDifficult = new ToggleMentionDifficult();
+		this.toggleEntityGeneric = new ToggleEntityGeneric();
 
 		// disable all at the beginning
 		newEntityAction.setEnabled(false);
@@ -267,7 +268,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		changeColorAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
-		flagMentionAction.setEnabled(false);
+		toggleMentionDifficult.setEnabled(false);
 		Annotator.logger.info("Actions initialised.");
 
 	}
@@ -386,7 +387,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
-		entityMenu.add(new JCheckBoxMenuItem(toggleGenericEntity));
+		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
 		return entityMenu;
 	}
 
@@ -732,8 +733,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void mentionChanged(Mention m) {
 		drawMention(m);
-		flagMentionAction.putValue(Action.NAME, (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT)
-				? Annotator.getString("action.unflag_mention") : Annotator.getString("action.flag_mention")));
+		toggleMentionDifficult.putValue(Action.SELECTED_KEY, Util.isDifficult(m));
 
 	}
 
@@ -867,6 +867,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EDIT));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.EDIT));
 
 		}
 
@@ -890,6 +891,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.COLOR_LENS));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.COLOR_LENS));
 
 		}
 
@@ -914,6 +916,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.set_shortcut"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_shortcut.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.KEYBOARD));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.KEYBOARD));
 
 		}
 
@@ -985,16 +988,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				} else if (!(etn.getParent() instanceof EntityTreeNode))
 					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
 				if (Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-					JLabel l = new JLabel("Generic");
+					JLabel l = new JLabel(Annotator.getString("entity.flag.generic"));
 					l.setIcon(FontIcon.of(Material.CLOUD));
 					panel.add(l);
 				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
-				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT))
-					lab1.setIcon(FontIcon.of(Material.LABEL));
-				else
-					lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
+				if (Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT)) {
+					JLabel l = new JLabel(Annotator.getString("mention.flag.difficult"));
+					l.setIcon(FontIcon.of(Material.WARNING));
+					panel.add(l);
+
+				}
+				lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
 			} else if (cModel != null && catn == cModel.groupRootNode)
 				lab1.setIcon(FontIcon.of(Material.GROUP_WORK));
 			else if (cModel != null && catn == cModel.rootNode)
@@ -1012,6 +1018,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.DELETE));
 
 		}
 
@@ -1042,6 +1049,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.DELETE));
 			this.m = m;
 
 		}
@@ -1140,6 +1148,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.GROUP));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.GROUP));
 
 		}
 
@@ -1211,11 +1220,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleGenericEntity extends AbstractAction {
+	class ToggleEntityGeneric extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
-		public ToggleGenericEntity() {
+		public ToggleEntityGeneric() {
 			putValue(Action.NAME, Annotator.getString("action.flag_entity_generic"));
+			putValue(Action.LARGE_ICON_KEY, getIcon());
+			putValue(Action.SMALL_ICON, getIcon());
 		}
 
 		@Override
@@ -1223,18 +1234,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Entity entity = (Entity) tn.getFeatureStructure();
 			cModel.toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+		}
 
+		public Icon getIcon() {
+			return FontIcon.of(Material.CLOUD);
 		}
 
 	}
 
-	class ToggleFlagMention extends AbstractAction {
+	class ToggleMentionDifficult extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ToggleFlagMention() {
-			putValue(Action.NAME, Annotator.getString("action.flag_mention"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL_OUTLINE));
+		public ToggleMentionDifficult() {
+			putValue(Action.NAME, Annotator.getString("action.flag_mention_difficult"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.WARNING));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.WARNING));
 
 		}
 
@@ -1243,10 +1258,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
-			if (getValue(Action.LARGE_ICON_KEY) == FontIcon.of(Material.LABEL))
-				putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL_OUTLINE));
-			else
-				putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.LABEL));
 
 		}
 
@@ -1383,12 +1394,21 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	class MyTreeSelectionListener implements TreeSelectionListener {
 
-		@Override
-		public void valueChanged(TreeSelectionEvent e) {
-			int num = tree.getSelectionCount();
-			TreePath[] paths = new TreePath[num];
-			CATreeNode[] nodes = new CATreeNode[num];
-			FeatureStructure[] fs = new FeatureStructure[num];
+		TreeSelectionEvent currentEvent = null;
+		int num;
+
+		// selected things
+		TreePath[] paths;
+		CATreeNode[] nodes;
+		FeatureStructure[] fs;
+
+		private void collectData(TreeSelectionEvent e) {
+			currentEvent = e;
+			num = tree.getSelectionCount();
+			paths = new TreePath[num];
+			nodes = new CATreeNode[num];
+			fs = new FeatureStructure[num];
+
 			try {
 				paths = tree.getSelectionPaths();
 
@@ -1399,41 +1419,71 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 			} catch (NullPointerException ex) {
 			}
-			renameAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-			changeKeyAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-			changeColorAction.setEnabled(num == 1 && fs[0] instanceof Entity);
-			toggleGenericEntity.setEnabled(num == 1 && fs[0] instanceof Entity);
-			if (toggleGenericEntity.isEnabled())
-				toggleGenericEntity.putValue(Action.SELECTED_KEY,
-						Util.contains(((Entity) fs[0]).getFlags(), Constants.ENTITY_FLAG_GENERIC));
-			else
-				toggleGenericEntity.putValue(Action.SELECTED_KEY, false);
-			deleteAction.setEnabled(
-					num == 1 && (fs[0] instanceof Mention || (fs[0] instanceof Entity && nodes[0].isLeaf())));
 
-			formGroupAction.setEnabled(num == 2 && fs[0] instanceof Entity && fs[1] instanceof Entity);
-			flagMentionAction.setEnabled(num == 1 && fs[0] instanceof Mention);
-			if (num == 1 && fs[0] instanceof Mention) {
-				flagMentionAction.putValue(Action.LARGE_ICON_KEY,
-						(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
-								? FontIcon.of(Material.LABEL) : FontIcon.of(Material.LABEL_OUTLINE)));
-				flagMentionAction.putValue(Action.NAME,
-						(Util.contains(((Mention) fs[0]).getFlags(), Constants.MENTION_FLAG_DIFFICULT)
-								? Annotator.getString("action.unflag_mention")
-								: Annotator.getString("action.flag_mention")));
-			}
-			if (num == 1 && (fs[0] instanceof Mention || fs[0] instanceof DetachedMentionPart))
-				mentionSelected((Annotation) fs[0]);
+		}
+
+		private boolean isSingle() {
+			return num == 1;
+		}
+
+		private boolean isDouble() {
+			return num == 2;
+		}
+
+		private boolean isEntity() {
+			for (FeatureStructure f : fs)
+				if (!(f instanceof Entity))
+					return false;
+			return true;
+		}
+
+		private boolean isDetachedMentionPart() {
+			for (FeatureStructure f : fs)
+				if (!(f instanceof DetachedMentionPart))
+					return false;
+			return true;
+		}
+
+		private boolean isMention() {
+			return (fs[0] instanceof Mention);
+		}
+
+		private boolean isEntityGroup() {
+			return (fs[0] instanceof EntityGroup);
+		}
+
+		private Entity getEntity(int i) {
+			return (Entity) fs[i];
+		}
+
+		private Annotation getAnnotation(int i) {
+			return (Annotation) fs[i];
+		}
+
+		private Mention getMention(int i) {
+			return (Mention) fs[i];
+		}
+
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			collectData(e);
+			renameAction.setEnabled(isSingle() && isEntity());
+			changeKeyAction.setEnabled(isSingle() && isEntity());
+			changeColorAction.setEnabled(isSingle() && isEntity());
+			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
+			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
+			deleteAction.setEnabled(isSingle() && (isMention() || isEntity()));
+
+			formGroupAction.setEnabled(isDouble() && isEntity());
+			toggleMentionDifficult.setEnabled(isSingle() && isMention());
+			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
+					isSingle() && isMention() && Util.isDifficult(getMention(0)));
+
+			if (isSingle() && (isMention() || isDetachedMentionPart()))
+				mentionSelected(getAnnotation(0));
 			else
 				mentionSelected(null);
 
-			if (num == 1) {
-				if (fs[0] instanceof Entity) {
-					Entity entity = (Entity) fs[0];
-					if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC))
-						statusBar.add(new JLabel("Generic"));
-				}
-			}
 		}
 
 	}
