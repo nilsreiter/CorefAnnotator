@@ -6,7 +6,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import org.apache.uima.cas.Type;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
@@ -21,12 +20,6 @@ public class StyleManager {
 			defaultStyle.addAttribute(StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 		}
 		return defaultStyle;
-	}
-
-	@Deprecated
-	public static void style(JCas jcas, StyledDocument document, Style style, Class<? extends Annotation> anno) {
-		for (Annotation a : JCasUtil.select(jcas, anno))
-			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
 	}
 
 	public static void style(StyledDocument document, Style style) {
