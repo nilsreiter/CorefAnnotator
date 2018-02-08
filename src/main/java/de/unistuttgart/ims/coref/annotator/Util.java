@@ -4,13 +4,17 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 
+import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
+
 public class Util {
 	public static String toString(TreeModel tm) {
-
 		return toString((TreeNode) tm.getRoot(), 0);
 	}
 
@@ -87,4 +91,31 @@ public class Util {
 		return nArr;
 
 	}
+
+	public static boolean isGeneric(Entity e) {
+		return Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC);
+	}
+
+	public static boolean isDifficult(Mention m) {
+		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
+	}
+
+	public static boolean isAmbiguous(Mention m) {
+		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
+	}
+
+	public static Meta getMeta(JCas jcas) {
+		if (!JCasUtil.exists(jcas, Meta.class)) {
+			Meta m = new Meta(jcas);
+			m.addToIndexes();
+			return m;
+		}
+		try {
+			return JCasUtil.selectSingle(jcas, Meta.class);
+		} catch (IllegalArgumentException e) {
+			Annotator.logger.catching(e);
+			return null;
+		}
+	}
+
 }

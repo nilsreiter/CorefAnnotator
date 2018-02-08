@@ -2,8 +2,11 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.reflections.Reflections;
 
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -12,10 +15,11 @@ public class PluginManager {
 	Set<Class<? extends StylePlugin>> stylePlugins;
 
 	public void init() {
-		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugins");
+		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
 		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
 		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
-
+		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
+		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins, ','));
 	}
 
 	public Set<Class<? extends IOPlugin>> getIOPlugins() {
@@ -24,6 +28,14 @@ public class PluginManager {
 
 	public Set<Class<? extends StylePlugin>> getStylePlugins() {
 		return stylePlugins;
+	}
+
+	public IOPlugin getDefaultIOPlugin() {
+		return new DefaultIOPlugin();
+	}
+
+	public StylePlugin getDefaultStylePlugin() {
+		return new DefaultStylePlugin();
 	}
 
 }

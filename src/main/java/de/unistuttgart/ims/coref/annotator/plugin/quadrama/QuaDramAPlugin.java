@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins.quadrama;
+package de.unistuttgart.ims.coref.annotator.plugin.quadrama;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +13,10 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
-public class QuaDramAPlugin implements IOPlugin, StylePlugin {
-
-	private static final String TYPE_SPEAKER = "de.unistuttgart.ims.drama.api.Speaker";
-	private static final String TYPE_STAGEDIRECTION = "de.unistuttgart.ims.drama.api.StageDirection";
-	private static final String TYPE_HEADING = "de.unistuttgart.ims.drama.api.Heading";
+public class QuaDramAPlugin extends DefaultIOPlugin implements StylePlugin {
 
 	@Override
 	public String getDescription() {
@@ -48,15 +44,15 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 
 		Style style = styleContext.addStyle("Speaker", defaultStyle);
 		style.addAttribute(StyleConstants.Bold, true);
-		map.put(style, ts.getType(TYPE_SPEAKER));
+		map.put(style, ts.getType(Constants.TYPE_SPEAKER));
 
 		style = styleContext.addStyle("Stage direction", defaultStyle);
 		style.addAttribute(StyleConstants.Italic, true);
-		map.put(style, ts.getType(TYPE_STAGEDIRECTION));
+		map.put(style, ts.getType(Constants.TYPE_STAGEDIRECTION));
 
 		style = styleContext.addStyle("Header", defaultStyle);
 		style.addAttribute(StyleConstants.FontSize, 16);
-		map.put(style, ts.getType(TYPE_HEADING));
+		map.put(style, ts.getType(Constants.TYPE_HEADING));
 
 		return map;
 	}

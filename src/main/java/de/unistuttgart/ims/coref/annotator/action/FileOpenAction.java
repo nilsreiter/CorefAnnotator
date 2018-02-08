@@ -26,7 +26,7 @@ public class FileOpenAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.fileOpenDialog(DefaultIOPlugin.getInstance());
+		mainApplication.fileOpenDialog(null, DefaultIOPlugin.getInstance());
 
 	}
 }

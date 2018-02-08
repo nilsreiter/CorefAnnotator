@@ -4,11 +4,14 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -17,6 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -28,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class CoreferenceModel extends DefaultTreeModel implements KeyListener, TreeSelectionListener {
 	JCas jcas;
@@ -37,7 +42,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
-
+	RangedHashSetValuedHashMap<Annotation> charposMentionMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
 	int key = 0;
@@ -51,15 +56,19 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	boolean keepEmptyEntities = true;
 
-	public CoreferenceModel(JCas jcas) {
-		super(new CATreeNode(null, "Add new entity"));
+	Configuration configuration;
+
+	public CoreferenceModel(JCas jcas, Configuration configuration) {
+		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
-		this.groupRootNode = new CATreeNode(null, "Groups");
+		this.groupRootNode = new CATreeNode(null, Annotator.getString("tree.groups"));
 		this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
+		this.configuration = configuration;
 
 	}
 
+	@Deprecated
 	public void importExistingData() {
 		for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 			addExistingEntity(e);
@@ -87,6 +96,16 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		fireMentionSelectedEvent(m);
 	}
 
+	public void toggleFlagEntity(Entity m, String flag) {
+		if (Util.contains(m.getFlags(), flag)) {
+			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
+		} else
+			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
+		nodeChanged(mentionMap.get(m));
+		// fireMentionChangedEvent(m);
+		// fireMentionSelectedEvent(m);
+	}
+
 	public void updateMention(Mention m, Entity newEntity) {
 		// remove mention from old entity
 		Entity oldEntity = m.getEntity();
@@ -107,9 +126,21 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	public void removeEntity(Entity e) {
 		removeNodeFromParent(entityMap.get(e));
 		e.removeFromIndexes();
-		int k = entityMap.remove(e).getKeyCode();
-		keyMap.remove(k);
+		entityMap.remove(e);
+		String k = e.getKey();
+		if (k != null)
+			keyMap.remove(k.charAt(0));
 		entityMentionMap.remove(e);
+	}
+
+	public void removeEntityGroup(EntityGroup eg) {
+		Set<Mention> mentions = new HashSet<Mention>(entityMentionMap.get(eg));
+		for (Mention m : mentions) {
+			removeMention(m);
+		}
+		removeNodeFromParent(entityMap.get(eg));
+		eg.removeFromIndexes();
+
 	}
 
 	public void removeEntityFromGroup(EntityGroup eg, EntityTreeNode e) {
@@ -137,9 +168,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		int ind = 0;
 		Comparator<EntityTreeNode> comparator = entitySortOrder.getComparator();
 		while (ind < this.rootNode.getChildCount()) {
+			CATreeNode n = (CATreeNode) rootNode.getChildAt(ind);
+			if (n.getFeatureStructure() == null)
+				break;
 			EntityTreeNode node = (EntityTreeNode) rootNode.getChildAt(ind);
 			if (comparator.compare(tn, node) <= 0)
 				break;
+
 			ind++;
 		}
 
@@ -194,7 +229,12 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void addNewMention(Entity e, int begin, int end) {
-		Mention m = AnnotationFactory.createAnnotation(jcas, begin, end, Mention.class);
+		Mention m = new Mention(jcas);
+		m.setBegin(begin);
+		m.setEnd(end);
+		if (configuration.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+			m = AnnotationUtil.trim(m);
+		m.addToIndexes();
 		connect(e, m);
 		fireMentionAddedEvent(m);
 	}
@@ -240,16 +280,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		System.err.println("keychar: " + e.getKeyChar());
 		JTextComponent ta = (JTextComponent) e.getSource();
 		if (keyMap.containsKey(e.getKeyChar())) {
 			e.consume();
 			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
-		} /*
-			 * else if (e.getKeyChar() == 'n') {
-			 * addNewEntityMention(ta.getSelectionStart(),
-			 * ta.getSelectionEnd()); }
-			 */
+		}
 	}
 
 	@Override
@@ -279,13 +314,27 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		insertNodeInto(mentionMap.get(dmp), mentionMap.get(m), 0);
 	}
 
+	public void removeDetachedMentionPart(Mention m, DetachedMentionPart dmp) {
+		m.setDiscontinuous(null);
+		removeNodeFromParent(mentionMap.get(dmp));
+		mentionMap.remove(dmp);
+		dmp.removeFromIndexes();
+		fireMentionChangedEvent(m);
+	}
+
 	public void addDiscontinuousToMention(Mention m, int begin, int end) {
 		DetachedMentionPart d = AnnotationFactory.createAnnotation(jcas, begin, end, DetachedMentionPart.class);
+		d.setMention(m);
 		m.setDiscontinuous(d);
+		charposMentionMap.add(d);
 		CATreeNode node = new CATreeNode(d, d.getCoveredText());
 		mentionMap.put(d, node);
 		insertNodeInto(node, mentionMap.get(m), 0);
 		fireMentionChangedEvent(m);
+	}
+
+	public Collection<Annotation> getMentions(int position) {
+		return this.charposMentionMap.get(position);
 	}
 
 	public void resort() {
@@ -337,11 +386,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
+		this.charposMentionMap.add(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionAdded(m);
 	}
 
 	public void fireMentionRemovedEvent(Mention m) {
+		this.charposMentionMap.remove(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionRemoved(m);
 	}
@@ -368,7 +419,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		CATreeNode parent = (CATreeNode) mentionMap.get(m).getParent();
 		int index = parent.getIndex(mentionMap.get(m));
 		parent.remove(mentionMap.get(m));
-		// removeNodeFromParent(mentionMap.get(m));
 		nodesWereRemoved(parent, new int[] { index }, new Object[] { mentionMap.get(m) });
 		fireMentionRemovedEvent(m);
 		entityMentionMap.get(m.getEntity()).remove(m);

@@ -11,6 +11,9 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -37,8 +40,6 @@ import javax.swing.text.View;
 
 import org.apache.commons.configuration2.Configuration;
 
-import de.unistuttgart.ims.commons.Counter;
-
 public class SearchPanel extends JFrame implements DocumentListener, ListSelectionListener, WindowListener {
 	final static Color HILIT_COLOR = Color.black;
 
@@ -55,6 +56,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	int contexts = 50;
 	boolean showBarChart = true;
 	JFrame chartFrame;
+	Set<Object> highlights = new HashSet<Object>();
 
 	public SearchPanel(DocumentWindow xdw, Configuration configuration) {
 		setTitle("Search");
@@ -63,7 +65,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 
 		hilit = xdw.textPane.getHighlighter();
 		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
-		xdw.textPane.setHighlighter(hilit);
+		// xdw.textPane.setHighlighter(hilit);
 
 		lm = new DefaultListModel<SearchResult>();
 		getContentPane().add(createSearchPanel(), BorderLayout.PAGE_START);
@@ -99,10 +101,10 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	public void insertUpdate(DocumentEvent e) {
 		try {
 			Pattern.compile(textField.getText());
-			search(textField.getText());
+			if (textField.getText().length() > 1)
+				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
-			ex.printStackTrace();
-			// logger.trace(ex.getMessage());
+			// silently catching
 		}
 	}
 
@@ -110,10 +112,10 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	public void removeUpdate(DocumentEvent e) {
 		try {
 			Pattern.compile(textField.getText());
-			search(textField.getText());
+			if (textField.getText().length() > 1)
+				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
-			ex.printStackTrace();
-			// SimpleXmiViewer.logger.trace(ex.getMessage());
+			// silently catching
 		}
 	}
 
@@ -121,10 +123,10 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	public void changedUpdate(DocumentEvent e) {
 		try {
 			Pattern.compile(textField.getText());
-			search(textField.getText());
+			if (textField.getText().length() > 1)
+				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
-			ex.printStackTrace();
-			// SimpleXmiViewer.logger.trace(ex.getMessage());
+			// silently catching
 		}
 	}
 
@@ -133,7 +135,17 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 		list.clearSelection();
 		statusbar.removeAll();
 		lm.clear();
-		hilit.removeAllHighlights();
+		Semaphore sema = new Semaphore(1);
+		try {
+			sema.acquire();
+			for (Object o : highlights) {
+				hilit.removeHighlight(o);
+			}
+			highlights.clear();
+			sema.release();
+		} catch (InterruptedException e1) {
+			Annotator.logger.catching(e1);
+		}
 		if (chartFrame != null)
 			chartFrame.dispose();
 		Counter<String> counter = new Counter<String>();
@@ -144,7 +156,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 			while (m.find()) {
 				try {
 					lm.addElement(new SearchResult(m.start(), m.end()));
-					hilit.addHighlight(m.start(), m.end(), painter);
+					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
 					if (showBarChart)
 						counter.add(text.substring(m.start(), m.end()));
 				} catch (BadLocationException e) {
@@ -238,7 +250,8 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 			chartFrame.setVisible(false);
 			chartFrame.dispose();
 		}
-		hilit.removeAllHighlights();
+		for (Object o : highlights)
+			hilit.removeHighlight(o);
 		dispose();
 
 	}

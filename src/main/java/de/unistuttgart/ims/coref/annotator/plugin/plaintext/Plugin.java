@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins;
+package de.unistuttgart.ims.coref.annotator.plugin.plaintext;
 
 import java.io.File;
 
@@ -11,27 +11,20 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
-import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
+import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
-public class DefaultIOPlugin implements IOPlugin {
-
-	static DefaultIOPlugin plugin = new DefaultIOPlugin();
+public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
-		return "";
+		return "Plain text";
 	}
 
 	@Override
 	public String getName() {
-		return "Default";
-	}
-
-	@Override
-	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return CollectionReaderFactory.createReaderDescription(XmiReader.class, XmiReader.PARAM_LENIENT, true,
-				XmiReader.PARAM_ADD_DOCUMENT_METADATA, false, XmiReader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
+		return "Plain text";
 	}
 
 	@Override
@@ -41,11 +34,13 @@ public class DefaultIOPlugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
+		return null;
 	}
 
-	public static DefaultIOPlugin getInstance() {
-		return plugin;
+	@Override
+	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
+		return CollectionReaderFactory.createReaderDescription(TextReader.class, TextReader.PARAM_SOURCE_LOCATION,
+				f.getAbsolutePath(), TextReader.ENCODING_AUTO, true);
 	}
 
 	@Override
@@ -55,7 +50,18 @@ public class DefaultIOPlugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return XmiFileFilter.filter;
+		return new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				return f.getName().endsWith(".txt");
+			}
+
+			@Override
+			public String getDescription() {
+				return "Plain text files";
+			}
+		};
 	}
 
 }

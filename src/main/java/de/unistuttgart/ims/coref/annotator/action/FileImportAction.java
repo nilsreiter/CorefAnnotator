@@ -22,7 +22,7 @@ public class FileImportAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.fileOpenDialog(plugin);
+		mainApplication.fileOpenDialog(null, plugin);
 
 	}
 }

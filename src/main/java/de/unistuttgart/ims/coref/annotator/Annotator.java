@@ -1,5 +1,10 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,8 +16,15 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -37,13 +49,12 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.quadrama.QuaDramAPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
-	static final Logger logger = LogManager.getLogger(Annotator.class);
+	public static final Logger logger = LogManager.getLogger(Annotator.class);
 	Set<DocumentWindow> openFiles = new HashSet<DocumentWindow>();
 
 	Configuration configuration;
@@ -54,11 +65,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	JFileChooser openDialog;
 
+	JFrame opening;
+
 	public static void main(String[] args) throws UIMAException {
 
 		Annotator a = new Annotator();
-		a.open(new File("src/test/resources/rjmw.0.xmi"), new QuaDramAPlugin());
-		// a.fileOpenDialog(CoreferenceFlavor.CRETA);
+		a.showOpening();
+		// a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
 	}
 
 	public Annotator() throws ResourceInitializationException {
@@ -69,10 +82,69 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	}
 
-	private void initialiseDialogs() {
+	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(XmiFileFilter.filter);
+
+		opening = new JFrame();
+		opening.setLocationRelativeTo(null);
+		opening.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				opening.dispose();
+				handleQuitRequestWith(null, null);
+			}
+		});
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.add(new JLabel("Default"));
+		panel.add(new JButton(new AbstractAction("Open") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				fileOpenDialog(opening, pluginManager.getDefaultIOPlugin());
+			}
+
+		}));
+		panel.add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				handleQuitRequestWith(null, null);
+			}
+		}));
+		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
+
+		opening.getContentPane().add(panel, BorderLayout.WEST);
+
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.add(new JLabel("Importer"));
+		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
+			try {
+				IOPlugin p = plugin.newInstance();
+				if (p.getImporter() != null) {
+					panel.add(new JButton(new AbstractAction(p.getName()) {
+
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							fileOpenDialog(opening, p);
+						}
+					}));
+				}
+			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
+				logger.catching(e);
+			}
+		}
+		opening.getContentPane().add(panel, BorderLayout.EAST);
+		opening.pack();
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {
@@ -124,18 +196,17 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
-		final DocumentWindow v = new DocumentWindow(this);
+		DocumentWindow v = new DocumentWindow(this);
+		v.setVisible(true);
 
-		/*
-		 * new Thread() {
-		 * 
-		 * @Override public void run() {
-		 */
-		logger.info("Loading XMI document from {}.", file);
-		v.loadFile(file, flavor);
-		/*
-		 * } }.run();
-		 */
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				v.loadFile(file, flavor);
+			}
+		};
+
+		SwingUtilities.invokeLater(runnable);
 		openFiles.add(v);
 		return v;
 	}
@@ -144,7 +215,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openFiles.remove(viewer);
 		viewer.dispose();
 		if (openFiles.isEmpty())
-			this.fileOpenDialog(new DefaultIOPlugin());
+			this.showOpening();
 	};
 
 	@Override
@@ -185,9 +256,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
 	}
 
-	public void fileOpenDialog(IOPlugin flavor) {
+	public void showOpening() {
+		this.opening.setVisible(true);
+	}
+
+	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
-		int r = openDialog.showOpenDialog(null);
+		openDialog.setFileFilter(flavor.getFileFilter());
+		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
@@ -195,8 +271,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			}
 			break;
 		default:
-			if (openFiles.isEmpty())
-				handleQuitRequestWith(null, null);
+			showOpening();
 		}
 	}
 

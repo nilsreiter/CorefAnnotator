@@ -57,15 +57,17 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		if (r == null)
 			return null;
 
+		int x = r.x;
+		int y = r.y + r.height;
+		r.setBounds(r.x, r.y + downDistance, r.width, r.height + lineWidth);
+
 		// Do your custom painting
 		Color color = getColor();
 		g.setColor(color == null ? c.getSelectionColor() : color);
 
-		g2.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f,
+		g2.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
 				(dotted ? new float[] { lineWidth * 3 } : null), 0));
-		g2.drawLine(r.x, r.y + r.height + downDistance, r.x + r.width, r.y + r.height + downDistance);
-
-		r.setBounds(r.x - lineWidth, r.y, r.width + 2 * lineWidth, r.height + lineWidth + downDistance);
+		g2.drawLine(x, y + downDistance, r.x + r.width, y + downDistance);
 		return r;
 	}
 
@@ -80,7 +82,6 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 			} else {
 				alloc = bounds.getBounds();
 			}
-
 			return alloc;
 		} else {
 			// Should only render part of View.
