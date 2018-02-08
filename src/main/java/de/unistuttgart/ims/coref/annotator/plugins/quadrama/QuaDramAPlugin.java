@@ -18,10 +18,6 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 
-	private static final String TYPE_SPEAKER = "de.unistuttgart.ims.drama.api.Speaker";
-	private static final String TYPE_STAGEDIRECTION = "de.unistuttgart.ims.drama.api.StageDirection";
-	private static final String TYPE_HEADING = "de.unistuttgart.ims.drama.api.Heading";
-
 	@Override
 	public String getDescription() {
 		return "Plugin that provides an importer and style.";
@@ -48,15 +44,15 @@ public class QuaDramAPlugin implements IOPlugin, StylePlugin {
 
 		Style style = styleContext.addStyle("Speaker", defaultStyle);
 		style.addAttribute(StyleConstants.Bold, true);
-		map.put(style, ts.getType(TYPE_SPEAKER));
+		map.put(style, ts.getType(Constants.TYPE_SPEAKER));
 
 		style = styleContext.addStyle("Stage direction", defaultStyle);
 		style.addAttribute(StyleConstants.Italic, true);
-		map.put(style, ts.getType(TYPE_STAGEDIRECTION));
+		map.put(style, ts.getType(Constants.TYPE_STAGEDIRECTION));
 
 		style = styleContext.addStyle("Header", defaultStyle);
 		style.addAttribute(StyleConstants.FontSize, 16);
-		map.put(style, ts.getType(TYPE_HEADING));
+		map.put(style, ts.getType(Constants.TYPE_HEADING));
 
 		return map;
 	}
