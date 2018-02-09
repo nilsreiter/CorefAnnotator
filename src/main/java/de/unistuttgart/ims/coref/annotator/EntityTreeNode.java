@@ -26,6 +26,11 @@ public class EntityTreeNode extends CATreeNode {
 	}
 
 	@Override
+	public CATreeNode getChildAt(int i) {
+		return (CATreeNode) super.getChildAt(i);
+	}
+
+	@Override
 	public Entity getFeatureStructure() {
 		return (Entity) super.getFeatureStructure();
 	}

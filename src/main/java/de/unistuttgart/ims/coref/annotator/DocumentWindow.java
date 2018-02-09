@@ -1109,7 +1109,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
 					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
-				} else if (cModel.entityMentionMap.get(etn.getFeatureStructure()).isEmpty()) {
+				} else if (tn.isLeaf()) {
 					cModel.removeEntity(etn.getFeatureStructure());
 				}
 			}

@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -19,7 +17,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
-import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -40,7 +37,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<FeatureStructure, EntityTreeNode> entityMap = new HashMap<FeatureStructure, EntityTreeNode>();
 	Map<FeatureStructure, CATreeNode> mentionMap = new HashMap<FeatureStructure, CATreeNode>();
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
-	HashSetValuedHashMap<Entity, Mention> entityMentionMap = new HashSetValuedHashMap<Entity, Mention>();
 	ColorMap colorMap = new ColorMap();
 	RangedHashSetValuedHashMap<Annotation> charposMentionMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
@@ -108,16 +104,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public void updateMention(Mention m, Entity newEntity) {
 		// remove mention from old entity
-		Entity oldEntity = m.getEntity();
-		entityMentionMap.get(oldEntity).remove(m);
 		removeNodeFromParent(mentionMap.get(m));
 		mentionMap.remove(m);
 
 		// attach it to the new entity
 		connect(newEntity, m);
-		if (entityMentionMap.get(oldEntity).isEmpty() && !keepEmptyEntities) {
-			removeEntity(oldEntity);
-		}
 
 		// fire event
 		this.fireMentionChangedEvent(m);
@@ -130,15 +121,16 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		String k = e.getKey();
 		if (k != null)
 			keyMap.remove(k.charAt(0));
-		entityMentionMap.remove(e);
 	}
 
 	public void removeEntityGroup(EntityGroup eg) {
-		Set<Mention> mentions = new HashSet<Mention>(entityMentionMap.get(eg));
-		for (Mention m : mentions) {
-			removeMention(m);
+		EntityTreeNode etn = entityMap.get(eg);
+		for (int i = 0; i < etn.getChildCount(); i++) {
+			FeatureStructure fs = etn.getChildAt(i).getFeatureStructure();
+			if (fs instanceof Mention)
+				removeMention((Mention) fs);
 		}
-		removeNodeFromParent(entityMap.get(eg));
+		removeNodeFromParent(etn);
 		eg.removeFromIndexes();
 
 	}
@@ -207,12 +199,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			addExistingEntity(e);
 
 		m.setEntity(e);
-		entityMentionMap.put(e, m);
 		CATreeNode tn = new CATreeNode(m, m.getCoveredText());
 		mentionMap.put(m, tn);
 		int ind = 0;
 		while (ind < entityMap.get(e).getChildCount()) {
-			CATreeNode node = (CATreeNode) entityMap.get(e).getChildAt(ind);
+			CATreeNode node = entityMap.get(e).getChildAt(ind);
 			if (node.getFeatureStructure() instanceof Entity
 					|| ((Annotation) node.getFeatureStructure()).getBegin() > m.getBegin())
 				break;
@@ -373,11 +364,11 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void updateColor(Entity entity, Color newColor) {
-		// colorMap.put(entity, newColor);
 		entity.setColor(newColor.getRGB());
-		this.nodeChanged(entityMap.get(entity));
-		for (Mention m : entityMentionMap.get(entity))
-			fireMentionChangedEvent(m);
+		EntityTreeNode entityNode = entityMap.get(entity);
+		this.nodeChanged(entityNode);
+		for (int i = 0; i < entityNode.getChildCount(); i++)
+			fireMentionChangedEvent((Mention) (entityNode.getChildAt(i)).getFeatureStructure());
 	}
 
 	public void fireMentionChangedEvent(Mention m) {
@@ -421,7 +412,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		parent.remove(mentionMap.get(m));
 		nodesWereRemoved(parent, new int[] { index }, new Object[] { mentionMap.get(m) });
 		fireMentionRemovedEvent(m);
-		entityMentionMap.get(m.getEntity()).remove(m);
 		mentionMap.remove(m);
 		m.removeFromIndexes();
 	}
