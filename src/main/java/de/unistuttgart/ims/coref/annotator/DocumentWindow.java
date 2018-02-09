@@ -690,6 +690,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		progressBar.setVisible(false);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void fireJCasLoadedEvent() {
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
