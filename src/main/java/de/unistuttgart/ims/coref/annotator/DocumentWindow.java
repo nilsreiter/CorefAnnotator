@@ -373,15 +373,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		JMenu entityMenu = new JMenu(Annotator.getString("menu.entities"));
-		entityMenu.add(new JMenuItem(renameAction));
+		JMenu entityMenu = new JMenu(Annotator.getString("menu.edit"));
 		entityMenu.add(new JMenuItem(deleteAction));
+		entityMenu.addSeparator();
+		entityMenu.add(Annotator.getString("menu.edit.mentions"));
+		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
+		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
+		entityMenu.addSeparator();
+		entityMenu.add(Annotator.getString("menu.edit.entities"));
+		entityMenu.add(new JMenuItem(renameAction));
 		entityMenu.add(new JMenuItem(newEntityAction));
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
 		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
 
+		JMenu sortMenu = new JMenu(Annotator.getString("menu.edit.entities.sort"));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
 		radio1.setSelected(true);
 		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.sortByMentions);
@@ -391,11 +398,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		entityMenu.addSeparator();
 
-		entityMenu.add(radio1);
-		entityMenu.add(radio2);
+		sortMenu.add(radio1);
+		sortMenu.add(radio2);
+		sortMenu.add(new JCheckBoxMenuItem(this.sortDescending));
 
-		entityMenu.add(new JCheckBoxMenuItem(this.sortDescending));
-
+		entityMenu.add(sortMenu);
 		return entityMenu;
 	}
 
