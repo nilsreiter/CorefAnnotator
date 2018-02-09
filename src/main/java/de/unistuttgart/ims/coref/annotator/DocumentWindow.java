@@ -12,6 +12,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -49,6 +50,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -102,6 +104,8 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -130,6 +134,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	boolean unsavedChanges = false;
 
 	// actions
+	AbstractAction commentAction = new CommentAction(null);
 	AbstractAction newEntityAction;
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
@@ -187,6 +192,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected void initialiseWindow() {
 		// popup
 		treePopupMenu = new JPopupMenu();
+		// treePopupMenu.add(this.commentAction);
 		treePopupMenu.add(this.renameAction);
 		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(this.changeColorAction);
@@ -378,6 +384,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString("menu.edit"));
 		entityMenu.add(new JMenuItem(deleteAction));
+		// entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString("menu.edit.mentions"));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
@@ -1106,6 +1113,21 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
+				if (cModel.comments.containsKey(m)) {
+					for (Comment comment : cModel.comments.get(m)) {
+						JLabel l = new JLabel(FontIcon.of(Material.COMMENT));
+						l.setToolTipText(comment.getValue());
+						l.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								System.err.println("!!");
+								commentAction.actionPerformed(null);
+							}
+						});
+						panel.add(Box.createRigidArea(new Dimension(5, 5)));
+						panel.add(l);
+					}
+				}
 				if (Util.isDifficult(m)) {
 					JLabel l = new JLabel();
 					if (showText)
@@ -1484,6 +1506,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	@Deprecated
 	abstract class MyAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -1785,6 +1808,63 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			for (Integer i : chunks) {
 				progressBar.setValue(i);
 			}
+		}
+
+	}
+
+	class CommentAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		Comment comment;
+
+		public CommentAction(Comment c) {
+			putValue(Action.NAME, Annotator.getString("action.comment"));
+			this.comment = c;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextArea msg = new JTextArea();
+			msg.setRows(5);
+			msg.setColumns(30);
+			msg.setLineWrap(true);
+			msg.setWrapStyleWord(true);
+			if (comment != null)
+				msg.setText(comment.getValue());
+
+			JScrollPane scrollPane = new JScrollPane(msg);
+			int r = JOptionPane.showConfirmDialog(DocumentWindow.this, scrollPane, "Enter your comment",
+					JOptionPane.OK_CANCEL_OPTION);
+			if (r == JOptionPane.OK_OPTION) {
+				if (comment != null) {
+					comment.setValue(msg.getText());
+				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
+					Annotation tgt = new Annotation(jcas);
+					tgt.setBegin(textPane.getSelectionStart());
+					tgt.setEnd(textPane.getSelectionEnd());
+					tgt.addToIndexes();
+					AnnotationComment com = new AnnotationComment(jcas);
+					com.setValue(msg.getText());
+					com.setAnnotation(tgt);
+					com.addToIndexes();
+					drawAnnotation(tgt, Color.YELLOW, false, true);
+				}
+				/*
+				 * else if (e.getSource() instanceof Component) { } Component
+				 * comp = (Component) e.getSource(); TreePath tp =
+				 * tree.getClosestPathForLocation(comp.getX(), comp.getY());
+				 * System.err.println(tp); } else if (tree.getSelectionCount()
+				 * == 1) { CATreeNode node = (CATreeNode)
+				 * tree.getSelectionPath().getLastPathComponent(); if
+				 * (node.getFeatureStructure() instanceof Mention) {
+				 * MentionComment c = new MentionComment(jcas);
+				 * c.setValue(msg.getText()); c.setMention((Mention)
+				 * node.getFeatureStructure()); c.addToIndexes();
+				 * cModel.comments.put(node.getFeatureStructure(), c); } }
+				 */
+			}
+
 		}
 
 	}

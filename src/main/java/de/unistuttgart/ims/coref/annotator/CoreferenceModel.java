@@ -17,6 +17,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -25,6 +26,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -41,6 +43,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
+	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 	int key = 0;
 
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
