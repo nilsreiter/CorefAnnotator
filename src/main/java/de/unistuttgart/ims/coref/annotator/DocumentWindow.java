@@ -109,6 +109,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
@@ -163,6 +164,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JMenu windowsMenu;
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
+	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 
 	// Settings
 	boolean trimWhitespace = true;
@@ -300,21 +302,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
 		viewMenu.addSeparator();
 
+		PluginManager pm = mainApplication.getPluginManager();
+
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
 		ButtonGroup grp = new ButtonGroup();
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
-				new ViewStyleSelectAction(mainApplication.getPluginManager().getDefaultStylePlugin()));
+		StylePlugin pl = pm.getDefaultStylePlugin();
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(pm.getDefaultStylePlugin()));
 		radio1.setSelected(true);
 		viewStyleMenu.add(radio1);
+		styleMenuItem.put(pl, radio1);
 		grp.add(radio1);
-		for (Class<? extends StylePlugin> plugin : mainApplication.getPluginManager().getStylePlugins()) {
-			try {
-				radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(plugin.newInstance()));
-				viewStyleMenu.add(radio1);
-				grp.add(radio1);
-			} catch (InstantiationException | IllegalAccessException e1) {
-				logger.catching(e1);
-			}
+		for (Class<? extends StylePlugin> plugin : pm.getStylePlugins()) {
+			pl = pm.getStylePlugin(plugin);
+			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(pl));
+			viewStyleMenu.add(radio1);
+			styleMenuItem.put(pl, radio1);
+			grp.add(radio1);
 
 		}
 		viewMenu.add(viewStyleMenu);
@@ -591,8 +594,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int oldSize = textPane.getFont().getSize();
-			textPane.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize - 1));
+			Font oldFont = textPane.getFont();
+			float oldSize = oldFont.getSize();
+
+			textPane.setFont(oldFont.deriveFont(oldSize - 1f));
 		}
 
 	}
@@ -612,8 +617,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int oldSize = textPane.getFont().getSize();
-			textPane.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, oldSize + 1));
+			Font oldFont = textPane.getFont();
+			float oldSize = oldFont.getSize();
+			textPane.setFont(oldFont.deriveFont(oldSize + 1f));
 		}
 
 	}
@@ -689,16 +695,20 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
 		Meta meta = Util.getMeta(jcas);
-		if (meta.getStylePlugin() != null)
+
+		if (meta.getStylePlugin() != null) {
+			Object o;
 			try {
-				Object o = Class.forName(meta.getStylePlugin()).newInstance();
+				Class<?> cl = Class.forName(meta.getStylePlugin());
+				o = mainApplication.getPluginManager().getPlugin((Class<? extends Plugin>) cl);
 				if (o instanceof StylePlugin)
 					switchStyle((StylePlugin) o);
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-				logger.catching(e1);
+			} catch (ClassNotFoundException e) {
+				logger.catching(e);
 			}
-		// else if (flavor.getStylePlugin() != null)
-		// switchStyle(jcas, flavor.getStylePlugin());
+
+		} else // if (flavor.getStylePlugin() != null)
+			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 
 		try {
 			Feature titleFeature = jcas.getTypeSystem()
@@ -741,6 +751,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 				}
 			Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+			styleMenuItem.get(sv).setSelected(true);
 		} catch (NullPointerException e) {
 			logger.catching(e);
 		}

@@ -64,7 +64,7 @@ public class QuaDramAPlugin extends DefaultIOPlugin implements StylePlugin {
 
 	@Override
 	public Style getBaseStyle() {
-		return null;
+		return StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 	}
 
 }
