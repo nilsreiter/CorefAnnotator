@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.Color;
 
-public class ColorMap {
+public class ColorProvider {
 
 	Color[] colors = new Color[] { Color.BLUE, Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.YELLOW };
 

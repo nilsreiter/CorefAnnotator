@@ -37,7 +37,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<FeatureStructure, EntityTreeNode> entityMap = new HashMap<FeatureStructure, EntityTreeNode>();
 	Map<FeatureStructure, CATreeNode> mentionMap = new HashMap<FeatureStructure, CATreeNode>();
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
-	ColorMap colorMap = new ColorMap();
+	ColorProvider colorMap = new ColorProvider();
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 

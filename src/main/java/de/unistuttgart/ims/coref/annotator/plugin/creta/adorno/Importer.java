@@ -12,13 +12,13 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.ColorMap;
+import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class Importer extends JCasAnnotator_ImplBase {
 
-	ColorMap colorMap = new ColorMap();
+	ColorProvider colorMap = new ColorProvider();
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {

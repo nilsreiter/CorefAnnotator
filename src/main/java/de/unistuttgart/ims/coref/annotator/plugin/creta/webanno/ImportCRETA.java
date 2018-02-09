@@ -13,7 +13,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 
-import de.unistuttgart.ims.coref.annotator.ColorMap;
+import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -61,7 +61,7 @@ public class ImportCRETA extends JCasAnnotator_ImplBase {
 		}
 
 		Set<HashSet<Mention>> sets = new HashSet<HashSet<Mention>>(combiner.values());
-		ColorMap cm = new ColorMap();
+		ColorProvider cm = new ColorProvider();
 		for (HashSet<Mention> s : sets) {
 			Entity e;
 			if (groups.containsKey(s))
