@@ -259,7 +259,8 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		eg.setMembers(arr);
 		eg.addToIndexes();
 
-		CATreeNode gtn = addExistingEntity(eg);
+		EntityTreeNode gtn = addExistingEntity(eg);
+
 		insertNodeInto(new EntityTreeNode(e1), gtn, 0);
 		insertNodeInto(new EntityTreeNode(e2), gtn, 1);
 
