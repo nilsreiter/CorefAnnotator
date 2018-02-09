@@ -251,7 +251,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		arr.set(0, e1);
 		arr.set(1, e2);
 		EntityGroup eg = new EntityGroup(jcas);
-		eg.setColor(colorMap.nextColor);
+		eg.setColor(colorMap.getNextColor().getRGB());
 		if (e1.getLabel() != null && e2.getLabel() != null)
 			eg.setLabel(e1.getLabel() + " and " + e2.getLabel());
 		else
