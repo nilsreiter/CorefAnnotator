@@ -193,12 +193,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
-		treePopupMenu.add(this.renameAction);
-		treePopupMenu.add(this.changeKeyAction);
-		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.deleteAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.addSeparator();
+		treePopupMenu.add(Annotator.getString("menu.edit.mentions"));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.addSeparator();
+		treePopupMenu.add(Annotator.getString("menu.edit.entities"));
+		treePopupMenu.add(this.newEntityAction);
+		treePopupMenu.add(this.renameAction);
+		treePopupMenu.add(this.changeColorAction);
+		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 
 		textPopupMenu = new JPopupMenu();
@@ -391,8 +396,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString("menu.edit.entities"));
-		entityMenu.add(new JMenuItem(renameAction));
 		entityMenu.add(new JMenuItem(newEntityAction));
+		entityMenu.add(new JMenuItem(renameAction));
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
