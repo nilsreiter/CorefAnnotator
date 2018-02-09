@@ -103,6 +103,7 @@ import com.apple.eawt.QuitResponse;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
@@ -147,7 +148,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction;
-	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels;
+	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, helpAction = new HelpAction();
 
 	// controller
 	CoreferenceModel cModel;
@@ -427,7 +428,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		// TODO: Disabled for the moment
-		// JMenu helpMenu = new JMenu(Annotator.getString("menu.help"));
+		JMenu helpMenu = new JMenu(Annotator.getString("menu.help"));
 		// JMenu debugMenu = new JMenu("Debug");
 
 		// windowsMenu = new JMenu(Annotator.getString("menu.windows"));
@@ -435,6 +436,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// documentMenu = new JMenu(Annotator.getString("menu.document"));
 		// documentMenu.setEnabled(segmentAnnotation != null);
 		// }
+
+		helpMenu.add(helpAction);
 
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem(Annotator.getString("menu.file.about"));
@@ -449,7 +452,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// if (segmentAnnotation != null)
 		// menuBar.add(documentMenu);
 		// menuBar.add(windowsMenu);
-		// menuBar.add(helpMenu);
+		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
 

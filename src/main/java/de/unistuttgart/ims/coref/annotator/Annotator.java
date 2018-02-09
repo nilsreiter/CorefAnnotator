@@ -49,6 +49,7 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -118,6 +119,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				handleQuitRequestWith(null, null);
 			}
 		}));
+		panel.add(new JButton(new HelpAction()));
 		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
 
 		opening.getContentPane().add(panel, BorderLayout.WEST);
