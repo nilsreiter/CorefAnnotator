@@ -634,7 +634,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			switchStyle(jcas, styleVariant);
+			switchStyle(styleVariant);
 
 		}
 
@@ -696,7 +696,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			try {
 				Object o = Class.forName(meta.getStylePlugin()).newInstance();
 				if (o instanceof StylePlugin)
-					switchStyle(jcas, (StylePlugin) o);
+					switchStyle((StylePlugin) o);
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 				logger.catching(e1);
 			}
@@ -730,7 +730,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
-	public void switchStyle(JCas jcas, StylePlugin sv) {
+	public void switchStyle(StylePlugin sv) {
 		try {
 			Annotator.logger.info("Switching to style {}", sv.getClass().getName());
 			if (sv.getBaseStyle() != null)
