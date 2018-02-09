@@ -751,7 +751,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		tree.repaint(tree.getPathBounds(e.getTreePath()));
+		if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+			tree.expandPath(e.getTreePath());
+		try {
+			tree.repaint(tree.getPathBounds(e.getTreePath()));
+		} catch (NullPointerException ex) {
+			logger.catching(ex);
+		}
 	}
 
 	@Override
@@ -761,7 +767,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
