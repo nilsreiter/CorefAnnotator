@@ -17,12 +17,17 @@ public class DefaultStylePlugin implements StylePlugin {
 
 	@Override
 	public Style getBaseStyle() {
-		return null;
+		return StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 	}
 
 	@Override
 	public Map<Style, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle) {
 		return null;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Default";
 	}
 
 }
