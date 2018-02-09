@@ -961,10 +961,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String name = JOptionPane.showInputDialog(Annotator.getString("dialog.rename_entity.prompt"));
+
 			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
-			etn.getFeatureStructure().setLabel(name);
-			cModel.nodeChanged(etn);
+			String l = etn.getFeatureStructure().getLabel();
+			String newLabel = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+					Annotator.getString("dialog.rename_entity.prompt"), "", JOptionPane.PLAIN_MESSAGE,
+					FontIcon.of(Material.KEYBOARD), null, l);
+			if (newLabel != null) {
+				etn.getFeatureStructure().setLabel(newLabel);
+				cModel.nodeChanged(etn);
+			}
 		}
 
 	}
@@ -1010,12 +1016,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String key = JOptionPane.showInputDialog(Annotator.getString("dialog.change_key.prompt"));
-			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
 
-			char keyCode = key.charAt(0);
-			System.err.println(KeyEvent.getKeyText(keyCode) + " " + keyCode);
-			cModel.reassignKey(keyCode, etn.getFeatureStructure());
+			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
+			Character ch = etn.getKeyCode();
+			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+					Annotator.getString("dialog.change_key.prompt"), "", JOptionPane.PLAIN_MESSAGE,
+					FontIcon.of(Material.KEYBOARD), null, ch);
+			if (newKey != null)
+				if (newKey.length() == 1) {
+					Character newChar = newKey.charAt(0);
+					etn.getFeatureStructure().setKey(newKey.substring(0, 1));
+					cModel.reassignKey(newChar, etn.getFeatureStructure());
+				} else {
+					JOptionPane.showMessageDialog(DocumentWindow.this,
+							Annotator.getString("dialog.change_key.invalid_string.message"),
+							Annotator.getString("dialog.change_key.invalid_string.title"),
+							JOptionPane.INFORMATION_MESSAGE);
+				}
 		}
 
 	}
