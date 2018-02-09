@@ -217,6 +217,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 			mentionMap.put(m.getDiscontinuous(), discNode);
 			insertNodeInto(discNode, tn, 0);
 		}
+		resort();
 	}
 
 	public void addNewMention(Entity e, int begin, int end) {
