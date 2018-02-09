@@ -142,7 +142,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction;
-	AbstractAction toggleTrimWhitespace;
+	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels;
 
 	// controller
 	CoreferenceModel cModel;
@@ -282,6 +282,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
 		this.toggleTrimWhitespace = new ToggleTrimWhitespace();
+		this.toggleShowTextInTreeLabels = new ToggleShowTextInTreeLabels();
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -329,6 +330,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuSettings() {
 		JMenu menu = new JMenu(Annotator.getString("menu.settings"));
 		menu.add(new JCheckBoxMenuItem(toggleTrimWhitespace));
+		menu.add(new JCheckBoxMenuItem(toggleShowTextInTreeLabels));
 		return menu;
 
 	}
@@ -1069,6 +1071,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
 				boolean leaf, int row, boolean hasFocus) {
 			// TODO: split up the code in multiple classes
+			boolean showText = mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			panel.setOpaque(false);
@@ -1093,7 +1097,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				} else if (!(etn.getParent() instanceof EntityTreeNode))
 					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
 				if (Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-					JLabel l = new JLabel(Annotator.getString("entity.flag.generic"));
+					JLabel l = new JLabel();
+					if (showText)
+						l.setText(Annotator.getString("entity.flag.generic"));
 					l.setIcon(FontIcon.of(Material.CLOUD));
 					panel.add(Box.createRigidArea(new Dimension(5, 5)));
 					panel.add(l);
@@ -1101,13 +1107,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
 				if (Util.isDifficult(m)) {
-					JLabel l = new JLabel(Annotator.getString("mention.flag.difficult"));
+					JLabel l = new JLabel();
+					if (showText)
+						l.setText(Annotator.getString("mention.flag.difficult"));
 					l.setIcon(FontIcon.of(Material.WARNING));
 					panel.add(Box.createRigidArea(new Dimension(5, 5)));
 					panel.add(l);
 				}
 				if (Util.isAmbiguous(m)) {
-					JLabel l = new JLabel(Annotator.getString("mention.flag.ambiguous"));
+					JLabel l = new JLabel();
+					if (showText)
+						l.setText(Annotator.getString("mention.flag.ambiguous"));
 					l.setIcon(FontIcon.of(Material.SHARE));
 					panel.add(Box.createRigidArea(new Dimension(5, 5)));
 					panel.add(l);
@@ -1449,6 +1459,27 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			boolean old = mainApplication.getConfiguration().getBoolean(Constants.CFG_TRIM_WHITESPACE, true);
 			mainApplication.getConfiguration().setProperty(Constants.CFG_TRIM_WHITESPACE, !old);
 			putValue(Action.SELECTED_KEY, !old);
+		}
+
+	}
+
+	class ToggleShowTextInTreeLabels extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleShowTextInTreeLabels() {
+			putValue(Action.NAME, Annotator.getString("action.toggle.show_text_labels"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.show_text_labels.tooltip"));
+			putValue(Action.SELECTED_KEY,
+					mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean old = mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			mainApplication.getConfiguration().setProperty(Constants.CFG_SHOW_TEXT_LABELS, !old);
+			putValue(Action.SELECTED_KEY, !old);
+			tree.repaint();
 		}
 
 	}
