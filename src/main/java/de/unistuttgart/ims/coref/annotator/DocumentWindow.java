@@ -375,6 +375,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString("menu.entities"));
 		entityMenu.add(new JMenuItem(renameAction));
+		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(newEntityAction));
 		entityMenu.add(new JMenuItem(changeColorAction));
 		entityMenu.add(new JMenuItem(changeKeyAction));
@@ -1111,9 +1112,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
-			if (tn.getFeatureStructure() instanceof Mention)
+			if (tn.getFeatureStructure() instanceof Mention) {
+				int row = tree.getLeadSelectionRow() - 1;
 				cModel.removeMention((Mention) tn.getFeatureStructure());
-			else if (tn.getFeatureStructure() instanceof EntityGroup) {
+				tree.setSelectionRow(row);
+			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
 				cModel.removeEntityGroup((EntityGroup) tn.getFeatureStructure());
 			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
