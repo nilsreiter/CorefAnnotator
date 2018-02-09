@@ -675,12 +675,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		public SortTreeByMentions() {
 			putValue(Action.NAME, Annotator.getString("action.sort_mentions"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.sort_mentions.tooltip"));
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SORT));
+			putValue(Action.SMALL_ICON, FontIcon.of(Material.SORT));
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			cModel.entitySortOrder = EntitySortOrder.Mentions;
 			cModel.entitySortOrder.descending = true;
+			sortDescending.putValue(Action.SELECTED_KEY, true);
 			cModel.resort();
 		}
 
