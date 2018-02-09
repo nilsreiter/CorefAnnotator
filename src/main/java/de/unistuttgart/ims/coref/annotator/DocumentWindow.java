@@ -242,13 +242,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
-		textPane.setSelectionColor(Color.RED);
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.setHighlighter(hilit);
 		textPane.addMouseListener(new TextMouseListener());
+		textPane.setCaret(new Caret());
+
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
@@ -258,7 +259,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		splitPane.setDividerLocation(500);
 		getContentPane().add(splitPane);
 
-		setPreferredSize(new Dimension(700, 800));
+		setPreferredSize(new Dimension(800, 800));
 		pack();
 		this.setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
@@ -772,14 +773,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	@Override
-	public void mentionSelected(Annotation m) {
+	public void annotationSelected(Annotation m) {
 		if (m != null) {
-			textPane.setCaretPosition(m.getEnd());
-			textPane.setSelectionColor(Color.red);
 			textPane.setSelectionStart(m.getBegin());
 			textPane.setSelectionEnd(m.getEnd());
+			// textPane.setCaretPosition(m.getEnd());
+			textPane.getCaret().setSelectionVisible(true);
 		} else {
-			textPane.setSelectionEnd(textPane.getSelectionStart());
+			textPane.getCaret().setSelectionVisible(false);
 		}
 	}
 
@@ -1647,9 +1648,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					isSingle() && isMention() && Util.isDifficult(getMention(0)));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
-				mentionSelected(getAnnotation(0));
+				annotationSelected(getAnnotation(0));
 			else
-				mentionSelected(null);
+				annotationSelected(null);
 
 		}
 

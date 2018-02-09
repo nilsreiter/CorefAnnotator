@@ -391,7 +391,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public void fireMentionSelectedEvent(Mention m) {
 		for (CoreferenceModelListener l : crModelListeners)
-			l.mentionSelected(m);
+			l.annotationSelected(m);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
