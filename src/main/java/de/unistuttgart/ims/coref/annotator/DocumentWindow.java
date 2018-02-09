@@ -1683,7 +1683,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				cModel.connect(m.getEntity(), m);
 
 				drawMention(m, false);
-				cModel.charposMentionMap.add(m);
+				cModel.characterPosition2AnnotationMap.add(m);
 			}
 			textPane.repaint();
 			publish(75);

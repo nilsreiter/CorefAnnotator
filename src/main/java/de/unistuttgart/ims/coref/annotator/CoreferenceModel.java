@@ -38,7 +38,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	Map<FeatureStructure, CATreeNode> mentionMap = new HashMap<FeatureStructure, CATreeNode>();
 	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
 	ColorMap colorMap = new ColorMap();
-	RangedHashSetValuedHashMap<Annotation> charposMentionMap = new RangedHashSetValuedHashMap<Annotation>();
+	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 
 	int key = 0;
@@ -260,8 +260,8 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		eg.addToIndexes();
 
 		CATreeNode gtn = addExistingEntity(eg);
-		this.insertNodeInto(new EntityTreeNode(e1), gtn, 0);
-		this.insertNodeInto(new EntityTreeNode(e2), gtn, 1);
+		insertNodeInto(new EntityTreeNode(e1), gtn, 0);
+		insertNodeInto(new EntityTreeNode(e2), gtn, 1);
 
 	}
 
@@ -317,7 +317,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		DetachedMentionPart d = AnnotationFactory.createAnnotation(jcas, begin, end, DetachedMentionPart.class);
 		d.setMention(m);
 		m.setDiscontinuous(d);
-		charposMentionMap.add(d);
+		characterPosition2AnnotationMap.add(d);
 		CATreeNode node = new CATreeNode(d, d.getCoveredText());
 		mentionMap.put(d, node);
 		insertNodeInto(node, mentionMap.get(m), 0);
@@ -325,7 +325,7 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public Collection<Annotation> getMentions(int position) {
-		return this.charposMentionMap.get(position);
+		return this.characterPosition2AnnotationMap.get(position);
 	}
 
 	public void resort() {
@@ -377,13 +377,13 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
-		this.charposMentionMap.add(m);
+		this.characterPosition2AnnotationMap.add(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionAdded(m);
 	}
 
 	public void fireMentionRemovedEvent(Mention m) {
-		this.charposMentionMap.remove(m);
+		this.characterPosition2AnnotationMap.remove(m);
 		for (CoreferenceModelListener l : crModelListeners)
 			l.mentionRemoved(m);
 	}
