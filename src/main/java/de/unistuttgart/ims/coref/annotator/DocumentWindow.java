@@ -207,13 +207,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.addTreeSelectionListener(new MyTreeSelectionListener());
 		tree.addMouseListener(new TreeMouseListener());
 
-		// selectionDetailPanel = new JLabel();
-		// selectionDetailPanel.setPreferredSize(new Dimension(200, 100));
-
-		rightPanel.setPreferredSize(new Dimension(200, 800));
+		rightPanel.setPreferredSize(new Dimension(300, 800));
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		// rightPanel.add(selectionDetailPanel, BorderLayout.SOUTH);
 
 		// tool bar
 		JToolBar controls = new JToolBar();
