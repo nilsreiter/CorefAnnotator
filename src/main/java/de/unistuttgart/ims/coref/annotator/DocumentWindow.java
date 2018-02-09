@@ -800,7 +800,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	public void mentionAdded(Mention m) {
 		drawMention(m);
 
-		textPane.setCaretPosition(m.getBegin());
+		// textPane.setCaretPosition(m.getBegin());
 
 	}
 
@@ -888,7 +888,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					} else if (targetFs instanceof Entity && droppedFs instanceof Mention) {
 						cModel.updateMention((Mention) droppedFs, (Entity) targetFs);
 					} else if (targetFs instanceof Mention && droppedFs instanceof DetachedMentionPart) {
-						System.err.println("!!");
 						DetachedMentionPart dmp = cModel.removeDiscontinuousMentionPart(
 								(Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
 						cModel.addDiscontinuousToMention((Mention) targetFs, dmp);
