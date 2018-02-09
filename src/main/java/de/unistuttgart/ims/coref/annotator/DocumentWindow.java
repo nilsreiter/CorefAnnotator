@@ -127,6 +127,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	// storing and caching
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	RangedCounter spanCounter = new RangedCounter();
+	boolean unsavedChanges = false;
 
 	// actions
 	AbstractAction newEntityAction;
@@ -396,8 +397,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		grp.add(radio2);
 		grp.add(radio1);
 
-		entityMenu.addSeparator();
-
 		sortMenu.add(radio1);
 		sortMenu.add(radio2);
 		sortMenu.add(new JCheckBoxMenuItem(this.sortDescending));
@@ -469,6 +468,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	protected void closeWindow(boolean quit) {
+		if (unsavedChanges) {
+			logger.debug("Closing window with unsaved changes");
+		}
 		mainApplication.close(this);
 	}
 
