@@ -1751,7 +1751,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			toggleMentionAmbiguous.setEnabled(isSingle() && isMention());
 			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
-					isSingle() && isMention() && Util.isDifficult(getMention(0)));
+					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
