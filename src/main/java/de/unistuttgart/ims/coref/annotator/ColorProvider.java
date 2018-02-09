@@ -5,11 +5,12 @@ import java.awt.Color;
 public class ColorProvider {
 
 	float x = 0;
-	float increment = 3f;
+	float increment = 183f;
+	float numberOfColors = 360f;
 
 	public Color getNextColor() {
-		x += increment;
-		return Color.getHSBColor(x / 360, 1, 1);
+		x = (x + increment) % numberOfColors;
+		return Color.getHSBColor(x / numberOfColors, 1, 1);
 	}
 
 }
