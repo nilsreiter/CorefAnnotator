@@ -16,14 +16,14 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.ColorMap;
+import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		ColorMap cm = new ColorMap();
+		ColorProvider cm = new ColorProvider();
 
 		TypeSystem ts = jcas.getTypeSystem();
 

@@ -751,7 +751,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		tree.repaint(tree.getPathBounds(e.getTreePath()));
+		if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+			tree.expandPath(e.getTreePath());
+		try {
+			tree.repaint(tree.getPathBounds(e.getTreePath()));
+		} catch (NullPointerException ex) {
+			logger.catching(ex);
+		}
 	}
 
 	@Override
@@ -761,7 +767,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -1109,7 +1114,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
 					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
-				} else if (cModel.entityMentionMap.get(etn.getFeatureStructure()).isEmpty()) {
+				} else if (tn.isLeaf()) {
 					cModel.removeEntity(etn.getFeatureStructure());
 				}
 			}
@@ -1683,7 +1688,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				cModel.connect(m.getEntity(), m);
 
 				drawMention(m, false);
-				cModel.charposMentionMap.add(m);
+				cModel.characterPosition2AnnotationMap.add(m);
 			}
 			textPane.repaint();
 			publish(75);
