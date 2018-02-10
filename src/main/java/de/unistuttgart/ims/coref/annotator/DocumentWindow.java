@@ -93,6 +93,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -655,7 +656,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public SortTreeByAlpha() {
-			super(Material.SORT_BY_ALPHA);
+			super(MaterialDesign.MDI_SORT_ALPHABETICAL);
 			putValue(Action.NAME, Annotator.getString("action.sort_alpha"));
 		}
 
@@ -672,7 +673,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public SortTreeByMentions() {
-			super(Material.SORT);
+			super(MaterialDesign.MDI_SORT_NUMERIC);
 			putValue(Action.NAME, Annotator.getString("action.sort_mentions"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.sort_mentions.tooltip"));
 		}
@@ -1372,7 +1373,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public FileSaveAsAction() {
-			super(Material.SAVE);
+			super(MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
 			putValue(Action.NAME, Annotator.getString("action.save_as"));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
@@ -1405,11 +1406,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntitySortOrder extends AbstractAction {
+	class ToggleEntitySortOrder extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntitySortOrder() {
+			super(MaterialDesign.MDI_SORT_VARIANT);
 			putValue(Action.NAME, Annotator.getString("action.sort_revert"));
 
 		}
@@ -1482,11 +1484,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ToggleShowTextInTreeLabels extends AbstractAction {
+	class ToggleShowTextInTreeLabels extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleShowTextInTreeLabels() {
+			super(MaterialDesign.MDI_FORMAT_TEXT);
 			putValue(Action.NAME, Annotator.getString("action.toggle.show_text_labels"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.show_text_labels.tooltip"));
 			putValue(Action.SELECTED_KEY,
