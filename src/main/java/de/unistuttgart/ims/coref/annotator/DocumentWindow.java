@@ -92,6 +92,7 @@ import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -1917,6 +1918,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Matcher m = pattern.matcher(e.getFeatureStructure().getLabel());
 			if (m.find())
 				return true;
+			StringArray flags = e.getFeatureStructure().getFlags();
+			if (flags != null)
+				for (int i = 0; i < e.getFeatureStructure().getFlags().size(); i++) {
+					m = pattern.matcher(e.getFeatureStructure().getFlags(i));
+					if (m.find())
+						return true;
+				}
 			for (int i = 0; i < e.getChildCount(); i++) {
 				FeatureStructure child = e.getChildAt(i).getFeatureStructure();
 				if (child instanceof Annotation) {
