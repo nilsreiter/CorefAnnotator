@@ -32,8 +32,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
@@ -93,12 +91,14 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
+import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
@@ -231,13 +231,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// tool bar
 		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
-		controls.add(new JButton(newEntityAction));
-		controls.add(new JButton(renameAction));
-		controls.add(new JButton(changeKeyAction));
-		controls.add(new JButton(changeColorAction));
-		controls.add(new JButton(deleteAction));
-		controls.add(new JButton(formGroupAction));
-		controls.add(new JButton(toggleMentionDifficult));
+		controls.setRollover(true);
+		controls.add(newEntityAction);
+		controls.add(renameAction);
+		controls.add(changeKeyAction);
+		controls.add(changeColorAction);
+		controls.add((deleteAction));
+		controls.add((formGroupAction));
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -591,41 +591,35 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		return mainApplication;
 	}
 
-	class ViewFontSizeDecreaseAction extends AbstractAction {
+	class ViewFontSizeDecreaseAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ViewFontSizeDecreaseAction() {
-			super();
+			super(Material.EXPOSURE_NEG_1);
 			putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EXPOSURE_NEG_1));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.EXPOSURE_NEG_1));
-
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Font oldFont = textPane.getFont();
 			float oldSize = oldFont.getSize();
-
 			textPane.setFont(oldFont.deriveFont(oldSize - 1f));
 		}
 
 	}
 
-	class ViewFontSizeIncreaseAction extends AbstractAction {
+	class ViewFontSizeIncreaseAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ViewFontSizeIncreaseAction() {
-			super();
+			super(Material.EXPOSURE_PLUS_1);
 			putValue(Action.NAME, Annotator.getString("action.view.increase_font_size"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EXPOSURE_PLUS_1));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.EXPOSURE_PLUS_1));
 		}
 
 		@Override
@@ -656,14 +650,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class SortTreeByAlpha extends AbstractAction {
+	class SortTreeByAlpha extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public SortTreeByAlpha() {
+			super(Material.SORT_BY_ALPHA);
 			putValue(Action.NAME, Annotator.getString("action.sort_alpha"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SORT_BY_ALPHA));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.SORT_BY_ALPHA));
 		}
 
 		@Override
@@ -674,15 +667,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class SortTreeByMentions extends AbstractAction {
+	class SortTreeByMentions extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public SortTreeByMentions() {
+			super(Material.SORT);
 			putValue(Action.NAME, Annotator.getString("action.sort_mentions"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.sort_mentions.tooltip"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SORT));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.SORT));
 		}
 
 		@Override
@@ -959,20 +951,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class RenameEntityAction extends AbstractAction {
+	class RenameEntityAction extends IkonAction {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		public RenameEntityAction() {
+			super(Material.EDIT);
 			putValue(Action.NAME, Annotator.getString("action.rename"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.rename.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.EDIT));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.EDIT));
 
 		}
 
@@ -994,18 +982,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ChangeColorForEntity extends AbstractAction {
+	class ChangeColorForEntity extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ChangeColorForEntity() {
+			super(Material.COLOR_LENS);
 			putValue(Action.NAME, Annotator.getString("action.set_color"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_color.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.COLOR_LENS));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.COLOR_LENS));
-
 		}
 
 		@Override
@@ -1025,11 +1011,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ChangeKeyForEntityAction extends AbstractAction {
+	class ChangeKeyForEntityAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
+			super(Material.KEYBOARD);
 			putValue(Action.NAME, Annotator.getString("action.set_shortcut"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.set_shortcut.tooltip"));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.KEYBOARD));
@@ -1062,17 +1049,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class NewEntityAction extends AbstractAction {
+	class NewEntityAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public NewEntityAction() {
+			super(Material.PERSON_ADD);
 			putValue(Action.NAME, Annotator.getString("action.new"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.new.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.PERSON_ADD));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.PERSON_ADD));
 
 		}
 
@@ -1176,14 +1162,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteAction extends AbstractAction {
+	class DeleteAction extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
+			super(Material.DELETE);
 			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.DELETE));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -1217,16 +1202,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteMentionAction extends AbstractAction {
+	class DeleteMentionAction extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
 		Mention m;
 
 		public DeleteMentionAction(Mention m) {
+			super(Material.DELETE);
 			putValue(Action.NAME, Annotator.getString("action.delete"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.delete.tooltip"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.DELETE));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.DELETE));
 			this.m = m;
 
 		}
@@ -1328,17 +1312,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class FormEntityGroup extends AbstractAction {
+	class FormEntityGroup extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
+		Ikon ikon = Material.GROUP;
+
 		public FormEntityGroup() {
+			super(Material.GROUP);
 			putValue(Action.NAME, Annotator.getString("action.group"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.group.tooltip"));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.GROUP));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.GROUP));
 
 		}
 
@@ -1383,17 +1367,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class FileSaveAsAction extends AbstractAction {
+	class FileSaveAsAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public FileSaveAsAction() {
+			super(Material.SAVE);
 			putValue(Action.NAME, Annotator.getString("action.save_as"));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SAVE));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.SAVE));
-
 		}
 
 		@Override
@@ -1439,13 +1421,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntityGeneric extends AbstractAction {
+	class ToggleEntityGeneric extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityGeneric() {
+			super(Material.CLOUD);
 			putValue(Action.NAME, Annotator.getString("action.flag_entity_generic"));
-			putValue(Action.LARGE_ICON_KEY, getIcon());
-			putValue(Action.SMALL_ICON, getIcon());
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.flag_entity_generic.tooltip"));
 		}
 
@@ -1457,21 +1438,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			registerChange();
 
 		}
-
-		public Icon getIcon() {
-			return FontIcon.of(Material.CLOUD);
-		}
-
 	}
 
-	class ToggleMentionDifficult extends AbstractAction {
+	class ToggleMentionDifficult extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionDifficult() {
+			super(Material.WARNING);
 			putValue(Action.NAME, Annotator.getString("action.flag_mention_difficult"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.WARNING));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.WARNING));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.flag_mention_difficult.tooltip"));
 
 		}
@@ -1487,15 +1462,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ToggleMentionAmbiguous extends AbstractAction {
+	class ToggleMentionAmbiguous extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionAmbiguous() {
+			super(Material.SHARE);
 			putValue(Action.NAME, Annotator.getString("action.flag_mention_ambiguous"));
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.SHARE));
-			putValue(Action.SMALL_ICON, FontIcon.of(Material.SHARE));
-
 		}
 
 		@Override
