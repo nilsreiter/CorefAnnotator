@@ -38,14 +38,12 @@ public class QDStylePlugin implements de.unistuttgart.ims.coref.annotator.plugin
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Plugin to format speakers bold and stage directions in italic.";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "QuaDramA";
 	}
 
 }

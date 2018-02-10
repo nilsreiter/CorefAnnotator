@@ -11,7 +11,7 @@ public class QuaDramAPlugin extends DefaultIOPlugin {
 
 	@Override
 	public String getDescription() {
-		return "Plugin that provides an importer and style.";
+		return "Plugin for importing files created in WebAnno in the QuaDramA project.";
 	}
 
 	@Override
