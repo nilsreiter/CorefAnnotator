@@ -6,11 +6,6 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,12 +27,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.INIConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.configuration2.tree.OverrideCombiner;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -71,9 +60,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	Set<DocumentWindow> openFiles = new HashSet<DocumentWindow>();
 
 	List<File> recentFiles;
-
-	@Deprecated
-	Configuration configuration;
 
 	TypeSystemDescription typeSystemDescription;
 
@@ -110,7 +96,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public Annotator() throws ResourceInitializationException {
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
-		this.initialiseConfiguration();
 		this.initialiseActions();
 		this.initialiseTypeSystem();
 		this.initialiseDialogs();
@@ -191,50 +176,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	protected void initialiseConfiguration() {
-		INIConfiguration defaultConfig = new INIConfiguration();
-		INIConfiguration userConfig = new INIConfiguration();
-
-		InputStream is = null;
-		try {
-			// reading of default properties from inside the war
-			is = getClass().getResourceAsStream("/default-config.ini");
-			if (is != null) {
-				defaultConfig.read(new InputStreamReader(is, "UTF-8"));
-				// defaults.load();
-			}
-		} catch (Exception e) {
-			logger.warn("Could not read default configuration.");
-			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
-
-		File userConfigFile = null;
-		try {
-			File homeDirectory = new File(System.getProperty("user.home"));
-			logger.debug("user.home: {}", homeDirectory.getAbsolutePath());
-			logger.debug("user.home (URI): {}", homeDirectory.toURI().toString());
-			userConfigFile = new File(homeDirectory, ".SimpleXmiViewer.ini");
-			if (userConfigFile.exists())
-				userConfig.read(new FileReader(userConfigFile));
-			else
-				userConfigFile.createNewFile();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ConfigurationException | IOException e) {
-			logger.warn("Could not read or parse user configuration in file {}. Exception: {}.", userConfigFile,
-					e.getMessage());
-			e.printStackTrace();
-		}
-
-		CombinedConfiguration config = new CombinedConfiguration(new OverrideCombiner());
-		config.addConfiguration(userConfig);
-		config.addConfiguration(defaultConfig);
-		configuration = config;
-
-	}
-
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
 		DocumentWindow v = new DocumentWindow(this);
 
@@ -287,15 +228,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	@Override
 	public void handlePreferences(PreferencesEvent e) {
-	}
-
-	@Deprecated
-	public Configuration getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
 	}
 
 	public void warnDialog(String message, String title) {
