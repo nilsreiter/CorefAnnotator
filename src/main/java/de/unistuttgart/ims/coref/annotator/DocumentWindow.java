@@ -1414,8 +1414,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					f = new File(f.getAbsolutePath() + ".xmi");
 				}
 				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin());
-				mainApplication.recentFiles.add(f);
-				mainApplication.recentFilesPanel.repaint();
+				mainApplication.recentFiles.add(0, f);
+				mainApplication.refreshRecents();
 				break;
 			default:
 			}

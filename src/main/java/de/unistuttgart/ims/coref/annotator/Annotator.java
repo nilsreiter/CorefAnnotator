@@ -153,10 +153,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
 		recentFilesPanel = new JPanel();
-		for (int i = 0; i < Math.min(recentFiles.size(), 8); i++) {
-			File f = recentFiles.get(i);
-			recentFilesPanel.add(new JButton(new SelectedFileOpenAction(this, f)));
-		}
+		refreshRecents();
 		mainPanel.add(recentFilesPanel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
@@ -239,7 +236,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
 		DocumentWindow v = new DocumentWindow(this);
-		v.setVisible(true);
 
 		Runnable runnable = new Runnable() {
 			@Override
@@ -370,6 +366,19 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			m.add(new SelectedFileOpenAction(this, recentFiles.get(i)));
 		return m;
 
+	}
+
+	public void refreshRecents() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				recentFilesPanel.removeAll();
+				for (int i = 0; i < Math.min(recentFiles.size(), 10); i++) {
+					File f = recentFiles.get(i);
+					recentFilesPanel.add(new JButton(new SelectedFileOpenAction(Annotator.this, f)));
+				}
+			}
+		});
 	}
 
 }
