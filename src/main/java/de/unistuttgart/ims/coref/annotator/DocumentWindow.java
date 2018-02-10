@@ -81,7 +81,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.XmiCasSerializer;
@@ -133,6 +132,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	RangedCounter spanCounter = new RangedCounter();
 	boolean unsavedChanges = false;
+	Feature titleFeature;
 
 	// actions
 	AbstractAction commentAction = new CommentAction(null);
@@ -709,6 +709,24 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	protected void setWindowTitle() {
+		String fileName = (file != null ? file.getName() : Annotator.getString("windowtitle.new_file"));
+		String documentTitle;
+		if (titleFeature != null)
+			documentTitle = jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature);
+		else
+			documentTitle = "Untitled document";
+		setTitle(documentTitle + " (" + fileName + ")"
+				+ (unsavedChanges ? " -- " + Annotator.getString("windowtitle.edited") : ""));
+	}
+
+	protected synchronized void registerChange() {
+		if (unsavedChanges == false) {
+			unsavedChanges = true;
+			setWindowTitle();
+		}
+	}
+
 	protected void fireModelCreatedEvent() {
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
@@ -742,22 +760,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		} else // if (flavor.getStylePlugin() != null)
 			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 
-		try {
-			Feature titleFeature = jcas.getTypeSystem()
-					.getFeatureByFullName(mainApplication.getConfiguration().getString("General.windowTitleFeature"));
-			String fileName = (file != null ? file.getName() : Annotator.getString("windowtitle.new_file"));
-			if (titleFeature != null)
-				try {
-					setTitle(jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature)
-							+ (fileName != null ? " (" + fileName + ")" : ""));
-				} catch (Exception e) {
-					setTitle((fileName != null ? " (" + fileName + ")" : ""));
-				}
-			else
-				setTitle((fileName != null ? " (" + fileName + ")" : ""));
-		} catch (CASRuntimeException e) {
-			logger.catching(e);
-		}
+		titleFeature = jcas.getTypeSystem()
+				.getFeatureByFullName(mainApplication.getConfiguration().getString("General.windowTitleFeature"));
+
+		setWindowTitle();
 
 		InitializeModel im = new InitializeModel(jcas);
 		im.execute();
@@ -913,6 +919,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 						cModel.addNewMention((Entity) targetFs, pa.getBegin(), pa.getEnd());
 					else if (targetFs instanceof Mention)
 						cModel.addDiscontinuousToMention((Mention) targetFs, pa.getBegin(), pa.getEnd());
+					registerChange();
+
 				} else if (dataFlavor == NodeTransferable.dataFlavor) {
 					CATreeNode object = (CATreeNode) info.getTransferable()
 							.getTransferData(NodeTransferable.dataFlavor);
@@ -926,6 +934,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 								(Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
 						cModel.addDiscontinuousToMention((Mention) targetFs, dmp);
 					}
+					registerChange();
+
 				}
 
 			} catch (UnsupportedFlavorException e1) {
@@ -987,6 +997,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (newLabel != null) {
 				etn.getFeatureStructure().setLabel(newLabel);
 				cModel.nodeChanged(etn);
+				registerChange();
+
 			}
 		}
 
@@ -1071,6 +1083,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			cModel.addNewEntityMention(textPane.getSelectionStart(), textPane.getSelectionEnd());
+			registerChange();
+
 		}
 
 	}
@@ -1181,6 +1195,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			registerChange();
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
@@ -1222,6 +1237,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			registerChange();
 			cModel.removeMention(m);
 		}
 
@@ -1320,11 +1336,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
 			Entity e1 = (Entity) ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent())
 					.getFeatureStructure();
 			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
 			cModel.formGroup(e1, e2);
+			registerChange();
 		}
 
 	}
@@ -1423,6 +1441,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Entity entity = (Entity) tn.getFeatureStructure();
 			cModel.toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+			registerChange();
+
 		}
 
 		public Icon getIcon() {
@@ -1448,6 +1468,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
+			registerChange();
+
 		}
 
 	}
@@ -1468,6 +1490,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
+			registerChange();
 
 		}
 

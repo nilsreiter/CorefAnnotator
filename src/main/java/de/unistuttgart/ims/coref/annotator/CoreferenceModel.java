@@ -21,7 +21,6 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -65,24 +64,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 		this.jcas = jcas;
 		this.configuration = configuration;
 
-	}
-
-	@Deprecated
-	public void importExistingData() {
-		for (Entity e : JCasUtil.select(jcas, Entity.class)) {
-			addExistingEntity(e);
-		}
-		for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class)) {
-			for (int i = 0; i < eg.getMembers().size(); i++) {
-				this.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), entityMap.get(eg), 0);
-			}
-
-		}
-		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			connect(m.getEntity(), m);
-
-			fireMentionAddedEvent(m);
-		}
 	}
 
 	public void toggleFlagMention(Mention m, String flag) {
