@@ -602,8 +602,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected void done() {
-				progressBar.setValue(1000);
+				progressBar.setValue(100);
 				progressBar.setVisible(false);
+				file = f;
+				unsavedChanges = false;
+				setWindowTitle();
 			}
 
 		}.execute();
@@ -744,6 +747,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		if (unsavedChanges == false) {
 			unsavedChanges = true;
 			setWindowTitle();
+			fileSaveAction.setEnabled(file != null);
 		}
 	}
 
@@ -1438,6 +1442,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
 				File f = saveDialog.getSelectedFile();
+				if (!f.getName().endsWith(".xmi")) {
+					f = new File(f.getAbsolutePath() + ".xmi");
+				}
 				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin());
 				break;
 			default:
