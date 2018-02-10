@@ -35,6 +35,6 @@ public class ShowSearchPanelAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		new SearchPanel(documentWindow, mainApplication.getConfiguration()).setVisible(true);
+		new SearchPanel(documentWindow, mainApplication.getPreferences()).setVisible(true);
 	}
 }

@@ -8,10 +8,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 
-public interface IOPlugin {
-	String getDescription();
-
-	String getName();
+public interface IOPlugin extends Plugin {
 
 	AnalysisEngineDescription getImporter() throws ResourceInitializationException;
 
@@ -19,7 +16,7 @@ public interface IOPlugin {
 
 	CollectionReaderDescription getReader(File f) throws ResourceInitializationException;
 
-	StylePlugin getStylePlugin();
+	Class<? extends StylePlugin> getStylePlugin();
 
 	FileFilter getFileFilter();
 }

@@ -9,7 +9,7 @@ public interface CoreferenceModelListener {
 
 	public void mentionChanged(Mention m);
 
-	public void mentionSelected(Annotation m);
+	public void annotationSelected(Annotation m);
 
 	void mentionRemoved(Mention m);
 

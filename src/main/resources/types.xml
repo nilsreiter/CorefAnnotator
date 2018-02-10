@@ -94,5 +94,46 @@
         </featureDescription>
       </features>
     </typeDescription>
+  <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.Comment</name>
+      <description/>
+      <supertypeName>uima.cas.TOP</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Author</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>Value</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+  <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.MentionComment</name>
+      <description/>
+      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Mention</name>
+          <description/>
+          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.AnnotationComment</name>
+      <description/>
+      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Annotation</name>
+          <description/>
+          <rangeTypeName>uima.tcas.Annotation</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
   </types>
 </typeSystemDescription>

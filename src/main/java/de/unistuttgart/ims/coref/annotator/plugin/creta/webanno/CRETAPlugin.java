@@ -4,11 +4,10 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
-public class CRETAPlugin extends DefaultIOPlugin implements IOPlugin {
+public class CRETAPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public String getDescription() {
@@ -31,7 +30,7 @@ public class CRETAPlugin extends DefaultIOPlugin implements IOPlugin {
 	}
 
 	@Override
-	public StylePlugin getStylePlugin() {
+	public Class<? extends StylePlugin> getStylePlugin() {
 		return null;
 	}
 

@@ -14,6 +14,7 @@ import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -38,8 +39,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.View;
 
-import org.apache.commons.configuration2.Configuration;
-
 public class SearchPanel extends JFrame implements DocumentListener, ListSelectionListener, WindowListener {
 	final static Color HILIT_COLOR = Color.black;
 
@@ -58,7 +57,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	JFrame chartFrame;
 	Set<Object> highlights = new HashSet<Object>();
 
-	public SearchPanel(DocumentWindow xdw, Configuration configuration) {
+	public SearchPanel(DocumentWindow xdw, Preferences configuration) {
 		setTitle("Search");
 		documentWindow = xdw;
 		text = xdw.textPane.getText();
@@ -78,7 +77,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 		getContentPane().add(listScroller, BorderLayout.CENTER);
 		setLocation(xdw.getLocation().x + xdw.getWidth(), xdw.getLocation().y);
 
-		contexts = configuration.getInt("General.resultContext", 50);
+		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, 50);
 
 		statusbar = new JPanel();
 		getContentPane().add(statusbar, BorderLayout.SOUTH);

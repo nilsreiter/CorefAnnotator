@@ -12,6 +12,7 @@ public enum EntitySortOrder {
 	}
 
 	public Comparator<EntityTreeNode> getComparator() {
+
 		switch (this) {
 		case Mentions:
 			return new Comparator<EntityTreeNode>() {
@@ -38,6 +39,20 @@ public enum EntitySortOrder {
 				}
 			};
 		}
+
+	}
+
+	public static Comparator<EntityTreeNode> getVisibilitySortOrder(Comparator<EntityTreeNode> def) {
+		return new Comparator<EntityTreeNode>() {
+			@Override
+			public int compare(EntityTreeNode o1, EntityTreeNode o2) {
+				if (o1.isVisible() && !o2.isVisible())
+					return -1;
+				if (o2.isVisible() && !o1.isVisible())
+					return 1;
+				return def.compare(o1, o2);
+			}
+		};
 
 	}
 }

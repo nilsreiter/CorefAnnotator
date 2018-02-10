@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>CorefAnnotator Help</title>
+</head>
+<body style="font-family:sans-serif;font-size:11pt;">
+<h1>CorefAnnotator</h1>
+<h2>Overview</h2>
+<p>CorefAnnotator is an annotation tool for coreference, i.e., to mark 
+whenever two or more words in a text refer to the same thing in the real world.
+We will refer to the words in a text as <i>mentions</i> and to the things in
+ the real world as <i>entities</i>. Entities don't have to be touchable or 
+ concrete. </p>
+<p>CorefAnnotator displays two views: The text on the left, and a tree on 
+the right. Mentions in the text can be selected with a point device (e.g., 
+mouse). To create a new entity in the tree on the right, either drag the 
+selected mention onto the root node of the tree, or click "new" in the tool bar. 
+Newly created entities then get a color assigned, and all their mentions in the 
+text are underlined with the color. Selecting a mention in the tree also selects 
+the mention in the text (and scrolls to an appropriate position if necessary). 
+Clicking on a mention in the text view shows a context menu with all mentions 
+that cover
+a certain text span. From there, one can reveal the mention in the tree or 
+directly delete id.</p>
+
+<p>In addition to a color, each entity has an assigned key code. This single 
+letter shortcut can be used to quickly assign mentions to entities (without 
+dragging). Both colors and key codes can be changed at any time, as can the 
+name of the entity that is displayed in the tree.</p>
+ 
+<h2>Annotation Concepts</h2>
+<h3>Difficult cases <img src="warning.png" width="20" height="20"/></h3>
+<p>While annotating, one typically stumbles upon difficult cases that 
+need to be discussed with peers or supervisors. To support these discussions, 
+difficult <i>mentions</i> can be tagged with the exclamation mark symbol: 
+<img src="warning.png" width="15" height="15"/>.</p>
+
+<h3>Groups <img src="group.png" height="20" width="20"/></h3>
+<p>Sometimes, anaphoric expressions can appear in plural without a plural 
+antecedent. In these cases, entities can be grouped into entity groups.<br/>
+&nbsp;&nbsp;(1) Mary was eating ice cream with John. <u>They</u> had a lot of fun.<br/>
+"They" in the previous example refers to both Mary and John, but they are 
+not present as an antecedent.</p>
+<p>In CorefAnnotator, any number of entities can be selected and formed as a 
+group entity. Group entities behave like regular entities (i.e., one can drag 
+and drop mentions onto them, assign shortcuts and colors), but they appear 
+separately at the bottom of the tree view. If they are expanded, entity groups 
+reveal their members (which are entities), as well as the mentions that are 
+used to refer to the group.</p>
+
+<h3>Genericity <img src="cloud.png" width="20" height="20"/></h3>
+<p>Genericity expresses whether an entity is a kind, instead of an instance. 
+The prototypical example is shown in (1) and (2):<br/>
+(1) <u>The elephant</u> met a rabbit. He asked him to be his friends. <br/>
+(2) When under water, <u>the elephant</u> uses its trunk as a snorkel.<br/>
+The underlined strings are exactly the same, but the first refers to a specific 
+instance or individual of a class, while the second refers to the class as a 
+whole.</p>
+
+<p>In CorefAnnotator, entities can be marked as generic via the context or top 
+menu. Generic entities are marked with the cloud symbol: 
+<img src="cloud.png" width="15" height="15"/>.</p>
+
+<h2>Import / Export</h2>
+<p>CorefAnnotator uses UIMA's XMI file format to store annotations and meta 
+data, with a custom type system. Only XMI files using this type system (i.e., 
+produced through <i>Save as...</i>) can be directly opened and saved. XMI files
+using other type systems can be imported and (sometimes) also exported. 
+Non-XMI files are not supported at the moment &emdash; with the only exception that
+it is possible to import plain text files.</p>
+</body>
+</html>

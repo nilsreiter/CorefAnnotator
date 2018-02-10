@@ -14,9 +14,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
 
-public class DefaultIOPlugin implements IOPlugin {
-
-	static DefaultIOPlugin plugin = new DefaultIOPlugin();
+public final class DefaultIOPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
@@ -44,12 +42,8 @@ public class DefaultIOPlugin implements IOPlugin {
 		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
 	}
 
-	public static DefaultIOPlugin getInstance() {
-		return plugin;
-	}
-
 	@Override
-	public StylePlugin getStylePlugin() {
+	public Class<? extends StylePlugin> getStylePlugin() {
 		return null;
 	}
 

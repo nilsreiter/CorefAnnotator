@@ -5,7 +5,7 @@ import java.awt.Color;
 public class ColorProvider {
 
 	float x = 0;
-	float increment = 183f;
+	float increment = 93f;
 	float numberOfColors = 360f;
 
 	public Color getNextColor() {
