@@ -1026,7 +1026,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
 					Annotator.getString("dialog.change_color.prompt"), color);
-			cModel.updateColor(etn.getFeatureStructure(), newColor);
+			if (color != newColor) {
+				cModel.updateColor(etn.getFeatureStructure(), newColor);
+				registerChange();
+			}
+
 		}
 
 	}
@@ -1056,6 +1060,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					Character newChar = newKey.charAt(0);
 					etn.getFeatureStructure().setKey(newKey.substring(0, 1));
 					cModel.reassignKey(newChar, etn.getFeatureStructure());
+					registerChange();
+
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString("dialog.change_key.invalid_string.message"),
