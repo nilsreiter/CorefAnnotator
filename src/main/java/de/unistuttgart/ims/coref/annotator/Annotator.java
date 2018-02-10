@@ -2,7 +2,9 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -12,13 +14,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,7 +40,6 @@ import org.apache.commons.configuration2.tree.OverrideCombiner;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
@@ -59,7 +64,12 @@ import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
 	public static final Logger logger = LogManager.getLogger(Annotator.class);
+
+	static ResourceBundle rbundle;
+
 	Set<DocumentWindow> openFiles = new HashSet<DocumentWindow>();
+
+	List<File> recentFiles;
 
 	Configuration configuration;
 
@@ -70,19 +80,33 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	JFileChooser openDialog;
 
 	JFrame opening;
+	JPanel statusBar;
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
+	Preferences p = Preferences.userNodeForPackage(Annotator.class);
+
 	public static Annotator app;
 
-	public static void main(String[] args) throws UIMAException {
-		app = new Annotator();
-		app.showOpening();
-		// a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					app = new Annotator();
+					app.showOpening();
+				} catch (ResourceInitializationException e) {
+					logger.catching(e);
+				}
+			}
+
+		});
 	}
 
 	public Annotator() throws ResourceInitializationException {
 		this.pluginManager.init();
+		this.recentFiles = loadRecentFiles();
 		this.initialiseConfiguration();
 		this.initialiseActions();
 		this.initialiseTypeSystem();
@@ -104,7 +128,9 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	protected JFrame getOpeningDialog() {
 
 		JFrame opening = new JFrame();
-		opening.setLocationRelativeTo(null);
+		opening.setLocationByPlatform(true);
+		// opening.setLocationRelativeTo(null);
+		opening.setPreferredSize(new Dimension(300, 400));
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -115,19 +141,33 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(new JLabel("Default"));
+		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.default")));
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
 		mainPanel.add(panel);
 
-		mainPanel.add(new JLabel("Importer"));
+		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
 		panel = new JPanel();
-		panel.setLayout(new GridLayout(4, 2));
+		for (int i = 0; i < Math.min(recentFiles.size(), 8); i++) {
+			File f = recentFiles.get(i);
+			JButton button = new JButton();
+			button.setText(f.getName());
+			button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					open(f, getPluginManager().getDefaultIOPlugin());
+				}
+			});
+			panel.add(button);
+		}
+		mainPanel.add(panel);
+
+		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
+		panel = new JPanel();
 		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
 			IOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
@@ -141,7 +181,17 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		}
 		mainPanel.add(panel);
 
+		for (Component c : mainPanel.getComponents())
+			((JComponent) c).setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
+				+ Annotator.class.getPackage().getImplementationVersion());
+
+		statusBar = new JPanel();
+		statusBar.add(versionLabel);
+
 		opening.getContentPane().add(mainPanel, BorderLayout.CENTER);
+		opening.getContentPane().add(statusBar, BorderLayout.SOUTH);
 		opening.pack();
 		return opening;
 	}
@@ -207,6 +257,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		SwingUtilities.invokeLater(runnable);
 		openFiles.add(v);
+		if (flavor instanceof DefaultIOPlugin)
+			recentFiles.add(0, file);
 		return v;
 	}
 
@@ -230,6 +282,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
+		storeRecentFiles();
 		System.exit(0);
 	}
 
@@ -279,13 +332,41 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public static String getString(String key, Locale locale) {
-		ResourceBundle words = ResourceBundle.getBundle("locales/strings", locale);
-
-		return words.getString(key);
+		if (rbundle == null)
+			rbundle = ResourceBundle.getBundle("locales/strings", locale);
+		return rbundle.getString(key);
 	}
 
 	public PluginManager getPluginManager() {
 		return pluginManager;
+	}
+
+	private List<File> loadRecentFiles() {
+		List<File> files = new LinkedList<File>();
+		String listOfFiles = p.get(Constants.PREF_RECENT, "");
+		logger.debug(listOfFiles);
+		String[] fileNames = listOfFiles.split(File.pathSeparator);
+		for (String fileRef : fileNames) {
+			File file = new File(fileRef);
+			if (file.exists() && !files.contains(file)) {
+				files.add(file);
+			}
+
+		}
+		return files;
+	}
+
+	private void storeRecentFiles() {
+		StringBuilder sb = new StringBuilder();
+		for (int index = 0; index < recentFiles.size(); index++) {
+			File file = recentFiles.get(index);
+			if (sb.length() > 0) {
+				sb.append(File.pathSeparator);
+			}
+			sb.append(file.getPath());
+		}
+		Preferences p = Preferences.userNodeForPackage(Annotator.class);
+		p.put(Constants.PREF_RECENT, sb.toString());
 	}
 
 }
