@@ -1099,7 +1099,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class NewEntityAction extends MyAction {
+	class NewEntityAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -1213,7 +1213,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteAction extends MyAction {
+	class DeleteAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
@@ -1254,7 +1254,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteMentionAction extends MyAction {
+	class DeleteMentionAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
 		Mention m;
@@ -1578,14 +1578,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			tree.repaint();
 		}
 
-	}
-
-	@Deprecated
-	abstract class MyAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public void setEnabled() {
-		};
 	}
 
 	class TreeMouseListener implements MouseListener {
