@@ -84,7 +84,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
-	Preferences p = Preferences.userNodeForPackage(Annotator.class);
+	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
 	public static Annotator app;
 
@@ -332,7 +332,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	private List<File> loadRecentFiles() {
 		List<File> files = new LinkedList<File>();
-		String listOfFiles = p.get(Constants.PREF_RECENT, "");
+		String listOfFiles = preferences.get(Constants.PREF_RECENT, "");
 		logger.debug(listOfFiles);
 		String[] fileNames = listOfFiles.split(File.pathSeparator);
 		for (String fileRef : fileNames) {
