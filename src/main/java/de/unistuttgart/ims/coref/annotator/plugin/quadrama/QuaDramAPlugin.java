@@ -4,10 +4,10 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
-public class QuaDramAPlugin extends DefaultIOPlugin {
+public class QuaDramAPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public String getDescription() {
@@ -33,4 +33,5 @@ public class QuaDramAPlugin extends DefaultIOPlugin {
 	public Class<? extends StylePlugin> getStylePlugin() {
 		return QDStylePlugin.class;
 	}
+
 }

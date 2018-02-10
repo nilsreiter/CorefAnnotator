@@ -14,7 +14,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
 
-public class DefaultIOPlugin implements IOPlugin {
+public final class DefaultIOPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {

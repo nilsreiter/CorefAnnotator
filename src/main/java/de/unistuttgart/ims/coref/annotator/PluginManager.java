@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.reflections.Reflections;
 
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -23,6 +24,7 @@ public class PluginManager {
 		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
 		// it's unclear why this is found in the first place
 		ioPlugins.remove(DefaultIOPlugin.class);
+		ioPlugins.remove(AbstractXmiPlugin.class);
 		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
 		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
 		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins, ','));
