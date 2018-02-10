@@ -1304,7 +1304,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			closeWindow(false);
+			if (unsavedChanges) {
+				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
+						Annotator.getString("dialog.unsaved_changes.message"),
+						Annotator.getString("dialog.unsaved_changes.title"), JOptionPane.OK_CANCEL_OPTION);
+				if (r == JOptionPane.OK_OPTION)
+					closeWindow(false);
+			} else
+				closeWindow(false);
 		}
 
 	}
