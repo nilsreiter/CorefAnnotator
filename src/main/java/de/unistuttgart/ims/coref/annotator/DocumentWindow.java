@@ -55,6 +55,7 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
@@ -163,6 +164,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JPanel statusBar;
 	JProgressBar progressBar;
 	JSplitPane splitPane;
+	JLabel styleLabel;
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -242,16 +244,34 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			comp.setFocusable(false);
 
 		// status bar
+		SpringLayout springs = new SpringLayout();
+		statusBar = new JPanel();
+		statusBar.setPreferredSize(new Dimension(800, 20));
+		statusBar.setLayout(springs);
+
 		progressBar = new JProgressBar();
 		progressBar.setMaximum(100);
 		progressBar.setMinimum(0);
+		progressBar.setPreferredSize(new Dimension(300, 20));
 
-		statusBar = new JPanel();
-		statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
-		statusBar.add(new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
-				+ Annotator.class.getPackage().getImplementationVersion()));
 		statusBar.add(progressBar);
+
+		styleLabel = new JLabel();
+		styleLabel.setText("Style: " + mainApplication.getPluginManager().getDefaultStylePlugin().getName());
+		styleLabel.setToolTipText(mainApplication.getPluginManager().getDefaultStylePlugin().getDescription());
+		styleLabel.setPreferredSize(new Dimension(150, 20));
+		statusBar.add(styleLabel);
+
+		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
+				+ Annotator.class.getPackage().getImplementationVersion());
+		versionLabel.setPreferredSize(new Dimension(150, 20));
+		statusBar.add(versionLabel);
+
+		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
+		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.WEST, statusBar);
+		springs.putConstraint(SpringLayout.EAST, styleLabel, 10, SpringLayout.WEST, versionLabel);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
+		statusBar.revalidate();
 
 		// initialise text view
 		JPanel leftPanel = new JPanel(new BorderLayout());
@@ -790,6 +810,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 			Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
 			styleMenuItem.get(sv).setSelected(true);
+			styleLabel.setText("Style: " + sv.getName());
+			styleLabel.setToolTipText(sv.getDescription());
+			styleLabel.repaint();
 		} catch (NullPointerException e) {
 			logger.catching(e);
 		}
