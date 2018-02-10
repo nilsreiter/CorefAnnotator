@@ -275,6 +275,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		statusBar.revalidate();
 
 		// initialise text view
+		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
@@ -284,7 +285,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.setHighlighter(hilit);
 		textPane.addMouseListener(new TextMouseListener());
-		textPane.setCaret(new Caret());
+		textPane.setCaret(caret);
+		textPane.getCaret().setVisible(true);
+		textPane.addFocusListener(caret);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
