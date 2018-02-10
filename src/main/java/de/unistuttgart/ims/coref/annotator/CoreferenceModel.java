@@ -56,8 +56,9 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 	public CoreferenceModel(JCas jcas, Configuration configuration) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
-		this.groupRootNode = new CATreeNode(null, Annotator.getString("tree.groups"));
-		this.insertNodeInto(groupRootNode, rootNode, 0);
+		// this.groupRootNode = new CATreeNode(null,
+		// Annotator.getString("tree.groups"));
+		// this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 		this.configuration = configuration;
 
@@ -163,10 +164,10 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 
 	public EntityTreeNode addExistingEntity(Entity e) {
 		EntityTreeNode tn = new EntityTreeNode(e, "");
-		if (e instanceof EntityGroup) {
-			insertNodeInto(tn, groupRootNode, 0);
-		} else
-			insertNodeInto(tn, rootNode, 0);
+		// if (e instanceof EntityGroup) {
+		// insertNodeInto(tn, groupRootNode, 0);
+		// } else
+		insertNodeInto(tn, rootNode, 0);
 		entityMap.put(e, tn);
 		if (e.getKey() != null) {
 			tn.setKeyCode(e.getKey().charAt(0));
@@ -335,8 +336,11 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		entity.setColor(newColor.getRGB());
 		EntityTreeNode entityNode = entityMap.get(entity);
 		this.nodeChanged(entityNode);
-		for (int i = 0; i < entityNode.getChildCount(); i++)
-			fireMentionChangedEvent((Mention) (entityNode.getChildAt(i)).getFeatureStructure());
+		for (int i = 0; i < entityNode.getChildCount(); i++) {
+			FeatureStructure child = entityNode.getChildAt(i).getFeatureStructure();
+			if (child instanceof Annotation)
+				fireMentionChangedEvent((Mention) child);
+		}
 	}
 
 	public void fireMentionChangedEvent(Mention m) {
