@@ -1,8 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -13,7 +11,6 @@ import java.util.Map;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
@@ -32,7 +29,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
-public class CoreferenceModel extends DefaultTreeModel implements KeyListener, TreeSelectionListener {
+public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionListener {
 	JCas jcas;
 	private static final long serialVersionUID = 1L;
 	Map<FeatureStructure, EntityTreeNode> entityMap = new HashMap<FeatureStructure, EntityTreeNode>();
@@ -253,25 +250,6 @@ public class CoreferenceModel extends DefaultTreeModel implements KeyListener, T
 
 	public JCas getJcas() {
 		return jcas;
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		JTextComponent ta = (JTextComponent) e.getSource();
-		if (keyMap.containsKey(e.getKeyChar())) {
-			e.consume();
-			addNewMention(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-
 	}
 
 	public boolean isKeyUsed(int i) {
