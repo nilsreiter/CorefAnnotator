@@ -21,6 +21,11 @@ class Caret extends DefaultCaret implements FocusListener {
 	}
 
 	@Override
+	public void setSelectionVisible(boolean visible) {
+		super.setSelectionVisible(true);
+	}
+
+	@Override
 	public void focusGained(FocusEvent e) {
 		super.setVisible(true);
 		super.setSelectionVisible(true);
@@ -28,7 +33,7 @@ class Caret extends DefaultCaret implements FocusListener {
 
 	@Override
 	public void focusLost(FocusEvent e) {
-		super.setVisible(false);
+		super.setVisible(true);
 		super.setSelectionVisible(true);
 	};
 
