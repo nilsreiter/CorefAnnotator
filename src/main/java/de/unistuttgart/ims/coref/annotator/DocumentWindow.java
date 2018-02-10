@@ -1878,6 +1878,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	/**
+	 * TODO: This should be indexed to make lookup faster
+	 *
+	 */
 	class EntityFinder implements DocumentListener, KeyListener {
 
 		Pattern pattern;
@@ -1889,7 +1893,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					TreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn instanceof EntityTreeNode) {
 						EntityTreeNode etn = (EntityTreeNode) tn;
-						etn.setVisible(matches(s, etn.getFeatureStructure()));
+						etn.setVisible(matches(s, etn));
 						cModel.nodeChanged(etn);
 					}
 				}
@@ -1907,38 +1911,33 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 		}
 
-		protected boolean matches(String s, Entity e) {
-			Matcher m = pattern.matcher(e.getLabel());
-			return m.find();
+		protected boolean matches(String s, EntityTreeNode e) {
+			Matcher m = pattern.matcher(e.getFeatureStructure().getLabel());
+			if (m.find())
+				return true;
+			for (int i = 0; i < e.getChildCount(); i++) {
+				String mc = ((Annotation) e.getChildAt(i).getFeatureStructure()).getCoveredText();
+				m = pattern.matcher(mc);
+				if (m.find())
+					return true;
+			}
+			return false;
+
 		}
 
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-			try {
-				filter(e.getDocument().getText(0, e.getDocument().getLength()));
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
+			filter(treeSearchField.getText());
 		}
 
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			try {
-				filter(e.getDocument().getText(0, e.getDocument().getLength()));
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-
+			filter(treeSearchField.getText());
 		}
 
 		@Override
 		public void changedUpdate(DocumentEvent e) {
-			try {
-				filter(e.getDocument().getText(0, e.getDocument().getLength()));
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-
+			filter(treeSearchField.getText());
 		}
 
 		@Override
