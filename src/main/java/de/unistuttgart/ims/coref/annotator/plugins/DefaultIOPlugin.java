@@ -16,8 +16,6 @@ import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
 
 public class DefaultIOPlugin implements IOPlugin {
 
-	static DefaultIOPlugin plugin = new DefaultIOPlugin();
-
 	@Override
 	public String getDescription() {
 		return "";
@@ -42,10 +40,6 @@ public class DefaultIOPlugin implements IOPlugin {
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
 		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
-	}
-
-	public static DefaultIOPlugin getInstance() {
-		return plugin;
 	}
 
 	@Override

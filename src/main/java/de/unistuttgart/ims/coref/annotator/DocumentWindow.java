@@ -1343,6 +1343,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	@Deprecated
 	class ExitAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 

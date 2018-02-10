@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -49,6 +49,9 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.action.ExitAction;
+import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
+import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -68,16 +71,20 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	JFrame opening;
 
-	public static void main(String[] args) throws UIMAException {
+	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
-		Annotator a = new Annotator();
-		a.showOpening();
+	public static Annotator app;
+
+	public static void main(String[] args) throws UIMAException {
+		app = new Annotator();
+		app.showOpening();
 		// a.fileOpenDialog(a.getPluginManager().getDefaultIOPlugin());
 	}
 
 	public Annotator() throws ResourceInitializationException {
 		this.pluginManager.init();
 		this.initialiseConfiguration();
+		this.initialiseActions();
 		this.initialiseTypeSystem();
 		this.initialiseDialogs();
 
@@ -87,8 +94,16 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(XmiFileFilter.filter);
+		opening = getOpeningDialog();
+	}
 
-		opening = new JFrame();
+	protected void initialiseActions() {
+		openAction = new FileOpenAction(this);
+	}
+
+	protected JFrame getOpeningDialog() {
+
+		JFrame opening = new JFrame();
 		opening.setLocationRelativeTo(null);
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
@@ -97,56 +112,38 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				handleQuitRequestWith(null, null);
 			}
 		});
+
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.add(new JLabel("Default"));
+
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.add(new JLabel("Default"));
-		panel.add(new JButton(new AbstractAction("Open") {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				fileOpenDialog(opening, pluginManager.getDefaultIOPlugin());
-			}
-
-		}));
-		panel.add(new JButton(new AbstractAction(Annotator.getString("action.quit")) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleQuitRequestWith(null, null);
-			}
-		}));
-		panel.add(new JButton(new HelpAction()));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.add(new JButton(openAction));
+		panel.add(new JButton(quitAction));
+		panel.add(new JButton(helpAction));
 		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
+		mainPanel.add(panel);
 
-		opening.getContentPane().add(panel, BorderLayout.WEST);
-
+		mainPanel.add(new JLabel("Importer"));
 		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.add(new JLabel("Importer"));
+		panel.setLayout(new GridLayout(4, 2));
 		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
+			IOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
-				IOPlugin p = plugin.newInstance();
 				if (p.getImporter() != null) {
-					panel.add(new JButton(new AbstractAction(p.getName()) {
-
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							fileOpenDialog(opening, p);
-						}
-					}));
+					AbstractAction importAction = new FileImportAction(this, p);
+					panel.add(new JButton(importAction));
 				}
-			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
-				logger.catching(e);
+			} catch (ResourceInitializationException e1) {
+				logger.catching(e1);
 			}
 		}
-		opening.getContentPane().add(panel, BorderLayout.EAST);
+		mainPanel.add(panel);
+
+		opening.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		opening.pack();
+		return opening;
 	}
 
 	protected void initialiseTypeSystem() throws ResourceInitializationException {

@@ -21,6 +21,8 @@ public class PluginManager {
 	public void init() {
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
 		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
+		// it's unclear why this is found in the first place
+		ioPlugins.remove(DefaultIOPlugin.class);
 		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
 		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
 		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins, ','));
