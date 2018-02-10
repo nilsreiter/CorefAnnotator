@@ -129,7 +129,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		JFrame opening = new JFrame();
 		opening.setLocationByPlatform(true);
-		// opening.setLocationRelativeTo(null);
+		opening.setTitle(Annotator.class.getPackage().getImplementationTitle());
 		opening.setPreferredSize(new Dimension(300, 400));
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
@@ -147,7 +147,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
-		panel.add(new JLabel(getClass().getPackage().getImplementationVersion()));
 		mainPanel.add(panel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
