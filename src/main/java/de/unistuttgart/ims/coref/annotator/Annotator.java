@@ -72,6 +72,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	List<File> recentFiles;
 
+	@Deprecated
 	Configuration configuration;
 
 	TypeSystemDescription typeSystemDescription;
@@ -288,6 +289,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void handlePreferences(PreferencesEvent e) {
 	}
 
+	@Deprecated
 	public Configuration getConfiguration() {
 		return configuration;
 	}
@@ -379,6 +381,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 				}
 			}
 		});
+	}
+
+	public Preferences getPreferences() {
+		return preferences;
 	}
 
 }

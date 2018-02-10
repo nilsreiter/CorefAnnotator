@@ -755,7 +755,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 
 		titleFeature = jcas.getTypeSystem()
-				.getFeatureByFullName(mainApplication.getConfiguration().getString("General.windowTitleFeature"));
+				.getFeatureByFullName(mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE,
+						"de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData:documentTitle"));
 
 		setWindowTitle();
 
@@ -1097,7 +1098,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
 				boolean leaf, int row, boolean hasFocus) {
 			// TODO: split up the code in multiple classes
-			boolean showText = mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			boolean showText = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
 
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -1513,13 +1514,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			putValue(Action.NAME, Annotator.getString("action.toggle.show_text_labels"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.show_text_labels.tooltip"));
 			putValue(Action.SELECTED_KEY,
-					mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
+					mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			boolean old = mainApplication.getConfiguration().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
-			mainApplication.getConfiguration().setProperty(Constants.CFG_SHOW_TEXT_LABELS, !old);
+			boolean old = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			mainApplication.getPreferences().putBoolean(Constants.CFG_SHOW_TEXT_LABELS, !old);
 			putValue(Action.SELECTED_KEY, !old);
 			tree.repaint();
 		}
@@ -1779,7 +1780,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		protected CoreferenceModel doInBackground() throws Exception {
 			CoreferenceModel cModel;
-			cModel = new CoreferenceModel(jcas, mainApplication.getConfiguration());
+			cModel = new CoreferenceModel(jcas, mainApplication.getPreferences());
 			cModel.addCoreferenceModelListener(DocumentWindow.this);
 
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {

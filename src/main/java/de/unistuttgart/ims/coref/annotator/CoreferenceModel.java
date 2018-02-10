@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -15,7 +16,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.jcas.JCas;
@@ -51,16 +51,16 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 
 	boolean keepEmptyEntities = true;
 
-	Configuration configuration;
+	Preferences preferences;
 
-	public CoreferenceModel(JCas jcas, Configuration configuration) {
+	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
 		// this.groupRootNode = new CATreeNode(null,
 		// Annotator.getString("tree.groups"));
 		// this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
-		this.configuration = configuration;
+		this.preferences = preferences;
 
 	}
 
@@ -206,7 +206,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		Mention m = new Mention(jcas);
 		m.setBegin(begin);
 		m.setEnd(end);
-		if (configuration.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			m = AnnotationUtil.trim(m);
 		m.addToIndexes();
 		connect(e, m);
