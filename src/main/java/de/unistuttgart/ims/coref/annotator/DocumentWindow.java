@@ -97,14 +97,12 @@ import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
-import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -149,7 +147,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction;
-	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, helpAction = new HelpAction();
+	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels;
 
 	// controller
 	CoreferenceModel cModel;
@@ -313,7 +311,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByAlpha = new SortTreeByAlpha();
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
-		this.toggleTrimWhitespace = new ToggleTrimWhitespace();
+		this.toggleTrimWhitespace = new ToggleTrimWhitespaceAction(mainApplication);
 		this.toggleShowTextInTreeLabels = new ToggleShowTextInTreeLabels();
 
 		// disable some at the beginning
@@ -378,22 +376,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu fileImportMenu = new JMenu(Annotator.getString("menu.file.import_from"));
 		JMenu fileExportMenu = new JMenu(Annotator.getString("menu.file.export_as"));
 
-		for (Class<? extends IOPlugin> pluginClass : mainApplication.getPluginManager().getIOPlugins()) {
+		PluginManager pm = mainApplication.getPluginManager();
+		for (Class<? extends IOPlugin> pluginClass : pm.getIOPlugins()) {
 			try {
-				IOPlugin plugin = pluginClass.newInstance();
+				IOPlugin plugin = pm.getIOPlugin(pluginClass);
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
 				if (plugin.getExporter() != null)
 					fileExportMenu.add(new FileExportAction(plugin));
-			} catch (InstantiationException | IllegalAccessException | ResourceInitializationException e) {
+			} catch (ResourceInitializationException e) {
 				logger.catching(e);
 			}
 
 		}
-
-		// fileImportMenu.add(new FileImportQuaDramAAction(mainApplication));
-		// fileImportMenu.add(new FileImportDKproAction(mainApplication));
-		// fileImportMenu.add(new FileImportCRETAAction(mainApplication));
 
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
@@ -402,7 +397,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		fileMenu.add(new FileSaveAsAction());
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(new JMenuItem(new CloseAction()));
-		fileMenu.add(new JMenuItem(new ExitAction()));
+		fileMenu.add(mainApplication.quitAction);
 
 		return fileMenu;
 	}
@@ -457,7 +452,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// documentMenu.setEnabled(segmentAnnotation != null);
 		// }
 
-		helpMenu.add(helpAction);
+		helpMenu.add(mainApplication.helpAction);
 
 		// Menu Items
 		JMenuItem aboutMenuItem = new JMenuItem(Annotator.getString("menu.file.about"));
@@ -1343,24 +1338,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	@Deprecated
-	class ExitAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public ExitAction() {
-			putValue(Action.NAME, Annotator.getString("action.quit"));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			mainApplication.handleQuitRequestWith(new QuitEvent(), new QuitResponse());
-		}
-
-	}
-
 	class FormEntityGroup extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -1536,26 +1513,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
 			registerChange();
 
-		}
-
-	}
-
-	class ToggleTrimWhitespace extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleTrimWhitespace() {
-			putValue(Action.NAME, Annotator.getString("action.toggle.trim_whitespace"));
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.trim_whitespace.tooltip"));
-			putValue(Action.SELECTED_KEY,
-					mainApplication.getConfiguration().getBoolean(Constants.CFG_TRIM_WHITESPACE, true));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			boolean old = mainApplication.getConfiguration().getBoolean(Constants.CFG_TRIM_WHITESPACE, true);
-			mainApplication.getConfiguration().setProperty(Constants.CFG_TRIM_WHITESPACE, !old);
-			putValue(Action.SELECTED_KEY, !old);
 		}
 
 	}
