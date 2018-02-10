@@ -16,7 +16,7 @@ public interface IOPlugin extends Plugin {
 
 	CollectionReaderDescription getReader(File f) throws ResourceInitializationException;
 
-	StylePlugin getStylePlugin();
+	Class<? extends StylePlugin> getStylePlugin();
 
 	FileFilter getFileFilter();
 }

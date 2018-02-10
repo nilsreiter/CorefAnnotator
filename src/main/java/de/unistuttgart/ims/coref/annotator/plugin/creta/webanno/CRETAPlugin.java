@@ -31,7 +31,7 @@ public class CRETAPlugin extends DefaultIOPlugin implements IOPlugin {
 	}
 
 	@Override
-	public StylePlugin getStylePlugin() {
+	public Class<? extends StylePlugin> getStylePlugin() {
 		return null;
 	}
 

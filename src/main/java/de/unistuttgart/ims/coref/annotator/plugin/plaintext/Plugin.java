@@ -44,7 +44,7 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public StylePlugin getStylePlugin() {
+	public Class<? extends StylePlugin> getStylePlugin() {
 		return null;
 	}
 
