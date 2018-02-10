@@ -3,8 +3,6 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -28,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -58,6 +57,7 @@ import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -154,15 +154,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel = new JPanel();
 		for (int i = 0; i < Math.min(recentFiles.size(), 8); i++) {
 			File f = recentFiles.get(i);
-			JButton button = new JButton();
-			button.setText(f.getName());
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					open(f, getPluginManager().getDefaultIOPlugin());
-				}
-			});
-			panel.add(button);
+			panel.add(new JButton(new SelectedFileOpenAction(this, f)));
 		}
 		mainPanel.add(panel);
 
@@ -288,12 +280,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	@Override
 	public void handleAbout(AboutEvent e) {
-		// aboutDialog.setVisible(true);
 	}
 
 	@Override
 	public void handlePreferences(PreferencesEvent e) {
-		// prefDialog.setVisible(true);
 	}
 
 	public Configuration getConfiguration() {
@@ -367,6 +357,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		}
 		Preferences p = Preferences.userNodeForPackage(Annotator.class);
 		p.put(Constants.PREF_RECENT, sb.toString());
+	}
+
+	public JMenu getRecentFilesMenu() {
+		JMenu m = new JMenu(Annotator.getString("menu.file.recent"));
+		for (int i = 0; i < Math.min(20, recentFiles.size()); i++)
+			m.add(new SelectedFileOpenAction(this, recentFiles.get(i)));
+		return m;
+
 	}
 
 }

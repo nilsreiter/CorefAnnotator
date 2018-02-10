@@ -392,6 +392,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		JMenu fileMenu = new JMenu(Annotator.getString("menu.file"));
 		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(fileSaveAction);
 		fileMenu.add(new FileSaveAsAction());
