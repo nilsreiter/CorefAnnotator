@@ -82,6 +82,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	JFrame opening;
 	JPanel statusBar;
+	JPanel recentFilesPanel;
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
@@ -151,12 +152,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		mainPanel.add(panel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
-		panel = new JPanel();
+		recentFilesPanel = new JPanel();
 		for (int i = 0; i < Math.min(recentFiles.size(), 8); i++) {
 			File f = recentFiles.get(i);
-			panel.add(new JButton(new SelectedFileOpenAction(this, f)));
+			recentFilesPanel.add(new JButton(new SelectedFileOpenAction(this, f)));
 		}
-		mainPanel.add(panel);
+		mainPanel.add(recentFilesPanel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
 		panel = new JPanel();
