@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -274,6 +275,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		for (DocumentWindow v : openFiles)
 			this.close(v);
 		storeRecentFiles();
+		try {
+			preferences.sync();
+		} catch (BackingStoreException e1) {
+			logger.catching(e1);
+		}
 		System.exit(0);
 	}
 
@@ -354,8 +360,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			}
 			sb.append(file.getPath());
 		}
-		Preferences p = Preferences.userNodeForPackage(Annotator.class);
-		p.put(Constants.PREF_RECENT, sb.toString());
+		preferences.put(Constants.PREF_RECENT, sb.toString());
 	}
 
 	public JMenu getRecentFilesMenu() {

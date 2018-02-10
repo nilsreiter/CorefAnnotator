@@ -15,7 +15,7 @@ public class DKproPlugin extends DefaultIOPlugin {
 
 	@Override
 	public String getDescription() {
-		return null;
+		return "Imports coreference annotations in the DKpro type system (also builtin to WebAnno)";
 	}
 
 	@Override
