@@ -1,1 +1,4 @@
 theme: jekyll-theme-minimal
+title: CorefAnnotator
+description: An annotation tool for coreference
+show_downloads: "true"
