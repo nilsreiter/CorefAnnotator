@@ -292,7 +292,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
-	public void resort() {
+	public void resort(Comparator<EntityTreeNode> comparator) {
 		int n = rootNode.getChildCount();
 		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);
 		List<CATreeNode> dontsort = new ArrayList<CATreeNode>(n);
@@ -303,7 +303,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 			else
 				dontsort.add((CATreeNode) rootNode.getChildAt(i));
 		}
-		children.sort(entitySortOrder.getComparator());
+		children.sort(comparator);
 		rootNode.removeAllChildren();
 		for (MutableTreeNode node : children) {
 			rootNode.add(node);
@@ -312,6 +312,10 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 			rootNode.add(node);
 		nodeChanged(rootNode);
 		nodeStructureChanged(rootNode);
+	}
+
+	public void resort() {
+		resort(entitySortOrder.getComparator());
 	}
 
 	public void reassignKey(char keyCode, Entity e) {

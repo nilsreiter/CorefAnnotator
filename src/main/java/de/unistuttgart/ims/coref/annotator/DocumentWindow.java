@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -49,6 +51,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -61,6 +64,8 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
@@ -160,6 +165,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JProgressBar progressBar;
 	JSplitPane splitPane;
 	JLabel styleLabel;
+	JTextField treeSearchField;
 
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
@@ -224,8 +230,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setCellRenderer(new CellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener());
 		tree.addMouseListener(new TreeMouseListener());
+		tree.addKeyListener(new TreeKeyListener());
 
+		treeSearchField = new JTextField();
+		treeSearchField.getDocument().addDocumentListener(new EntityFinder());
+		treeSearchField.addKeyListener(new EntityFinder());
 		rightPanel.setPreferredSize(new Dimension(300, 800));
+		rightPanel.add(treeSearchField, BorderLayout.NORTH);
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
@@ -374,7 +385,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString("menu.tools"));
 		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
-
 		return toolsMenu;
 	}
 
@@ -1103,6 +1113,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (value instanceof EntityTreeNode) {
 				EntityTreeNode etn = (EntityTreeNode) value;
 				Entity e = etn.getFeatureStructure();
+				if (!etn.isVisible()) {
+					lab1.setForeground(Color.GRAY);
+				} else {
+					lab1.setForeground(Color.BLACK);
+				}
 				if (e instanceof EntityGroup)
 					lab1.setIcon(FontIcon.of(Material.GROUP, new Color(e.getColor())));
 				else
@@ -1747,7 +1762,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				annotationSelected(getAnnotation(0));
 			else
 				annotationSelected(null);
-
 		}
 
 	}
@@ -1858,6 +1872,122 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				 * node.getFeatureStructure()); c.addToIndexes();
 				 * cModel.comments.put(node.getFeatureStructure(), c); } }
 				 */
+			}
+
+		}
+
+	}
+
+	class EntityFinder implements DocumentListener, KeyListener {
+
+		Pattern pattern;
+
+		public void filter(String s) {
+			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+			if (s.length() >= 1) {
+				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
+					TreeNode tn = cModel.rootNode.getChildAt(i);
+					if (tn instanceof EntityTreeNode) {
+						EntityTreeNode etn = (EntityTreeNode) tn;
+						etn.setVisible(matches(s, etn.getFeatureStructure()));
+						cModel.nodeChanged(etn);
+					}
+				}
+				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.entitySortOrder.getComparator()));
+			} else {
+				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
+					TreeNode tn = cModel.rootNode.getChildAt(i);
+					if (tn instanceof EntityTreeNode) {
+						EntityTreeNode etn = (EntityTreeNode) tn;
+						etn.setVisible(true);
+						cModel.nodeChanged(etn);
+					}
+				}
+				cModel.resort();
+			}
+		}
+
+		protected boolean matches(String s, Entity e) {
+			Matcher m = pattern.matcher(e.getLabel());
+			return m.find();
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			try {
+				filter(e.getDocument().getText(0, e.getDocument().getLength()));
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			try {
+				filter(e.getDocument().getText(0, e.getDocument().getLength()));
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
+
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			try {
+				filter(e.getDocument().getText(0, e.getDocument().getLength()));
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
+
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+				tree.grabFocus();
+				tree.addSelectionRow(1);
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+
+		}
+
+	}
+
+	class TreeKeyListener implements KeyListener {
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+
+		}
+
+		@Override
+		public void keyReleased(KeyEvent ev) {
+			if (ev.getKeyCode() == KeyEvent.VK_ENTER) {
+				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
+				if (b != e) {
+					for (TreePath tp : tree.getSelectionPaths()) {
+						EntityTreeNode etn = (EntityTreeNode) tp.getLastPathComponent();
+						cModel.addNewMention(etn.getFeatureStructure(), b, e);
+					}
+					treeSearchField.setText("");
+					textPane.grabFocus();
+				}
+			} else if (ev.getKeyCode() == KeyEvent.VK_UP) {
+				if (tree.getLeadSelectionRow() == 0)
+					treeSearchField.grabFocus();
 			}
 
 		}

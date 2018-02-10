@@ -9,6 +9,8 @@ public class EntityTreeNode extends CATreeNode {
 
 	Character keyCode = null;
 
+	boolean visible = true;
+
 	public EntityTreeNode(Entity featureStructure, String label) {
 		super(featureStructure, label);
 	}
@@ -43,5 +45,13 @@ public class EntityTreeNode extends CATreeNode {
 	@Override
 	public boolean isVirtual() {
 		return !(getFeatureStructure() instanceof EntityGroup);
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 }
