@@ -8,6 +8,8 @@ import javax.swing.Action;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+
 public abstract class IkonAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
@@ -18,17 +20,23 @@ public abstract class IkonAction extends AbstractAction {
 
 	public IkonAction(Ikon icon) {
 		this.ikon = icon;
-		putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, enabledColor));
-		putValue(Action.SMALL_ICON, FontIcon.of(ikon, enabledColor));
-
+		try {
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, enabledColor));
+			putValue(Action.SMALL_ICON, FontIcon.of(ikon, enabledColor));
+		} catch (UnsupportedOperationException e) {
+			Annotator.logger.catching(e);
+		}
 	}
 
 	@Override
 	public void setEnabled(boolean b) {
 		super.setEnabled(b);
-		putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, (b ? enabledColor : disabledColor)));
-		putValue(Action.SMALL_ICON, FontIcon.of(ikon, (b ? enabledColor : disabledColor)));
-
+		try {
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, (b ? enabledColor : disabledColor)));
+			putValue(Action.SMALL_ICON, FontIcon.of(ikon, (b ? enabledColor : disabledColor)));
+		} catch (UnsupportedOperationException e) {
+			Annotator.logger.catching(e);
+		}
 	}
 
 	public Ikon getIkon() {
