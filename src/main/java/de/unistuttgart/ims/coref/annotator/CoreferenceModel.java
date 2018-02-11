@@ -142,7 +142,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		insertNodeInto(tn, entityNode, ind);
 
 		if (m.getDiscontinuous() != null) {
-			CATreeNode discNode = get(m.getDiscontinuous());
+			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
 			insertNodeInto(discNode, tn, 0);
 		}
 		fireAnnotationChangedEvent(m);
@@ -240,6 +240,12 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 	}
 
 	public CATreeNode get(DetachedMentionPart m) {
+		return mentionMap.get(m);
+	}
+
+	public CATreeNode getOrCreate(DetachedMentionPart m) {
+		if (!mentionMap.containsKey(m))
+			return add(m);
 		return mentionMap.get(m);
 	}
 
