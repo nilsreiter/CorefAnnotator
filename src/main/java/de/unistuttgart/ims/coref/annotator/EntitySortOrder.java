@@ -27,12 +27,10 @@ public enum EntitySortOrder {
 			return new Comparator<EntityTreeNode>() {
 				@Override
 				public int compare(EntityTreeNode o1, EntityTreeNode o2) {
-					if (o1.getFeatureStructure() == null && o2.getFeatureStructure() != null)
-						return 1;
-					if (o2.getFeatureStructure() == null && o1.getFeatureStructure() != null)
-						return -1;
 					String l1 = o1.getFeatureStructure().getLabel();
 					String l2 = o2.getFeatureStructure().getLabel();
+					l1 = (l1 == null ? "null" : l1);
+					l2 = (l2 == null ? "null" : l2);
 					if (l1 == null || l2 == null)
 						return 0;
 					return (isDescending() ? -1 : 1) * l1.compareTo(l2);
