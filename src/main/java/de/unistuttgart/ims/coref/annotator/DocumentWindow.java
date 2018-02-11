@@ -1804,9 +1804,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		protected boolean matches(String s, EntityTreeNode e) {
-			Matcher m = pattern.matcher(e.getFeatureStructure().getLabel());
-			if (m.find())
-				return true;
+			if (e.getFeatureStructure() == null)
+				return false;
+			Matcher m;
+			if (e.getFeatureStructure().getLabel() != null) {
+				m = pattern.matcher(e.getFeatureStructure().getLabel());
+				if (m.find())
+					return true;
+			}
 			StringArray flags = e.getFeatureStructure().getFlags();
 			if (flags != null)
 				for (int i = 0; i < e.getFeatureStructure().getFlags().size(); i++) {
