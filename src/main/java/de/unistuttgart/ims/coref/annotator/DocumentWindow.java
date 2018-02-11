@@ -590,6 +590,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}.execute();
 	}
 
+	@Deprecated
 	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
 			IOPlugin flavor) {
 
