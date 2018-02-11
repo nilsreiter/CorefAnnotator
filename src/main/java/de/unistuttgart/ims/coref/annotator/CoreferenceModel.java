@@ -423,13 +423,14 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		}
 	}
 
-	public void updateMention(Mention m, Entity newEntity) {
+	public void moveTo(Mention m, Entity newEntity) {
+		CATreeNode mentionNode = get(m);
 		// remove mention from old entity
-		removeNodeFromParent(mentionMap.get(m));
+		removeNodeFromParent(mentionNode);
 		mentionMap.remove(m);
 
 		// attach it to the new entity
-		addTo(get(newEntity), get(m));
+		addTo(get(newEntity), mentionNode);
 
 		// fire event
 		fireAnnotationChangedEvent(m);

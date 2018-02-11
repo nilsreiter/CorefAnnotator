@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,7 +18,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -867,7 +865,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					if (targetFs instanceof EntityGroup && droppedFs instanceof Entity) {
 						cModel.addTo((EntityGroup) targetFs, (Entity) droppedFs);
 					} else if (targetFs instanceof Entity && droppedFs instanceof Mention) {
-						cModel.updateMention((Mention) droppedFs, (Entity) targetFs);
+						cModel.moveTo((Mention) droppedFs, (Entity) targetFs);
 					} else if (targetFs instanceof Mention && droppedFs instanceof DetachedMentionPart) {
 						DetachedMentionPart dmp = cModel
 								.removeFrom((Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
@@ -877,14 +875,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 				}
 
-			} catch (UnsupportedFlavorException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception e1) {
+				Annotator.logger.catching(e1);
 			}
 
 			return true;
@@ -1715,10 +1707,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			publish(70);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
-
-				highlightManager.draw(m, false);
 				cModel.characterPosition2AnnotationMap.add(m);
 			}
+			highlightManager.clearAndDrawAllAnnotations();
 			textPane.repaint();
 			publish(75);
 			return cModel;
@@ -1966,9 +1957,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
 		}
 
-		public void drawAllAnnotations() {
+		public void clearAndDrawAllAnnotations() {
 			hilit.removeAllHighlights();
 			highlightMap.clear();
+			spanCounter.clear();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				draw(m, new Color(m.getEntity().getColor()), false, false);
 				if (m.getDiscontinuous() != null)
