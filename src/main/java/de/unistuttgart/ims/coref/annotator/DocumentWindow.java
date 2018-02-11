@@ -155,12 +155,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	// controller
 	CoreferenceModel cModel;
+	HighlightManager highlightManager;
 
 	// Window components
 	JTree tree;
 	JTextPane textPane;
-	Highlighter hilit;
-	Highlighter.HighlightPainter painter;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JPanel statusBar;
@@ -289,14 +288,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		// initialise text view
 		Caret caret = new Caret();
+		highlightManager = new HighlightManager();
 		JPanel leftPanel = new JPanel(new BorderLayout());
-		hilit = new DefaultHighlighter();
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
-		textPane.setHighlighter(hilit);
+		textPane.setHighlighter(highlightManager.getHighlighter());
 		textPane.addMouseListener(new TextMouseListener());
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
@@ -488,61 +487,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Annotator.logger.debug("Closing window with unsaved changes");
 		}
 		mainApplication.close(this);
-	}
-
-	public void undrawAnnotation(Annotation a) {
-		Object hi = highlightMap.get(a);
-		Span span = new Span(a);
-		if (hi != null)
-			hilit.removeHighlight(hi);
-		if (span != null)
-			spanCounter.subtract(span);
-	}
-
-	public void drawAnnotation(Annotation a, Color c, boolean dotted, boolean repaint) {
-		Object hi = highlightMap.get(a);
-		Span span = new Span(a);
-		if (hi != null) {
-			hilit.removeHighlight(hi);
-			spanCounter.subtract(span);
-		}
-		try {
-			int n = spanCounter.getMax(span);
-			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-			spanCounter.add(span);
-			highlightMap.put(a, hi);
-			// TODO: this is overkill, but didn't work otherwise
-			if (repaint)
-				textPane.repaint();
-
-		} catch (BadLocationException e) {
-			Annotator.logger.catching(e);
-		}
-	}
-
-	public void drawMention(Mention m) {
-		drawAnnotation(m, new Color(m.getEntity().getColor()), false, true);
-		if (m.getDiscontinuous() != null)
-			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
-
-	}
-
-	public void drawMention(Mention m, boolean repaint) {
-		drawAnnotation(m, new Color(m.getEntity().getColor()), false, false);
-		if (m.getDiscontinuous() != null)
-			drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
-	}
-
-	public void drawAnnotations() {
-		hilit.removeAllHighlights();
-		highlightMap.clear();
-		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			drawAnnotation(m, new Color(m.getEntity().getColor()), false, false);
-			if (m.getDiscontinuous() != null)
-				drawAnnotation(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
-
-		}
-		textPane.repaint();
 	}
 
 	public void loadFile(File file, IOPlugin flavor) {
@@ -834,8 +778,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	@Override
-	public void mentionAdded(Mention m) {
-		drawMention(m);
+	public void mentionAdded(Annotation m) {
+		highlightManager.draw(m);
 
 		// make continued clicking and tagging possible
 		textPane.grabFocus();
@@ -845,18 +789,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	@Override
-	public void mentionChanged(Mention m) {
-		drawMention(m);
+	public void annotationChanged(Annotation m) {
+		highlightManager.draw(m);
 	}
 
 	@Override
-	public void mentionRemoved(Mention m) {
-		if (m.getDiscontinuous() != null) {
-			spanCounter.subtract(new Span(m.getDiscontinuous()));
-			hilit.removeHighlight(highlightMap.get(m.getDiscontinuous()));
-		}
-		spanCounter.subtract(new Span(m));
-		hilit.removeHighlight(highlightMap.get(m));
+	public void annotationRemoved(Annotation m) {
+		highlightManager.undraw(m);
 
 	}
 
@@ -914,11 +853,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 					if (targetFs == null)
-						cModel.addNewEntityMention(pa.getBegin(), pa.getEnd());
+						cModel.add(pa.getBegin(), pa.getEnd());
 					else if (targetFs instanceof Entity)
-						cModel.addNewMention((Entity) targetFs, pa.getBegin(), pa.getEnd());
+						cModel.addTo((Entity) targetFs, pa.getBegin(), pa.getEnd());
 					else if (targetFs instanceof Mention)
-						cModel.addDiscontinuousToMention((Mention) targetFs, pa.getBegin(), pa.getEnd());
+						cModel.addTo((Mention) targetFs, pa.getBegin(), pa.getEnd());
 					registerChange();
 
 				} else if (dataFlavor == NodeTransferable.dataFlavor) {
@@ -926,13 +865,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 							.getTransferData(NodeTransferable.dataFlavor);
 					FeatureStructure droppedFs = object.getFeatureStructure();
 					if (targetFs instanceof EntityGroup && droppedFs instanceof Entity) {
-						cModel.addToGroup((EntityGroup) targetFs, (Entity) droppedFs);
+						cModel.addTo((EntityGroup) targetFs, (Entity) droppedFs);
 					} else if (targetFs instanceof Entity && droppedFs instanceof Mention) {
 						cModel.updateMention((Mention) droppedFs, (Entity) targetFs);
 					} else if (targetFs instanceof Mention && droppedFs instanceof DetachedMentionPart) {
-						DetachedMentionPart dmp = cModel.removeDiscontinuousMentionPart(
-								(Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
-						cModel.addDiscontinuousToMention((Mention) targetFs, dmp);
+						DetachedMentionPart dmp = cModel
+								.removeFrom((Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
+						cModel.addTo((Mention) targetFs, dmp);
 					}
 					registerChange();
 
@@ -1082,7 +1021,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.addNewEntityMention(textPane.getSelectionStart(), textPane.getSelectionEnd());
+			cModel.add(textPane.getSelectionStart(), textPane.getSelectionEnd());
 			registerChange();
 
 		}
@@ -1204,22 +1143,21 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
-				cModel.removeMention((Mention) tn.getFeatureStructure());
+				cModel.remove((Mention) tn.getFeatureStructure());
 				tree.setSelectionRow(row);
 			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-				cModel.removeEntityGroup((EntityGroup) tn.getFeatureStructure());
+				cModel.remove((EntityGroup) tn.getFeatureStructure());
 			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-				Mention m = (Mention) ((CATreeNode) tn.getParent()).getFeatureStructure();
-				undrawAnnotation(dmp);
-				cModel.removeDetachedMentionPart(m, dmp);
+				// highlightManager.undraw(dmp);
+				cModel.remove(dmp);
 			} else if (tn.getFeatureStructure() instanceof Entity) {
 				EntityTreeNode etn = (EntityTreeNode) tn;
 				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
-					cModel.removeEntityFromGroup((EntityGroup) parentFs, (EntityTreeNode) tn);
+					cModel.removeFrom((EntityGroup) parentFs, (EntityTreeNode) tn);
 				} else if (tn.isLeaf()) {
-					cModel.removeEntity(etn.getFeatureStructure());
+					cModel.remove(etn.getFeatureStructure());
 				}
 			}
 		}
@@ -1242,7 +1180,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			registerChange();
-			cModel.removeMention(m);
+			cModel.remove(m);
 		}
 
 	}
@@ -1253,7 +1191,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			JTextComponent ta = (JTextComponent) e.getSource();
 			if (cModel.keyMap.containsKey(e.getKeyChar())) {
 				e.consume();
-				cModel.addNewMention(cModel.keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
+				cModel.addTo(cModel.keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
 				registerChange();
 			}
 		}
@@ -1765,7 +1703,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel.addCoreferenceModelListener(DocumentWindow.this);
 
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
-				cModel.addExistingEntity(e);
+				cModel.add(e);
 			}
 			publish(60);
 			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class)) {
@@ -1776,9 +1714,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 			publish(70);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				cModel.connect(m.getEntity(), m);
+				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
 
-				drawMention(m, false);
+				highlightManager.draw(m, false);
 				cModel.characterPosition2AnnotationMap.add(m);
 			}
 			textPane.repaint();
@@ -1841,7 +1779,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					com.setValue(msg.getText());
 					com.setAnnotation(tgt);
 					com.addToIndexes();
-					drawAnnotation(tgt, Color.YELLOW, false, true);
+					highlightManager.draw(tgt, Color.YELLOW, false, true);
 				}
 				/*
 				 * else if (e.getSource() instanceof Component) { } Component
@@ -1975,7 +1913,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					for (TreePath tp : tree.getSelectionPaths()) {
 						if (tp.getLastPathComponent() instanceof EntityTreeNode) {
 							EntityTreeNode etn = (EntityTreeNode) tp.getLastPathComponent();
-							cModel.addNewMention(etn.getFeatureStructure(), b, e);
+							cModel.addTo(etn.getFeatureStructure(), b, e);
 						}
 					}
 					treeSearchField.setText("");
@@ -1996,5 +1934,83 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public CoreferenceModel getCoreferenceModel() {
 		return cModel;
+	}
+
+	class HighlightManager {
+		Highlighter hilit;
+		Highlighter.HighlightPainter painter;
+
+		Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+		RangedCounter spanCounter = new RangedCounter();
+
+		public HighlightManager() {
+			hilit = new DefaultHighlighter();
+
+		}
+
+		public void draw(Annotation a) {
+			if (a instanceof Mention)
+				draw((Mention) a);
+		}
+
+		public void draw(Mention m) {
+			draw(m, new Color(m.getEntity().getColor()), false, true);
+			if (m.getDiscontinuous() != null)
+				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
+
+		}
+
+		public void draw(Mention m, boolean repaint) {
+			draw(m, new Color(m.getEntity().getColor()), false, false);
+			if (m.getDiscontinuous() != null)
+				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+		}
+
+		public void drawAllAnnotations() {
+			hilit.removeAllHighlights();
+			highlightMap.clear();
+			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+				draw(m, new Color(m.getEntity().getColor()), false, false);
+				if (m.getDiscontinuous() != null)
+					draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+
+			}
+			textPane.repaint();
+		}
+
+		public void undraw(Annotation a) {
+			Object hi = highlightMap.get(a);
+			Span span = new Span(a);
+			if (hi != null)
+				hilit.removeHighlight(hi);
+			if (span != null)
+				spanCounter.subtract(span);
+		}
+
+		protected void draw(Annotation a, Color c, boolean dotted, boolean repaint) {
+			Object hi = highlightMap.get(a);
+			Span span = new Span(a);
+			if (hi != null) {
+				hilit.removeHighlight(hi);
+				spanCounter.subtract(span);
+			}
+			try {
+				int n = spanCounter.getMax(span);
+				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+				spanCounter.add(span);
+				highlightMap.put(a, hi);
+				// TODO: this is overkill, but didn't work otherwise
+				if (repaint)
+					textPane.repaint();
+
+			} catch (BadLocationException e) {
+				Annotator.logger.catching(e);
+			}
+		}
+
+		public Highlighter getHighlighter() {
+			return hilit;
+		}
+
 	}
 }

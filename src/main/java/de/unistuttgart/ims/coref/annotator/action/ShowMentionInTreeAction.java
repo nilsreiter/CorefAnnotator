@@ -26,7 +26,7 @@ public class ShowMentionInTreeAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		CATreeNode node = documentWindow.getCoreferenceModel().getNode(m);
+		CATreeNode node = documentWindow.getCoreferenceModel().get(m);
 		Object[] path = documentWindow.getCoreferenceModel().getPathToRoot(node);
 		TreePath tp = new TreePath(path);
 		this.documentWindow.getTree().setSelectionPath(tp);
