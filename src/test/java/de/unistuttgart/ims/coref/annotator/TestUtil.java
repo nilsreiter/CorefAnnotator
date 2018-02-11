@@ -3,9 +3,11 @@ package de.unistuttgart.ims.coref.annotator;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.uima.UIMAException;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.junit.Test;
 
 public class TestUtil {
@@ -20,5 +22,13 @@ public class TestUtil {
 
 		assertEquals(1, newArray.size());
 		assertEquals("World", newArray.get(0));
+	}
+
+	@Test
+	public void testExtend() throws UIMAException {
+		JCas jcas = JCasFactory.createText("The dog barks.");
+		Annotation a = AnnotationFactory.createAnnotation(jcas, 5, 6, Annotation.class);
+		Util.extend(a);
+		assertEquals(4, a.getBegin());
 	}
 }

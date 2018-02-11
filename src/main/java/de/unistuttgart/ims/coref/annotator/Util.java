@@ -8,6 +8,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -116,6 +117,28 @@ public class Util {
 			Annotator.logger.catching(e);
 			return null;
 		}
+	}
+
+	public static <T extends Annotation> T extend(T annotation) {
+		final char[] s = annotation.getCoveredText().toCharArray();
+		char[] text = annotation.getCAS().getDocumentText().toCharArray();
+		if (s.length == 0)
+			return annotation;
+
+		int b = annotation.getBegin(), e = annotation.getEnd();
+
+		char prev = text[b - 1];
+		while (b > 0 && Character.isLetter(prev)) {
+			prev = text[(--b) - 1];
+		}
+
+		char next = text[e];
+		while (e < text.length && Character.isLetter(next))
+			next = text[(++e)];
+
+		annotation.setBegin(b);
+		annotation.setEnd(e);
+		return annotation;
 	}
 
 }

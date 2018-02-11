@@ -197,6 +197,8 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
 		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			m = AnnotationUtil.trim(m);
+		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, true))
+			m = Util.extend(m);
 		registerAnnotation(m);
 		return m;
 	}
