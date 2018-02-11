@@ -1675,18 +1675,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 				cModel.add(e);
-			}
-			publish(60);
-			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class)) {
-				for (int i = 0; i < eg.getMembers().size(); i++) {
-					cModel.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), cModel.entityMap.get(eg), 0);
-				}
 
 			}
+			publish(60);
+			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
+				for (int i = 0; i < eg.getMembers().size(); i++)
+					cModel.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), cModel.get(eg), 0);
+
 			publish(70);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
-				cModel.characterPosition2AnnotationMap.add(m);
+				cModel.registerAnnotation(m);
 			}
 			highlightManager.clearAndDrawAllAnnotations(jcas);
 			textPane.repaint();
