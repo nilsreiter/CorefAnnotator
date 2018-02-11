@@ -836,7 +836,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		drawMention(m);
 
 		// make continued clicking and tagging possible
-		textPane.requestFocus();
+		textPane.grabFocus();
 		textPane.setSelectionStart(m.getBegin());
 		textPane.setSelectionEnd(m.getEnd());
 		textPane.getCaret().setSelectionVisible(true);
