@@ -1568,6 +1568,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
 				Collection<Annotation> mentions = cModel.getMentions(offset);
+				if (mentions.isEmpty())
+					return;
 				textPopupMenu.add(Annotator.getString("menu.entities"));
 				for (Annotation anno : mentions) {
 					StringBuilder b = new StringBuilder();
