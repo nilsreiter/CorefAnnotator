@@ -69,10 +69,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
@@ -284,18 +281,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		// initialise text view
 		Caret caret = new Caret();
-		highlightManager = new HighlightManager();
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
-		textPane.setHighlighter(highlightManager.getHighlighter());
 		textPane.addMouseListener(new TextMouseListener());
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
+		highlightManager = new HighlightManager(textPane);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
@@ -1691,7 +1687,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
 				cModel.characterPosition2AnnotationMap.add(m);
 			}
-			highlightManager.clearAndDrawAllAnnotations();
+			highlightManager.clearAndDrawAllAnnotations(jcas);
 			textPane.repaint();
 			publish(75);
 			return cModel;
@@ -1907,83 +1903,5 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public CoreferenceModel getCoreferenceModel() {
 		return cModel;
-	}
-
-	class HighlightManager {
-		Highlighter hilit;
-		Highlighter.HighlightPainter painter;
-
-		Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-		RangedCounter spanCounter = new RangedCounter();
-
-		public HighlightManager() {
-			hilit = new DefaultHighlighter();
-		}
-
-		public void draw(Annotation a) {
-			if (a instanceof Mention)
-				draw((Mention) a);
-		}
-
-		public void draw(Mention m) {
-			draw(m, new Color(m.getEntity().getColor()), false, true);
-			if (m.getDiscontinuous() != null)
-				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
-
-		}
-
-		public void draw(Mention m, boolean repaint) {
-			draw(m, new Color(m.getEntity().getColor()), false, false);
-			if (m.getDiscontinuous() != null)
-				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
-		}
-
-		public void clearAndDrawAllAnnotations() {
-			hilit.removeAllHighlights();
-			highlightMap.clear();
-			spanCounter.clear();
-			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				draw(m, new Color(m.getEntity().getColor()), false, false);
-				if (m.getDiscontinuous() != null)
-					draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
-
-			}
-			textPane.repaint();
-		}
-
-		public void undraw(Annotation a) {
-			Object hi = highlightMap.get(a);
-			Span span = new Span(a);
-			if (hi != null)
-				hilit.removeHighlight(hi);
-			if (span != null)
-				spanCounter.subtract(span);
-		}
-
-		protected void draw(Annotation a, Color c, boolean dotted, boolean repaint) {
-			Object hi = highlightMap.get(a);
-			Span span = new Span(a);
-			if (hi != null) {
-				hilit.removeHighlight(hi);
-				spanCounter.subtract(span);
-			}
-			try {
-				int n = spanCounter.getMax(span);
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-				spanCounter.add(span);
-				highlightMap.put(a, hi);
-				// TODO: this is overkill, but didn't work otherwise
-				if (repaint)
-					textPane.repaint();
-
-			} catch (BadLocationException e) {
-				Annotator.logger.catching(e);
-			}
-		}
-
-		public Highlighter getHighlighter() {
-			return hilit;
-		}
-
 	}
 }
