@@ -8,8 +8,11 @@ public abstract class DocumentWindowAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
+	DocumentWindow documentWindow;
+
 	public DocumentWindowAction(DocumentWindow dw, Ikon ikon) {
 		super(dw.getMainApplication(), ikon);
+		this.documentWindow = dw;
 	}
 
 }

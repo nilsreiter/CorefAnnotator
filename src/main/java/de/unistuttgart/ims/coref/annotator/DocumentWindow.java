@@ -106,6 +106,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
@@ -1592,7 +1593,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 					JMenu mentionMenu = new JMenu(b.toString());
 					mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
-					Action a = new ShowMentionInTreeAction(m);
+					Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
 					mentionMenu.add('"' + surf + '"');
 					mentionMenu.add(a);
 					mentionMenu.add(new DeleteMentionAction(m));
@@ -1637,29 +1638,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void popupMenuCanceled(PopupMenuEvent e) {
-
-		}
-
-	}
-
-	class ShowMentionInTreeAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		Mention m;
-
-		public ShowMentionInTreeAction(Mention m) {
-			putValue(Action.NAME, Annotator.getString("action.show_mention_in_tree"));
-			this.m = m;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			CATreeNode node = cModel.mentionMap.get(m);
-			Object[] path = cModel.getPathToRoot(node);
-			TreePath tp = new TreePath(path);
-			tree.setSelectionPath(tp);
-			tree.scrollPathToVisible(tp);
 
 		}
 
@@ -2010,5 +1988,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		}
 
+	}
+
+	public JTree getTree() {
+		return tree;
+	}
+
+	public CoreferenceModel getCoreferenceModel() {
+		return cModel;
 	}
 }
