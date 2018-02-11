@@ -18,7 +18,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +93,6 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -533,15 +531,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}.execute();
 	}
 
-	@Deprecated
-	protected void loadStream(InputStream inputStream, TypeSystemDescription typeSystemDescription, String windowTitle,
-			IOPlugin flavor) {
-
-		LoadAndImport lai = new LoadAndImport(this, inputStream, typeSystemDescription, flavor);
-		lai.execute();
-
-	}
-
 	public JCas getJcas() {
 		return jcas;
 	}
@@ -778,12 +767,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void mentionAdded(Annotation m) {
 		highlightManager.draw(m);
-
-		// make continued clicking and tagging possible
-		textPane.grabFocus();
-		textPane.setSelectionStart(m.getBegin());
-		textPane.setSelectionEnd(m.getEnd());
-		textPane.getCaret().setSelectionVisible(true);
 	}
 
 	@Override
@@ -794,7 +777,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void annotationRemoved(Annotation m) {
 		highlightManager.undraw(m);
-
 	}
 
 	class PanelTransferHandler extends TransferHandler {
@@ -1936,7 +1918,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		public HighlightManager() {
 			hilit = new DefaultHighlighter();
-
 		}
 
 		public void draw(Annotation a) {
