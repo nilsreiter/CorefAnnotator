@@ -101,6 +101,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.ToggleFullTokensAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
@@ -371,6 +372,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu menu = new JMenu(Annotator.getString("menu.settings"));
 		menu.add(new JCheckBoxMenuItem(toggleTrimWhitespace));
 		menu.add(new JCheckBoxMenuItem(toggleShowTextInTreeLabels));
+		menu.add(new JCheckBoxMenuItem(new ToggleFullTokensAction(this.mainApplication)));
 		return menu;
 
 	}
@@ -683,9 +685,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		} else // if (flavor.getStylePlugin() != null)
 			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 
-		titleFeature = jcas.getTypeSystem()
-				.getFeatureByFullName(mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE,
-						"de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData:documentTitle"));
+		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
+				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
 
 		setWindowTitle();
 

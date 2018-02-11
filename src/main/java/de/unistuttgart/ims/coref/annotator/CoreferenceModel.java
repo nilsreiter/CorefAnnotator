@@ -88,11 +88,9 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 	}
 
 	public void add(int begin, int end) {
-		String covered = jcas.getDocumentText().substring(begin, end);
-
 		// document model
-		Entity e = createEntity(covered);
 		Mention m = createMention(begin, end);
+		Entity e = createEntity(m.getCoveredText());
 
 		// tree model
 		addTo(add(e), add(m));
@@ -197,7 +195,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
 		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			m = AnnotationUtil.trim(m);
-		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, true))
+		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
 			m = Util.extend(m);
 		registerAnnotation(m);
 		return m;

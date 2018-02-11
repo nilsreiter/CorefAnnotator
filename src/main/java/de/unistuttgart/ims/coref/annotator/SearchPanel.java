@@ -77,7 +77,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 		getContentPane().add(listScroller, BorderLayout.CENTER);
 		setLocation(xdw.getLocation().x + xdw.getWidth(), xdw.getLocation().y);
 
-		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, 50);
+		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
 
 		statusbar = new JPanel();
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
