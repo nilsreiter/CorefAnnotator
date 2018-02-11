@@ -1,8 +1,11 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 deploy:
   provider: releases
-  api_key: dad12342b1e622c959a7be5355e440ade494f005
+  api_key:
+    secure: F4OgaKBB37PVUMfV93c9SpMy9aMWUBWHeyuB+ej2jZr+YXPZjlwEWL+9vK7XkG284w9d6Mltw76hzC1/UewaGtFrXNWpJQfUMr4R+B+/Y7qPOltgnYVi0t2f2bFloDq8W6k9Dw1fvFHjla32bqxXIIzHfSWf6VOmaNI7XMXyzn9Xz9WvBmzIgfETzRU0zAGZeAjk0HFuk/egzJl2eVGQIBvnMnb4qyL8kxN5dAcjgmnm5nZqfNARqE6VgNTdL+ezB71gBeS2g8CxamPXNF/DnJtIimL6M66iyQAssS+UVd7uYLDGj///HWw/ENaOzgv9OGAz7mZcIYpOGQDqfjyvLDTV9vIlEtQY5FgpJkTxhwCzjwJaVNnIxC1dmdoluA52mcNjGES2Ek5FRasZBlb9ue/C9kqWsLWeiSlysGYxPY8CbVSzKqUINfB6qIozY3rpzb0E+hwVhNh/rIe1Bo2JGOIlqna/vUpl9heSJTMzLDr8C8ui9cl9ppxcEDGxz7VBb9jzs6hq/9JAZzdtpF+Fy1k2fTJ1/hS6FTQ5m5R/qlBb0A6bokKr+rOvgn8wc61xd2CUHwW6x0Xv8sF9frymMzZyCP2og6Zcr/rZc6yLHIOIi2b8uejsIEYzO6l9R8iYE/ZptRP+jLWe35N1n+XHqUfqMHHf7gB/gbSq8tTnSlI=
   file: target/CorefAnnotator-*.jar
-  skip_cleanup: true
+  on:
+    repo: nilsreiter/CorefAnnotator
+    branch: develop
