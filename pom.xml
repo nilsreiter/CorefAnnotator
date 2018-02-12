@@ -3,13 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.0.0-beta3</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>1.9.0</version.dkpro>
+		<version.ikonli>2.1.1</version.ikonli>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
@@ -249,12 +250,17 @@
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-material-pack</artifactId>
-			<version>2.1.1</version>
+			<version>${version.ikonli}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-swing</artifactId>
-			<version>2.1.1</version>
+			<version>${version.ikonli}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-materialdesign-pack</artifactId>
+			<version>${version.ikonli}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -285,11 +291,6 @@
 				de.tudarmstadt.ukp.dkpro.core.io.text-asl
 			</artifactId>
 			<version>${version.dkpro}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.kordamp.ikonli</groupId>
-			<artifactId>ikonli-materialdesign-pack</artifactId>
-			<version>2.1.1</version>
 		</dependency>
 	</dependencies>
 </project>

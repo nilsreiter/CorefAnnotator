@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,6 +84,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			@Override
 			public void run() {
 				try {
+					try {
+						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					} catch (Exception e) {
+						Annotator.logger.error("Could not set look and feel {}.", e.getMessage());
+					}
+
 					app = new Annotator();
 					app.showOpening();
 				} catch (ResourceInitializationException e) {
