@@ -162,6 +162,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 
+	Thread messageVoider;
+
 	// Menu components
 	JMenuBar menuBar = new JMenuBar();
 	JMenu documentMenu;
@@ -636,9 +638,33 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	protected void setMessage(String message) {
+		setMessage(message, false);
+	}
+
+	protected synchronized void setMessage(String message, boolean disappearing) {
 		messageLabel.setText(message);
 		messageLabel.repaint();
 		statusBar.revalidate();
+
+		if (messageVoider != null && messageVoider.isAlive())
+			messageVoider.interrupt();
+
+		if (disappearing) {
+			messageVoider = new Thread() {
+
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+						setMessage("");
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+			};
+			SwingUtilities.invokeLater(messageVoider);
+		}
 	}
 
 	protected void setWindowTitle() {
@@ -795,14 +821,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public boolean canImport(TransferHandler.TransferSupport info) {
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
-			if (dl.getPath() == null)
+			if (dl.getPath() == null) {
+				setMessage("");
 				return false;
+			}
 			TreePath treePath = dl.getPath();
 			targetNode = (CATreeNode) treePath.getLastPathComponent();
 			targetFS = targetNode.getFeatureStructure();
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+				if (targetFS instanceof Mention)
+					setMessage(Annotator.getString("message.creates_mention_part"));
+				else if (targetFS instanceof Entity)
+					setMessage(Annotator.getString("message.creates_mention"));
+				else if (targetFS == null)
+					setMessage(Annotator.getString("message.creates_entity"));
 				return true;
 			}
 			// move existing node
@@ -856,12 +890,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		protected boolean handlePotentialAnnotationTransfer(PotentialAnnotation potentialAnnotation) {
 
-			if (targetNode == null)
+			if (targetFS == null) {
 				cModel.add(potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
-			else if (targetFS instanceof Entity)
+				setMessage(Annotator.getString("message.entity_created"), true);
+			} else if (targetFS instanceof Entity) {
 				cModel.addTo((Entity) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
-			else if (targetFS instanceof Mention)
+				setMessage(Annotator.getString("message.mention_created"), true);
+			} else if (targetFS instanceof Mention) {
 				cModel.addTo((Mention) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				setMessage(Annotator.getString("message.mention_part_created"), true);
+			}
 			registerChange();
 			return true;
 		}
