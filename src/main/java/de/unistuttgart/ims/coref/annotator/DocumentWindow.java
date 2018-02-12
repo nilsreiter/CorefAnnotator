@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -286,19 +285,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// initialise text view
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
-		textPane = new JTextPane() {
-			private static final long serialVersionUID = 1L;
-			public Map<Font, FontMetrics> fontMetrics = new HashMap<Font, FontMetrics>();
+		textPane = new JTextPane();/*
+									 * { private static final long
+									 * serialVersionUID = 1L; public Map<Font,
+									 * FontMetrics> fontMetrics = new
+									 * HashMap<Font, FontMetrics>();
+									 * 
+									 * @Override public FontMetrics
+									 * getFontMetrics(Font fnt) { if
+									 * (!fontMetrics.containsKey(fnt)) {
+									 * fontMetrics.put(fnt, new
+									 * FontMetricsWrapper(super.getFontMetrics(
+									 * fnt), lineSpacing)); } return
+									 * fontMetrics.get(fnt); } };
+									 */
 
-			@Override
-			public FontMetrics getFontMetrics(Font fnt) {
-				if (!fontMetrics.containsKey(fnt)) {
-					fontMetrics.put(fnt, new FontMetricsWrapper(super.getFontMetrics(fnt), lineSpacing));
-				}
-				return fontMetrics.get(fnt);
-			}
-		};
-
+		// textPane.setFont(new FontWrapper(textPane.getFont()));
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -711,13 +713,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
 		progressBar.setVisible(false);
-		setMessage("");
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void fireJCasLoadedEvent() {
-		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
-		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
 		Meta meta = Util.getMeta(jcas);
 
@@ -730,10 +725,18 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					switchStyle((StylePlugin) o);
 			} catch (ClassNotFoundException e) {
 				Annotator.logger.catching(e);
+				switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 			}
-
-		} else // if (flavor.getStylePlugin() != null)
+		} else
 			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
+
+		setMessage("");
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void fireJCasLoadedEvent() {
+		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
+		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
 				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
@@ -751,26 +754,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public void switchStyle(StylePlugin sv) {
-		try {
-			Annotator.logger.info("Switching to style {}", sv.getClass().getName());
-			if (sv.getBaseStyle() != null)
-				StyleManager.style(textPane.getStyledDocument(), sv.getBaseStyle());
-			else
-				StyleManager.style(textPane.getStyledDocument(), StyleManager.getDefaultStyle());
-			Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
-					StyleManager.getDefaultStyle());
-			if (styles != null)
-				for (Style style : styles.keySet()) {
-					StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
-				}
-			Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
-			styleMenuItem.get(sv).setSelected(true);
-			styleLabel.setText("Style: " + sv.getName());
-			styleLabel.setToolTipText(sv.getDescription());
-			styleLabel.repaint();
-		} catch (NullPointerException e) {
-			Annotator.logger.catching(e);
-		}
+		Annotator.logger.info("Switching to style {}", sv.getClass().getName());
+
+		StyleManager.revertAll(textPane.getStyledDocument());
+		if (sv.getBaseStyle() != null)
+			StyleManager.styleParagraph(textPane.getStyledDocument(), sv.getBaseStyle());
+		Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
+				StyleManager.getDefaultCharacterStyle());
+		if (styles != null)
+			for (Style style : styles.keySet()) {
+				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+			}
+		Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+		styleMenuItem.get(sv).setSelected(true);
+		styleLabel.setText("Style: " + sv.getName());
+		styleLabel.setToolTipText(sv.getDescription());
+		styleLabel.repaint();
 	}
 
 	@Override

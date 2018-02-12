@@ -8,6 +8,8 @@ import javax.swing.text.StyleContext;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 
+import de.unistuttgart.ims.coref.annotator.StyleManager;
+
 public class DefaultStylePlugin implements StylePlugin {
 
 	@Override
@@ -17,7 +19,7 @@ public class DefaultStylePlugin implements StylePlugin {
 
 	@Override
 	public Style getBaseStyle() {
-		return StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+		return StyleManager.getDefaultParagraphStyle();
 	}
 
 	@Override

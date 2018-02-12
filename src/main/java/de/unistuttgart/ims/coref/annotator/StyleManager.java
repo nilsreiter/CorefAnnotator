@@ -11,19 +11,39 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 public class StyleManager {
 
-	static Style defaultStyle = null;
+	static Style defaultCharacterStyle = null;
+	static Style defaultParagraphStyle = null;
 
-	public static Style getDefaultStyle() {
-		if (defaultStyle == null) {
-			defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-			defaultStyle.addAttribute(StyleConstants.LineSpacing, 5f);
-			defaultStyle.addAttribute(StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+	public static Style getDefaultCharacterStyle() {
+		if (defaultCharacterStyle == null) {
+
+			defaultCharacterStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, "monospace");
+			// defaultStyle.addAttribute(StyleConstants.Alignment,
+			// StyleConstants.ALIGN_JUSTIFIED);
 		}
-		return defaultStyle;
+		return defaultCharacterStyle;
 	}
 
-	public static void style(StyledDocument document, Style style) {
+	public static Style getDefaultParagraphStyle() {
+		if (defaultParagraphStyle == null) {
+			defaultParagraphStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+			defaultParagraphStyle.addAttribute(StyleConstants.LineSpacing, 0.5f);
+		}
+		return defaultParagraphStyle;
+	}
+
+	public static void revertAll(StyledDocument document) {
+		styleParagraph(document, getDefaultParagraphStyle());
+		styleCharacter(document, getDefaultCharacterStyle());
+	}
+
+	public static void styleCharacter(StyledDocument document, Style style) {
 		document.setCharacterAttributes(0, document.getLength(), style, true);
+	}
+
+	public static void styleParagraph(StyledDocument document, Style style) {
+		document.setParagraphAttributes(0, document.getLength(), style, true);
 	}
 
 	public static void style(JCas jcas, StyledDocument document, Style style, Type anno) {
