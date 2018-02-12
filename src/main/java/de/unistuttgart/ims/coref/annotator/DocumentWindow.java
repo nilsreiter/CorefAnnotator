@@ -955,14 +955,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
 			String l = etn.getFeatureStructure().getLabel();
-			String newLabel = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+			String newLabel = (String) JOptionPane.showInputDialog(textPane,
 					Annotator.getString("dialog.rename_entity.prompt"), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(Material.KEYBOARD), null, l);
 			if (newLabel != null) {
 				etn.getFeatureStructure().setLabel(newLabel);
 				cModel.nodeChanged(etn);
 				registerChange();
-
 			}
 		}
 
@@ -1934,7 +1933,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void keyReleased(KeyEvent ev) {
-			if (ev.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (tree.hasFocus() && ev.getKeyCode() == KeyEvent.VK_ENTER) {
 				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
 				if (b != e) {
 					for (TreePath tp : tree.getSelectionPaths()) {
