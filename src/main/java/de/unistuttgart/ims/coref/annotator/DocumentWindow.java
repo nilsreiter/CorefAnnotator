@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -175,6 +176,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	// Settings
 	boolean trimWhitespace = true;
+	float lineSpacing = 2f;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -284,7 +286,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// initialise text view
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
-		textPane = new JTextPane();
+		textPane = new JTextPane() {
+			private static final long serialVersionUID = 1L;
+			public Map<Font, FontMetrics> fontMetrics = new HashMap<Font, FontMetrics>();
+
+			@Override
+			public FontMetrics getFontMetrics(Font fnt) {
+				if (!fontMetrics.containsKey(fnt)) {
+					fontMetrics.put(fnt, new FontMetricsWrapper(super.getFontMetrics(fnt), lineSpacing));
+				}
+				return fontMetrics.get(fnt);
+			}
+		};
+
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -293,6 +307,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
+		// textPane.setFont(new MyFont(textPane.getFont()));
 		highlightManager = new HighlightManager(textPane);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
