@@ -11,7 +11,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -131,7 +130,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Feature titleFeature;
 
 	// actions
-	AbstractAction commentAction = new CommentAction(null);
+	// AbstractAction commentAction = new CommentAction(null);
 	AbstractAction newEntityAction;
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
@@ -994,9 +993,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	class CellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -1044,21 +1040,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
-				if (cModel.comments.containsKey(m)) {
-					for (Comment comment : cModel.comments.get(m)) {
-						JLabel l = new JLabel(FontIcon.of(Material.COMMENT));
-						l.setToolTipText(comment.getValue());
-						l.addMouseListener(new MouseAdapter() {
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								System.err.println("!!");
-								commentAction.actionPerformed(null);
-							}
-						});
-						panel.add(Box.createRigidArea(new Dimension(5, 5)));
-						panel.add(l);
-					}
-				}
+				/*
+				 * if (cModel.comments.containsKey(m)) { for (Comment comment :
+				 * cModel.comments.get(m)) { JLabel l = new
+				 * JLabel(FontIcon.of(Material.COMMENT));
+				 * l.setToolTipText(comment.getValue()); l.addMouseListener(new
+				 * MouseAdapter() {
+				 * 
+				 * @Override public void mouseClicked(MouseEvent e) {
+				 * System.err.println("!!");
+				 * commentAction.actionPerformed(null); } });
+				 * panel.add(Box.createRigidArea(new Dimension(5, 5)));
+				 * panel.add(l); } }
+				 */
 				if (Util.isDifficult(m)) {
 					JLabel l = new JLabel();
 					if (showText)
