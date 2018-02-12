@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -157,7 +159,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JPanel statusBar;
 	JProgressBar progressBar;
 	JSplitPane splitPane;
-	JLabel styleLabel;
+	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 
 	// Menu components
@@ -261,13 +263,18 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		styleLabel.setPreferredSize(new Dimension(150, 20));
 		statusBar.add(styleLabel);
 
+		messageLabel = new JLabel();
+		messageLabel.setSize(new Dimension(1, 20));
+		statusBar.add(messageLabel);
+
 		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
 				+ Annotator.class.getPackage().getImplementationVersion());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
 		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
-		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.WEST, statusBar);
+		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.EAST, messageLabel);
+		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);
 		springs.putConstraint(SpringLayout.EAST, styleLabel, 10, SpringLayout.WEST, versionLabel);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 		statusBar.revalidate();
@@ -483,6 +490,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		LoadAndImport lai;
 		try {
+			setMessage(Annotator.getString("message.loading"));
 			lai = new LoadAndImport(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
@@ -497,6 +505,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public synchronized void saveToFile(File f, IOPlugin plugin) {
+		setMessage(Annotator.getString("message.saving"));
 		progressBar.setValue(0);
 		progressBar.setVisible(true);
 
@@ -513,6 +522,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			protected void done() {
 				progressBar.setValue(100);
 				progressBar.setVisible(false);
+				setMessage("");
 				file = f;
 				unsavedChanges = false;
 				setWindowTitle();
@@ -625,6 +635,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	protected void setMessage(String message) {
+		messageLabel.setText(message);
+		messageLabel.repaint();
+		statusBar.revalidate();
+	}
+
 	protected void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString("windowtitle.new_file"));
 		String documentTitle;
@@ -654,6 +670,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
 		progressBar.setVisible(false);
+		setMessage("");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -770,9 +787,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	class PanelTransferHandler extends TransferHandler {
 
-		/**
-		 * 
-		 */
+		CATreeNode targetNode;
+		FeatureStructure targetFS;
+
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -781,17 +798,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (dl.getPath() == null)
 				return false;
 			TreePath treePath = dl.getPath();
-			CATreeNode selectedNode = (CATreeNode) treePath.getLastPathComponent();
-			FeatureStructure fs = selectedNode.getFeatureStructure();
+			targetNode = (CATreeNode) treePath.getLastPathComponent();
+			targetFS = targetNode.getFeatureStructure();
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (selectedNode == cModel.groupRootNode)
-					return false;
+				return true;
 			}
-			// move existing mention
+			// move existing node
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-				if (fs instanceof TOP)
+				if (targetFS instanceof TOP)
 					return false;
 			}
 
@@ -812,44 +828,56 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			JTree.DropLocation dl = (JTree.DropLocation) info.getDropLocation();
 			TreePath tp = dl.getPath();
-			// tree.expandPath(tp.getParentPath());
 			DataFlavor dataFlavor = info.getTransferable().getTransferDataFlavors()[0];
 
-			try {
-
-				FeatureStructure targetFs = ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure();
-				if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
-					PotentialAnnotation pa = (PotentialAnnotation) info.getTransferable()
+			targetNode = ((CATreeNode) tp.getLastPathComponent());
+			targetFS = targetNode.getFeatureStructure();
+			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
+				PotentialAnnotation pa;
+				try {
+					pa = (PotentialAnnotation) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					if (targetFs == null)
-						cModel.add(pa.getBegin(), pa.getEnd());
-					else if (targetFs instanceof Entity)
-						cModel.addTo((Entity) targetFs, pa.getBegin(), pa.getEnd());
-					else if (targetFs instanceof Mention)
-						cModel.addTo((Mention) targetFs, pa.getBegin(), pa.getEnd());
-					registerChange();
-
-				} else if (dataFlavor == NodeTransferable.dataFlavor) {
-					CATreeNode object = (CATreeNode) info.getTransferable()
-							.getTransferData(NodeTransferable.dataFlavor);
-					FeatureStructure droppedFs = object.getFeatureStructure();
-					if (targetFs instanceof EntityGroup && droppedFs instanceof Entity) {
-						cModel.addTo((EntityGroup) targetFs, (Entity) droppedFs);
-					} else if (targetFs instanceof Entity && droppedFs instanceof Mention) {
-						cModel.moveTo((Mention) droppedFs, (Entity) targetFs);
-					} else if (targetFs instanceof Mention && droppedFs instanceof DetachedMentionPart) {
-						DetachedMentionPart dmp = cModel
-								.removeFrom((Mention) ((CATreeNode) object.getParent()).getFeatureStructure());
-						cModel.addTo((Mention) targetFs, dmp);
-					}
-					registerChange();
-
+					handlePotentialAnnotationTransfer(pa);
+				} catch (UnsupportedFlavorException | IOException e) {
+					Annotator.logger.catching(e);
 				}
-
-			} catch (Exception e1) {
-				Annotator.logger.catching(e1);
+			} else if (dataFlavor == NodeTransferable.dataFlavor) {
+				CATreeNode object;
+				try {
+					object = (CATreeNode) info.getTransferable().getTransferData(NodeTransferable.dataFlavor);
+					handleNodeMoving(object);
+				} catch (UnsupportedFlavorException | IOException e) {
+					Annotator.logger.catching(e);
+				}
 			}
 
+			return true;
+		}
+
+		protected boolean handlePotentialAnnotationTransfer(PotentialAnnotation potentialAnnotation) {
+
+			if (targetNode == null)
+				cModel.add(potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+			else if (targetFS instanceof Entity)
+				cModel.addTo((Entity) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+			else if (targetFS instanceof Mention)
+				cModel.addTo((Mention) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+			registerChange();
+			return true;
+		}
+
+		protected boolean handleNodeMoving(CATreeNode moved) {
+			FeatureStructure droppedFS = moved.getFeatureStructure();
+			if (targetFS instanceof EntityGroup && droppedFS instanceof Entity) {
+				cModel.addTo((EntityGroup) targetFS, (Entity) droppedFS);
+			} else if (targetFS instanceof Entity && droppedFS instanceof Mention) {
+				cModel.moveTo((Mention) droppedFS, (Entity) targetFS);
+			} else if (targetFS instanceof Mention && droppedFS instanceof DetachedMentionPart) {
+				DetachedMentionPart dmp = cModel.removeFrom((Mention) targetFS);
+				cModel.addTo((Mention) targetFS, dmp);
+			} else
+				return false;
+			registerChange();
 			return true;
 		}
 
