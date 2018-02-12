@@ -36,7 +36,7 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
 	Map<FeatureStructure, EntityTreeNode> entityMap = new HashMap<FeatureStructure, EntityTreeNode>();
-	EntitySortOrder entitySortOrder = EntitySortOrder.Alphabet;
+	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
 	CATreeNode groupRootNode;
 
 	JCas jcas;

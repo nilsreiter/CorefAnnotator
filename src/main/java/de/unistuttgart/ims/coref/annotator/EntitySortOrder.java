@@ -5,7 +5,7 @@ import java.util.Comparator;
 public enum EntitySortOrder {
 	Mentions, Alphabet;
 
-	boolean descending = false;
+	boolean descending = true;
 
 	public boolean isDescending() {
 		return descending;

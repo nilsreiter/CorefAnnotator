@@ -434,8 +434,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		JMenu sortMenu = new JMenu(Annotator.getString("menu.edit.entities.sort"));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
-		radio1.setSelected(true);
 		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.sortByMentions);
+		radio2.setSelected(true);
 		ButtonGroup grp = new ButtonGroup();
 		grp.add(radio2);
 		grp.add(radio1);
