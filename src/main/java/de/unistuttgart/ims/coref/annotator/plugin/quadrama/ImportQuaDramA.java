@@ -17,7 +17,9 @@ import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
 
 public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 
@@ -70,6 +72,9 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 					m.setEntity(entityMap.get(eFS.get(i)));
 				}
 		}
+
+		Meta m = Util.getMeta(jcas);
+		m.setStylePlugin(QDStylePlugin.class.getCanonicalName());
 
 	}
 

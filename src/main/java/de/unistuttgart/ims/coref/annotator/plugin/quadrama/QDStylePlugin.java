@@ -28,6 +28,7 @@ public class QDStylePlugin implements de.unistuttgart.ims.coref.annotator.plugin
 
 		style = styleContext.addStyle("Header", defaultStyle);
 		style.addAttribute(StyleConstants.FontSize, (Integer) defaultStyle.getAttribute(StyleConstants.FontSize) + 6);
+		style.addAttribute(StyleConstants.Bold, true);
 		map.put(style, ts.getType(Constants.TYPE_HEADING));
 
 		return map;
