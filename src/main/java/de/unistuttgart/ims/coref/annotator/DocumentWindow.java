@@ -112,7 +112,6 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
@@ -715,25 +714,26 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		progressBar.setVisible(false);
 
 		Meta meta = Util.getMeta(jcas);
+		StylePlugin sPlugin = null;
 
 		if (meta.getStylePlugin() != null) {
 			Object o;
 			try {
 				Class<?> cl = Class.forName(meta.getStylePlugin());
-				o = mainApplication.getPluginManager().getPlugin((Class<? extends Plugin>) cl);
+				o = mainApplication.getPluginManager().getPlugin(cl);
 				if (o instanceof StylePlugin)
-					switchStyle((StylePlugin) o);
+					sPlugin = (StylePlugin) o;
 			} catch (ClassNotFoundException e) {
 				Annotator.logger.catching(e);
-				switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
 			}
-		} else
-			switchStyle(mainApplication.getPluginManager().getDefaultStylePlugin());
+		}
+		if (sPlugin == null)
+			sPlugin = mainApplication.getPluginManager().getDefaultStylePlugin();
 
+		switchStyle(sPlugin);
 		setMessage("");
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void fireJCasLoadedEvent() {
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));

@@ -19,8 +19,6 @@ public class StyleManager {
 
 			defaultCharacterStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, "monospace");
-			// defaultStyle.addAttribute(StyleConstants.Alignment,
-			// StyleConstants.ALIGN_JUSTIFIED);
 		}
 		return defaultCharacterStyle;
 	}
