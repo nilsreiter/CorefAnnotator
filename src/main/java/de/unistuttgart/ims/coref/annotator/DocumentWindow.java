@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -103,6 +102,8 @@ import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFullTokensAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -175,6 +176,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	// Settings
 	boolean trimWhitespace = true;
 	float lineSpacing = 2f;
+	StylePlugin currentStyle;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -358,8 +360,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuView() {
 		JMenu viewMenu = new JMenu(Annotator.getString("menu.view"));
-		viewMenu.add(new JMenuItem(new ViewFontSizeDecreaseAction()));
-		viewMenu.add(new JMenuItem(new ViewFontSizeIncreaseAction()));
+		viewMenu.add(new ViewFontSizeDecreaseAction(this));
+		viewMenu.add(new ViewFontSizeIncreaseAction(this));
 		viewMenu.addSeparator();
 
 		PluginManager pm = mainApplication.getPluginManager();
@@ -557,46 +559,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		return mainApplication;
 	}
 
-	class ViewFontSizeDecreaseAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ViewFontSizeDecreaseAction() {
-			super(Material.EXPOSURE_NEG_1);
-			putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Font oldFont = textPane.getFont();
-			float oldSize = oldFont.getSize();
-			textPane.setFont(oldFont.deriveFont(oldSize - 1f));
-		}
-
-	}
-
-	class ViewFontSizeIncreaseAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ViewFontSizeIncreaseAction() {
-			super(Material.EXPOSURE_PLUS_1);
-			putValue(Action.NAME, Annotator.getString("action.view.increase_font_size"));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Font oldFont = textPane.getFont();
-			float oldSize = oldFont.getSize();
-			textPane.setFont(oldFont.deriveFont(oldSize + 1f));
-		}
-
-	}
-
 	class ViewStyleSelectAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -753,23 +715,47 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
-	public void switchStyle(StylePlugin sv) {
-		Annotator.logger.info("Switching to style {}", sv.getClass().getName());
+	public void updateStyle(Object constant, Object value) {
+		Style baseStyle = currentStyle.getBaseStyle();
+		baseStyle.addAttribute(constant, value);
+		switchStyle(currentStyle);
+	}
 
-		StyleManager.revertAll(textPane.getStyledDocument());
-		if (sv.getBaseStyle() != null)
-			StyleManager.styleParagraph(textPane.getStyledDocument(), sv.getBaseStyle());
-		Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
-				StyleManager.getDefaultCharacterStyle());
-		if (styles != null)
-			for (Style style : styles.keySet()) {
-				StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+	public void switchStyle(StylePlugin sv) {
+		switchStyle(sv, sv.getBaseStyle());
+	}
+
+	public void switchStyle(StylePlugin sv, Style baseStyle) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				progressBar.setValue(0);
+				progressBar.setVisible(true);
+				Annotator.logger.debug("Activating style {}", sv.getClass().getName());
+
+				StyleManager.revertAll(textPane.getStyledDocument());
+				progressBar.setValue(20);
+
+				Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
+						baseStyle);
+				if (styles != null)
+					for (Style style : styles.keySet()) {
+						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+						progressBar.setValue(progressBar.getValue() + 10);
+					}
+				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+				currentStyle = sv;
+				styleMenuItem.get(sv).setSelected(true);
+				styleLabel.setText(Annotator.getString("status.style") + ": " + sv.getName());
+				styleLabel.setToolTipText(sv.getDescription());
+				styleLabel.repaint();
+				progressBar.setValue(100);
+				progressBar.setVisible(false);
 			}
-		Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
-		styleMenuItem.get(sv).setSelected(true);
-		styleLabel.setText("Style: " + sv.getName());
-		styleLabel.setToolTipText(sv.getDescription());
-		styleLabel.repaint();
+
+		});
+
 	}
 
 	@Override
@@ -1974,5 +1960,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public CoreferenceModel getCoreferenceModel() {
 		return cModel;
+	}
+
+	public StylePlugin getCurrentStyle() {
+		return currentStyle;
 	}
 }

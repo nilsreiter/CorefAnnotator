@@ -1,5 +1,8 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.Font;
+
+import javax.swing.UIManager;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
@@ -9,6 +12,8 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+
 public class StyleManager {
 
 	static Style defaultCharacterStyle = null;
@@ -16,9 +21,9 @@ public class StyleManager {
 
 	public static Style getDefaultCharacterStyle() {
 		if (defaultCharacterStyle == null) {
-
 			defaultCharacterStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, "monospace");
+			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, Font.DIALOG);
+			defaultCharacterStyle.addAttribute(StyleConstants.FontSize, UIManager.getFont("TextPane.font").getSize());
 		}
 		return defaultCharacterStyle;
 	}
@@ -47,6 +52,10 @@ public class StyleManager {
 	public static void style(JCas jcas, StyledDocument document, Style style, Type anno) {
 		for (Annotation a : jcas.getAnnotationIndex(anno))
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
+	}
+
+	public static int getFontSize(StylePlugin sv) {
+		return (Integer) sv.getBaseStyle().getAttribute(StyleConstants.FontSize);
 	}
 
 }
