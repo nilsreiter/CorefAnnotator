@@ -57,7 +57,6 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -176,12 +175,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public DocumentWindow(Annotator annotator) {
 		super();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			Annotator.logger.error("Could not set look and feel {}.", e.getMessage());
-		}
-
 		this.mainApplication = annotator;
 		this.initialiseActions();
 		this.initialiseMenu();
