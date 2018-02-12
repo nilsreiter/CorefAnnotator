@@ -11,3 +11,4 @@ deploy:
   on:
     repo: nilsreiter/CorefAnnotator
     branch: develop
+    tags: true
