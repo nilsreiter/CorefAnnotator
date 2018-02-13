@@ -16,7 +16,7 @@ public class QuaDramAPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public String getName() {
-		return "QuaDramA/WebAnno";
+		return "QuaDramA";
 	}
 
 	@Override

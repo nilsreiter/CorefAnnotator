@@ -17,7 +17,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 public class PluginManager {
 	Set<Class<? extends IOPlugin>> ioPlugins;
 	Set<Class<? extends StylePlugin>> stylePlugins;
-	Map<Class<? extends Plugin>, Plugin> instances = new HashMap<Class<? extends Plugin>, Plugin>();
+	Map<Class<?>, Plugin> instances = new HashMap<Class<?>, Plugin>();
 
 	public void init() {
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
@@ -49,12 +49,12 @@ public class PluginManager {
 		return getStylePlugin(DefaultStylePlugin.class);
 	}
 
-	public Plugin getPlugin(Class<? extends Plugin> cl) {
+	public Plugin getPlugin(Class<?> cl) {
 		if (!instances.containsKey(cl)) {
 			Plugin p;
 			try {
 				Annotator.logger.info("Creating new instance of plugin {}", cl.getName());
-				p = cl.newInstance();
+				p = (Plugin) cl.newInstance();
 				instances.put(cl, p);
 			} catch (InstantiationException | IllegalAccessException e) {
 				Annotator.logger.catching(e);
@@ -63,11 +63,11 @@ public class PluginManager {
 		return instances.get(cl);
 	}
 
-	public StylePlugin getStylePlugin(Class<? extends StylePlugin> clazz) {
+	public StylePlugin getStylePlugin(Class<?> clazz) {
 		return (StylePlugin) getPlugin(clazz);
 	}
 
-	public IOPlugin getIOPlugin(Class<? extends IOPlugin> cl) {
+	public IOPlugin getIOPlugin(Class<?> cl) {
 		return (IOPlugin) getPlugin(cl);
 	}
 
