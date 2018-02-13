@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.util.Map;
 
+import javax.swing.text.AttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 
@@ -23,7 +24,7 @@ public class DefaultStylePlugin implements StylePlugin {
 	}
 
 	@Override
-	public Map<Style, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle) {
+	public Map<AttributeSet, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle) {
 		return null;
 	}
 

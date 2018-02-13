@@ -68,6 +68,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Style;
@@ -737,10 +738,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				StyleManager.revertAll(textPane.getStyledDocument());
 				progressBar.setValue(20);
 
-				Map<Style, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(), styleContext,
-						baseStyle);
+				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
+						styleContext, baseStyle);
 				if (styles != null)
-					for (Style style : styles.keySet()) {
+					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
 						progressBar.setValue(progressBar.getValue() + 10);
 					}

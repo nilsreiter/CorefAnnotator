@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.Font;
 
 import javax.swing.UIManager;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
@@ -49,7 +50,7 @@ public class StyleManager {
 		document.setParagraphAttributes(0, document.getLength(), style, true);
 	}
 
-	public static void style(JCas jcas, StyledDocument document, Style style, Type anno) {
+	public static void style(JCas jcas, StyledDocument document, AttributeSet style, Type anno) {
 		for (Annotation a : jcas.getAnnotationIndex(anno))
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
 	}
