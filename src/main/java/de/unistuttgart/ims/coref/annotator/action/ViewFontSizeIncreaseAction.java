@@ -12,7 +12,6 @@ import org.kordamp.ikonli.material.Material;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.StyleManager;
 
 public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
@@ -27,6 +26,6 @@ public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		documentWindow.updateStyle(StyleConstants.FontSize,
-				StyleManager.getFontSize(documentWindow.getCurrentStyle()) + 1);
+				StyleConstants.getFontSize(documentWindow.getCurrentStyle().getBaseStyle()) + 1);
 	}
 }
