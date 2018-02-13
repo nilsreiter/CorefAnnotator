@@ -71,7 +71,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Style;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -717,7 +717,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public void updateStyle(Object constant, Object value) {
-		Style baseStyle = currentStyle.getBaseStyle();
+		MutableAttributeSet baseStyle = currentStyle.getBaseStyle();
 		baseStyle.addAttribute(constant, value);
 		switchStyle(currentStyle);
 	}
@@ -726,7 +726,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		switchStyle(sv, sv.getBaseStyle());
 	}
 
-	public void switchStyle(StylePlugin sv, Style baseStyle) {
+	public void switchStyle(StylePlugin sv, AttributeSet baseStyle) {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override

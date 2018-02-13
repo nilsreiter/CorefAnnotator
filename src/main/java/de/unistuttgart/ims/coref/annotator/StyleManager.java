@@ -4,7 +4,8 @@ import java.awt.Font;
 
 import javax.swing.UIManager;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.Style;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
@@ -17,21 +18,22 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class StyleManager {
 
-	static Style defaultCharacterStyle = null;
-	static Style defaultParagraphStyle = null;
+	static SimpleAttributeSet defaultCharacterStyle = null;
+	static SimpleAttributeSet defaultParagraphStyle = null;
 
-	public static Style getDefaultCharacterStyle() {
+	public static MutableAttributeSet getDefaultCharacterStyle() {
 		if (defaultCharacterStyle == null) {
-			defaultCharacterStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+			defaultCharacterStyle = new SimpleAttributeSet();// StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, Font.DIALOG);
 			defaultCharacterStyle.addAttribute(StyleConstants.FontSize, UIManager.getFont("TextPane.font").getSize());
 		}
 		return defaultCharacterStyle;
 	}
 
-	public static Style getDefaultParagraphStyle() {
+	public static MutableAttributeSet getDefaultParagraphStyle() {
 		if (defaultParagraphStyle == null) {
-			defaultParagraphStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+			defaultParagraphStyle = new SimpleAttributeSet();
+			StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 			defaultParagraphStyle.addAttribute(StyleConstants.LineSpacing, 0.5f);
 		}
 		return defaultParagraphStyle;
@@ -42,11 +44,11 @@ public class StyleManager {
 		styleCharacter(document, getDefaultCharacterStyle());
 	}
 
-	public static void styleCharacter(StyledDocument document, Style style) {
+	public static void styleCharacter(StyledDocument document, AttributeSet style) {
 		document.setCharacterAttributes(0, document.getLength(), style, true);
 	}
 
-	public static void styleParagraph(StyledDocument document, Style style) {
+	public static void styleParagraph(StyledDocument document, AttributeSet style) {
 		document.setParagraphAttributes(0, document.getLength(), style, true);
 	}
 

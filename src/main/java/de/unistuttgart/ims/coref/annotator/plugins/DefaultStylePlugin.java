@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator.plugins;
 import java.util.Map;
 
 import javax.swing.text.AttributeSet;
-import javax.swing.text.Style;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.cas.Type;
@@ -19,12 +19,13 @@ public class DefaultStylePlugin implements StylePlugin {
 	}
 
 	@Override
-	public Style getBaseStyle() {
+	public MutableAttributeSet getBaseStyle() {
 		return StyleManager.getDefaultParagraphStyle();
 	}
 
 	@Override
-	public Map<AttributeSet, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context, Style defaultStyle) {
+	public Map<AttributeSet, Type> getSpanStyles(TypeSystem typeSystem, StyleContext context,
+			AttributeSet defaultStyle) {
 		return null;
 	}
 
