@@ -33,6 +33,8 @@ public class StyleManager {
 			defaultParagraphStyle = new SimpleAttributeSet();
 			StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 			defaultParagraphStyle.addAttribute(StyleConstants.LineSpacing, 0.5f);
+			defaultParagraphStyle.addAttribute(StyleConstants.FontFamily, Font.DIALOG);
+			defaultParagraphStyle.addAttribute(StyleConstants.FontSize, UIManager.getFont("TextPane.font").getSize());
 		}
 		return defaultParagraphStyle;
 	}
