@@ -429,6 +429,19 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 		}
 	}
 
+	public void merge(EntityTreeNode e1, EntityTreeNode e2) {
+		for (int i = 0; i < e2.getChildCount();) {
+			CATreeNode node = e2.getChildAt(i);
+			if (node.getFeatureStructure() instanceof Mention) {
+				Mention m = (Mention) node.getFeatureStructure();
+				moveTo(m, e1.getFeatureStructure());
+			} else {
+				i++;
+			}
+		}
+		remove(e2.getFeatureStructure());
+	}
+
 	public void moveTo(Mention m, Entity newEntity) {
 		CATreeNode mentionNode = get(m);
 		// remove mention from old entity
