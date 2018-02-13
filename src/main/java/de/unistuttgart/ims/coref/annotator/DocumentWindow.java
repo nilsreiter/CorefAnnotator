@@ -354,6 +354,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		changeColorAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
+		mergeSelectedEntitiesAction.setEnabled(false);
 		toggleMentionDifficult.setEnabled(false);
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
