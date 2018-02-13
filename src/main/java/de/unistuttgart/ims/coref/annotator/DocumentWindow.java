@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -103,6 +104,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFullTokensAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
@@ -363,12 +365,25 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu viewMenu = new JMenu(Annotator.getString("menu.view"));
 		viewMenu.add(new ViewFontSizeDecreaseAction(this));
 		viewMenu.add(new ViewFontSizeIncreaseAction(this));
+
+		JMenu fontFamilyMenu = new JMenu(Annotator.getString("menu.view.fontfamily"));
+		String[] fontFamilies = new String[] { Font.SANS_SERIF, Font.SERIF, Font.MONOSPACED };
+		ButtonGroup grp = new ButtonGroup();
+		for (String s : fontFamilies) {
+			AbstractAction a = new ViewFontFamilySelectAction(this, s);
+			JRadioButtonMenuItem radio = new JRadioButtonMenuItem(a);
+			fontFamilyMenu.add(radio);
+			grp.add(radio);
+		}
+		// TODO: Disabled for the moment
+		// viewMenu.add(fontFamilyMenu);
+
 		viewMenu.addSeparator();
 
 		PluginManager pm = mainApplication.getPluginManager();
 
 		JMenu viewStyleMenu = new JMenu(Annotator.getString("menu.view.style"));
-		ButtonGroup grp = new ButtonGroup();
+		grp = new ButtonGroup();
 		StylePlugin pl = pm.getDefaultStylePlugin();
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(pm.getDefaultStylePlugin()));
 		radio1.setSelected(true);
@@ -693,6 +708,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		if (sPlugin == null)
 			sPlugin = mainApplication.getPluginManager().getDefaultStylePlugin();
 
+		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
 		setMessage("");
 	}
@@ -735,11 +751,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				progressBar.setVisible(true);
 				Annotator.logger.debug("Activating style {}", sv.getClass().getName());
 
-				StyleManager.revertAll(textPane.getStyledDocument());
 				progressBar.setValue(20);
 
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
 						styleContext, baseStyle);
+				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
