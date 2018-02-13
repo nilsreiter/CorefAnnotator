@@ -91,7 +91,6 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -141,7 +140,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction changeKeyAction;
 	AbstractAction changeColorAction;
 	DeleteAction deleteAction;
-	AbstractAction formGroupAction;
+	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
 	ToggleMentionDifficult toggleMentionDifficult;
 	ToggleMentionAmbiguous toggleMentionAmbiguous;
 	ToggleEntityGeneric toggleEntityGeneric;
@@ -246,6 +245,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		controls.add(changeColorAction);
 		controls.add((deleteAction));
 		controls.add((formGroupAction));
+		controls.add(mergeSelectedEntitiesAction);
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -354,6 +354,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		changeColorAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		formGroupAction.setEnabled(false);
+		mergeSelectedEntitiesAction.setEnabled(false);
 		toggleMentionDifficult.setEnabled(false);
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
@@ -1314,10 +1315,28 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class FormEntityGroup extends IkonAction {
+	class MergeSelectedEntities extends IkonAction {
+
 		private static final long serialVersionUID = 1L;
 
-		Ikon ikon = Material.GROUP;
+		public MergeSelectedEntities() {
+			super(Material.MERGE_TYPE);
+			putValue(Action.NAME, Annotator.getString("action.merge"));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.merge.tooltip"));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			EntityTreeNode e1 = ((EntityTreeNode) tree.getSelectionPaths()[0].getLastPathComponent());
+			EntityTreeNode e2 = ((EntityTreeNode) tree.getSelectionPaths()[1].getLastPathComponent());
+			cModel.merge(e1, e2);
+			registerChange();
+		}
+
+	}
+
+	class FormEntityGroup extends IkonAction {
+		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
 			super(Material.GROUP);
@@ -1711,6 +1730,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			deleteAction.setEnabled(isSingle()
 					&& (isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf())));
 			formGroupAction.setEnabled(isDouble() && isEntity());
+			mergeSelectedEntitiesAction.setEnabled(isDouble() && isEntity());
 
 			toggleMentionDifficult.setEnabled(isSingle() && isMention());
 			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
