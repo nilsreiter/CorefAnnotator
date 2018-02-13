@@ -1181,7 +1181,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			registerChange();
-			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
+			for (TreePath tp : tree.getSelectionPaths())
+				deleteSingle((CATreeNode) tp.getLastPathComponent());
+		}
+
+		private void deleteSingle(CATreeNode tn) {
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
 				cModel.remove((Mention) tn.getFeatureStructure());
@@ -1727,8 +1731,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			changeColorAction.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
 			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
-			deleteAction.setEnabled(isSingle()
-					&& (isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf())));
+			deleteAction
+					.setEnabled(isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf()));
 			formGroupAction.setEnabled(isDouble() && isEntity());
 			mergeSelectedEntitiesAction.setEnabled(isDouble() && isEntity());
 
