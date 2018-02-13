@@ -1320,7 +1320,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public MergeSelectedEntities() {
-			super(MaterialDesign.MDI_CALL_MERGE);
+			super(Material.MERGE_TYPE);
 			putValue(Action.NAME, Annotator.getString("action.merge"));
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.merge.tooltip"));
 		}
