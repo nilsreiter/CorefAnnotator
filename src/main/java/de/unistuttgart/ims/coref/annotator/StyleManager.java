@@ -14,8 +14,6 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
-
 public class StyleManager {
 
 	static SimpleAttributeSet defaultCharacterStyle = null;
@@ -55,10 +53,6 @@ public class StyleManager {
 	public static void style(JCas jcas, StyledDocument document, AttributeSet style, Type anno) {
 		for (Annotation a : jcas.getAnnotationIndex(anno))
 			document.setCharacterAttributes(a.getBegin(), a.getEnd() - a.getBegin(), style, false);
-	}
-
-	public static int getFontSize(StylePlugin sv) {
-		return (Integer) sv.getBaseStyle().getAttribute(StyleConstants.FontSize);
 	}
 
 }
