@@ -22,15 +22,15 @@ public class QDStylePlugin implements de.unistuttgart.ims.coref.annotator.plugin
 
 		SimpleAttributeSet sas;
 
-		sas = new SimpleAttributeSet(defaultStyle);
+		sas = new SimpleAttributeSet();
 		sas.addAttribute(StyleConstants.Bold, true);
 		map.put(sas, ts.getType(Constants.TYPE_SPEAKER));
 
-		sas = new SimpleAttributeSet(defaultStyle);
+		sas = new SimpleAttributeSet();
 		sas.addAttribute(StyleConstants.Italic, true);
 		map.put(sas, ts.getType(Constants.TYPE_STAGEDIRECTION));
 
-		sas = new SimpleAttributeSet(defaultStyle);
+		sas = new SimpleAttributeSet();
 		sas.addAttribute(StyleConstants.FontSize, (Integer) defaultStyle.getAttribute(StyleConstants.FontSize) + 6);
 		sas.addAttribute(StyleConstants.Bold, true);
 		map.put(sas, ts.getType(Constants.TYPE_HEADING));
