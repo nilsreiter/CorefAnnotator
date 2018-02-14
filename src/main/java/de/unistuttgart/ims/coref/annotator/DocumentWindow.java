@@ -1126,9 +1126,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 
 				lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
-			} else if (cModel != null && catn == cModel.groupRootNode)
-				lab1.setIcon(FontIcon.of(Material.GROUP_WORK));
-			else if (cModel != null && catn == cModel.rootNode)
+			} else if (cModel != null && catn == cModel.rootNode)
 				lab1.setIcon(FontIcon.of(Material.PERSON_ADD));
 			else if (cModel != null && catn.getFeatureStructure() instanceof DetachedMentionPart)
 				lab1.setIcon(FontIcon.of(Material.CHILD_FRIENDLY));
