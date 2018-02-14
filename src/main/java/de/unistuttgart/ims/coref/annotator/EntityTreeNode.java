@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 
+@Deprecated
 public class EntityTreeNode extends CATreeNode {
 
 	private static final long serialVersionUID = 1L;

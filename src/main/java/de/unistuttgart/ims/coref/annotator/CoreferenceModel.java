@@ -33,7 +33,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	ColorProvider colorMap = new ColorProvider();
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
-	Map<FeatureStructure, EntityTreeNode> entityMap = new HashMap<FeatureStructure, EntityTreeNode>();
+	Map<FeatureStructure, CATreeNode> entityMap = new HashMap<FeatureStructure, CATreeNode>();
 	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
 	CATreeNode groupRootNode;
 
@@ -49,11 +49,11 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	Preferences preferences;
 
-	RootNode rootNode;
+	CATreeNode rootNode;
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
-		super(new RootNode(Annotator.getString("tree.root")));
-		this.rootNode = (RootNode) getRoot();
+		super(new CATreeNode(null, Annotator.getString("tree.root")));
+		this.rootNode = (CATreeNode) getRoot();
 		this.jcas = jcas;
 		this.preferences = preferences;
 
@@ -71,8 +71,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return node;
 	}
 
-	public EntityTreeNode add(Entity e) {
-		EntityTreeNode tn = new EntityTreeNode(e, "");
+	public CATreeNode add(Entity e) {
+		CATreeNode tn = new CATreeNode(e, "");
 		insertNodeInto(tn, rootNode, 0);
 		entityMap.put(e, tn);
 		if (e.getKey() != null) {
@@ -119,7 +119,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		fireMentionAddedEvent(m);
 	}
 
-	public void addTo(EntityTreeNode entityNode, CATreeNode mentionNode) {
+	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
 
 		Mention m = (Mention) mentionNode.getFeatureStructure();
 		Entity e = entityNode.getFeatureStructure();
@@ -157,7 +157,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		oldArr.removeFromIndexes();
 
 		// tree stuff
-		insertNodeInto(new EntityTreeNode(e), entityMap.get(eg), 0);
+		insertNodeInto(new CATreeNode(e, e.getLabel()), entityMap.get(eg), 0);
 	}
 
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
@@ -223,10 +223,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 		eg.setMembers(0, e1);
 		eg.setMembers(1, e2);
 
-		EntityTreeNode gtn = add(eg);
+		CATreeNode gtn = add(eg);
 
-		insertNodeInto(new EntityTreeNode(e1), gtn, 0);
-		insertNodeInto(new EntityTreeNode(e2), gtn, 1);
+		insertNodeInto(new CATreeNode(e1, e1.getLabel()), gtn, 0);
+		insertNodeInto(new CATreeNode(e2, e2.getLabel()), gtn, 1);
 
 	}
 
@@ -248,7 +248,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return mentionMap.get(m);
 	}
 
-	public EntityTreeNode get(Entity e) {
+	public CATreeNode get(Entity e) {
 		return entityMap.get(e);
 	}
 
@@ -305,7 +305,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		m.removeFromIndexes();
 	}
 
-	protected void remove(Entity e, EntityTreeNode etn) {
+	protected void remove(Entity e, CATreeNode etn) {
 		for (int i = 0; i < etn.getChildCount(); i++) {
 			etn.removeAllChildren();
 			CATreeNode n = etn.getChildAt(i);
@@ -337,7 +337,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		remove(e, get(e));
 	}
 
-	public void removeFrom(EntityGroup eg, EntityTreeNode e) {
+	public void removeFrom(EntityGroup eg, CATreeNode e) {
 		removeNodeFromParent(e);
 		FSArray oldArray = eg.getMembers();
 		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
@@ -352,7 +352,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void remove(EntityGroup eg) {
-		EntityTreeNode etn = entityMap.get(eg);
+		CATreeNode etn = entityMap.get(eg);
 		for (int i = 0; i < etn.getChildCount(); i++) {
 			FeatureStructure fs = etn.getChildAt(i).getFeatureStructure();
 			if (fs instanceof Mention)
@@ -371,8 +371,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 		resort(entitySortOrder.getComparator());
 	}
 
-	public void resort(Comparator<EntityTreeNode> comparator) {
-		MutableList<EntityTreeNode> children = Lists.mutable.withAll(rootNode);
+	public void resort(Comparator<CATreeNode> comparator) {
+		MutableList<CATreeNode> children = Lists.mutable.withAll(rootNode);
+		children = children.reject(n -> !n.isEntity());
 		children.sort(comparator);
 		rootNode.removeAllChildren();
 		children.forEach(node -> rootNode.add(node));
@@ -402,7 +403,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public void updateColor(Entity entity, Color newColor) {
 		entity.setColor(newColor.getRGB());
-		EntityTreeNode entityNode = entityMap.get(entity);
+		CATreeNode entityNode = entityMap.get(entity);
 		this.nodeChanged(entityNode);
 		for (int i = 0; i < entityNode.getChildCount(); i++) {
 			FeatureStructure child = entityNode.getChildAt(i).getFeatureStructure();
@@ -411,8 +412,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 	}
 
-	public void merge(EntityTreeNode e1, EntityTreeNode e2) {
-		EntityTreeNode bigger, smaller;
+	public void merge(CATreeNode e1, CATreeNode e2) {
+		CATreeNode bigger, smaller;
 		if (e1.getChildCount() >= e2.getChildCount()) {
 			bigger = e1;
 			smaller = e2;
@@ -429,7 +430,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 				i++;
 			}
 		}
-		remove(smaller.getFeatureStructure());
+		remove(smaller.getEntity());
 	}
 
 	public void moveTo(Mention m, Entity newEntity) {

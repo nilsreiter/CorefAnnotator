@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -8,7 +9,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class CATreeNode extends DefaultMutableTreeNode {
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.Mention;
+
+public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode> {
 
 	static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
@@ -20,6 +25,9 @@ public class CATreeNode extends DefaultMutableTreeNode {
 
 	String label;
 
+	boolean visible = true;
+	Character keyCode = null;
+
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
 			this.featureStructure = featureStructure;
@@ -29,10 +37,19 @@ public class CATreeNode extends DefaultMutableTreeNode {
 		this.label = label;
 	}
 
-	public FeatureStructure getFeatureStructure() {
+	public CATreeNode(Entity e) {
+		this(e, e.getLabel());
+	}
+
+	public Entity getEntity() {
+		return getFeatureStructure();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends FeatureStructure> T getFeatureStructure() {
 		if (featureStructure == null)
 			featureStructure = mentionCache.get(featureStructureHash);
-		return featureStructure;
+		return (T) featureStructure;
 	}
 
 	@Override
@@ -48,12 +65,68 @@ public class CATreeNode extends DefaultMutableTreeNode {
 		return label;
 	}
 
+	@Override
+	public CATreeNode getChildAt(int i) {
+		return (CATreeNode) super.getChildAt(i);
+	}
+
+	@Override
+	public CATreeNode getParent() {
+		return (CATreeNode) super.getParent();
+	}
+
 	public void setLabel(String label) {
 		this.label = label;
 	}
 
 	public boolean isVirtual() {
 		return false;
+	}
+
+	public boolean isEntity() {
+		return featureStructure instanceof Entity;
+	}
+
+	public boolean isMention() {
+		return featureStructure instanceof Mention;
+	}
+
+	public boolean isMentionPart() {
+		return featureStructure instanceof DetachedMentionPart;
+	}
+
+	@Override
+	public Iterator<CATreeNode> iterator() {
+		return new Iterator<CATreeNode>() {
+			int pos = 0;
+
+			@Override
+			public boolean hasNext() {
+				return pos < getChildCount();
+			}
+
+			@Override
+			public CATreeNode next() {
+				return getChildAt(pos++);
+			}
+
+		};
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	public Character getKeyCode() {
+		return keyCode;
+	}
+
+	public void setKeyCode(char keyCode) {
+		this.keyCode = keyCode;
 	}
 
 }

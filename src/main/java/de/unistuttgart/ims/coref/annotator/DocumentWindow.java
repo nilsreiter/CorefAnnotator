@@ -932,8 +932,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			JTree tree = (JTree) comp;
 			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
 
-			if (tn.getFeatureStructure() instanceof Entity || tn.getFeatureStructure() instanceof Mention
-					|| tn.getFeatureStructure() instanceof DetachedMentionPart)
+			if (tn.isEntity() || tn.isMention() || tn.isMentionPart())
 				return new NodeTransferable(tn);
 			return null;
 		}
@@ -956,13 +955,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
-			String l = etn.getFeatureStructure().getLabel();
+			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
+			String l = etn.getEntity().getLabel();
 			String newLabel = (String) JOptionPane.showInputDialog(textPane,
 					Annotator.getString("dialog.rename_entity.prompt"), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(Material.KEYBOARD), null, l);
 			if (newLabel != null) {
-				etn.getFeatureStructure().setLabel(newLabel);
+				etn.getEntity().setLabel(newLabel);
 				cModel.nodeChanged(etn);
 				registerChange();
 			}
@@ -985,8 +984,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
-			Color color = new Color(etn.getFeatureStructure().getColor());
+			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
+			Color color = new Color(etn.getEntity().getColor());
 
 			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
 					Annotator.getString("dialog.change_color.prompt"), color);
@@ -1015,7 +1014,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			EntityTreeNode etn = (EntityTreeNode) tree.getLastSelectedPathComponent();
+			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
 			Character ch = etn.getKeyCode();
 			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
 					Annotator.getString("dialog.change_key.prompt"), "", JOptionPane.PLAIN_MESSAGE,
@@ -1023,7 +1022,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					etn.getFeatureStructure().setKey(newKey.substring(0, 1));
+					etn.getEntity().setKey(newKey.substring(0, 1));
 					cModel.reassignKey(newChar, etn.getFeatureStructure());
 					registerChange();
 
@@ -1078,12 +1077,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			String stringValue = tree.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
 
 			lab1.setText(stringValue);
-			CATreeNode catn = null;
-			if (value instanceof CATreeNode)
-				catn = (CATreeNode) value;
-			if (value instanceof EntityTreeNode) {
-				EntityTreeNode etn = (EntityTreeNode) value;
-				Entity e = etn.getFeatureStructure();
+			if (!(value instanceof CATreeNode))
+				return panel;
+			CATreeNode catn = (CATreeNode) value;
+			if (catn.isEntity()) {
+				CATreeNode etn = catn;
+				Entity e = catn.getEntity();
 				if (!etn.isVisible()) {
 					lab1.setForeground(Color.GRAY);
 				} else {
@@ -1092,7 +1091,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				lab1.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
 				if (etn.getKeyCode() != null) {
 					lab1.setText(etn.getKeyCode() + ": " + e.getLabel() + " (" + etn.getChildCount() + ")");
-				} else if (!(etn.getParent() instanceof EntityTreeNode))
+				} else if (!(etn.getParent().isEntity()))
 					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
 				if (e instanceof EntityGroup) {
 					panel.add(Box.createRigidArea(new Dimension(5, 5)));
@@ -1108,19 +1107,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				}
 			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
 				Mention m = (Mention) catn.getFeatureStructure();
-				/*
-				 * if (cModel.comments.containsKey(m)) { for (Comment comment :
-				 * cModel.comments.get(m)) { JLabel l = new
-				 * JLabel(FontIcon.of(Material.COMMENT));
-				 * l.setToolTipText(comment.getValue()); l.addMouseListener(new
-				 * MouseAdapter() {
-				 * 
-				 * @Override public void mouseClicked(MouseEvent e) {
-				 * System.err.println("!!");
-				 * commentAction.actionPerformed(null); } });
-				 * panel.add(Box.createRigidArea(new Dimension(5, 5)));
-				 * panel.add(l); } }
-				 */
+
 				if (Util.isDifficult(m)) {
 					JLabel l = new JLabel();
 					if (showText)
@@ -1181,13 +1168,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
 				// highlightManager.undraw(dmp);
 				cModel.remove(dmp);
-			} else if (tn.getFeatureStructure() instanceof Entity) {
-				EntityTreeNode etn = (EntityTreeNode) tn;
-				FeatureStructure parentFs = ((CATreeNode) etn.getParent()).getFeatureStructure();
+			} else if (tn.isEntity()) {
+				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
-					cModel.removeFrom((EntityGroup) parentFs, (EntityTreeNode) tn);
+					cModel.removeFrom((EntityGroup) parentFs, tn);
 				} else if (tn.isLeaf()) {
-					cModel.remove(etn.getFeatureStructure());
+					cModel.remove(tn.getEntity());
 				}
 			}
 		}
@@ -1316,8 +1302,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			EntityTreeNode e1 = ((EntityTreeNode) tree.getSelectionPaths()[0].getLastPathComponent());
-			EntityTreeNode e2 = ((EntityTreeNode) tree.getSelectionPaths()[1].getLastPathComponent());
+			CATreeNode e1 = ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent());
+			CATreeNode e2 = ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent());
 			cModel.merge(e1, e2);
 			registerChange();
 		}
@@ -1756,7 +1742,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			publish(60);
 			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
 				for (int i = 0; i < eg.getMembers().size(); i++)
-					cModel.insertNodeInto(new EntityTreeNode(eg.getMembers(i)), cModel.get(eg), 0);
+					cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
 
 			publish(70);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
@@ -1857,10 +1843,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 			if (s.length() >= 1) {
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
-					TreeNode tn = cModel.rootNode.getChildAt(i);
-					if (tn instanceof EntityTreeNode) {
-						EntityTreeNode etn = (EntityTreeNode) tn;
-						etn.setVisible(matches(s, etn));
+					CATreeNode tn = cModel.rootNode.getChildAt(i);
+					if (tn.isEntity()) {
+						tn.setVisible(matches(s, tn));
 						tree.scrollRowToVisible(0);
 					}
 				}
@@ -1868,10 +1853,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.entitySortOrder.getComparator()));
 			} else {
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
-					TreeNode tn = cModel.rootNode.getChildAt(i);
-					if (tn instanceof EntityTreeNode) {
-						EntityTreeNode etn = (EntityTreeNode) tn;
-						etn.setVisible(true);
+					CATreeNode tn = cModel.rootNode.getChildAt(i);
+					if (tn.isEntity()) {
+						tn.setVisible(true);
 					}
 				}
 				cModel.nodeStructureChanged(cModel.rootNode);
@@ -1879,19 +1863,20 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 		}
 
-		protected boolean matches(String s, EntityTreeNode e) {
-			if (e.getFeatureStructure() == null)
+		protected boolean matches(String s, CATreeNode e) {
+			if (!e.isEntity())
 				return false;
 			Matcher m;
-			if (e.getFeatureStructure().getLabel() != null) {
-				m = pattern.matcher(e.getFeatureStructure().getLabel());
+
+			if (e.getEntity().getLabel() != null) {
+				m = pattern.matcher(e.getEntity().getLabel());
 				if (m.find())
 					return true;
 			}
-			StringArray flags = e.getFeatureStructure().getFlags();
+			StringArray flags = e.getEntity().getFlags();
 			if (flags != null)
-				for (int i = 0; i < e.getFeatureStructure().getFlags().size(); i++) {
-					m = pattern.matcher(e.getFeatureStructure().getFlags(i));
+				for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
+					m = pattern.matcher(e.getEntity().getFlags(i));
 					if (m.find())
 						return true;
 				}
@@ -1961,9 +1946,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
 				if (b != e) {
 					for (TreePath tp : tree.getSelectionPaths()) {
-						if (tp.getLastPathComponent() instanceof EntityTreeNode) {
-							EntityTreeNode etn = (EntityTreeNode) tp.getLastPathComponent();
-							cModel.addTo(etn.getFeatureStructure(), b, e);
+						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
+							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
+							cModel.addTo(etn.getEntity(), b, e);
 						}
 					}
 					treeSearchField.setText("");
