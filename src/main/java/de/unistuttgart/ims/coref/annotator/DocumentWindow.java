@@ -223,7 +223,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setDragEnabled(true);
 		tree.setLargeModel(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-		tree.setTransferHandler(new PanelTransferHandler());
+		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener());
 		tree.addMouseListener(new TreeMouseListener());
@@ -815,7 +815,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.undraw(m);
 	}
 
-	class PanelTransferHandler extends TransferHandler {
+	class MyTreeTransferHandler extends TransferHandler {
 
 		CATreeNode targetNode;
 		FeatureStructure targetFS;
