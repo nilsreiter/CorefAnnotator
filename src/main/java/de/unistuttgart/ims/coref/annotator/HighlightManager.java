@@ -63,23 +63,23 @@ class HighlightManager {
 	public void undraw(Annotation a) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
+		if (span != null)
+			spanCounter.subtract(span, hi);
 		if (hi != null)
 			hilit.removeHighlight(hi);
-		if (span != null)
-			spanCounter.subtract(span);
 	}
 
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
+			spanCounter.subtract(span, hi);
 			hilit.removeHighlight(hi);
-			spanCounter.subtract(span);
 		}
 		try {
-			int n = spanCounter.getMax(span);
+			int n = spanCounter.getNextLevel(span);
 			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-			spanCounter.add(span);
+			spanCounter.add(span, hi, n);
 			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
