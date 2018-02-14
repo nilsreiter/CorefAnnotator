@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.cas.FeatureStructure;
@@ -19,6 +17,8 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -49,11 +49,11 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	Preferences preferences;
 
-	CATreeNode rootNode;
+	RootNode rootNode;
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
-		super(new CATreeNode(null, Annotator.getString("tree.root")));
-		this.rootNode = (CATreeNode) getRoot();
+		super(new RootNode(Annotator.getString("tree.root")));
+		this.rootNode = (RootNode) getRoot();
 		this.jcas = jcas;
 		this.preferences = preferences;
 
@@ -372,23 +372,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void resort(Comparator<EntityTreeNode> comparator) {
-		int n = rootNode.getChildCount();
-		List<EntityTreeNode> children = new ArrayList<EntityTreeNode>(n);
-		List<CATreeNode> dontsort = new ArrayList<CATreeNode>(n);
-
-		for (int i = 0; i < n; i++) {
-			if (rootNode.getChildAt(i) instanceof EntityTreeNode)
-				children.add((EntityTreeNode) rootNode.getChildAt(i));
-			else
-				dontsort.add((CATreeNode) rootNode.getChildAt(i));
-		}
+		MutableList<EntityTreeNode> children = Lists.mutable.withAll(rootNode);
 		children.sort(comparator);
 		rootNode.removeAllChildren();
-		for (MutableTreeNode node : children) {
-			rootNode.add(node);
-		}
-		for (MutableTreeNode node : dontsort)
-			rootNode.add(node);
+		children.forEach(node -> rootNode.add(node));
 		nodeChanged(rootNode);
 		nodeStructureChanged(rootNode);
 	}
