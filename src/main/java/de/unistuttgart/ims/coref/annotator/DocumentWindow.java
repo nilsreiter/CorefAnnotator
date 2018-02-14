@@ -223,7 +223,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setLargeModel(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new PanelTransferHandler());
-		tree.setCellRenderer(new CellRenderer());
+		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener());
 		tree.addMouseListener(new TreeMouseListener());
 		tree.addKeyListener(new TreeKeyListener());
@@ -1058,7 +1058,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class CellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
