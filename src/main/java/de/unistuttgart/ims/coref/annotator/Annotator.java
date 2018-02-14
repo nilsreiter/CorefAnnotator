@@ -6,9 +6,6 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -33,6 +30,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -58,9 +58,9 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	static ResourceBundle rbundle;
 
-	Set<DocumentWindow> openFiles = new HashSet<DocumentWindow>();
+	Set<DocumentWindow> openFiles = Sets.mutable.empty();
 
-	List<File> recentFiles;
+	MutableList<File> recentFiles;
 
 	TypeSystemDescription typeSystemDescription;
 
@@ -275,8 +275,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		return pluginManager;
 	}
 
-	private List<File> loadRecentFiles() {
-		List<File> files = new LinkedList<File>();
+	private MutableList<File> loadRecentFiles() {
+		MutableList<File> files = Lists.mutable.empty();
 		String listOfFiles = preferences.get(Constants.PREF_RECENT, "");
 		logger.debug(listOfFiles);
 		String[] fileNames = listOfFiles.split(File.pathSeparator);

@@ -3,8 +3,6 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -32,7 +30,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	ColorProvider colorMap = new ColorProvider();
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
-	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
+	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
 
@@ -69,6 +67,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public CATreeNode add(Mention m) {
 		CATreeNode node = new CATreeNode(m, m.getCoveredText());
 		fsMap.put(m, node);
+		characterPosition2AnnotationMap.add(m);
 		return node;
 	}
 
@@ -197,25 +196,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
-		this.characterPosition2AnnotationMap.add(m);
-		for (CoreferenceModelListener l : crModelListeners)
-			l.mentionAdded(m);
+		crModelListeners.forEach(l -> l.mentionAdded(m));
 	}
 
 	public void fireAnnotationChangedEvent(Annotation m) {
-		for (CoreferenceModelListener l : crModelListeners)
-			l.annotationChanged(m);
+		crModelListeners.forEach(l -> l.annotationChanged(m));
 	}
 
 	public void fireAnnotationRemovedEvent(Annotation m) {
-		this.characterPosition2AnnotationMap.remove(m);
-		for (CoreferenceModelListener l : crModelListeners)
-			l.annotationRemoved(m);
+		crModelListeners.forEach(l -> l.annotationRemoved(m));
 	}
 
 	public void fireMentionSelectedEvent(Mention m) {
-		for (CoreferenceModelListener l : crModelListeners)
-			l.annotationSelected(m);
+		crModelListeners.forEach(l -> l.annotationSelected(m));
 	}
 
 	public void formGroup(Entity e1, Entity e2) {
@@ -363,6 +356,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public void remove(Mention m) {
 		remove(m, get(m));
+		characterPosition2AnnotationMap.remove(m);
 	}
 
 	public void resort() {
