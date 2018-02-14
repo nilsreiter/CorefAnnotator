@@ -669,10 +669,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString("windowtitle.new_file"));
-		String documentTitle;
-		if (titleFeature != null)
-			documentTitle = jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature);
-		else
+		String documentTitle = null;
+		try {
+			if (titleFeature != null)
+				documentTitle = jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature);
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+		}
+		if (documentTitle == null)
 			documentTitle = "Untitled document";
 		setTitle(documentTitle + " (" + fileName + ")"
 				+ (unsavedChanges ? " -- " + Annotator.getString("windowtitle.edited") : ""));
