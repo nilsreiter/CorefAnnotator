@@ -151,17 +151,18 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
 		panel = new JPanel();
-		for (Class<? extends IOPlugin> plugin : getPluginManager().getIOPlugins()) {
+		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
 			IOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
 				if (p.getImporter() != null) {
 					AbstractAction importAction = new FileImportAction(this, p);
-					panel.add(new JButton(importAction));
+					pan.add(new JButton(importAction));
 				}
 			} catch (ResourceInitializationException e1) {
 				logger.catching(e1);
 			}
-		}
+		}, panel);
+
 		mainPanel.add(panel);
 
 		for (Component c : mainPanel.getComponents())

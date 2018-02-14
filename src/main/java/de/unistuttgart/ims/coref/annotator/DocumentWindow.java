@@ -91,6 +91,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -289,22 +290,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// initialise text view
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
-		textPane = new JTextPane();/*
-									 * { private static final long
-									 * serialVersionUID = 1L; public Map<Font,
-									 * FontMetrics> fontMetrics = new
-									 * HashMap<Font, FontMetrics>();
-									 * 
-									 * @Override public FontMetrics
-									 * getFontMetrics(Font fnt) { if
-									 * (!fontMetrics.containsKey(fnt)) {
-									 * fontMetrics.put(fnt, new
-									 * FontMetricsWrapper(super.getFontMetrics(
-									 * fnt), lineSpacing)); } return
-									 * fontMetrics.get(fnt); } };
-									 */
-
-		// textPane.setFont(new FontWrapper(textPane.getFont()));
+		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -313,7 +299,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
-		// textPane.setFont(new MyFont(textPane.getFont()));
 		highlightManager = new HighlightManager(textPane);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -1766,10 +1751,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel = new CoreferenceModel(jcas, mainApplication.getPreferences());
 			cModel.addCoreferenceModelListener(DocumentWindow.this);
 
-			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
-				cModel.add(e);
+			Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> cModel.add(e));
 
-			}
 			publish(60);
 			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
 				for (int i = 0; i < eg.getMembers().size(); i++)
