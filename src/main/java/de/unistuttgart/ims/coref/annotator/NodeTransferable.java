@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
+@Deprecated
 public class NodeTransferable implements Transferable {
 	public static DataFlavor dataFlavor = new DataFlavor(CATreeNode.class, "TreeNode");
 

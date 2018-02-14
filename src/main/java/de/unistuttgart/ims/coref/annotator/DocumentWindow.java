@@ -92,6 +92,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -860,7 +861,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			// Check for flavor
 			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
-					&& !info.isDataFlavorSupported(NodeTransferable.dataFlavor)) {
+					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
 				return false;
 			}
 
@@ -870,6 +871,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			targetNode = ((CATreeNode) tp.getLastPathComponent());
 			targetFS = targetNode.getFeatureStructure();
+			try {
+				Object o = info.getTransferable().getTransferData(dataFlavor);
+				System.err.println(o);
+			} catch (UnsupportedFlavorException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 				PotentialAnnotation pa;
 				try {
@@ -879,10 +890,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
-			} else if (dataFlavor == NodeTransferable.dataFlavor) {
-				CATreeNode object;
+			} else if (dataFlavor == NodeListTransferable.dataFlavor) {
 				try {
-					object = (CATreeNode) info.getTransferable().getTransferData(NodeTransferable.dataFlavor);
+					@SuppressWarnings("unchecked")
+					ImmutableList<CATreeNode> object = (ImmutableList<CATreeNode>) info.getTransferable()
+							.getTransferData(NodeListTransferable.dataFlavor);
 					handleNodeMoving(object);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
@@ -908,16 +920,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			return true;
 		}
 
-		protected boolean handleNodeMoving(CATreeNode moved) {
-			FeatureStructure droppedFS = moved.getFeatureStructure();
-			if (targetFS instanceof EntityGroup && droppedFS instanceof Entity) {
-				cModel.addTo((EntityGroup) targetFS, (Entity) droppedFS);
-			} else if (targetFS instanceof Entity && droppedFS instanceof Mention) {
-				cModel.moveTo((Mention) droppedFS, (Entity) targetFS);
-			} else if (targetFS instanceof Mention && droppedFS instanceof DetachedMentionPart) {
-				DetachedMentionPart dmp = cModel.removeFrom((Mention) targetFS);
-				cModel.addTo((Mention) targetFS, dmp);
-			} else
+		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
+
+			if (targetFS instanceof EntityGroup)
+				moved.forEach(n -> cModel.addTo((EntityGroup) targetFS, n.getFeatureStructure()));
+			if (targetFS instanceof Entity)
+				moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (Entity) targetFS));
+			else if (targetFS instanceof Mention)
+				moved.forEach(n -> cModel.addTo((Mention) targetFS, n.getFeatureStructure()));
+			else
 				return false;
 			registerChange();
 			return true;
@@ -931,11 +942,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTree tree = (JTree) comp;
-			CATreeNode tn = (CATreeNode) tree.getLastSelectedPathComponent();
+			ImmutableList<TreePath> paths = Lists.immutable.of(tree.getSelectionPaths());
 
-			if (tn.isEntity() || tn.isMention() || tn.isMentionPart())
-				return new NodeTransferable(tn);
-			return null;
+			ImmutableList<CATreeNode> nodes = paths.collect(tp -> (CATreeNode) tp.getLastPathComponent())
+					.select(n -> n.isEntity() || n.isMention() || n.isMentionPart());
+			if (nodes.isEmpty())
+				return null;
+			return new NodeListTransferable(nodes);
 		}
 
 	}

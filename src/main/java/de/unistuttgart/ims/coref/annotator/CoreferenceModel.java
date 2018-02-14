@@ -120,7 +120,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
 
-		Mention m = (Mention) mentionNode.getFeatureStructure();
+		Mention m = mentionNode.getFeatureStructure();
 		Entity e = entityNode.getFeatureStructure();
 		m.setEntity(e);
 		CATreeNode tn = add(m);
