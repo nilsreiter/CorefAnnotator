@@ -121,10 +121,12 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 		this.visible = visible;
 	}
 
+	@Deprecated
 	public Character getKeyCode() {
 		return keyCode;
 	}
 
+	@Deprecated
 	public void setKeyCode(char keyCode) {
 		this.keyCode = keyCode;
 	}

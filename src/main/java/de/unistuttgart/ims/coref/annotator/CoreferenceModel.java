@@ -3,7 +3,6 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -33,7 +33,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	ColorProvider colorMap = new ColorProvider();
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 	List<CoreferenceModelListener> crModelListeners = new LinkedList<CoreferenceModelListener>();
-	Map<FeatureStructure, CATreeNode> fsMap = new HashMap<FeatureStructure, CATreeNode>();
+	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
 
 	JCas jcas;
@@ -41,8 +41,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	int key = 0;
 
+	@Deprecated
 	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-	Map<Character, Entity> keyMap = new HashMap<Character, Entity>();
+	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	@Deprecated
 	Map<FeatureStructure, CATreeNode> mentionMap = fsMap;
@@ -76,7 +77,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		insertNodeInto(tn, rootNode, 0);
 		fsMap.put(e, tn);
 		if (e.getKey() != null) {
-			tn.setKeyCode(e.getKey().charAt(0));
 			keyMap.put(e.getKey().charAt(0), e);
 		}
 		return tn;
@@ -263,12 +263,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public void reassignKey(char keyCode, Entity e) {
 		Entity old = keyMap.get(keyCode);
 		if (old != null) {
-			fsMap.get(old).setKeyCode(Character.MIN_VALUE);
 			old.setKey(null);
 			nodeChanged(fsMap.get(old));
 		}
 		keyMap.put(keyCode, e);
-		fsMap.get(e).setKeyCode(keyCode);
 		e.setKey(String.valueOf(keyCode));
 		nodeChanged(fsMap.get(e));
 	}

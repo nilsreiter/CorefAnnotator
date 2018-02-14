@@ -1015,7 +1015,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 
 			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			Character ch = etn.getKeyCode();
+			Character ch = etn.getEntity().getKey().charAt(0);
 			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
 					Annotator.getString("dialog.change_key.prompt"), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(Material.KEYBOARD), null, ch);
@@ -1089,8 +1089,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					lab1.setForeground(Color.BLACK);
 				}
 				lab1.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
-				if (etn.getKeyCode() != null) {
-					lab1.setText(etn.getKeyCode() + ": " + e.getLabel() + " (" + etn.getChildCount() + ")");
+				if (etn.getEntity().getKey() != null) {
+					lab1.setText(etn.getEntity().getKey() + ": " + e.getLabel() + " (" + etn.getChildCount() + ")");
 				} else if (!(etn.getParent().isEntity()))
 					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
 				if (e instanceof EntityGroup) {
