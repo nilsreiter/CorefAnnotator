@@ -32,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
@@ -1061,75 +1062,83 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
+		boolean showText = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+
+		CATreeNode treeNode;
+
+		protected void addFlag(JPanel panel, String textLabel, Icon icon) {
+			JLabel l = new JLabel();
+			if (showText)
+				l.setText(textLabel);
+			l.setIcon(icon);
+			panel.add(Box.createRigidArea(new Dimension(5, 5)));
+			panel.add(l);
+		}
+
+		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
+			lab1.setText(entity.getLabel());
+			if (!treeNode.isVisible()) {
+				lab1.setForeground(Color.GRAY);
+			} else {
+				lab1.setForeground(Color.BLACK);
+			}
+			lab1.setIcon(FontIcon.of(Material.PERSON, new Color(entity.getColor())));
+			if (entity.getKey() != null) {
+				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+			} else if (!(treeNode.getParent().isEntity()))
+				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+			if (entity instanceof EntityGroup) {
+				panel.add(Box.createRigidArea(new Dimension(5, 5)));
+				panel.add(new JLabel(FontIcon.of(Material.GROUP_WORK)));
+			}
+			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
+				addFlag(panel, Annotator.getString("entity.flag.generic"), FontIcon.of(Material.CLOUD));
+			}
+			return panel;
+		}
+
+		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
+			lab1.setText(m.getCoveredText());
+			if (Util.isDifficult(m)) {
+				addFlag(panel, Annotator.getString("mention.flag.difficult"), FontIcon.of(Material.WARNING));
+			}
+			if (Util.isAmbiguous(m)) {
+				addFlag(panel, Annotator.getString("mention.flag.ambiguous"), FontIcon.of(Material.SHARE));
+			}
+			lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
+			return panel;
+		}
 
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
 				boolean leaf, int row, boolean hasFocus) {
-			// TODO: split up the code in multiple classes
-			boolean showText = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
 
+			// we only handle instances of CATreeNode
+			if (!(value instanceof CATreeNode))
+				return new JLabel("tree node");
+
+			// get the current tree node
+			treeNode = (CATreeNode) value;
+
+			// this is the panel representing the node
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			panel.setOpaque(false);
-			JLabel lab1 = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
+
+			// this is the main label for the node
+			JLabel mainLabel = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
-			panel.add(lab1);
-			String stringValue = tree.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
+			panel.add(mainLabel);
 
-			lab1.setText(stringValue);
-			if (!(value instanceof CATreeNode))
-				return panel;
-			CATreeNode catn = (CATreeNode) value;
-			if (catn.isEntity()) {
-				CATreeNode etn = catn;
-				Entity e = catn.getEntity();
-				if (!etn.isVisible()) {
-					lab1.setForeground(Color.GRAY);
-				} else {
-					lab1.setForeground(Color.BLACK);
-				}
-				lab1.setIcon(FontIcon.of(Material.PERSON, new Color(e.getColor())));
-				if (etn.getEntity().getKey() != null) {
-					lab1.setText(etn.getEntity().getKey() + ": " + e.getLabel() + " (" + etn.getChildCount() + ")");
-				} else if (!(etn.getParent().isEntity()))
-					lab1.setText(e.getLabel() + " (" + etn.getChildCount() + ")");
-				if (e instanceof EntityGroup) {
-					panel.add(Box.createRigidArea(new Dimension(5, 5)));
-					panel.add(new JLabel(FontIcon.of(Material.GROUP_WORK)));
-				}
-				if (Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-					JLabel l = new JLabel();
-					if (showText)
-						l.setText(Annotator.getString("entity.flag.generic"));
-					l.setIcon(FontIcon.of(Material.CLOUD));
-					panel.add(Box.createRigidArea(new Dimension(5, 5)));
-					panel.add(l);
-				}
-			} else if (catn != null && catn.getFeatureStructure() instanceof Mention) {
-				Mention m = (Mention) catn.getFeatureStructure();
-
-				if (Util.isDifficult(m)) {
-					JLabel l = new JLabel();
-					if (showText)
-						l.setText(Annotator.getString("mention.flag.difficult"));
-					l.setIcon(FontIcon.of(Material.WARNING));
-					panel.add(Box.createRigidArea(new Dimension(5, 5)));
-					panel.add(l);
-				}
-				if (Util.isAmbiguous(m)) {
-					JLabel l = new JLabel();
-					if (showText)
-						l.setText(Annotator.getString("mention.flag.ambiguous"));
-					l.setIcon(FontIcon.of(Material.SHARE));
-					panel.add(Box.createRigidArea(new Dimension(5, 5)));
-					panel.add(l);
-				}
-
-				lab1.setIcon(FontIcon.of(Material.PERSON_PIN));
-			} else if (cModel != null && catn == cModel.rootNode)
-				lab1.setIcon(FontIcon.of(Material.PERSON_ADD));
-			else if (cModel != null && catn.getFeatureStructure() instanceof DetachedMentionPart)
-				lab1.setIcon(FontIcon.of(Material.CHILD_FRIENDLY));
+			// depending of node type, do different things
+			if (treeNode.isEntity())
+				return handleEntity(panel, mainLabel, treeNode.getEntity());
+			else if (treeNode.isMention()) {
+				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
+			} else if (cModel != null && treeNode == cModel.rootNode)
+				mainLabel.setIcon(FontIcon.of(Material.PERSON_ADD));
+			else if (cModel != null && treeNode.getFeatureStructure() instanceof DetachedMentionPart)
+				mainLabel.setIcon(FontIcon.of(Material.CHILD_FRIENDLY));
 
 			return panel;
 		}
