@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
@@ -29,7 +27,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
-public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionListener {
+public class CoreferenceModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	ColorProvider colorMap = new ColorProvider();
@@ -56,9 +54,6 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
-		// this.groupRootNode = new CATreeNode(null,
-		// Annotator.getString("tree.groups"));
-		// this.insertNodeInto(groupRootNode, rootNode, 0);
 		this.jcas = jcas;
 		this.preferences = preferences;
 
@@ -461,11 +456,6 @@ public class CoreferenceModel extends DefaultTreeModel implements TreeSelectionL
 
 		// fire event
 		fireAnnotationChangedEvent(m);
-	}
-
-	@Override
-	public void valueChanged(TreeSelectionEvent e) {
-
 	}
 
 }
