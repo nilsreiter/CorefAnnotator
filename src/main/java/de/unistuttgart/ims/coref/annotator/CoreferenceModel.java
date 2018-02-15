@@ -364,12 +364,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
-		MutableList<CATreeNode> children = Lists.mutable.withAll(rootNode);
-		children = children.reject(n -> !n.isEntity());
-		children.sort(comparator);
-		rootNode.removeAllChildren();
-		children.forEach(node -> rootNode.add(node));
-		nodeChanged(rootNode);
+		rootNode.getChildren().sort(comparator);
 		nodeStructureChanged(rootNode);
 	}
 
