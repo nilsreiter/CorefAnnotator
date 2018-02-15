@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -129,6 +130,15 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 	@Deprecated
 	public void setKeyCode(char keyCode) {
 		this.keyCode = keyCode;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Vector<CATreeNode> getChildren() {
+		return this.children;
+	}
+
+	public void setChildren(Vector<CATreeNode> vec) {
+		this.children = vec;
 	}
 
 }
