@@ -293,6 +293,13 @@
 			<version>${version.dkpro}</version>
 		</dependency>
 		<dependency>
+			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
+			<artifactId>
+				de.tudarmstadt.ukp.dkpro.core.io.conll-asl
+			</artifactId>
+			<version>${version.dkpro}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections-api</artifactId>
 			<version>9.1.0</version>
