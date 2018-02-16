@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,7 +82,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -537,8 +535,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected Object doInBackground() throws Exception {
-				SimplePipeline.runPipeline(jcas, plugin.getExporter());
-				XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
+				SimplePipeline.runPipeline(jcas, plugin.getExporter(), plugin.getWriter(f));
 				return new Object();
 			}
 
