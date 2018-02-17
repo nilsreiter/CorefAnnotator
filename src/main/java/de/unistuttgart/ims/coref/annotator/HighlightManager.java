@@ -8,6 +8,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.LayeredHighlighter;
 
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -28,22 +29,46 @@ class HighlightManager {
 		textComponent.setHighlighter(hilit);
 	}
 
+	/**
+	 * @deprecated Use {@link #underline(Annotation)} instead
+	 */
+	@Deprecated
 	public void draw(Annotation a) {
+		underline(a);
+	}
+
+	public void underline(Annotation a) {
 		if (a instanceof Mention)
-			draw((Mention) a);
+			underline((Mention) a);
 	}
 
+	/**
+	 * @deprecated Use {@link #underline(Mention)} instead
+	 */
+	@Deprecated
 	public void draw(Mention m) {
-		draw(m, new Color(m.getEntity().getColor()), false, true);
+		underline(m);
+	}
+
+	public void underline(Mention m) {
+		draw(m, new Color(m.getEntity().getColor()), false, true, null);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
+			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
 
 	}
 
+	/**
+	 * @deprecated Use {@link #underline(Mention,boolean)} instead
+	 */
+	@Deprecated
 	public void draw(Mention m, boolean repaint) {
-		draw(m, new Color(m.getEntity().getColor()), false, false);
+		underline(m, repaint);
+	}
+
+	public void underline(Mention m, boolean repaint) {
+		draw(m, new Color(m.getEntity().getColor()), false, false, null);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 	}
 
 	public void clearAndDrawAllAnnotations(JCas jcas) {
@@ -51,9 +76,9 @@ class HighlightManager {
 		highlightMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			draw(m, new Color(m.getEntity().getColor()), false, false);
+			draw(m, new Color(m.getEntity().getColor()), false, false, null);
 			if (m.getDiscontinuous() != null)
-				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 
 		}
 		textComponent.repaint();
@@ -68,7 +93,8 @@ class HighlightManager {
 			hilit.removeHighlight(hi);
 	}
 
-	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint) {
+	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
+			LayeredHighlighter.LayerPainter painter) {
 		Object hi = highlightMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
@@ -77,7 +103,10 @@ class HighlightManager {
 		}
 		try {
 			int n = spanCounter.getNextLevel(span);
-			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+			if (painter == null)
+				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+			else
+				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
 			spanCounter.add(span, hi, n);
 			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
