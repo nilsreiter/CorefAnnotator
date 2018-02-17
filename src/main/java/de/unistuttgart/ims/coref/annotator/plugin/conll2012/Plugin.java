@@ -6,10 +6,13 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
+import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
+import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -33,7 +36,14 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(Exporter.class);
+		AggregateBuilder b = new AggregateBuilder();
+		b.add(Constants.FLOW_KEY_TOKENIZER, AnalysisEngineFactory.createEngineDescription(BreakIteratorSegmenter.class,
+				BreakIteratorSegmenter.PARAM_WRITE_SENTENCE, false));
+		b.add(Constants.FLOW_KEY_SENTENCE_SPLITTER, AnalysisEngineFactory.createEngineDescription(
+				BreakIteratorSegmenter.class, BreakIteratorSegmenter.PARAM_WRITE_TOKEN, false));
+		b.add(Constants.FLOW_KEY_CONVERTER, AnalysisEngineFactory.createEngineDescription(Exporter.class));
+		b.setFlowControllerDescription(FlowControllerFactory.createFlowControllerDescription(FlowController.class));
+		return b.createAggregateDescription();
 	}
 
 	@Override
