@@ -136,7 +136,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Feature titleFeature;
 
 	// actions
-	// AbstractAction commentAction = new CommentAction(null);
+	AbstractAction commentAction = new CommentAction(null);
 	AbstractAction newEntityAction;
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
@@ -439,7 +439,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(deleteAction));
-		// entityMenu.add(new JMenuItem(commentAction));
+		entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
@@ -1371,7 +1371,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-            saveDialog.setFileFilter(plugin.getFileFilter());
+			saveDialog.setFileFilter(plugin.getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
