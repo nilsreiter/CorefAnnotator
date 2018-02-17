@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,7 +82,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -538,8 +536,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected Object doInBackground() throws Exception {
-				SimplePipeline.runPipeline(jcas, plugin.getExporter());
-				XmiCasSerializer.serialize(jcas.getCas(), new FileOutputStream(f));
+				SimplePipeline.runPipeline(jcas, plugin.getExporter(), plugin.getWriter(f));
 				return new Object();
 			}
 
@@ -549,8 +546,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				progressBar.setVisible(false);
 				setMessage("");
 				file = f;
-				unsavedChanges = false;
-				setWindowTitle();
+				if (plugin == mainApplication.getPluginManager().getDefaultIOPlugin()) {
+					unsavedChanges = false;
+					setWindowTitle();
+				}
 			}
 
 		}.execute();
@@ -1364,6 +1363,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		public FileExportAction(IOPlugin plugin) {
 			putValue(Action.NAME, plugin.getName());
+			this.plugin = plugin;
 
 		}
 
@@ -1371,7 +1371,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(XmiFileFilter.filter);
+            saveDialog.setFileFilter(plugin.getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
@@ -1404,7 +1404,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			else
 				saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(XmiFileFilter.filter);
+			saveDialog.setFileFilter(mainApplication.getPluginManager().getDefaultIOPlugin().getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
