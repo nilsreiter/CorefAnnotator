@@ -80,6 +80,8 @@ public class Constants {
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String MENU_COMMENTS = "menu.comments";
+		public static final String MENU_ENTITIES = "menu.entities";
 
 	}
 }

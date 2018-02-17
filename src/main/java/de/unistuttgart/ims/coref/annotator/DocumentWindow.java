@@ -18,7 +18,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +69,7 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -91,6 +91,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -110,6 +111,7 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -1563,40 +1565,66 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (SwingUtilities.isRightMouseButton(e)) {
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
-				Collection<Annotation> mentions = cModel.getMentions(offset);
-				if (mentions.isEmpty())
+				MutableList<Annotation> localAnnotations = Lists.mutable.withAll(cModel.getMentions(offset));
+				if (localAnnotations.isEmpty())
 					return;
-				textPopupMenu.add(Annotator.getString("menu.entities"));
+
+				MutableList<Annotation> mentions = localAnnotations
+						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+				if (!mentions.isEmpty())
+					textPopupMenu.add(Annotator.getString(Strings.MENU_ENTITIES));
 				for (Annotation anno : mentions) {
-					StringBuilder b = new StringBuilder();
-					b.append(anno.getAddress());
-					Mention m = null;
-					DetachedMentionPart dmp = null;
-					if (anno instanceof Mention) {
-						m = (Mention) anno;
-						dmp = m.getDiscontinuous();
-					} else if (anno instanceof DetachedMentionPart) {
-						dmp = (DetachedMentionPart) anno;
-						m = dmp.getMention();
-					}
-					String surf = m.getCoveredText();
-					if (dmp != null)
-						surf += " [,] " + dmp.getCoveredText();
-					if (m.getEntity().getLabel() != null)
-						b.append(": ").append(m.getEntity().getLabel());
+					if (anno instanceof Mention)
+						textPopupMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+					else if (anno instanceof DetachedMentionPart)
+						textPopupMenu.add(
+								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+				}
+				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
 
-					JMenu mentionMenu = new JMenu(b.toString());
-					mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
-					Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-					mentionMenu.add('"' + surf + '"');
-					mentionMenu.add(a);
-					mentionMenu.add(new DeleteMentionAction(m));
-
-					textPopupMenu.add(mentionMenu);
+				if (!comments.isEmpty())
+					textPopupMenu.add(Annotator.getString(Strings.MENU_COMMENTS));
+				for (Annotation anno : comments) {
+					if (anno instanceof CommentAnchor)
+						textPopupMenu.add(getCommentItem((CommentAnchor) anno));
 				}
 				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 
 			}
+
+		}
+
+		private JMenu getCommentItem(CommentAnchor anno) {
+			Comment c = anno.getComment();
+			StringBuilder b = new StringBuilder();
+			if (c.getAuthor() != null)
+				b.append(c.getAuthor());
+			else
+				b.append("Unknown author");
+			JMenu subMenu = new JMenu(b.toString());
+			subMenu.add(c.getValue());
+			subMenu.add(new CommentAction(c));
+			return subMenu;
+		}
+
+		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
+			StringBuilder b = new StringBuilder();
+			b.append(m.getAddress());
+
+			String surf = m.getCoveredText();
+
+			if (dmp != null)
+				surf += " [,] " + dmp.getCoveredText();
+			if (m.getEntity().getLabel() != null)
+				b.append(": ").append(m.getEntity().getLabel());
+
+			JMenu mentionMenu = new JMenu(b.toString());
+			mentionMenu.setIcon(FontIcon.of(Material.PERSON, new Color(m.getEntity().getColor())));
+			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+			mentionMenu.add('"' + surf + '"');
+			mentionMenu.add(a);
+			mentionMenu.add(new DeleteMentionAction(m));
+			return mentionMenu;
 		}
 
 		@Override
@@ -1824,7 +1852,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (comment != null) {
 					comment.setValue(msg.getText());
 				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
-					Annotation tgt = new Annotation(jcas);
+					CommentAnchor tgt = new CommentAnchor(jcas);
 					tgt.setBegin(textPane.getSelectionStart());
 					tgt.setEnd(textPane.getSelectionEnd());
 					tgt.addToIndexes();
@@ -1832,7 +1860,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					com.setValue(msg.getText());
 					com.setAnnotation(tgt);
 					com.addToIndexes();
-					highlightManager.draw(tgt, Color.YELLOW, false, true);
+					tgt.setComment(com);
+					highlightManager.draw(tgt, Color.YELLOW, false, true,
+							new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
+					cModel.characterPosition2AnnotationMap.add(tgt);
 				}
 				/*
 				 * else if (e.getSource() instanceof Component) { } Component
