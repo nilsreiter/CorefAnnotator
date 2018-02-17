@@ -18,7 +18,6 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 class HighlightManager {
 	JTextComponent textComponent;
 	Highlighter hilit;
-	Highlighter.HighlightPainter painter;
 
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	RangedCounter spanCounter = new RangedCounter();
