@@ -69,4 +69,9 @@ public class Plugin implements IOPlugin {
 		return null;
 	}
 
+	@Override
+	public String getSuffix() {
+		return ".txt";
+	}
+
 }

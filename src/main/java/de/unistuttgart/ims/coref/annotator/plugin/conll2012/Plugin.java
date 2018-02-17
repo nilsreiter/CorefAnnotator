@@ -15,6 +15,7 @@ import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.uimautil.SetDocumentId;
 
 public class Plugin implements IOPlugin {
 
@@ -48,8 +49,13 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(Conll2012Writer.class,
-				Conll2012Writer.PARAM_TARGET_LOCATION, f.getAbsolutePath());
+		AggregateBuilder b = new AggregateBuilder();
+		b.add(AnalysisEngineFactory.createEngineDescription(SetDocumentId.class, SetDocumentId.PARAM_DOCUMENT_ID,
+				f.getName().replaceAll(getSuffix(), "")));
+		b.add(AnalysisEngineFactory.createEngineDescription(Conll2012Writer.class,
+				Conll2012Writer.PARAM_TARGET_LOCATION, f.getParentFile().getAbsolutePath(),
+				Conll2012Writer.PARAM_USE_DOCUMENT_ID, true));
+		return b.createAggregateDescription();
 	}
 
 	@Override
@@ -68,7 +74,7 @@ public class Plugin implements IOPlugin {
 
 			@Override
 			public boolean accept(File f) {
-				return f.getName().endsWith(".csv");
+				return f.getName().endsWith(".conll");
 			}
 
 			@Override
@@ -77,6 +83,11 @@ public class Plugin implements IOPlugin {
 			}
 
 		};
+	}
+
+	@Override
+	public String getSuffix() {
+		return ".conll";
 	}
 
 }

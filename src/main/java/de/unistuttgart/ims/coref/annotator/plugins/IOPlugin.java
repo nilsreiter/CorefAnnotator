@@ -21,4 +21,6 @@ public interface IOPlugin extends Plugin {
 	Class<? extends StylePlugin> getStylePlugin();
 
 	FileFilter getFileFilter();
+
+	String getSuffix();
 }

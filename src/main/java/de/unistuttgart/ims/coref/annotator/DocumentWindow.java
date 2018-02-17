@@ -1402,7 +1402,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			else
 				saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(XmiFileFilter.filter);
+			saveDialog.setFileFilter(mainApplication.getPluginManager().getDefaultIOPlugin().getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString("dialog.save_as.title"));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
