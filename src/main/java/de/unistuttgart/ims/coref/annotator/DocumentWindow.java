@@ -1824,13 +1824,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class CommentAction extends AbstractAction {
+	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		Comment comment;
 
 		public CommentAction(Comment c) {
+			super(MaterialDesign.MDI_MESSAGE_PLUS);
 			putValue(Action.NAME, Annotator.getString(Strings.ACTION_COMMENT));
 			this.comment = c;
 		}
