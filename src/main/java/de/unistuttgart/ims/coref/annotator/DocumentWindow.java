@@ -704,6 +704,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		setMessage("");
 
 		commentsWindow = new CommentWindow(this, cModel);
+
 	}
 
 	protected void fireJCasLoadedEvent() {
@@ -1601,7 +1602,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		private JMenu getCommentItem(CommentAnchor anno) {
-			Comment c = cModel.getCommentsModel().getComment(anno);
+			Comment c = cModel.getCommentsModel().get(anno);
 			StringBuilder b = new StringBuilder();
 			if (c.getAuthor() != null)
 				b.append(c.getAuthor());

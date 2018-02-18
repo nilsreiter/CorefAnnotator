@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -30,7 +31,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class CoreferenceModel extends DefaultTreeModel {
-	class CommentsModel extends AbstractListModel<Comment> {
+	public class CommentsModel extends AbstractListModel<Comment> {
 
 		MutableList<Comment> comments = Lists.mutable.empty();
 		MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
@@ -42,8 +43,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 		public void load() {
 
-			add("bla", "Nils", 0, 10);
-			add("blubb", "Nils", 15, 20);
+			for (Comment comment : JCasUtil.select(jcas, Comment.class)) {
+				register(comment);
+			}
 			Annotator.logger.debug("Comments list contains {} elements.", comments.size());
 		}
 
@@ -60,29 +62,11 @@ public class CoreferenceModel extends DefaultTreeModel {
 			comment.setAnnotation(annotation);
 			comment.addToIndexes();
 
-			commentMap.put(annotation, comment);
-			characterPosition2AnnotationMap.add(annotation);
-			int ind = 0;
-			Comparator<Comment> comp = CommentSortOrder.POSITION.getComparator();
-			while (ind < comments.size()) {
-				if (comp.compare(comment, comments.get(ind)) < 0) {
-					break;
-				}
-				ind++;
-
-			}
-			comments.add(ind, comment);
-			fireIntervalAdded(this, ind, ind);
-
-			fireMentionAddedEvent(annotation);
+			register(comment);
 		}
 
-		public Comment getComment(CommentAnchor ca) {
+		public Comment get(CommentAnchor ca) {
 			return commentMap.get(ca);
-		}
-
-		public void add(Comment c) {
-
 		}
 
 		@Override
@@ -93,6 +77,37 @@ public class CoreferenceModel extends DefaultTreeModel {
 		@Override
 		public Comment getElementAt(int index) {
 			return comments.get(index);
+		}
+
+		protected void register(Comment comment) {
+			if (comment instanceof AnnotationComment) {
+				commentMap.put(((AnnotationComment) comment).getAnnotation(), comment);
+				characterPosition2AnnotationMap.add(((AnnotationComment) comment).getAnnotation());
+			}
+			int ind = 0;
+			Comparator<Comment> comp = CommentSortOrder.POSITION.getComparator();
+			while (ind < comments.size()) {
+				if (comp.compare(comment, comments.get(ind)) < 0) {
+					break;
+				}
+				ind++;
+			}
+			comments.add(ind, comment);
+			fireIntervalAdded(this, ind, ind);
+			if (comment instanceof AnnotationComment)
+				fireMentionAddedEvent(((AnnotationComment) comment).getAnnotation());
+
+		}
+
+		public void remove(Comment c) {
+			int index = comments.indexOf(c);
+			comments.remove(index);
+			fireIntervalRemoved(this, index, index);
+			commentMap.remove(c);
+			if (c instanceof AnnotationComment) {
+				characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
+				fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
+			}
 		}
 	}
 

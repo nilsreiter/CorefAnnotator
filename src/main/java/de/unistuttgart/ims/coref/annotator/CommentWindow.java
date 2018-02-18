@@ -42,7 +42,7 @@ public class CommentWindow extends JFrame {
 		commentList = new PanelList<Comment>(new PanelFactory<Comment>() {
 			@Override
 			public JPanel getPanel(Comment object) {
-				return new CommentPanel(object);
+				return new CommentPanel(commentsListModel, object);
 			}
 
 		});
@@ -69,15 +69,6 @@ public class CommentWindow extends JFrame {
 	}
 
 	public void enterNewComment() {
-
-	}
-
-	class CellRenderer implements PanelFactory<Comment> {
-
-		@Override
-		public JPanel getPanel(Comment object) {
-			return new CommentPanel(object);
-		}
 
 	}
 

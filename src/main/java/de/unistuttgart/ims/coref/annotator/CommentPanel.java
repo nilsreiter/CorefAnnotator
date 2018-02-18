@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
+import de.unistuttgart.ims.coref.annotator.CoreferenceModel.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
@@ -20,7 +21,7 @@ class CommentPanel extends JPanel {
 	JTextArea textArea;
 	Action deleteAction, editAction;
 
-	public CommentPanel(Comment c) {
+	public CommentPanel(CommentsModel model, Comment c) {
 		comment = c;
 		SpringLayout springs = new SpringLayout();
 		setOpaque(true);
@@ -35,7 +36,7 @@ class CommentPanel extends JPanel {
 		textArea.setOpaque(true);
 		textArea.setRows(3);
 		textArea.setEditable(false);
-		JButton deleteButton = new JButton(new DeleteCommentAction(c));
+		JButton deleteButton = new JButton(new DeleteCommentAction(model, c));
 		JButton editButton = new JButton(new ExitAction());
 
 		add(textArea);

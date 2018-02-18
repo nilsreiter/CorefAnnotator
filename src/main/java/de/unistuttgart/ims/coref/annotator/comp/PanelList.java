@@ -37,7 +37,6 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void intervalAdded(ListDataEvent e) {
-
 		Annotator.logger.debug("intervalAdded {}", e);
 		for (int i = e.getIndex0(); i <= e.getIndex1(); i++)
 			this.add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
@@ -46,7 +45,8 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 
 	@Override
 	public void intervalRemoved(ListDataEvent e) {
-		for (int i = e.getIndex0(); i < e.getIndex1(); i++)
+		Annotator.logger.debug("intervalRemoved {}", e);
+		for (int i = e.getIndex0(); i <= e.getIndex1(); i++)
 			this.remove(i);
 		revalidate();
 	}
