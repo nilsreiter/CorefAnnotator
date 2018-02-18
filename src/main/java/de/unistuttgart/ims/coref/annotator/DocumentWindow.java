@@ -1598,15 +1598,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		private JMenu getCommentItem(CommentAnchor anno) {
-			Comment c = anno.getComment();
+			Comment c = cModel.getCommentsModel().getComment(anno);
 			StringBuilder b = new StringBuilder();
 			if (c.getAuthor() != null)
 				b.append(c.getAuthor());
 			else
 				b.append("Unknown author");
 			JMenu subMenu = new JMenu(b.toString());
+			subMenu.setIcon(FontIcon.of(Material.COMMENT));
 			subMenu.add(c.getValue());
-			subMenu.add(new CommentAction(c));
+			CommentAction action = new CommentAction(c);
+			action.putValue(Action.NAME, Constants.Strings.ACTION_EDIT_COMMENT);
+			action.putValue(Action.SMALL_ICON, FontIcon.of(MaterialDesign.MDI_MESSAGE_DRAW));
+			subMenu.add(action);
 			return subMenu;
 		}
 
