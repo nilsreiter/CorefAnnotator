@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractListModel;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -15,10 +16,13 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
+import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -26,6 +30,72 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class CoreferenceModel extends DefaultTreeModel {
+	class CommentsModel extends AbstractListModel<Comment> {
+
+		MutableList<Comment> comments = Lists.mutable.empty();
+		MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
+
+		private static final long serialVersionUID = 1L;
+
+		private CommentsModel() {
+		}
+
+		public void load() {
+
+			add("bla", "Nils", 0, 10);
+			add("blubb", "Nils", 15, 20);
+			Annotator.logger.debug("Comments list contains {} elements.", comments.size());
+		}
+
+		public void add(String text, String author, int begin, int end) {
+
+			CommentAnchor annotation = new CommentAnchor(jcas);
+			annotation.setBegin(begin);
+			annotation.setEnd(end);
+			annotation.addToIndexes();
+
+			AnnotationComment comment = new AnnotationComment(jcas);
+			comment.setAuthor(author);
+			comment.setValue(text);
+			comment.setAnnotation(annotation);
+			comment.addToIndexes();
+
+			commentMap.put(annotation, comment);
+			characterPosition2AnnotationMap.add(annotation);
+			int ind = 0;
+			Comparator<Comment> comp = CommentSortOrder.POSITION.getComparator();
+			while (ind < comments.size()) {
+				if (comp.compare(comment, comments.get(ind)) < 0) {
+					break;
+				}
+				ind++;
+
+			}
+			comments.add(ind, comment);
+			fireIntervalAdded(this, ind, ind);
+
+			fireMentionAddedEvent(annotation);
+		}
+
+		public Comment getComment(CommentAnchor ca) {
+			return commentMap.get(ca);
+		}
+
+		public void add(Comment c) {
+
+		}
+
+		@Override
+		public int getSize() {
+			return comments.size();
+		}
+
+		@Override
+		public Comment getElementAt(int index) {
+			return comments.get(index);
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
 	ColorProvider colorMap = new ColorProvider();
@@ -50,11 +120,14 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	CATreeNode rootNode;
 
+	CommentsModel commentsModel;
+
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
 		this.jcas = jcas;
 		this.preferences = preferences;
+		this.commentsModel = new CommentsModel();
 
 	}
 
@@ -88,6 +161,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 		// tree model
 		addTo(add(e), add(m));
+	}
+
+	public void add(String text, String author, int begin, int end) {
+		commentsModel.add(text, author, begin, end);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
@@ -195,7 +272,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return m;
 	}
 
-	public void fireMentionAddedEvent(Mention m) {
+	public void fireMentionAddedEvent(Annotation m) {
 		crModelListeners.forEach(l -> l.mentionAdded(m));
 	}
 
@@ -431,6 +508,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 		// fire event
 		fireAnnotationChangedEvent(m);
+	}
+
+	public CommentsModel getCommentsModel() {
+		return commentsModel;
 	}
 
 }
