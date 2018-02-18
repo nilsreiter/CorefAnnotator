@@ -805,7 +805,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void mentionAdded(Annotation m) {
+		if (m instanceof Mention)
 		highlightManager.underline(m);
+		else if (m instanceof CommentAnchor)
+			highlightManager.highlight(m);
 	}
 
 	@Override
