@@ -109,6 +109,11 @@ public class CoreferenceModel extends DefaultTreeModel {
 				fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
 			}
 		}
+
+		public void update(Comment c) {
+			int index = comments.indexOf(c);
+			this.fireContentsChanged(this, index, index);
+		}
 	}
 
 	private static final long serialVersionUID = 1L;
