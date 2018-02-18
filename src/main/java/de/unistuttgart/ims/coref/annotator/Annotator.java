@@ -103,6 +103,17 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public Annotator() throws ResourceInitializationException {
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
+
+		try {
+			if (!preferences.nodeExists(Constants.CFG_ANNOTATOR_ID))
+				if (System.getProperty("user.name") != null)
+					preferences.put(Constants.CFG_ANNOTATOR_ID, System.getProperty("user.name"));
+				else
+					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+
 		this.initialiseActions();
 		this.initialiseTypeSystem();
 		this.initialiseDialogs();
