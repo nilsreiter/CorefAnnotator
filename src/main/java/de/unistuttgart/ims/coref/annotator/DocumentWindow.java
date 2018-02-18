@@ -69,7 +69,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -109,7 +108,6 @@ import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -167,6 +165,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JSplitPane splitPane;
 	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
+
+	// Sub windows
+	CommentWindow commentsWindow;
 
 	Thread messageVoider;
 
@@ -701,6 +702,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
 		setMessage("");
+
+		commentsWindow = new CommentWindow(this, cModel);
 	}
 
 	protected void fireJCasLoadedEvent() {
@@ -806,7 +809,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	@Override
 	public void mentionAdded(Annotation m) {
 		if (m instanceof Mention)
-		highlightManager.underline(m);
+			highlightManager.underline(m);
 		else if (m instanceof CommentAnchor)
 			highlightManager.highlight(m);
 	}
@@ -1860,18 +1863,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (comment != null) {
 					comment.setValue(msg.getText());
 				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
-					CommentAnchor tgt = new CommentAnchor(jcas);
-					tgt.setBegin(textPane.getSelectionStart());
-					tgt.setEnd(textPane.getSelectionEnd());
-					tgt.addToIndexes();
-					AnnotationComment com = new AnnotationComment(jcas);
-					com.setValue(msg.getText());
-					com.setAnnotation(tgt);
-					com.addToIndexes();
-					tgt.setComment(com);
-					highlightManager.draw(tgt, Color.YELLOW, false, true,
-							new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
-					cModel.characterPosition2AnnotationMap.add(tgt);
+					cModel.getCommentsModel().add(msg.getText(), "", textPane.getSelectionStart(),
+							textPane.getSelectionEnd());
 				}
 				/*
 				 * else if (e.getSource() instanceof Component) { } Component
