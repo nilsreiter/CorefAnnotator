@@ -17,58 +17,16 @@ import org.apache.uima.jcas.tcas.Annotation;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 class HighlightManager {
-	JTextComponent textComponent;
+	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	Highlighter hilit;
 
-	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	RangedCounter spanCounter = new RangedCounter();
+	JTextComponent textComponent;
 
 	public HighlightManager(JTextComponent component) {
 		hilit = new DefaultHighlighter();
 		textComponent = component;
 		textComponent.setHighlighter(hilit);
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Annotation)} instead
-	 */
-	@Deprecated
-	public void draw(Annotation a) {
-		underline(a);
-	}
-
-	public void underline(Annotation a) {
-		if (a instanceof Mention)
-			underline((Mention) a);
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Mention)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m) {
-		underline(m);
-	}
-
-	public void underline(Mention m) {
-		draw(m, new Color(m.getEntity().getColor()), false, true, null);
-		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
-
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Mention,boolean)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m, boolean repaint) {
-		underline(m, repaint);
-	}
-
-	public void underline(Mention m, boolean repaint) {
-		draw(m, new Color(m.getEntity().getColor()), false, false, null);
-		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 	}
 
 	public void clearAndDrawAllAnnotations(JCas jcas) {
@@ -84,13 +42,12 @@ class HighlightManager {
 		textComponent.repaint();
 	}
 
-	public void undraw(Annotation a) {
-		Object hi = highlightMap.get(a);
-		Span span = new Span(a);
-		if (span != null)
-			spanCounter.subtract(span, hi);
-		if (hi != null)
-			hilit.removeHighlight(hi);
+	/**
+	 * @deprecated Use {@link #underline(Annotation)} instead
+	 */
+	@Deprecated
+	public void draw(Annotation a) {
+		underline(a);
 	}
 
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
@@ -118,8 +75,56 @@ class HighlightManager {
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #underline(Mention)} instead
+	 */
+	@Deprecated
+	public void draw(Mention m) {
+		underline(m);
+	}
+
+	/**
+	 * @deprecated Use {@link #underline(Mention,boolean)} instead
+	 */
+	@Deprecated
+	public void draw(Mention m, boolean repaint) {
+		underline(m, repaint);
+	}
+
 	public Highlighter getHighlighter() {
 		return hilit;
+	}
+
+	public void highlight(Annotation a) {
+		draw(a, new Color(255, 255, 150), false, false,
+				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
+	}
+
+	public void underline(Annotation a) {
+		if (a instanceof Mention)
+			underline((Mention) a);
+	}
+
+	public void underline(Mention m) {
+		draw(m, new Color(m.getEntity().getColor()), false, true, null);
+		if (m.getDiscontinuous() != null)
+			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
+
+	}
+
+	public void underline(Mention m, boolean repaint) {
+		draw(m, new Color(m.getEntity().getColor()), false, false, null);
+		if (m.getDiscontinuous() != null)
+			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+	}
+
+	public void undraw(Annotation a) {
+		Object hi = highlightMap.get(a);
+		Span span = new Span(a);
+		if (span != null)
+			spanCounter.subtract(span, hi);
+		if (hi != null)
+			hilit.removeHighlight(hi);
 	}
 
 }
