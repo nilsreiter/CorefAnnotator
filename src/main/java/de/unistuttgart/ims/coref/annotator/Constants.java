@@ -14,7 +14,7 @@ public class Constants {
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String PREF_RECENT = "recent_files";
 
-	static class Strings {
+	public static class Strings {
 
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
 		public static final String MENU_VIEW = "menu.view";
@@ -80,6 +80,11 @@ public class Constants {
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String ACTION_TOGGLE_FULL_TOKENS_TOOLTIP = "action.toggle.full_tokens.tooltip";
+		public static final String ACTION_TOGGLE_FULL_TOKENS = "action.toggle.full_tokens";
+		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
+		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 
 	}
 }

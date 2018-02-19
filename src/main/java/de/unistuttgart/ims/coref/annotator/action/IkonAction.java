@@ -28,6 +28,17 @@ public abstract class IkonAction extends AbstractAction {
 		}
 	}
 
+	public IkonAction(Ikon icon, String stringKey) {
+		this.ikon = icon;
+		putValue(Action.NAME, Annotator.getString(stringKey));
+		try {
+			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, enabledColor));
+			putValue(Action.SMALL_ICON, FontIcon.of(ikon, enabledColor));
+		} catch (UnsupportedOperationException e) {
+			Annotator.logger.catching(e);
+		}
+	}
+
 	@Override
 	public void setEnabled(boolean b) {
 		super.setEnabled(b);

@@ -988,8 +988,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ChangeColorForEntity() {
-			super(Material.COLOR_LENS);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_SET_COLOR));
+			super(Material.COLOR_LENS, Strings.ACTION_SET_COLOR);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1017,8 +1016,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
-			super(Material.KEYBOARD);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_SET_SHORTCUT));
+			super(Material.KEYBOARD, Strings.ACTION_SET_SHORTCUT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(Material.KEYBOARD));
 			putValue(Action.SMALL_ICON, FontIcon.of(Material.KEYBOARD));
@@ -1055,8 +1053,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public NewEntityAction() {
-			super(Material.PERSON_ADD);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_NEW));
+			super(Material.PERSON_ADD, Strings.ACTION_NEW);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1162,8 +1159,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			super(Material.DELETE);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_DELETE));
+			super(Material.DELETE, Strings.ACTION_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1207,8 +1203,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		Mention m;
 
 		public DeleteMentionAction(Mention m) {
-			super(Material.DELETE);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_DELETE));
+			super(Material.DELETE, Strings.ACTION_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			this.m = m;
 
@@ -1316,8 +1311,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public MergeSelectedEntities() {
-			super(Material.MERGE_TYPE);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_MERGE));
+			super(Material.MERGE_TYPE, Strings.ACTION_MERGE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_TOOLTIP));
 		}
 
@@ -1335,8 +1329,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			super(Material.GROUP);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_GROUP));
+			super(Material.GROUP, Strings.ACTION_GROUP);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1371,7 +1364,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
 			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-            saveDialog.setFileFilter(plugin.getFileFilter());
+			saveDialog.setFileFilter(plugin.getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
 			int r = saveDialog.showSaveDialog(DocumentWindow.this);
 			switch (r) {
@@ -1390,8 +1383,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public FileSaveAsAction() {
-			super(MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_SAVE_AS));
+			super(MaterialDesign.MDI_CONTENT_SAVE_SETTINGS, Strings.ACTION_SAVE_AS);
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 		}
@@ -1428,8 +1420,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntitySortOrder() {
-			super(MaterialDesign.MDI_SORT_VARIANT);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_REVERT));
+			super(MaterialDesign.MDI_SORT_VARIANT, Strings.ACTION_SORT_REVERT);
 
 		}
 
@@ -1444,8 +1435,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityGeneric() {
-			super(Material.CLOUD);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC));
+			super(Material.CLOUD, Strings.ACTION_FLAG_ENTITY_GENERIC);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC_TOOLTIP));
 		}
 
@@ -1464,8 +1454,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionDifficult() {
-			super(Material.WARNING);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT));
+			super(Material.WARNING, Strings.ACTION_FLAG_MENTION_DIFFICULT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP));
 
 		}
@@ -1506,8 +1495,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ToggleShowTextInTreeLabels() {
-			super(MaterialDesign.MDI_FORMAT_TEXT);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS));
+			super(MaterialDesign.MDI_FORMAT_TEXT, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
 			putValue(Action.SELECTED_KEY,
 					mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
