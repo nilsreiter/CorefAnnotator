@@ -180,6 +180,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	float lineSpacing = 2f;
 	StylePlugin currentStyle;
 
+	// sub windows
+	SearchPanel searchPanel;
+
 	public DocumentWindow(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
@@ -503,6 +506,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		if (unsavedChanges) {
 			Annotator.logger.debug("Closing window with unsaved changes");
 		}
+		searchPanel.setVisible(false);
+		searchPanel.dispose();
+		searchPanel = null;
 		mainApplication.close(this);
 	}
 
@@ -664,6 +670,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			documentTitle = "Untitled document";
 		setTitle(documentTitle + " (" + fileName + ")"
 				+ (unsavedChanges ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
+	}
+
+	public void showSearch() {
+		if (searchPanel == null) {
+			searchPanel = new SearchPanel(this, mainApplication.getPreferences());
+		}
+		searchPanel.setVisible(true);
 	}
 
 	protected synchronized void registerChange() {
