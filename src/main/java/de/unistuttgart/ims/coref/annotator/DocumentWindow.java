@@ -507,9 +507,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Annotator.logger.debug("Closing window with unsaved changes");
 		}
 		if (searchPanel != null) {
-		searchPanel.setVisible(false);
-		searchPanel.dispose();
-		searchPanel = null;
+			searchPanel.setVisible(false);
+			searchPanel.dispose();
+			searchPanel = null;
 		}
 		mainApplication.close(this);
 	}
@@ -1481,14 +1481,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (TreePath tp : tree.getSelectionPaths()) {
-				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-				tn.setVisible(!tn.isVisible());
-				Entity entity = (Entity) tn.getFeatureStructure();
-				cModel.update(entity, tn.isVisible());
+			if (tree.getSelectionCount() > 0) {
+				for (TreePath tp : tree.getSelectionPaths()) {
+					CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
+					tn.setVisible(!tn.isVisible());
+					Entity entity = (Entity) tn.getFeatureStructure();
+					cModel.update(entity, tn.isVisible());
+				}
 			}
-			registerChange();
-
 		}
 	}
 
