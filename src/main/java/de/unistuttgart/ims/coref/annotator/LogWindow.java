@@ -20,7 +20,9 @@ public class LogWindow extends JFrame {
 		JTextArea textArea = new JTextArea();
 		Dimension d = new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
 		d.height -= 100;
+		d.width -= 100;
 		textArea.setMaximumSize(d);
+		textArea.setPreferredSize(new Dimension(d));
 		JScrollPane scroll = new JScrollPane(textArea);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		try {
