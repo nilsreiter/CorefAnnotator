@@ -49,6 +49,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -103,6 +104,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public Annotator() throws ResourceInitializationException {
+		logger.trace("Application startup");
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 		this.initialiseActions();
@@ -144,6 +146,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
+		panel.add(new JButton(new ShowLogWindowAction(this)));
 		mainPanel.add(panel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
@@ -187,6 +190,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
+		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow(this);
 
 		Runnable runnable = new Runnable() {

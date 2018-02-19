@@ -350,7 +350,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toggleMentionDifficult.setEnabled(false);
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
-		Annotator.logger.info("Actions initialised.");
+		Annotator.logger.trace("Actions initialised.");
 
 	}
 
@@ -503,12 +503,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 		});
 
-		Annotator.logger.info("Initialised menu bar.");
+		Annotator.logger.info("Initialised menus");
 	}
 
 	protected void closeWindow(boolean quit) {
 		if (unsavedChanges) {
-			Annotator.logger.debug("Closing window with unsaved changes");
+			Annotator.logger.warn("Closing window with unsaved changes");
 		}
 		if (searchPanel != null) {
 			searchPanel.setVisible(false);
@@ -541,7 +541,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public synchronized void saveToFile(File f, IOPlugin plugin) {
-		Annotator.logger.debug("Exporting into file {} using plugin {}", f, plugin.getName());
+		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 		progressBar.setValue(0);
 		progressBar.setVisible(true);
@@ -724,9 +724,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
 		setMessage("");
+		Annotator.logger.info("Document model has been loaded.");
 	}
 
 	protected void fireJCasLoadedEvent() {
+		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
