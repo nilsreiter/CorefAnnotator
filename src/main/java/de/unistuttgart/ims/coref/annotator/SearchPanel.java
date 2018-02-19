@@ -77,8 +77,6 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	JTextField textField;
 	JLabel searchResultsLabel = new JLabel(" "), selectedEntityLabel = new JLabel();
 	int contexts = 50;
-	boolean showBarChart = true;
-	JFrame chartFrame;
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
 
@@ -191,9 +189,6 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		} catch (InterruptedException e1) {
 			Annotator.logger.catching(e1);
 		}
-		if (chartFrame != null)
-			chartFrame.dispose();
-		Counter<String> counter = new Counter<String>();
 		if (s.length() > 0) {
 
 			Pattern p = Pattern.compile(s);
@@ -202,8 +197,6 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 				try {
 					lm.addElement(new SearchResult(m.start(), m.end()));
 					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
-					if (showBarChart)
-						counter.add(text.substring(m.start(), m.end()));
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
@@ -214,7 +207,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 		}
 
-		pack();
+		// pack();
 	}
 
 	class SearchResult {
@@ -285,10 +278,6 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		if (chartFrame != null) {
-			chartFrame.setVisible(false);
-			chartFrame.dispose();
-		}
 		for (Object o : highlights)
 			hilit.removeHighlight(o);
 		dispose();
@@ -302,26 +291,19 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	class TSL extends CATreeSelectionListener implements ListSelectionListener {
