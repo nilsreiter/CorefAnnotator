@@ -79,6 +79,7 @@ public class Constants {
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String ACTION_SEARCH = "action.search";
+		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 
 	}
 

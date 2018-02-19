@@ -99,7 +99,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
 
 		textField = new JTextField(20);
-		textField.setToolTipText("Search");
+		textField.setToolTipText(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
 		textField.getDocument().addDocumentListener(this);
 
 		JToolBar bar = new JToolBar();
@@ -128,16 +128,6 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		addWindowListener(this);
 		pack();
-	}
-
-	public JPanel createSearchPanel() {
-		JPanel searchPanel = new JPanel();
-		textField = new JTextField(20);
-		textField.setToolTipText("Search");
-		textField.getDocument().addDocumentListener(this);
-
-		searchPanel.add(textField);
-		return searchPanel;
 	}
 
 	@Override
