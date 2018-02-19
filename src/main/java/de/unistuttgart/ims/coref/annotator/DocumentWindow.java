@@ -227,7 +227,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
-		tree.addTreeSelectionListener(new MyTreeSelectionListener());
+		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
 		tree.addKeyListener(new TreeKeyListener());
 
@@ -1654,75 +1654,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class MyTreeSelectionListener implements TreeSelectionListener {
+	class MyTreeSelectionListener extends CATreeSelectionListener {
 
-		TreeSelectionEvent currentEvent = null;
-		int num;
-
-		// selected things
-		ImmutableList<TreePath> paths;
-		MutableList<CATreeNode> nodes;
-		MutableList<FeatureStructure> fs;
-
-		private synchronized void collectData(TreeSelectionEvent e) {
-			currentEvent = e;
-			num = tree.getSelectionCount();
-			paths = Lists.immutable.of(tree.getSelectionPaths());
-			nodes = Lists.mutable.empty();
-			fs = Lists.mutable.empty();
-
-			if (num > 0)
-				try {
-					for (int i = 0; i < paths.size(); i++) {
-						nodes.add(i, (CATreeNode) paths.get(i).getLastPathComponent());
-						fs.add(i, nodes.get(i).getFeatureStructure());
-					}
-				} catch (NullPointerException ex) {
-				}
-
-		}
-
-		private boolean isSingle() {
-			return num == 1;
-		}
-
-		private boolean isDouble() {
-			return num == 2;
-		}
-
-		private boolean isEntity() {
-			return fs.allSatisfy(f -> f instanceof Entity);
-		}
-
-		private boolean isDetachedMentionPart() {
-			return fs.allSatisfy(f -> f instanceof DetachedMentionPart);
-		}
-
-		private boolean isMention() {
-			return fs.allSatisfy(f -> f instanceof Mention);
-		}
-
-		private boolean isEntityGroup() {
-			return fs.allSatisfy(f -> f instanceof EntityGroup);
-		}
-
-		private boolean isLeaf() {
-			for (TreeNode n : nodes)
-				if (!n.isLeaf())
-					return false;
-			return true;
-		}
-
-		private Entity getEntity(int i) {
-			return (Entity) fs.get(i);
-		}
-
-		private Annotation getAnnotation(int i) {
-			return (Annotation) fs.get(i);
-		}
-
-		private Mention getMention(int i) {
-			return (Mention) fs.get(i);
+		public MyTreeSelectionListener(JTree tree) {
+			super(tree);
 		}
 
 		@Override
