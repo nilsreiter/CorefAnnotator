@@ -191,7 +191,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
-		crModelListeners.forEach(l -> l.mentionAdded(m));
+		crModelListeners.forEach(l -> l.annotationAdded(m));
 	}
 
 	public void fireAnnotationChangedEvent(Annotation m) {

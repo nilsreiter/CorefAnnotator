@@ -802,7 +802,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	@Override
-	public void mentionAdded(Annotation m) {
+	public void annotationAdded(Annotation m) {
 		highlightManager.draw(m);
 	}
 
