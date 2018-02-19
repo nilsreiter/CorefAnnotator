@@ -68,7 +68,6 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
@@ -76,7 +75,6 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -91,7 +89,6 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -227,7 +224,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
-		tree.addTreeSelectionListener(new MyTreeSelectionListener());
+		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
 		tree.addKeyListener(new TreeKeyListener());
 
@@ -1654,75 +1651,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class MyTreeSelectionListener implements TreeSelectionListener {
+	class MyTreeSelectionListener extends CATreeSelectionListener {
 
-		TreeSelectionEvent currentEvent = null;
-		int num;
-
-		// selected things
-		ImmutableList<TreePath> paths;
-		MutableList<CATreeNode> nodes;
-		MutableList<FeatureStructure> fs;
-
-		private synchronized void collectData(TreeSelectionEvent e) {
-			currentEvent = e;
-			num = tree.getSelectionCount();
-			paths = Lists.immutable.of(tree.getSelectionPaths());
-			nodes = Lists.mutable.empty();
-			fs = Lists.mutable.empty();
-
-			if (num > 0)
-				try {
-					for (int i = 0; i < paths.size(); i++) {
-						nodes.add(i, (CATreeNode) paths.get(i).getLastPathComponent());
-						fs.add(i, nodes.get(i).getFeatureStructure());
-					}
-				} catch (NullPointerException ex) {
-				}
-
-		}
-
-		private boolean isSingle() {
-			return num == 1;
-		}
-
-		private boolean isDouble() {
-			return num == 2;
-		}
-
-		private boolean isEntity() {
-			return fs.allSatisfy(f -> f instanceof Entity);
-		}
-
-		private boolean isDetachedMentionPart() {
-			return fs.allSatisfy(f -> f instanceof DetachedMentionPart);
-		}
-
-		private boolean isMention() {
-			return fs.allSatisfy(f -> f instanceof Mention);
-		}
-
-		private boolean isEntityGroup() {
-			return fs.allSatisfy(f -> f instanceof EntityGroup);
-		}
-
-		private boolean isLeaf() {
-			for (TreeNode n : nodes)
-				if (!n.isLeaf())
-					return false;
-			return true;
-		}
-
-		private Entity getEntity(int i) {
-			return (Entity) fs.get(i);
-		}
-
-		private Annotation getAnnotation(int i) {
-			return (Annotation) fs.get(i);
-		}
-
-		private Mention getMention(int i) {
-			return (Mention) fs.get(i);
+		public MyTreeSelectionListener(JTree tree) {
+			super(tree);
 		}
 
 		@Override
