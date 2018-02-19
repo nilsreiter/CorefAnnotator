@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 public class Constants {
 	public static class Strings {
 
+		public static final String ACTION_ADD_FINDINGS_TO_ENTITY = "action.add_findings_to_entity";
+		public static final String ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP = "action.add_findings_to_entity.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
 		public static final String ACTION_DELETE = "action.delete";
@@ -73,6 +75,8 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
+		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 
 	}
 

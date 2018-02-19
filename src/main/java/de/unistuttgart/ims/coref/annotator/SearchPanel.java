@@ -40,6 +40,7 @@ import javax.swing.text.Highlighter;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public class SearchPanel extends JFrame implements DocumentListener, WindowListener {
 	class AnnotateSelectedFindings extends IkonAction {
@@ -73,7 +74,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();;
 	JList<SearchResult> list;
 	JTextField textField;
-	JPanel statusbar;
+	JLabel searchResultsLabel = new JLabel(" "), selectedEntityLabel = new JLabel();
 	int contexts = 50;
 	boolean showBarChart = true;
 	JFrame chartFrame;
@@ -118,7 +119,9 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		JScrollPane listScroller = new JScrollPane(list);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
-		statusbar = new JPanel();
+		JPanel statusbar = new JPanel();
+		statusbar.add(this.searchResultsLabel);
+		statusbar.add(this.selectedEntityLabel);
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
 		getContentPane().add(searchPanel, BorderLayout.NORTH);
 		getContentPane().add(listScroller, BorderLayout.CENTER);
@@ -174,7 +177,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	public void search(String s) {
 		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
-		statusbar.removeAll();
+		searchResultsLabel.setText("");
 		lm.clear();
 		Semaphore sema = new Semaphore(1);
 		try {
@@ -206,7 +209,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			}
 			list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
-			statusbar.add(new JLabel(lm.size() + " search results."));
+			searchResultsLabel.setText(lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
 
 		}
 
@@ -335,6 +338,11 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			treeCondition = (isSingle() && isEntity());
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
+			if (treeCondition)
+				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
+						+ ((Entity) fs.get(0)).getLabel());
+			else
+				selectedEntityLabel.setText("");
 		}
 
 		@Override
