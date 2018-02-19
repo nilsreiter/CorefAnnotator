@@ -75,7 +75,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();;
 	JList<SearchResult> list;
 	JTextField textField;
-	JLabel searchResultsLabel = new JLabel(" "), selectedEntityLabel = new JLabel();
+	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
 	int contexts = 50;
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
