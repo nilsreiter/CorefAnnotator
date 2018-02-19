@@ -69,8 +69,6 @@ public class CommentWindow extends JFrame {
 		setTitle("Comments");
 		setLocation(mainWindow.getLocation().x + mainWindow.getWidth(), mainWindow.getLocation().y);
 
-		setVisible(true);
-
 		getContentPane().setPreferredSize(new Dimension(200, 800));
 		setSize(new Dimension(200, 100));
 	}

@@ -84,6 +84,7 @@ public class Constants {
 		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_ENTITIES = "menu.entities";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comments";
+		public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
 
 	}
 }

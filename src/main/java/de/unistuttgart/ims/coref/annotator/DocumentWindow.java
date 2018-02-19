@@ -388,6 +388,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		}
 		viewMenu.add(viewStyleMenu);
+		viewMenu.add(new ViewShowCommentsAction());
 		return viewMenu;
 
 	}
@@ -579,6 +580,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(styleVariant);
+
+		}
+
+	}
+
+	class ViewShowCommentsAction extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewShowCommentsAction() {
+			super(MaterialDesign.MDI_MESSAGE);
+			putValue(Action.NAME, Constants.Strings.ACTION_SHOW_COMMENTS);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			commentsWindow.setVisible(true);
 
 		}
 
