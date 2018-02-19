@@ -21,8 +21,8 @@ public class HelpWindow extends JFrame {
 	protected HelpWindow() {
 
 		tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Index", new JScrollPane(load("docs/index.html")));
-		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto.html")));
+		tabbedPane.addTab("Index", new JScrollPane(load("docs/index")));
+		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto")));
 
 		this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		this.pack();
@@ -33,6 +33,9 @@ public class HelpWindow extends JFrame {
 	private JEditorPane load(String path) {
 		JEditorPane textArea;
 		try {
+			if (!path.endsWith(".html"))
+				path += ".html";
+
 			URL url = getClass().getClassLoader().getResource(path);
 			textArea = new JEditorPane(url);
 			textArea.setContentType("text/html");
