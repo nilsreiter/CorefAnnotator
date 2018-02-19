@@ -1451,11 +1451,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			Entity entity = (Entity) tn.getFeatureStructure();
-			cModel.toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+			for (TreePath tp : tree.getSelectionPaths()) {
+				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
+				Entity entity = (Entity) tn.getFeatureStructure();
+				cModel.toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+			}
 			registerChange();
-
 		}
 	}
 
@@ -1546,8 +1547,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
-				int row = tree.getClosestRowForLocation(e.getX(), e.getY());
-				tree.setSelectionRow(row);
 				treePopupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
@@ -1732,18 +1731,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			renameAction.setEnabled(isSingle() && isEntity());
 			changeKeyAction.setEnabled(isSingle() && isEntity());
 			changeColorAction.setEnabled(isSingle() && isEntity());
-			toggleEntityGeneric.setEnabled(isSingle() && isEntity());
-			toggleEntityGeneric.putValue(Action.SELECTED_KEY, isSingle() && isEntity() && Util.isGeneric(getEntity(0)));
+			toggleEntityGeneric.setEnabled(isEntity());
+			toggleEntityGeneric.putValue(Action.SELECTED_KEY,
+					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
 			deleteAction
 					.setEnabled(isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf()));
 			formGroupAction.setEnabled(isDouble() && isEntity());
 			mergeSelectedEntitiesAction.setEnabled(isDouble() && isEntity());
 
-			toggleMentionDifficult.setEnabled(isSingle() && isMention());
+			toggleMentionDifficult.setEnabled(isMention());
 			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isDifficult(getMention(0)));
 
-			toggleMentionAmbiguous.setEnabled(isSingle() && isMention());
+			toggleMentionAmbiguous.setEnabled(isMention());
 			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
 
