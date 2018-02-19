@@ -61,6 +61,21 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 				documentWindow.cModel.addTo(node.getEntity(), result.getBegin(), result.getEnd());
 			}
 		}
+	}
+
+	class RunSearch extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public RunSearch() {
+			super(MaterialDesign.MDI_FILE_FIND, Constants.Strings.ACTION_SEARCH);
+			setEnabled(false);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			search(textField.getText());
+		}
 
 	}
 
@@ -80,7 +95,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
 
-	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings();
+	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch();
 
 	public SearchPanel(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
@@ -104,7 +119,8 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
-		bar.add(this.annotateSelectedFindings);
+		bar.add(runSearch);
+		bar.add(annotateSelectedFindings);
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(textField);
@@ -132,9 +148,10 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
+		runSearch.setEnabled(textField.getText().length() > 0);
 		try {
 			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 1)
+			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
 			// silently catching
@@ -143,9 +160,10 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
+		runSearch.setEnabled(textField.getText().length() > 0);
 		try {
 			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 1)
+			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
 			// silently catching
@@ -154,9 +172,10 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
+		runSearch.setEnabled(textField.getText().length() > 0);
 		try {
 			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 1)
+			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
 			// silently catching
