@@ -24,7 +24,7 @@ public class LogWindow extends JFrame {
 		JScrollPane scroll = new JScrollPane(textArea);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		try {
-			File logFile = new File(System.getProperty("user.home"), "..CorefAnnotator.log");
+			File logFile = new File(System.getProperty("user.home"), ".CorefAnnotator.log");
 			if (logFile.exists() && logFile.canRead()) {
 				String log = FileUtils.file2String(logFile);
 				textArea.setText(log);
