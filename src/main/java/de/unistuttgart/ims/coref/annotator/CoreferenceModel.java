@@ -394,6 +394,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 	}
 
+	public void update(Entity entity, boolean displayed) {
+		CATreeNode node = get(entity);
+		for (int i = 0; i < node.getChildCount(); i++) {
+			CATreeNode child = node.getChildAt(i);
+			if (child.isMention())
+				if (displayed)
+					fireMentionAddedEvent(child.getFeatureStructure());
+				else
+					fireAnnotationRemovedEvent(child.getFeatureStructure());
+
+		}
+	};
+
 	public void merge(CATreeNode e1, CATreeNode e2) {
 		CATreeNode bigger, smaller;
 		if (e1.getChildCount() >= e2.getChildCount()) {
