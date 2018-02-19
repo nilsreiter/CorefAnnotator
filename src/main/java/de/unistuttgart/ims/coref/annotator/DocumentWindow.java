@@ -1095,7 +1095,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
-			if (!treeNode.isVisible()) {
+			if (!treeNode.isVisible() || treeNode.getRank() < 50) {
 				lab1.setForeground(Color.GRAY);
 				lab1.setIcon(FontIcon.of(Material.PERSON_OUTLINE, Color.GRAY));
 			} else {
@@ -1881,7 +1881,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
 					CATreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn.isEntity()) {
-						tn.setVisible(matches(s, tn));
+						tn.setRank(matches(s, tn) ? 60 : 40);
 						tree.scrollRowToVisible(0);
 					}
 				}
@@ -1891,7 +1891,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
 					CATreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn.isEntity()) {
-						tn.setVisible(true);
+						tn.setRank(50);
+
 					}
 				}
 				cModel.nodeStructureChanged(cModel.rootNode);

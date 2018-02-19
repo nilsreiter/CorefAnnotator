@@ -110,7 +110,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public void addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		addTo(get(e), add(m));
-		fireMentionAddedEvent(m);
+		if (get(e).isVisible())
+			fireMentionAddedEvent(m);
 	}
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
