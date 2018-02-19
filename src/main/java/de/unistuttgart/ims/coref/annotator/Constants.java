@@ -80,6 +80,7 @@ public class Constants {
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String ACTION_SEARCH = "action.search";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
+		public static final String ACTION_SHOW_LOG = "action.show.log";
 
 	}
 

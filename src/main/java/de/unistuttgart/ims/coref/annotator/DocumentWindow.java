@@ -99,6 +99,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFullTokensAction;
@@ -407,6 +408,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
 		toolsMenu.add(showSearchPanelAction);
+		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
 

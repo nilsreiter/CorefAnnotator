@@ -72,6 +72,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
+	LogWindow logWindow = null;
+
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
@@ -325,6 +327,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public Preferences getPreferences() {
 		return preferences;
+	}
+
+	public LogWindow getLogWindow() {
+		if (logWindow == null)
+			logWindow = new LogWindow();
+		return logWindow;
 	}
 
 }
