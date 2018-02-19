@@ -532,6 +532,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public synchronized void saveToFile(File f, IOPlugin plugin) {
+		Annotator.logger.debug("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 		progressBar.setValue(0);
 		progressBar.setVisible(true);
