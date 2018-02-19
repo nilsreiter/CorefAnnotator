@@ -146,7 +146,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleEntityGeneric, toggleEntityDisplayed;
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
-	AbstractAction fileSaveAction;
+	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
 
 	// controller
@@ -250,6 +250,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		controls.add((deleteAction));
 		controls.add((formGroupAction));
 		controls.add(mergeSelectedEntitiesAction);
+		controls.add(showSearchPanelAction);
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -335,6 +336,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.toggleTrimWhitespace = new ToggleTrimWhitespaceAction(mainApplication);
 		this.toggleShowTextInTreeLabels = new ToggleShowTextInTreeLabels();
 		this.toggleEntityDisplayed = new ToggleEntityVisible();
+		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -404,7 +406,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
-		toolsMenu.add(new JMenuItem(new ShowSearchPanelAction(mainApplication, this)));
+		toolsMenu.add(showSearchPanelAction);
 		return toolsMenu;
 	}
 
