@@ -39,12 +39,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	int key = 0;
 
-	@Deprecated
-	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
-
-	@Deprecated
-	Map<FeatureStructure, CATreeNode> mentionMap = fsMap;
 
 	Preferences preferences;
 
