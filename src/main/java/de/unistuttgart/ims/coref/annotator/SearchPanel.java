@@ -135,8 +135,8 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
 		JPanel statusbar = new JPanel();
-		statusbar.add(this.searchResultsLabel);
-		statusbar.add(this.selectedEntityLabel);
+		statusbar.add(searchResultsLabel);
+		statusbar.add(selectedEntityLabel);
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
 		getContentPane().add(searchPanel, BorderLayout.NORTH);
 		getContentPane().add(listScroller, BorderLayout.CENTER);
@@ -154,6 +154,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
+			searchResultsLabel.setText(ex.getLocalizedMessage());
 			// silently catching
 		}
 	}
@@ -166,6 +167,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
+			searchResultsLabel.setText(ex.getLocalizedMessage());
 			// silently catching
 		}
 	}
@@ -178,6 +180,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			if (textField.getText().length() > 2)
 				search(textField.getText());
 		} catch (PatternSyntaxException ex) {
+			searchResultsLabel.setText(ex.getLocalizedMessage());
 			// silently catching
 		}
 	}
