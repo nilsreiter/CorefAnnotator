@@ -110,7 +110,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public void addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		addTo(get(e), add(m));
-		fireMentionAddedEvent(m);
+		if (get(e).isVisible())
+			fireMentionAddedEvent(m);
 	}
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
@@ -134,7 +135,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
 			insertNodeInto(discNode, tn, 0);
 		}
-		fireAnnotationChangedEvent(m);
+		if (entityNode.isVisible())
+			fireAnnotationChangedEvent(m);
 		resort();
 	}
 
@@ -393,6 +395,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 				fireAnnotationChangedEvent((Mention) child);
 		}
 	}
+
+	public void update(Entity entity, boolean displayed) {
+		CATreeNode node = get(entity);
+		for (int i = 0; i < node.getChildCount(); i++) {
+			CATreeNode child = node.getChildAt(i);
+			if (child.isMention())
+				if (displayed)
+					fireMentionAddedEvent(child.getFeatureStructure());
+				else
+					fireAnnotationRemovedEvent(child.getFeatureStructure());
+
+		}
+	};
 
 	public void merge(CATreeNode e1, CATreeNode e2) {
 		CATreeNode bigger, smaller;

@@ -28,6 +28,7 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	boolean visible = true;
 	Character keyCode = null;
+	int rank = 50;
 
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
@@ -139,6 +140,14 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	public void setChildren(Vector<CATreeNode> vec) {
 		this.children = vec;
+	}
+
+	public int getRank() {
+		return rank;
+	}
+
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 
 }

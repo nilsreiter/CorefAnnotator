@@ -91,6 +91,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -145,7 +146,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
 	ToggleMentionDifficult toggleMentionDifficult;
 	ToggleMentionAmbiguous toggleMentionAmbiguous;
-	ToggleEntityGeneric toggleEntityGeneric;
+	AbstractAction toggleEntityGeneric, toggleEntityDisplayed;
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction;
@@ -212,6 +213,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -332,6 +334,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.fileSaveAction = new FileSaveAction(this);
 		this.toggleTrimWhitespace = new ToggleTrimWhitespaceAction(mainApplication);
 		this.toggleShowTextInTreeLabels = new ToggleShowTextInTreeLabels();
+		this.toggleEntityDisplayed = new ToggleEntityVisible();
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -452,6 +455,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(new JMenuItem(changeKeyAction));
 		entityMenu.add(new JMenuItem(formGroupAction));
 		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
+		entityMenu.add(new JCheckBoxMenuItem(toggleEntityDisplayed));
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
@@ -1092,12 +1096,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
-			if (!treeNode.isVisible()) {
+			if (!treeNode.isVisible() || treeNode.getRank() < 50) {
 				lab1.setForeground(Color.GRAY);
+				lab1.setIcon(FontIcon.of(Material.PERSON_OUTLINE, Color.GRAY));
 			} else {
 				lab1.setForeground(Color.BLACK);
+				lab1.setIcon(FontIcon.of(Material.PERSON, new Color(entity.getColor())));
 			}
-			lab1.setIcon(FontIcon.of(Material.PERSON, new Color(entity.getColor())));
 			if (entity.getKey() != null) {
 				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
@@ -1454,6 +1459,26 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
+	class ToggleEntityVisible extends IkonAction {
+		private static final long serialVersionUID = 1L;
+
+		public ToggleEntityVisible() {
+			super(Material.PERSON_OUTLINE, Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (TreePath tp : tree.getSelectionPaths()) {
+				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
+				tn.setVisible(!tn.isVisible());
+				Entity entity = (Entity) tn.getFeatureStructure();
+				cModel.update(entity, tn.isVisible());
+			}
+			registerChange();
+
+		}
+	}
+
 	class ToggleMentionDifficult extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1636,27 +1661,25 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		int num;
 
 		// selected things
-		TreePath[] paths;
-		CATreeNode[] nodes;
-		FeatureStructure[] fs;
+		ImmutableList<TreePath> paths;
+		MutableList<CATreeNode> nodes;
+		MutableList<FeatureStructure> fs;
 
-		private void collectData(TreeSelectionEvent e) {
+		private synchronized void collectData(TreeSelectionEvent e) {
 			currentEvent = e;
 			num = tree.getSelectionCount();
-			paths = new TreePath[num];
-			nodes = new CATreeNode[num];
-			fs = new FeatureStructure[num];
+			paths = Lists.immutable.of(tree.getSelectionPaths());
+			nodes = Lists.mutable.empty();
+			fs = Lists.mutable.empty();
 
-			try {
-				paths = tree.getSelectionPaths();
-
-				fs = new FeatureStructure[paths.length];
-				for (int i = 0; i < paths.length; i++) {
-					nodes[i] = (CATreeNode) paths[i].getLastPathComponent();
-					fs[i] = nodes[i].getFeatureStructure();
+			if (num > 0)
+				try {
+					for (int i = 0; i < paths.size(); i++) {
+						nodes.add(i, (CATreeNode) paths.get(i).getLastPathComponent());
+						fs.add(i, nodes.get(i).getFeatureStructure());
+					}
+				} catch (NullPointerException ex) {
 				}
-			} catch (NullPointerException ex) {
-			}
 
 		}
 
@@ -1669,25 +1692,19 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		private boolean isEntity() {
-			for (FeatureStructure f : fs)
-				if (!(f instanceof Entity))
-					return false;
-			return true;
+			return fs.allSatisfy(f -> f instanceof Entity);
 		}
 
 		private boolean isDetachedMentionPart() {
-			for (FeatureStructure f : fs)
-				if (!(f instanceof DetachedMentionPart))
-					return false;
-			return true;
+			return fs.allSatisfy(f -> f instanceof DetachedMentionPart);
 		}
 
 		private boolean isMention() {
-			return (fs[0] instanceof Mention);
+			return fs.allSatisfy(f -> f instanceof Mention);
 		}
 
 		private boolean isEntityGroup() {
-			return (fs[0] instanceof EntityGroup);
+			return fs.allSatisfy(f -> f instanceof EntityGroup);
 		}
 
 		private boolean isLeaf() {
@@ -1698,15 +1715,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		private Entity getEntity(int i) {
-			return (Entity) fs[i];
+			return (Entity) fs.get(i);
 		}
 
 		private Annotation getAnnotation(int i) {
-			return (Annotation) fs[i];
+			return (Annotation) fs.get(i);
 		}
 
 		private Mention getMention(int i) {
-			return (Mention) fs[i];
+			return (Mention) fs.get(i);
 		}
 
 		@Override
@@ -1730,6 +1747,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
 
+			toggleEntityDisplayed.setEnabled(isEntity());
+			toggleEntityDisplayed.putValue(Action.SELECTED_KEY, isEntity() && nodes.allSatisfy(f -> !f.isVisible()));
+
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
 			else
@@ -1752,7 +1772,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel = new CoreferenceModel(jcas, mainApplication.getPreferences());
 			cModel.addCoreferenceModelListener(DocumentWindow.this);
 
-			Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> cModel.add(e));
+			Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
+				cModel.add(e);
+			});
 
 			publish(60);
 			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
@@ -1860,7 +1882,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
 					CATreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn.isEntity()) {
-						tn.setVisible(matches(s, tn));
+						tn.setRank(matches(s, tn) ? 60 : 40);
 						tree.scrollRowToVisible(0);
 					}
 				}
@@ -1870,7 +1892,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
 					CATreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn.isEntity()) {
-						tn.setVisible(true);
+						tn.setRank(50);
+
 					}
 				}
 				cModel.nodeStructureChanged(cModel.rootNode);
