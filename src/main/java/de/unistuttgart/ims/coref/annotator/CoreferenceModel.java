@@ -361,6 +361,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
+		Annotator.logger.info("Sorting entity tree with {}", comparator.toString());
 		rootNode.getChildren().sort(comparator);
 		nodeStructureChanged(rootNode);
 	}
