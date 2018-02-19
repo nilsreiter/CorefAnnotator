@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelFactory;
@@ -29,8 +30,18 @@ public class CommentWindow extends JFrame {
 		this.mainWindow = mainWindow;
 		this.documentModel = documentModel;
 		this.commentsListModel = documentModel.getCommentsModel();
-		this.initialiseWindow();
-		this.initialiseList();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				initialiseWindow();
+			}
+		});
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				initialiseList();
+			}
+		});
 
 	}
 
@@ -44,7 +55,6 @@ public class CommentWindow extends JFrame {
 			public JPanel getPanel(Comment object) {
 				return new CommentPanel(commentsListModel, object);
 			}
-
 		});
 		commentList.setModel(commentsListModel);
 
@@ -54,10 +64,6 @@ public class CommentWindow extends JFrame {
 		editArea.setLineWrap(true);
 		editArea.setWrapStyleWord(true);
 
-		// JScrollPane scrollPane = new JScrollPane(commentList,
-		// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-		// JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
 		getContentPane().add(new JScrollPane(commentList), BorderLayout.CENTER);
 
 		setTitle("Comments");
@@ -66,10 +72,13 @@ public class CommentWindow extends JFrame {
 		setVisible(true);
 
 		getContentPane().setPreferredSize(new Dimension(200, 800));
+		setSize(new Dimension(200, 100));
 	}
 
-	public void enterNewComment() {
-
+	public void enterNewComment(int begin, int end) {
+		Comment c = commentsListModel.add("", mainWindow.getMainApplication().getPreferences()
+				.get(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID), begin, end);
+		((CommentPanel) commentList.getPanel(c)).fireEditAction();
 	}
 
 }

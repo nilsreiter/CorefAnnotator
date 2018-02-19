@@ -49,7 +49,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 			Annotator.logger.debug("Comments list contains {} elements.", comments.size());
 		}
 
-		public void add(String text, String author, int begin, int end) {
+		public Comment add(String text, String author, int begin, int end) {
 
 			CommentAnchor annotation = new CommentAnchor(jcas);
 			annotation.setBegin(begin);
@@ -63,6 +63,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 			comment.addToIndexes();
 
 			register(comment);
+			return comment;
 		}
 
 		public Comment get(CommentAnchor ca) {

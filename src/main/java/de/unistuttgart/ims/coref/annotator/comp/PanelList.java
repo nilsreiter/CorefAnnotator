@@ -18,6 +18,7 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 	private static final long serialVersionUID = 1L;
 
 	ListModel<T> model;
+	int selection;
 	PanelFactory<T> factory;
 	MutableMap<T, JPanel> panelMap = Maps.mutable.empty();
 
@@ -27,7 +28,7 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 		this.setPreferredSize(new Dimension(200, 300));
 	}
 
-	protected JPanel getPanel(T obj) {
+	public JPanel getPanel(T obj) {
 		if (!panelMap.containsKey(obj)) {
 			panelMap.put(obj, factory.getPanel(obj));
 		}
@@ -38,8 +39,9 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 	@Override
 	public void intervalAdded(ListDataEvent e) {
 		Annotator.logger.debug("intervalAdded {}", e);
-		for (int i = e.getIndex0(); i <= e.getIndex1(); i++)
-			this.add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
+		for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
+			add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
+		}
 		revalidate();
 	}
 
@@ -65,4 +67,13 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 		model.addListDataListener(this);
 	}
 
+	public void setSelection(T c) {
+		for (T t : panelMap.keySet()) {
+			if (c == null || t == c)
+				panelMap.get(t).setEnabled(true);
+			else
+				panelMap.get(t).setEnabled(false);
+		}
+		contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, model.getSize()));
+	}
 }

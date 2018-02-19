@@ -47,7 +47,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -1849,39 +1848,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JTextArea msg = new JTextArea();
-			msg.setRows(5);
-			msg.setColumns(30);
-			msg.setLineWrap(true);
-			msg.setWrapStyleWord(true);
-			if (comment != null)
-				msg.setText(comment.getValue());
-
-			JScrollPane scrollPane = new JScrollPane(msg);
-			int r = JOptionPane.showConfirmDialog(DocumentWindow.this, scrollPane, "Enter your comment",
-					JOptionPane.OK_CANCEL_OPTION);
-			if (r == JOptionPane.OK_OPTION) {
-				if (comment != null) {
-					comment.setValue(msg.getText());
-				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
-					cModel.getCommentsModel().add(msg.getText(), "", textPane.getSelectionStart(),
-							textPane.getSelectionEnd());
-				}
-				/*
-				 * else if (e.getSource() instanceof Component) { } Component
-				 * comp = (Component) e.getSource(); TreePath tp =
-				 * tree.getClosestPathForLocation(comp.getX(), comp.getY());
-				 * System.err.println(tp); } else if (tree.getSelectionCount()
-				 * == 1) { CATreeNode node = (CATreeNode)
-				 * tree.getSelectionPath().getLastPathComponent(); if
-				 * (node.getFeatureStructure() instanceof Mention) {
-				 * MentionComment c = new MentionComment(jcas);
-				 * c.setValue(msg.getText()); c.setMention((Mention)
-				 * node.getFeatureStructure()); c.addToIndexes();
-				 * cModel.comments.put(node.getFeatureStructure(), c); } }
-				 */
-			}
-
+			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
 		}
 
 	}

@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
@@ -8,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -15,8 +17,15 @@ import de.unistuttgart.ims.coref.annotator.CoreferenceModel.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 
 public class CommentPanel extends JPanel {
+
+	private static final Color TEXT_BACKGROUND_ENABLED = new Color(255, 255, 200);
+	private static final Color TEXT_BACKGROUND_DISABLED = Color.WHITE;
+
+	private static final Color TEXT_FOREGROUND_ENABLED = Color.BLACK;
+	private static final Color TEXT_FOREGROUND_DISABLED = Color.GRAY;
 
 	public class SaveCommentAction extends IkonAction {
 		CommentsModel model;
@@ -30,6 +39,11 @@ public class CommentPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
+			@SuppressWarnings("unchecked")
+			PanelList<Comment> parent = (PanelList<Comment>) CommentPanel.this.getParent();
+			parent.setSelection(null);
+
 			comment.setValue(textArea.getText());
 			model.update(comment);
 			saveAction.setEnabled(false);
@@ -44,12 +58,20 @@ public class CommentPanel extends JPanel {
 
 		public EditCommentAction() {
 			super(MaterialDesign.MDI_MESSAGE_DRAW);
+			putValue(Action.NAME, "edit");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
+			@SuppressWarnings("unchecked")
+			PanelList<Comment> parent = (PanelList<Comment>) CommentPanel.this.getParent();
+			parent.setSelection(comment);
+
 			textArea.setEditable(true);
 			saveAction.setEnabled(true);
+			textArea.grabFocus();
+
 		}
 	}
 
@@ -68,13 +90,13 @@ public class CommentPanel extends JPanel {
 
 		comment = c;
 		SpringLayout springs = new SpringLayout();
-		setOpaque(true);
+		// setOpaque(true);
 		setLayout(springs);
-		// setPreferredSize(new Dimension(100, 50));
 
 		textArea = new JTextArea();
 		textArea.setText(c.getValue());
-		textArea.setBackground(new Color(255, 255, 200));
+		textArea.setForeground(TEXT_FOREGROUND_ENABLED);
+		textArea.setBackground(TEXT_BACKGROUND_ENABLED);
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		textArea.setOpaque(true);
@@ -82,28 +104,49 @@ public class CommentPanel extends JPanel {
 		textArea.setEditable(false);
 
 		JToolBar toolbar = new JToolBar();
+		toolbar.setOrientation(JToolBar.HORIZONTAL);
 		toolbar.setFloatable(false);
-		toolbar.add(deleteAction);
-		toolbar.add(editAction);
-		toolbar.add(saveAction);
+		toolbar.add(deleteAction).setHideActionText(false);
+		toolbar.add(editAction).setHideActionText(false);
+		toolbar.add(saveAction).setHideActionText(false);
 
 		add(textArea);
 		add(toolbar);
-		// add(editButton);
-		// add(deleteButton);
-		// add(saveButton);
 
 		springs.putConstraint(SpringLayout.WEST, textArea, 10, SpringLayout.WEST, this);
 		springs.putConstraint(SpringLayout.EAST, textArea, -10, SpringLayout.EAST, this);
 		springs.putConstraint(SpringLayout.NORTH, textArea, 10, SpringLayout.NORTH, this);
 
-		springs.putConstraint(SpringLayout.NORTH, toolbar, 10, SpringLayout.SOUTH, textArea);
+		springs.putConstraint(SpringLayout.SOUTH, toolbar, -10, SpringLayout.SOUTH, this);
+		springs.putConstraint(SpringLayout.NORTH, toolbar, -10, SpringLayout.SOUTH, textArea);
+		springs.putConstraint(SpringLayout.WEST, toolbar, 10, SpringLayout.WEST, this);
 
-		// springs.putConstraint(SpringLayout.SOUTH, toolbar, -10,
-		// SpringLayout.SOUTH, this);
-		// springs.putConstraint(SpringLayout.EAST, toolbar, -10,
-		// SpringLayout.EAST, this);
+		setMinimumSize(new Dimension(200, 130));
+		setMaximumSize(new Dimension(500, 130));
+		setBorder(new TitledBorder(comment.getAuthor()));
+	}
 
+	public void fireEditAction() {
+		editAction.actionPerformed(null);
+	}
+
+	@Override
+	public void setEnabled(boolean b) {
+		super.setEnabled(b);
+		editAction.setEnabled(b);
+		deleteAction.setEnabled(b);
+
+		if (b) {
+			setForeground(Color.BLACK);
+			setOpaque(true);
+			textArea.setBackground(TEXT_BACKGROUND_ENABLED);
+			textArea.setForeground(TEXT_FOREGROUND_ENABLED);
+		} else {
+			setOpaque(false);
+			setForeground(new Color(200, 200, 200));
+			textArea.setBackground(TEXT_BACKGROUND_DISABLED);
+			textArea.setForeground(TEXT_FOREGROUND_DISABLED);
+		}
 	}
 
 }

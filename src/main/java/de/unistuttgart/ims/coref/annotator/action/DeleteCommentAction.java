@@ -16,8 +16,8 @@ public class DeleteCommentAction extends IkonAction {
 	CoreferenceModel.CommentsModel model;
 
 	public DeleteCommentAction(CoreferenceModel.CommentsModel model, Comment comment) {
-		super(MaterialDesign.MDI_MESSAGE_BULLETED_OFF);
-		putValue(Action.NAME, "Delete comment");
+		super(MaterialDesign.MDI_DELETE);
+		putValue(Action.NAME, "Delete");
 		this.comment = comment;
 		this.model = model;
 	}
