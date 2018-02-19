@@ -135,7 +135,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
 			insertNodeInto(discNode, tn, 0);
 		}
-		fireAnnotationChangedEvent(m);
+		if (entityNode.isVisible())
+			fireAnnotationChangedEvent(m);
 		resort();
 	}
 
