@@ -506,9 +506,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		if (unsavedChanges) {
 			Annotator.logger.debug("Closing window with unsaved changes");
 		}
+		if (searchPanel != null) {
 		searchPanel.setVisible(false);
 		searchPanel.dispose();
 		searchPanel = null;
+		}
 		mainApplication.close(this);
 	}
 
