@@ -48,8 +48,9 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(MaterialDesign.MDI_ACCOUNT_PLUS);
-			putValue(Action.NAME, "add to currently selected entity");
+			super(MaterialDesign.MDI_ACCOUNT_PLUS, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
+			putValue(Action.SHORT_DESCRIPTION,
+					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 		}
 
 		@Override
