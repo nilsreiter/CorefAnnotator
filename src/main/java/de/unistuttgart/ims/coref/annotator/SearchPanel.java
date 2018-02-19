@@ -1,14 +1,10 @@
 package de.unistuttgart.ims.coref.annotator;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.HashSet;
@@ -19,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,20 +24,44 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
-import javax.swing.text.View;
 
-public class SearchPanel extends JFrame implements DocumentListener, ListSelectionListener, WindowListener {
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+
+import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+
+public class SearchPanel extends JFrame implements DocumentListener, WindowListener {
+	class AnnotateSelectedFindings extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public AnnotateSelectedFindings() {
+			super(MaterialDesign.MDI_ACCOUNT_PLUS);
+			putValue(Action.NAME, "add to currently selected entity");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Annotator.logger.debug("Adding search results to entity");
+			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
+			for (SearchResult result : list.getSelectedValuesList()) {
+				documentWindow.cModel.addTo(node.getEntity(), result.getBegin(), result.getEnd());
+			}
+		}
+
+	}
+
 	final static Color HILIT_COLOR = Color.black;
 
 	private static final long serialVersionUID = 1L;
@@ -48,7 +70,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 
 	DocumentWindow documentWindow;
 	String text;
-	DefaultListModel<SearchResult> lm;
+	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();;
 	JList<SearchResult> list;
 	JTextField textField;
 	JPanel statusbar;
@@ -56,32 +78,52 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	boolean showBarChart = true;
 	JFrame chartFrame;
 	Set<Object> highlights = new HashSet<Object>();
+	TSL tsl = null;
+
+	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings();
 
 	public SearchPanel(DocumentWindow xdw, Preferences configuration) {
-		setTitle("Search");
 		documentWindow = xdw;
 		text = xdw.textPane.getText();
-
-		hilit = xdw.textPane.getHighlighter();
-		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
-		// xdw.textPane.setHighlighter(hilit);
-
-		lm = new DefaultListModel<SearchResult>();
-		getContentPane().add(createSearchPanel(), BorderLayout.PAGE_START);
-		list = new JList<SearchResult>(lm);
-		list.getSelectionModel().addListSelectionListener(this);
-		list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setCellRenderer(new SearchResultRenderer());
-		JScrollPane listScroller = new JScrollPane(list);
-		// listScroller.setPreferredSize(new Dimension(300, 500));
-		getContentPane().add(listScroller, BorderLayout.CENTER);
-		setLocation(xdw.getLocation().x + xdw.getWidth(), xdw.getLocation().y);
-
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
+		annotateSelectedFindings.setEnabled(false);
+		tsl = new TSL(documentWindow.tree);
+		documentWindow.tree.addTreeSelectionListener(tsl);
+
+		this.initialiseWindow();
+	}
+
+	protected void initialiseWindow() {
+
+		hilit = documentWindow.textPane.getHighlighter();
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+
+		textField = new JTextField(20);
+		textField.setToolTipText("Search");
+		textField.getDocument().addDocumentListener(this);
+
+		JToolBar bar = new JToolBar();
+		bar.setFloatable(false);
+		bar.add(this.annotateSelectedFindings);
+
+		JPanel searchPanel = new JPanel();
+		searchPanel.add(textField);
+		searchPanel.add(bar);
+
+		list = new JList<SearchResult>(lm);
+		list.getSelectionModel().addListSelectionListener(tsl);
+		list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		list.setCellRenderer(new SearchResultRenderer());
+
+		JScrollPane listScroller = new JScrollPane(list);
+		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
 		statusbar = new JPanel();
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
+		getContentPane().add(searchPanel, BorderLayout.NORTH);
+		getContentPane().add(listScroller, BorderLayout.CENTER);
 
+		setTitle("Search");
 		addWindowListener(this);
 		pack();
 	}
@@ -130,7 +172,7 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 	}
 
 	public void search(String s) {
-		list.getSelectionModel().removeListSelectionListener(this);
+		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
 		statusbar.removeAll();
 		lm.clear();
@@ -162,19 +204,13 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 					e.printStackTrace();
 				}
 			}
-			list.getSelectionModel().addListSelectionListener(this);
+			list.getSelectionModel().addListSelectionListener(tsl);
+			tsl.listCondition = false;
 			statusbar.add(new JLabel(lm.size() + " search results."));
 
 		}
 
 		pack();
-	}
-
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-
-		SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
-		documentWindow.textPane.setCaretPosition(result.getEnd());
 	}
 
 	class SearchResult {
@@ -284,77 +320,35 @@ public class SearchPanel extends JFrame implements DocumentListener, ListSelecti
 
 	}
 
-	class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter {
-		public UnderlinePainter(Color color) {
-			super(color);
+	class TSL extends CATreeSelectionListener implements ListSelectionListener {
+
+		public TSL(JTree tree) {
+			super(tree);
 		}
 
-		/**
-		 * Paints a portion of a highlight.
-		 *
-		 * @param g
-		 *            the graphics context
-		 * @param offs0
-		 *            the starting model offset >= 0
-		 * @param offs1
-		 *            the ending model offset >= offs1
-		 * @param bounds
-		 *            the bounding box of the view, which is not necessarily the
-		 *            region to paint.
-		 * @param c
-		 *            the editor
-		 * @param view
-		 *            View painting for
-		 * @return region drawing occured in
-		 */
+		boolean treeCondition = false;
+		boolean listCondition = false;
+
 		@Override
-		public Shape paintLayer(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c, View view) {
-			Rectangle r = getDrawingArea(offs0, offs1, bounds, view);
-
-			Graphics2D g2 = (Graphics2D) g;
-
-			if (r == null)
-				return null;
-
-			// Do your custom painting
-			Color color = getColor();
-			g.setColor(color == null ? c.getSelectionColor() : color);
-
-			g2.setStroke(new BasicStroke(3));
-			g2.drawLine(r.x, r.y + r.height, r.x + r.width, r.y + r.height);
-
-			return r;
+		public void valueChanged(TreeSelectionEvent e) {
+			collectData(e);
+			treeCondition = (isSingle() && isEntity());
+			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
+			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 		}
 
-		private Rectangle getDrawingArea(int offs0, int offs1, Shape bounds, View view) {
-			// Contained in view, can just use bounds.
-
-			if (offs0 == view.getStartOffset() && offs1 == view.getEndOffset()) {
-				Rectangle alloc;
-
-				if (bounds instanceof Rectangle) {
-					alloc = (Rectangle) bounds;
-				} else {
-					alloc = bounds.getBounds();
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if (e.getValueIsAdjusting()) {
+				if (list.getSelectedIndices().length == 1) {
+					SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
+					documentWindow.textPane.setCaretPosition(result.getEnd());
 				}
-
-				return alloc;
-			} else {
-				// Should only render part of View.
-				try {
-					// --- determine locations ---
-					Shape shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, bounds);
-					Rectangle r = (shape instanceof Rectangle) ? (Rectangle) shape : shape.getBounds();
-
-					return r;
-				} catch (BadLocationException e) {
-					// can't render
-				}
+				listCondition = (list.getSelectedValuesList().size() > 0);
+				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
+				Annotator.logger.debug("Setting listCondition to {}", listCondition);
 			}
-
-			// Can't render
-
-			return null;
 		}
+
 	}
 }
