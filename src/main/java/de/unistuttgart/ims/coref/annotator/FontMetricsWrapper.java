@@ -8,6 +8,7 @@ import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
 import java.text.CharacterIterator;
 
+@Deprecated
 public class FontMetricsWrapper extends FontMetrics {
 	private static final long serialVersionUID = 1L;
 
