@@ -23,6 +23,8 @@ public class LogWindow extends JFrame {
 		d.width -= 100;
 		textArea.setMaximumSize(d);
 		textArea.setPreferredSize(new Dimension(d));
+		textArea.setEditable(false);
+
 		JScrollPane scroll = new JScrollPane(textArea);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		try {
@@ -35,7 +37,6 @@ public class LogWindow extends JFrame {
 		} catch (IOException e1) {
 			Annotator.logger.catching(e1);
 		}
-		textArea.setEditable(false);
 
 		this.add(scroll, BorderLayout.CENTER);
 		this.pack();
