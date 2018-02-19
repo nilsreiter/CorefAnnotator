@@ -77,6 +77,7 @@ public class Constants {
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
+		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 
 	}
 

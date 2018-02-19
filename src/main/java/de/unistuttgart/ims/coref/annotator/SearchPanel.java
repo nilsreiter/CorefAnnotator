@@ -126,7 +126,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		getContentPane().add(searchPanel, BorderLayout.NORTH);
 		getContentPane().add(listScroller, BorderLayout.CENTER);
 
-		setTitle("Search");
+		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		addWindowListener(this);
 		pack();
 	}
