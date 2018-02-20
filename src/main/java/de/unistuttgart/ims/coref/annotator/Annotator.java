@@ -116,7 +116,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(XmiFileFilter.filter);
+		openDialog.setFileFilter(FileFilters.xmi);
 		opening = getOpeningDialog();
 	}
 

@@ -12,7 +12,7 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
-import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
+import de.unistuttgart.ims.coref.annotator.FileFilters;
 
 public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
@@ -49,7 +49,7 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return XmiFileFilter.filter;
+		return FileFilters.xmi;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+@Deprecated
 public class XmiFileFilter extends FileFilter {
 	public static XmiFileFilter filter = new XmiFileFilter();
 
