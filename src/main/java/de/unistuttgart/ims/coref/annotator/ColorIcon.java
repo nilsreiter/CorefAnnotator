@@ -6,6 +6,7 @@ import java.awt.Graphics;
 
 import javax.swing.Icon;
 
+@Deprecated
 public class ColorIcon implements Icon {
 	private static final int size = 20;
 
