@@ -23,20 +23,27 @@ public class Constants {
 		public static final String ACTION_RENAME = "action.rename";
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
+		public static final String ACTION_SEARCH = "action.search";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
+		public static final String ACTION_SHOW_LOG = "action.show.log";
 		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 		public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
 		public static final String ACTION_SORT_MENTIONS = "action.sort_mentions";
 		public static final String ACTION_SORT_MENTIONS_TOOLTIP = "action.sort_mentions.tooltip";
 		public static final String ACTION_SORT_REVERT = "action.sort_revert";
+		public static final String ACTION_TOGGLE_DELETE_EMPTY_ENTITIES = "action.toggle.delete_empty_entities";
+		public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
 		public static final String ACTION_TOGGLE_FULL_TOKENS = "action.toggle.full_tokens";
 		public static final String ACTION_TOGGLE_FULL_TOKENS_TOOLTIP = "action.toggle.full_tokens.tooltip";
+		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED = "action.toggle.keep_tree_sorted";
+		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP = "action.toggle.keep_tree_sorted.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
-		public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
+		public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
+		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
@@ -72,32 +79,25 @@ public class Constants {
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
+		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
+		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
+		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
+		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
-		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
-		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
-		public static final String ACTION_SEARCH = "action.search";
-		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
-		public static final String ACTION_SHOW_LOG = "action.show.log";
-		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
-		public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
-		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED = "action.toggle.keep_tree_sorted";
-		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP = "action.toggle.keep_tree_sorted.tooltip";
-		public static final String ACTION_TOGGLE_DELETE_EMPTY_ENTITIES = "action.toggle.delete_empty_entities";
 
 	}
 
-	public static final String CFG_FULL_TOKENS = "full_tokens";
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
+	public static final String CFG_FULL_TOKENS = "full_tokens";
+
+	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
-
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 	public static final String CFG_WINDOWTITLE = "Windowtitle";
-	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
