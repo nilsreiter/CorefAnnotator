@@ -13,9 +13,9 @@ public class ToggleTrimWhitespaceAction extends AnnotatorAction {
 	private static final long serialVersionUID = 1L;
 
 	public ToggleTrimWhitespaceAction(Annotator annotator) {
-		super(annotator, Material.COMPARE_ARROWS);
-		putValue(Action.NAME, Annotator.getString("action.toggle.trim_whitespace"));
-		putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.toggle.trim_whitespace.tooltip"));
+		super(annotator, Material.COMPARE_ARROWS, Constants.Strings.ACTION_TOGGLE_TRIM_WHITESPACE);
+		putValue(Action.SHORT_DESCRIPTION,
+				Annotator.getString(Constants.Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP));
 		putValue(Action.SELECTED_KEY, mainApplication.getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, true));
 	}
 

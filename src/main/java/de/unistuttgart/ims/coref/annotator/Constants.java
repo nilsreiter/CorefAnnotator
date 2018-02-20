@@ -81,6 +81,8 @@ public class Constants {
 		public static final String ACTION_SEARCH = "action.search";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
+		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
+		public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 
 	}
 
