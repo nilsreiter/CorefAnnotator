@@ -103,6 +103,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFullTokensAction;
+import de.unistuttgart.ims.coref.annotator.action.ToggleKeepTreeSortedAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleTrimWhitespaceAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
@@ -401,6 +402,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		menu.add(new JCheckBoxMenuItem(toggleTrimWhitespace));
 		menu.add(new JCheckBoxMenuItem(toggleShowTextInTreeLabels));
 		menu.add(new JCheckBoxMenuItem(new ToggleFullTokensAction(this.mainApplication)));
+		menu.add(new JCheckBoxMenuItem(new ToggleKeepTreeSortedAction(this.mainApplication)));
 		return menu;
 
 	}
