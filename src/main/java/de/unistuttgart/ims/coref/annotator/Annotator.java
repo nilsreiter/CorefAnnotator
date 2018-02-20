@@ -50,6 +50,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
+import de.unistuttgart.ims.coref.annotator.comp.XFileChooser;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -67,7 +68,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	PluginManager pluginManager = new PluginManager();
 
-	JFileChooser openDialog;
+	XFileChooser openDialog;
 
 	JFrame opening;
 	JPanel statusBar;
@@ -114,9 +115,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
+		openDialog = new XFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(FileFilters.xmi);
+
 		opening = getOpeningDialog();
 	}
 
@@ -189,14 +191,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
+	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				DocumentWindow v = new DocumentWindow(Annotator.this);
-				v.loadFile(file, flavor);
+				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
 					recentFiles.add(0, file);
@@ -219,7 +221,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void openFiles(OpenFilesEvent e) {
 		for (Object file : e.getFiles()) {
 			if (file instanceof File) {
-				open((File) file, new DefaultIOPlugin());
+				open((File) file, new DefaultIOPlugin(), null);
 			}
 		}
 	}
@@ -260,7 +262,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
-				open(f, flavor);
+				open(f, flavor, openDialog.getSelectedLanguage());
 			}
 			break;
 		default:

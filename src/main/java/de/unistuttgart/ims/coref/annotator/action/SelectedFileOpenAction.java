@@ -22,7 +22,7 @@ public class SelectedFileOpenAction extends AnnotatorAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.open(file, mainApplication.getPluginManager().getDefaultIOPlugin());
+		mainApplication.open(file, mainApplication.getPluginManager().getDefaultIOPlugin(), null);
 	}
 
 }

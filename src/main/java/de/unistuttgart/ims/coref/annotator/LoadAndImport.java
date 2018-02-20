@@ -10,6 +10,7 @@ import javax.swing.SwingWorker;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.JCasIterator;
@@ -21,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
+import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 class LoadAndImport extends SwingWorker<JCas, Object> {
 
@@ -29,6 +31,7 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
+	String language = null;
 
 	public LoadAndImport(DocumentWindow documentWindow, InputStream inputStream,
 			TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
@@ -81,7 +84,13 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 
 	private JCas readFile() throws ResourceInitializationException {
 		JCasIterator iter;
-		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), flavor.getImporter()).iterator();
+		AggregateBuilder b = new AggregateBuilder();
+		if (getLanguage() != null)
+			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
+					getLanguage()));
+		b.add(flavor.getImporter());
+
+		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), b.createAggregateDescription()).iterator();
 		if (iter.hasNext()) {
 			return iter.next();
 		}
@@ -107,6 +116,14 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 }

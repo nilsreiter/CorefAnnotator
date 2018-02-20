@@ -524,7 +524,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		mainApplication.close(this);
 	}
 
-	public void loadFile(File file, IOPlugin flavor) {
+	public void loadFile(File file, IOPlugin flavor, String language) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
 		else
@@ -534,6 +534,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			lai = new LoadAndImport(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
+			lai.setLanguage(language);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
