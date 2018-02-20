@@ -259,11 +259,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
-			<artifactId>ikonli-material-pack</artifactId>
-			<version>${version.ikonli}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-swing</artifactId>
 			<version>${version.ikonli}</version>
 		</dependency>
