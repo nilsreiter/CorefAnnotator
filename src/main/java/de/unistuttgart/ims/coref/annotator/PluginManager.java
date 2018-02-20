@@ -22,6 +22,7 @@ public class PluginManager {
 	Map<Class<?>, Plugin> instances = new HashMap<Class<?>, Plugin>();
 
 	public void init() {
+		Annotator.logger.trace("Initialising plugin manager");
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
 		MutableSet<Class<? extends IOPlugin>> ioPlugins = Sets.mutable
 				.withAll(reflections.getSubTypesOf(IOPlugin.class));

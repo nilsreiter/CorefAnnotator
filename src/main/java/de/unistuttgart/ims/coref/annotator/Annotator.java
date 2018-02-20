@@ -49,6 +49,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -71,6 +72,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
+
+	LogWindow logWindow = null;
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
@@ -101,6 +104,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public Annotator() throws ResourceInitializationException {
+		logger.trace("Application startup");
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 		this.initialiseActions();
@@ -142,6 +146,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
+		panel.add(new JButton(new ShowLogWindowAction(this)));
 		mainPanel.add(panel);
 
 		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
@@ -185,20 +190,22 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
-		DocumentWindow v = new DocumentWindow(this);
+		logger.trace("Creating new DocumentWindow");
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				DocumentWindow v = new DocumentWindow(Annotator.this);
 				v.loadFile(file, flavor);
+				openFiles.add(v);
+				if (flavor instanceof DefaultIOPlugin)
+					recentFiles.add(0, file);
+
 			}
 		};
 
 		SwingUtilities.invokeLater(runnable);
-		openFiles.add(v);
-		if (flavor instanceof DefaultIOPlugin)
-			recentFiles.add(0, file);
-		return v;
+		return null;
 	}
 
 	public void close(DocumentWindow viewer) {
@@ -325,6 +332,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public Preferences getPreferences() {
 		return preferences;
+	}
+
+	public LogWindow getLogWindow() {
+		if (logWindow == null)
+			logWindow = new LogWindow();
+		return logWindow;
 	}
 
 }

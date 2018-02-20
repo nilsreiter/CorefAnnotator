@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.math3.util.Pair;
 
+@Deprecated
 public class Counter<K> extends HashMap<K, Integer> {
 	private static final long serialVersionUID = 1L;
 

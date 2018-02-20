@@ -109,6 +109,16 @@
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 					</archive>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
 				</configuration>
 				<executions>
 					<execution>
@@ -293,6 +303,13 @@
 			<version>${version.dkpro}</version>
 		</dependency>
 		<dependency>
+			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
+			<artifactId>
+				de.tudarmstadt.ukp.dkpro.core.io.conll-asl
+			</artifactId>
+			<version>${version.dkpro}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections-api</artifactId>
 			<version>9.1.0</version>
@@ -301,6 +318,13 @@
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections</artifactId>
 			<version>9.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
+			<artifactId>
+				de.tudarmstadt.ukp.dkpro.core.tokit-asl
+			</artifactId>
+			<version>${version.dkpro}</version>
 		</dependency>
 	</dependencies>
 </project>

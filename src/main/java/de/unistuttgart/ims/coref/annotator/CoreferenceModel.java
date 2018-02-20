@@ -39,12 +39,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	int key = 0;
 
-	@Deprecated
-	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
-
-	@Deprecated
-	Map<FeatureStructure, CATreeNode> mentionMap = fsMap;
 
 	Preferences preferences;
 
@@ -115,7 +110,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public void addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		addTo(get(e), add(m));
-		fireMentionAddedEvent(m);
+		if (get(e).isVisible())
+			fireMentionAddedEvent(m);
 	}
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
@@ -139,7 +135,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
 			insertNodeInto(discNode, tn, 0);
 		}
-		fireAnnotationChangedEvent(m);
+		if (entityNode.isVisible())
+			fireAnnotationChangedEvent(m);
 		resort();
 	}
 
@@ -196,7 +193,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void fireMentionAddedEvent(Mention m) {
-		crModelListeners.forEach(l -> l.mentionAdded(m));
+		crModelListeners.forEach(l -> l.annotationAdded(m));
 	}
 
 	public void fireAnnotationChangedEvent(Annotation m) {
@@ -364,12 +361,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
-		MutableList<CATreeNode> children = Lists.mutable.withAll(rootNode);
-		children = children.reject(n -> !n.isEntity());
-		children.sort(comparator);
-		rootNode.removeAllChildren();
-		children.forEach(node -> rootNode.add(node));
-		nodeChanged(rootNode);
+		Annotator.logger.info("Sorting entity tree with {}", comparator.toString());
+		rootNode.getChildren().sort(comparator);
 		nodeStructureChanged(rootNode);
 	}
 
@@ -403,6 +396,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 				fireAnnotationChangedEvent((Mention) child);
 		}
 	}
+
+	public void update(Entity entity, boolean displayed) {
+		CATreeNode node = get(entity);
+		for (int i = 0; i < node.getChildCount(); i++) {
+			CATreeNode child = node.getChildAt(i);
+			if (child.isMention())
+				if (displayed)
+					fireMentionAddedEvent(child.getFeatureStructure());
+				else
+					fireAnnotationRemovedEvent(child.getFeatureStructure());
+
+		}
+	};
 
 	public void merge(CATreeNode e1, CATreeNode e2) {
 		CATreeNode bigger, smaller;

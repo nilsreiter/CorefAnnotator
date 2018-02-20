@@ -10,7 +10,7 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.material.Material;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
@@ -18,8 +18,7 @@ public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ViewFontSizeDecreaseAction(DocumentWindow documentWindow) {
-		super(documentWindow, Material.EXPOSURE_NEG_1);
-		putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
+		super(documentWindow, Material.EXPOSURE_NEG_1, Strings.ACTION_VIEW_DECREASE_FONT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}
