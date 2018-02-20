@@ -91,6 +91,7 @@ public class Constants {
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 	public static final String CFG_WINDOWTITLE = "Windowtitle";
+	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";

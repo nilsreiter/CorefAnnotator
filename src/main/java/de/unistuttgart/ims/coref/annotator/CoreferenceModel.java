@@ -137,7 +137,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 		if (entityNode.isVisible())
 			fireAnnotationChangedEvent(m);
-		resort();
+		if (preferences.getBoolean(Constants.CFG_KEEP_TREE_SORTED, Defaults.CFG_KEEP_TREE_SORTED))
+			resort();
 	}
 
 	public void addTo(EntityGroup eg, Entity e) {
