@@ -32,9 +32,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
-	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
+	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
 
 	JCas jcas;
+	@Deprecated
 	boolean keepEmptyEntities = true;
 
 	int key = 0;

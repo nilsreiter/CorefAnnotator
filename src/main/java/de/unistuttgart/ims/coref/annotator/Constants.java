@@ -89,6 +89,7 @@ public class Constants {
 	}
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
+	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 
