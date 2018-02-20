@@ -14,9 +14,7 @@ public abstract class TogglePreferenceAction extends AnnotatorAction {
 	String prefKey;
 	boolean defaultValue;
 
-	public TogglePreferenceAction(Annotator annotator, Ikon ikon, String stringKey, String prefKey, boolean def)
-
-	{
+	public TogglePreferenceAction(Annotator annotator, Ikon ikon, String stringKey, String prefKey, boolean def) {
 		super(annotator, ikon, stringKey);
 		putValue(Action.SELECTED_KEY, mainApplication.getPreferences().getBoolean(prefKey, def));
 		this.prefKey = prefKey;
@@ -28,6 +26,14 @@ public abstract class TogglePreferenceAction extends AnnotatorAction {
 		boolean old = mainApplication.getPreferences().getBoolean(prefKey, defaultValue);
 		mainApplication.getPreferences().putBoolean(prefKey, !old);
 		putValue(Action.SELECTED_KEY, !old);
+	}
+
+	public static TogglePreferenceAction getAction(Annotator annotator, Ikon ikon, String stringKey, String prefKey,
+			boolean def) {
+		TogglePreferenceAction action = new TogglePreferenceAction(annotator, ikon, stringKey, prefKey, def) {
+			private static final long serialVersionUID = 1L;
+		};
+		return action;
 	}
 
 }

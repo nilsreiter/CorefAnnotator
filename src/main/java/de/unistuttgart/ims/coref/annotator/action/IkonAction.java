@@ -32,8 +32,10 @@ public abstract class IkonAction extends AbstractAction {
 		this.ikon = icon;
 		putValue(Action.NAME, Annotator.getString(stringKey));
 		try {
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, enabledColor));
-			putValue(Action.SMALL_ICON, FontIcon.of(ikon, enabledColor));
+			if (icon != null) {
+				putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon, enabledColor));
+				putValue(Action.SMALL_ICON, FontIcon.of(ikon, enabledColor));
+			}
 		} catch (UnsupportedOperationException e) {
 			Annotator.logger.catching(e);
 		}
