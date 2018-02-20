@@ -48,10 +48,10 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(MaterialDesign.MDI_ACCOUNT, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
+			super(MaterialDesign.MDI_ARROW_RIGHT, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
-			this.addIkon(MaterialDesign.MDI_ARROW_RIGHT);
+			this.addIkon(MaterialDesign.MDI_ACCOUNT);
 		}
 
 		@Override
