@@ -191,20 +191,21 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
 		logger.trace("Creating new DocumentWindow");
-		DocumentWindow v = new DocumentWindow(this);
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				DocumentWindow v = new DocumentWindow(Annotator.this);
 				v.loadFile(file, flavor);
+				openFiles.add(v);
+				if (flavor instanceof DefaultIOPlugin)
+					recentFiles.add(0, file);
+
 			}
 		};
 
 		SwingUtilities.invokeLater(runnable);
-		openFiles.add(v);
-		if (flavor instanceof DefaultIOPlugin)
-			recentFiles.add(0, file);
-		return v;
+		return null;
 	}
 
 	public void close(DocumentWindow viewer) {
