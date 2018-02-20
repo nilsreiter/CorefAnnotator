@@ -77,13 +77,14 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return tn;
 	}
 
-	public void add(int begin, int end) {
+	public Mention add(int begin, int end) {
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
 
 		// tree model
 		addTo(add(e), add(m));
+		return m;
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
