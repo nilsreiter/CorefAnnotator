@@ -25,25 +25,62 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
+/**
+ * Class represents the document and the tree view on the document. All
+ * annotation happens through this class.
+ * 
+ *
+ */
 public class CoreferenceModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * A mapping from character positions to annotations
+	 */
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
+
+	/**
+	 * Assigns colors to new entities
+	 */
 	ColorProvider colorMap = new ColorProvider();
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
+
+	/**
+	 * A list of listeners to annotation events
+	 */
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
+
+	/**
+	 * A map of feature structures to the tree nodes that represent them
+	 */
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
+
+	/**
+	 * The sort order for the tree nodes
+	 */
 	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
 
+	/**
+	 * The document
+	 */
 	JCas jcas;
+
 	@Deprecated
 	boolean keepEmptyEntities = true;
 
+	@Deprecated
 	int key = 0;
 
+	/**
+	 * Maps shortcut characters onto entities
+	 */
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	Preferences preferences;
 
+	/**
+	 * root node of tree
+	 */
 	CATreeNode rootNode;
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
@@ -77,6 +114,15 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return tn;
 	}
 
+	/**
+	 * Create a new entity e and a new mention m, and add m to e.
+	 * 
+	 * @param begin
+	 *            Begin of mention
+	 * @param end
+	 *            End of mention
+	 * @return The new mention
+	 */
 	public Mention add(int begin, int end) {
 		// document model
 		Mention m = createMention(begin, end);
@@ -185,9 +231,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return e;
 	}
 
+	/**
+	 * Creates a new mention annotation in the document and adds it to the
+	 * indexes
+	 * 
+	 * @param b
+	 *            the begin character position
+	 * @param e
+	 *            the end character position
+	 * @return the created mention
+	 */
 	protected Mention createMention(int b, int e) {
 		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
-		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			m = AnnotationUtil.trim(m);
 		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
 			m = Util.extend(m);
@@ -195,19 +251,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return m;
 	}
 
-	public void fireMentionAddedEvent(Mention m) {
+	protected void fireMentionAddedEvent(Mention m) {
 		crModelListeners.forEach(l -> l.annotationAdded(m));
 	}
 
-	public void fireAnnotationChangedEvent(Annotation m) {
+	protected void fireAnnotationChangedEvent(Annotation m) {
 		crModelListeners.forEach(l -> l.annotationChanged(m));
 	}
 
-	public void fireAnnotationRemovedEvent(Annotation m) {
+	protected void fireAnnotationRemovedEvent(Annotation m) {
 		crModelListeners.forEach(l -> l.annotationRemoved(m));
 	}
 
-	public void fireMentionSelectedEvent(Mention m) {
+	protected void fireMentionSelectedEvent(Mention m) {
 		crModelListeners.forEach(l -> l.annotationSelected(m));
 	}
 
