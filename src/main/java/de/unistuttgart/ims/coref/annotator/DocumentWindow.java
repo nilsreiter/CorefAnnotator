@@ -1249,6 +1249,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	// TODO: integrate into CoreferenceModel
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
