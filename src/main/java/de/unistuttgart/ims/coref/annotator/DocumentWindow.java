@@ -1022,8 +1022,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public ChangeColorForEntity() {
 			super(MaterialDesign.MDI_FORMAT_COLOR_FILL, Strings.ACTION_SET_COLOR);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
