@@ -273,14 +273,24 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	protected void remove(Mention m, CATreeNode node) {
+		CATreeNode parent = node.getParent();
+
+		// removing from tree
 		removeNodeFromParent(node);
-		// nodesWereRemoved(node.getParent(), new int[] { index }, new Object[]
-		// { mentionMap.get(m) });
-		fireAnnotationRemovedEvent(m);
 
 		// document
 		fsMap.remove(m);
 		m.removeFromIndexes();
+
+		if (preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+			if (parent.isEntity() && parent.isLeaf()) {
+				remove(parent.getEntity(), parent);
+			}
+		}
+
+		// fire event
+		fireAnnotationRemovedEvent(m);
+
 	}
 
 	protected void remove(DetachedMentionPart m, CATreeNode node) {
