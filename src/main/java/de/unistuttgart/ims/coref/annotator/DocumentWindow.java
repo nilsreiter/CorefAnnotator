@@ -351,6 +351,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toggleMentionDifficult.setEnabled(false);
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
+		toggleEntityDisplayed.setEnabled(false);
 		Annotator.logger.trace("Actions initialised.");
 
 	}
