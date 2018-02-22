@@ -306,6 +306,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
+		textPane.addKeyListener(new TextViewKeyListener());
+		textPane.setCaretPosition(0);
+		textPane.addCaretListener(this);
+
 		highlightManager = new HighlightManager(textPane);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -719,19 +723,18 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public void setCoreferenceModel(CoreferenceModel model) {
+		this.cModel = model;
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
-		textPane.addKeyListener(new TextViewKeyListener());
-		textPane.setCaretPosition(0);
-		textPane.addCaretListener(this);
-		highlightManager.clearAndDrawAllAnnotations(jcas);
-		textPane.repaint();
+
+		// text
 
 		progressBar.setValue(100);
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
 		progressBar.setVisible(false);
 
+		// Style
 		Meta meta = Util.getMeta(jcas);
 		StylePlugin sPlugin = null;
 
@@ -764,6 +767,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
 				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
+
+		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
 
