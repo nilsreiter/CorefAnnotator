@@ -77,9 +77,9 @@ class HighlightManager {
 			hilit.removeHighlight(hi);
 		}
 		try {
-			int n = spanCounter.add(span, hi);
+			int n = spanCounter.getNextLevel(span);
 			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-
+			spanCounter.add(span, hi, n);
 			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
