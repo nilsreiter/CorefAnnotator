@@ -11,6 +11,7 @@ public class Constants {
 		public static final String ACTION_COMMENT = "action.comment";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+		public static final Object ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
 		public static final String ACTION_FLAG_ENTITY_GENERIC_TOOLTIP = "action.flag_entity_generic.tooltip";
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
@@ -61,10 +62,12 @@ public class Constants {
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
+		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
+		public static final String MENU_ENTITIES = "menu.entities";
 		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
@@ -89,9 +92,6 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String MENU_ENTITIES = "menu.entities";
-		public static final String MENU_COMMENTS = "menu.comments";
-		public static final Object ACTION_EDIT_COMMENT = "action.edit.comment";
 
 	}
 
