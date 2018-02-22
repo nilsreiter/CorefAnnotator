@@ -165,6 +165,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JSplitPane splitPane;
 	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
+	TreeKeyListener treeKeyListener = new TreeKeyListener();
 
 	Thread messageVoider;
 
@@ -231,7 +232,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
-		tree.addKeyListener(new TreeKeyListener());
+		tree.addKeyListener(treeKeyListener);
 
 		treeSearchField = new JTextField();
 		treeSearchField.getDocument().addDocumentListener(new EntityFinder());
@@ -1003,7 +1004,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			treeKeyListener.setIgnoreNext(true);
 			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
 			String l = etn.getEntity().getLabel();
 			String newLabel = (String) JOptionPane.showInputDialog(textPane,
@@ -1927,6 +1928,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	class TreeKeyListener implements KeyListener {
 
+		boolean ignoreNext = false;
+
 		@Override
 		public void keyTyped(KeyEvent e) {
 
@@ -1939,7 +1942,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void keyReleased(KeyEvent ev) {
-			if (tree.hasFocus() && ev.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (ignoreNext)
+				ignoreNext = false;
+			else if (tree.hasFocus() && ev.getKeyCode() == KeyEvent.VK_ENTER) {
 				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
 				if (b != e) {
 					for (TreePath tp : tree.getSelectionPaths()) {
@@ -1954,8 +1959,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			} else if (ev.getKeyCode() == KeyEvent.VK_UP) {
 				if (tree.getLeadSelectionRow() == 0)
 					treeSearchField.grabFocus();
+
 			}
 
+		}
+
+		public boolean isIgnoreNext() {
+			return ignoreNext;
+		}
+
+		public void setIgnoreNext(boolean ignoreNext) {
+			this.ignoreNext = ignoreNext;
 		}
 
 	}
