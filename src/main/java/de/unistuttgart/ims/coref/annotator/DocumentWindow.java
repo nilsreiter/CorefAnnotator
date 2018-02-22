@@ -20,9 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +80,6 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
@@ -90,6 +87,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -118,6 +116,8 @@ import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
+import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
 
@@ -134,6 +134,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	RangedCounter spanCounter = new RangedCounter();
 	boolean unsavedChanges = false;
 	Feature titleFeature;
+	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
 	// AbstractAction commentAction = new CommentAction(null);
@@ -183,7 +184,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	StylePlugin currentStyle;
 
 	// sub windows
-	SearchPanel searchPanel;
+	SearchDialog searchPanel;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -305,6 +306,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
+		textPane.addKeyListener(new TextViewKeyListener());
+		textPane.setCaretPosition(0);
+		textPane.addCaretListener(this);
+
 		highlightManager = new HighlightManager(textPane);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -530,10 +535,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		else
 			this.fileSaveAction.setEnabled(false);
 
-		LoadAndImport lai;
+		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
-			lai = new LoadAndImport(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
+			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -669,6 +674,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
+	public void setProgress(int i) {
+		progressBar.setValue(i);
+	}
+
 	protected void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 		String documentTitle = null;
@@ -686,9 +695,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public void showSearch() {
 		if (searchPanel == null) {
-			searchPanel = new SearchPanel(this, mainApplication.getPreferences());
+			searchPanel = new SearchDialog(this, mainApplication.getPreferences());
 		}
 		searchPanel.setVisible(true);
+	}
+
+	@Override
+	public void entityAdded(Entity entity) {
+		if (entity.getKey() != null) {
+			keyMap.put(entity.getKey().charAt(0), entity);
+		}
+	}
+
+	@Override
+	public void entityRemoved(Entity entity) {
+		if (entity.getKey() != null) {
+			keyMap.remove(entity.getKey().charAt(0));
+		}
 	}
 
 	protected synchronized void registerChange() {
@@ -699,17 +722,18 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	protected void fireModelCreatedEvent() {
+	public void setCoreferenceModel(CoreferenceModel model) {
+		cModel = model;
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
-		textPane.addKeyListener(new TextViewKeyListener());
-		textPane.setCaretPosition(0);
-		textPane.addCaretListener(this);
+
+		// UI
 		progressBar.setValue(100);
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
 		progressBar.setVisible(false);
 
+		// Style
 		Meta meta = Util.getMeta(jcas);
 		StylePlugin sPlugin = null;
 
@@ -729,11 +753,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
+
+		// final
 		setMessage("");
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
-	protected void fireJCasLoadedEvent() {
+	public void setJCas(JCas jcas) {
+
+		this.jcas = jcas;
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
@@ -741,9 +769,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
 				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
 
+		highlightManager.clearAndDrawAllAnnotations(jcas);
+
 		setWindowTitle();
 
-		InitializeModel im = new InitializeModel(jcas);
+		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();
 	}
 
@@ -903,20 +933,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			targetNode = ((CATreeNode) tp.getLastPathComponent());
 			targetFS = targetNode.getFeatureStructure();
-			try {
-				Object o = info.getTransferable().getTransferData(dataFlavor);
-				System.err.println(o);
-			} catch (UnsupportedFlavorException e1) {
-				Annotator.logger.catching(e1);
-			} catch (IOException e1) {
-				Annotator.logger.catching(e1);
-			}
+
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
-				PotentialAnnotation pa;
 				try {
-					pa = (PotentialAnnotation) info.getTransferable()
-							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					handlePotentialAnnotationTransfer(pa);
+					@SuppressWarnings("unchecked")
+					ImmutableList<PotentialAnnotation> paList = (ImmutableList<PotentialAnnotation>) info
+							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor);
+					for (PotentialAnnotation pa : paList)
+						handlePotentialAnnotationTransfer(pa);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1061,7 +1085,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
 					etn.getEntity().setKey(newKey.substring(0, 1));
-					cModel.reassignKey(newChar, etn.getFeatureStructure());
+					keyMap.put(newChar, etn.getFeatureStructure());
 					registerChange();
 
 				} else {
@@ -1246,14 +1270,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	// TODO: integrate into CoreferenceModel
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			JTextComponent ta = (JTextComponent) e.getSource();
-			if (cModel.keyMap.containsKey(e.getKeyChar())) {
+			if (keyMap.containsKey(e.getKeyChar())) {
 				e.consume();
-				cModel.addTo(cModel.keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
+				cModel.addTo(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
 				registerChange();
 			}
 		}
@@ -1709,59 +1732,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				annotationSelected(getAnnotation(0));
 			else
 				annotationSelected(null);
-		}
-
-	}
-
-	class InitializeModel extends SwingWorker<CoreferenceModel, Integer> {
-
-		JCas jcas;
-
-		public InitializeModel(JCas jcas) {
-			this.jcas = jcas;
-		}
-
-		@Override
-		protected CoreferenceModel doInBackground() throws Exception {
-			CoreferenceModel cModel;
-			cModel = new CoreferenceModel(jcas, mainApplication.getPreferences());
-			cModel.addCoreferenceModelListener(DocumentWindow.this);
-
-			Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
-				cModel.add(e);
-			});
-
-			publish(60);
-			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
-				for (int i = 0; i < eg.getMembers().size(); i++)
-					cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
-
-			publish(70);
-			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
-				cModel.registerAnnotation(m);
-			}
-			highlightManager.clearAndDrawAllAnnotations(jcas);
-			textPane.repaint();
-			publish(75);
-			return cModel;
-		}
-
-		@Override
-		protected void done() {
-			try {
-				cModel = get();
-				fireModelCreatedEvent();
-			} catch (InterruptedException | ExecutionException e) {
-				Annotator.logger.catching(e);
-			}
-		}
-
-		@Override
-		protected void process(List<Integer> chunks) {
-			for (Integer i : chunks) {
-				progressBar.setValue(i);
-			}
 		}
 
 	}

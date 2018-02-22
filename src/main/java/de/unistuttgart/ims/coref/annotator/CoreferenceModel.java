@@ -30,7 +30,6 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * annotation happens through this class.
  * 
  *
- * TODO: Move key bindings to DocumentWindow
  */
 public class CoreferenceModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
@@ -75,6 +74,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	/**
 	 * Maps shortcut characters onto entities
 	 */
+	@Deprecated
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	Preferences preferences;
@@ -112,6 +112,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		if (e.getKey() != null) {
 			keyMap.put(e.getKey().charAt(0), e);
 		}
+		fireEntityAddedEvent(e);
 		return tn;
 	}
 
@@ -264,6 +265,14 @@ public class CoreferenceModel extends DefaultTreeModel {
 		crModelListeners.forEach(l -> l.annotationRemoved(m));
 	}
 
+	protected void fireEntityRemovedEvent(Entity e) {
+		crModelListeners.forEach(l -> l.entityRemoved(e));
+	}
+
+	protected void fireEntityAddedEvent(Entity e) {
+		crModelListeners.forEach(l -> l.entityAdded(e));
+	}
+
 	public void formGroup(Entity e1, Entity e2) {
 		EntityGroup eg = createEntityGroup(e1.getLabel() + " and " + e2.getLabel(), 2);
 		eg.setMembers(0, e1);
@@ -309,10 +318,12 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
+	@Deprecated
 	public boolean isKeyUsed(int i) {
 		return keyMap.containsKey(i);
 	}
 
+	@Deprecated
 	public void reassignKey(char keyCode, Entity e) {
 		Entity old = keyMap.get(keyCode);
 		if (old != null) {
@@ -378,6 +389,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		String k = e.getKey();
 		if (k != null)
 			keyMap.remove(k.charAt(0));
+		fireEntityRemovedEvent(e);
 		e.removeFromIndexes();
 	}
 
@@ -478,7 +490,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 					fireMentionAddedEvent(child.getFeatureStructure());
 				else
 					fireAnnotationRemovedEvent(child.getFeatureStructure());
-
 		}
 	};
 
