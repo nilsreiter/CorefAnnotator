@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelFactory;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 
-public class CommentWindow extends JFrame {
+public class CommentWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
