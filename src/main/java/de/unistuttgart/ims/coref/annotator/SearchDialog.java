@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -157,6 +158,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		list.getSelectionModel().addListSelectionListener(tsl);
 		list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		list.setCellRenderer(new SearchResultRenderer());
+		list.setVisibleRowCount(10);
 
 		JScrollPane listScroller = new JScrollPane(list);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
@@ -169,6 +171,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		getContentPane().add(listScroller, BorderLayout.CENTER);
 
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
+		setMaximumSize(new Dimension(600, 800));
+		setLocationRelativeTo(documentWindow);
 		addWindowListener(this);
 		pack();
 	}
@@ -246,7 +250,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 		}
 
-		// pack();
+		pack();
 	}
 
 	class SearchResult {
