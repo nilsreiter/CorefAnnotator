@@ -12,7 +12,7 @@ public class ShowLogWindowAction extends AnnotatorAction {
 	private static final long serialVersionUID = 1L;
 
 	public ShowLogWindowAction(Annotator mApp) {
-		super(mApp, MaterialDesign.MDI_CODE_NOT_EQUAL, Constants.Strings.ACTION_SHOW_LOG);
+		super(mApp, Constants.Strings.ACTION_SHOW_LOG, MaterialDesign.MDI_CODE_NOT_EQUAL);
 	}
 
 	@Override

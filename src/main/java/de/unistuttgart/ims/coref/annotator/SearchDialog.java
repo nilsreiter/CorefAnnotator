@@ -72,7 +72,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(MaterialDesign.MDI_ARROW_RIGHT, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
+			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			this.addIkon(MaterialDesign.MDI_ACCOUNT);
@@ -92,7 +92,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindingsAsNewEntity() {
-			super(MaterialDesign.MDI_ACCOUNT_PLUS, Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY);
+			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
 		}
@@ -117,7 +117,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		private static final long serialVersionUID = 1L;
 
 		public RunSearch() {
-			super(MaterialDesign.MDI_FILE_FIND, Constants.Strings.ACTION_SEARCH);
+			super(Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 			setEnabled(false);
 		}
 

@@ -10,15 +10,16 @@ public abstract class AnnotatorAction extends IkonAction {
 
 	Annotator mainApplication;
 
-	public AnnotatorAction(Annotator mApp, Ikon ikon) {
+	public AnnotatorAction(Annotator mApp, Ikon... ikon) {
 		super(ikon);
 		this.mainApplication = mApp;
 
 	}
 
-	public AnnotatorAction(Annotator mApp, Ikon ikon, String stringKey) {
-		super(ikon, stringKey);
+	public AnnotatorAction(Annotator mApp, String stringKey, Ikon... ikon) {
+		super(stringKey, ikon);
 		this.mainApplication = mApp;
 
 	}
+
 }

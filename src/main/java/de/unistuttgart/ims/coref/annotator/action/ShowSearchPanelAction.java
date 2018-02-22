@@ -19,7 +19,7 @@ public class ShowSearchPanelAction extends DocumentWindowAction {
 	Annotator mainApplication;
 
 	public ShowSearchPanelAction(Annotator mainApplication, DocumentWindow dw) {
-		super(dw, MaterialDesign.MDI_FILE_FIND, Constants.Strings.ACTION_SEARCH);
+		super(dw, Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.search.tooltip"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
