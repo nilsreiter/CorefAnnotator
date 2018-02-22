@@ -42,7 +42,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
-public class SearchPanel extends JFrame implements DocumentListener, WindowListener {
+public class SearchWindow extends JFrame implements DocumentListener, WindowListener {
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -123,7 +123,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
 
-	public SearchPanel(DocumentWindow xdw, Preferences configuration) {
+	public SearchWindow(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
 		text = xdw.textPane.getText();
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);

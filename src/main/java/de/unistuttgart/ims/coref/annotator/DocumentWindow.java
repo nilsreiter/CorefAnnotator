@@ -184,7 +184,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	StylePlugin currentStyle;
 
 	// sub windows
-	SearchPanel searchPanel;
+	SearchWindow searchPanel;
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -695,7 +695,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public void showSearch() {
 		if (searchPanel == null) {
-			searchPanel = new SearchPanel(this, mainApplication.getPreferences());
+			searchPanel = new SearchWindow(this, mainApplication.getPreferences());
 		}
 		searchPanel.setVisible(true);
 	}
