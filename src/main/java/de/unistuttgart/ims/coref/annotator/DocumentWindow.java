@@ -90,6 +90,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -134,6 +135,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	RangedCounter spanCounter = new RangedCounter();
 	boolean unsavedChanges = false;
 	Feature titleFeature;
+	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
 	// AbstractAction commentAction = new CommentAction(null);
@@ -691,6 +693,20 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		searchPanel.setVisible(true);
 	}
 
+	@Override
+	public void entityAdded(Entity entity) {
+		if (entity.getKey() != null) {
+			keyMap.put(entity.getKey().charAt(0), entity);
+		}
+	}
+
+	@Override
+	public void entityRemoved(Entity entity) {
+		if (entity.getKey() != null) {
+			keyMap.remove(entity.getKey().charAt(0));
+		}
+	}
+
 	protected synchronized void registerChange() {
 		if (unsavedChanges == false) {
 			unsavedChanges = true;
@@ -1061,7 +1077,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
 					etn.getEntity().setKey(newKey.substring(0, 1));
-					cModel.reassignKey(newChar, etn.getFeatureStructure());
+					keyMap.put(newChar, etn.getFeatureStructure());
 					registerChange();
 
 				} else {
@@ -1246,14 +1262,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	// TODO: integrate into CoreferenceModel
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			JTextComponent ta = (JTextComponent) e.getSource();
-			if (cModel.keyMap.containsKey(e.getKeyChar())) {
+			if (keyMap.containsKey(e.getKeyChar())) {
 				e.consume();
-				cModel.addTo(cModel.keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
+				cModel.addTo(keyMap.get(e.getKeyChar()), ta.getSelectionStart(), ta.getSelectionEnd());
 				registerChange();
 			}
 		}
