@@ -933,14 +933,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			targetNode = ((CATreeNode) tp.getLastPathComponent());
 			targetFS = targetNode.getFeatureStructure();
-			try {
-				Object o = info.getTransferable().getTransferData(dataFlavor);
-				System.err.println(o);
-			} catch (UnsupportedFlavorException e1) {
-				Annotator.logger.catching(e1);
-			} catch (IOException e1) {
-				Annotator.logger.catching(e1);
-			}
+
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 				PotentialAnnotation pa;
 				try {
