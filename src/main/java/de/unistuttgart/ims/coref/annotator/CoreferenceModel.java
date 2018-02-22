@@ -30,6 +30,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * annotation happens through this class.
  * 
  *
+ * TODO: Move key bindings to DocumentWindow
  */
 public class CoreferenceModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
@@ -301,6 +302,13 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return fsMap.get(e);
 	}
 
+	/**
+	 * Retrieve all annotations that cover the current character position
+	 * 
+	 * @param position
+	 *            The character position
+	 * @return A collection of annotations
+	 */
 	public Collection<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
 	}
