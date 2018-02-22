@@ -954,12 +954,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
-
-			if (targetFS instanceof EntityGroup)
-				moved.forEach(n -> cModel.addTo((EntityGroup) targetFS, n.getFeatureStructure()));
-			if (targetFS instanceof Entity)
-				moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (Entity) targetFS));
-			else if (targetFS instanceof Mention)
+			Annotator.logger.debug("Moving {} things", moved.size());
+			if (targetFS instanceof Entity) {
+				if (targetFS instanceof EntityGroup) {
+					moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (EntityGroup) targetFS));
+					moved.forEach(n -> cModel.addTo((EntityGroup) targetFS, n.getFeatureStructure()));
+				} else
+					moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (Entity) targetFS));
+			} else if (targetFS instanceof Mention)
 				moved.forEach(n -> cModel.addTo((Mention) targetFS, n.getFeatureStructure()));
 			else
 				return false;
