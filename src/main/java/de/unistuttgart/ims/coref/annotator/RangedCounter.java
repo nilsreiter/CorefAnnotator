@@ -14,12 +14,13 @@ public class RangedCounter {
 
 	Map<Integer, HashBiMap<Integer, Object>> map = new HashMap<Integer, HashBiMap<Integer, Object>>();
 
-	public void subtract(Span span, Object hi) {
-		RichIterable<Integer> interval = Interval.fromTo(span.begin, span.end);
-		interval.forEach(Procedures.cast(i -> map.get(i).inverse().remove(hi)));
+	public synchronized int add(Span span, Object object) {
+		int l = getNextLevel(span);
+		add(span, object, l);
+		return l;
 	}
 
-	public void add(Span span, Object hilight, int level) {
+	private void add(Span span, Object hilight, int level) {
 		RichIterable<Integer> interval = Interval.fromTo(span.begin, span.end);
 		interval.forEach(Procedures.cast(i -> {
 			if (!map.containsKey(i)) {
@@ -29,11 +30,15 @@ public class RangedCounter {
 		}));
 	}
 
+	public void clear() {
+		map.clear();
+	}
+
 	public int getNextLevel(Span span) {
 		return getNextLevel(span, 0, 3);
 	}
 
-	public int getNextLevel(Span span, int from, int to) {
+	private int getNextLevel(Span span, int from, int to) {
 
 		MutableSet<Integer> range = Interval.fromTo(from, to).toSet();
 		for (int i = span.begin; i < span.end; i++) {
@@ -47,8 +52,9 @@ public class RangedCounter {
 		return Collections.min(range);
 	}
 
-	public void clear() {
-		map.clear();
+	public void subtract(Span span, Object hi) {
+		RichIterable<Integer> interval = Interval.fromTo(span.begin, span.end);
+		interval.forEach(Procedures.cast(i -> map.get(i).inverse().remove(hi)));
 	}
 
 }
