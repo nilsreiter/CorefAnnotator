@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.util.Comparator;
 
 public enum EntitySortOrder {
-	Mentions, Alphabet;
+	Mentions, Alphabet, None;
 
 	boolean descending = true;
 
@@ -14,6 +14,13 @@ public enum EntitySortOrder {
 	public Comparator<CATreeNode> getComparator() {
 
 		switch (this) {
+		case None:
+			return new Comparator<CATreeNode>() {
+				@Override
+				public int compare(CATreeNode o1, CATreeNode o2) {
+					return 0;
+				}
+			};
 		case Mentions:
 			return new Comparator<CATreeNode>() {
 				@Override
@@ -46,11 +53,10 @@ public enum EntitySortOrder {
 		return new Comparator<CATreeNode>() {
 			@Override
 			public int compare(CATreeNode o1, CATreeNode o2) {
-				if (o1.isVisible() && !o2.isVisible())
-					return -1;
-				if (o2.isVisible() && !o1.isVisible())
-					return 1;
-				return def.compare(o1, o2);
+				int r = Integer.compare(o2.getRank(), o1.getRank());
+				if (r == 0)
+					return def.compare(o1, o2);
+				return r;
 			}
 		};
 

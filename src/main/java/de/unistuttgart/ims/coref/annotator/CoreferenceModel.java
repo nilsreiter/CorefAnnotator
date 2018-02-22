@@ -30,6 +30,13 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
+/**
+ * Class represents the document and the tree view on the document. All
+ * annotation happens through this class.
+ * 
+ *
+ * TODO: Move key bindings to DocumentWindow
+ */
 public class CoreferenceModel extends DefaultTreeModel {
 	public class CommentsModel extends AbstractListModel<Comment> {
 
@@ -118,27 +125,54 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * A mapping from character positions to annotations
+	 */
 	RangedHashSetValuedHashMap<Annotation> characterPosition2AnnotationMap = new RangedHashSetValuedHashMap<Annotation>();
+
+	/**
+	 * Assigns colors to new entities
+	 */
 	ColorProvider colorMap = new ColorProvider();
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
-	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
-	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
-	EntitySortOrder entitySortOrder = EntitySortOrder.Mentions;
 
+	/**
+	 * A list of listeners to annotation events
+	 */
+	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
+
+	/**
+	 * A map of feature structures to the tree nodes that represent them
+	 */
+	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
+
+	/**
+	 * The sort order for the tree nodes
+	 */
+	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
+
+	/**
+	 * The document
+	 */
 	JCas jcas;
+
+	@Deprecated
 	boolean keepEmptyEntities = true;
 
+	@Deprecated
 	int key = 0;
 
-	@Deprecated
-	char[] keyCodes = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+	/**
+	 * Maps shortcut characters onto entities
+	 */
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
-
-	@Deprecated
-	Map<FeatureStructure, CATreeNode> mentionMap = fsMap;
 
 	Preferences preferences;
 
+	/**
+	 * root node of tree
+	 */
 	CATreeNode rootNode;
 
 	CommentsModel commentsModel;
@@ -175,13 +209,23 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return tn;
 	}
 
-	public void add(int begin, int end) {
+	/**
+	 * Create a new entity e and a new mention m, and add m to e.
+	 * 
+	 * @param begin
+	 *            Begin of mention
+	 * @param end
+	 *            End of mention
+	 * @return The new mention
+	 */
+	public Mention add(int begin, int end) {
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
 
 		// tree model
 		addTo(add(e), add(m));
+		return m;
 	}
 
 	public void add(String text, String author, int begin, int end) {
@@ -213,7 +257,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	public void addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		addTo(get(e), add(m));
-		fireMentionAddedEvent(m);
+		if (get(e).isVisible())
+			fireMentionAddedEvent(m);
 	}
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
@@ -237,8 +282,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
 			insertNodeInto(discNode, tn, 0);
 		}
-		fireAnnotationChangedEvent(m);
-		resort();
+		if (entityNode.isVisible())
+			fireAnnotationChangedEvent(m);
+		if (preferences.getBoolean(Constants.CFG_KEEP_TREE_SORTED, Defaults.CFG_KEEP_TREE_SORTED))
+			resort();
 	}
 
 	public void addTo(EntityGroup eg, Entity e) {
@@ -283,9 +330,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return e;
 	}
 
+	/**
+	 * Creates a new mention annotation in the document and adds it to the
+	 * indexes
+	 * 
+	 * @param b
+	 *            the begin character position
+	 * @param e
+	 *            the end character position
+	 * @return the created mention
+	 */
 	protected Mention createMention(int b, int e) {
 		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
-		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			m = AnnotationUtil.trim(m);
 		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
 			m = Util.extend(m);
@@ -293,20 +350,16 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return m;
 	}
 
-	public void fireMentionAddedEvent(Annotation m) {
-		crModelListeners.forEach(l -> l.mentionAdded(m));
+	protected void fireMentionAddedEvent(Annotation annotation) {
+		crModelListeners.forEach(l -> l.annotationAdded(annotation));
 	}
 
-	public void fireAnnotationChangedEvent(Annotation m) {
+	protected void fireAnnotationChangedEvent(Annotation m) {
 		crModelListeners.forEach(l -> l.annotationChanged(m));
 	}
 
-	public void fireAnnotationRemovedEvent(Annotation m) {
+	protected void fireAnnotationRemovedEvent(Annotation m) {
 		crModelListeners.forEach(l -> l.annotationRemoved(m));
-	}
-
-	public void fireMentionSelectedEvent(Mention m) {
-		crModelListeners.forEach(l -> l.annotationSelected(m));
 	}
 
 	public void formGroup(Entity e1, Entity e2) {
@@ -343,6 +396,13 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return fsMap.get(e);
 	}
 
+	/**
+	 * Retrieve all annotations that cover the current character position
+	 * 
+	 * @param position
+	 *            The character position
+	 * @return A collection of annotations
+	 */
 	public Collection<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
 	}
@@ -371,14 +431,24 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	protected void remove(Mention m, CATreeNode node) {
+		CATreeNode parent = node.getParent();
+
+		// removing from tree
 		removeNodeFromParent(node);
-		// nodesWereRemoved(node.getParent(), new int[] { index }, new Object[]
-		// { mentionMap.get(m) });
-		fireAnnotationRemovedEvent(m);
 
 		// document
 		fsMap.remove(m);
 		m.removeFromIndexes();
+
+		if (preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+			if (parent.isEntity() && parent.isLeaf()) {
+				remove(parent.getEntity(), parent);
+			}
+		}
+
+		// fire event
+		fireAnnotationRemovedEvent(m);
+
 	}
 
 	protected void remove(DetachedMentionPart m, CATreeNode node) {
@@ -462,6 +532,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
+		Annotator.logger.info("Sorting entity tree with {}", comparator.toString());
 		rootNode.getChildren().sort(comparator);
 		nodeStructureChanged(rootNode);
 	}
@@ -483,7 +554,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
 		nodeChanged(fsMap.get(m));
 		fireAnnotationChangedEvent(m);
-		fireMentionSelectedEvent(m);
 	}
 
 	public void updateColor(Entity entity, Color newColor) {
@@ -496,6 +566,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 				fireAnnotationChangedEvent((Mention) child);
 		}
 	}
+
+	public void update(Entity entity, boolean displayed) {
+		CATreeNode node = get(entity);
+		for (int i = 0; i < node.getChildCount(); i++) {
+			CATreeNode child = node.getChildAt(i);
+			if (child.isMention())
+				if (displayed)
+					fireMentionAddedEvent(child.getFeatureStructure());
+				else
+					fireAnnotationRemovedEvent(child.getFeatureStructure());
+
+		}
+	};
 
 	public void merge(CATreeNode e1, CATreeNode e2) {
 		CATreeNode bigger, smaller;

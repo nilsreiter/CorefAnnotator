@@ -8,17 +8,16 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import javax.swing.text.StyleConstants;
 
-import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ViewFontSizeIncreaseAction(DocumentWindow dw) {
-		super(dw, Material.EXPOSURE_PLUS_1);
-		putValue(Action.NAME, Annotator.getString("action.view.increase_font_size"));
+		super(dw, MaterialDesign.MDI_FORMAT_SIZE, Strings.ACTION_VIEW_INCREASE_FONT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}

@@ -8,9 +8,9 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import javax.swing.text.StyleConstants;
 
-import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
@@ -18,10 +18,10 @@ public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ViewFontSizeDecreaseAction(DocumentWindow documentWindow) {
-		super(documentWindow, Material.EXPOSURE_NEG_1);
-		putValue(Action.NAME, Annotator.getString("action.view.decrease_font_size"));
+		super(documentWindow, MaterialDesign.MDI_FORMAT_SIZE, Strings.ACTION_VIEW_DECREASE_FONT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
 	}
 
 	@Override

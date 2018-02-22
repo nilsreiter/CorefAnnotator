@@ -13,14 +13,14 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiWriter;
-import de.unistuttgart.ims.coref.annotator.XmiFileFilter;
+import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 
 public abstract class AbstractXmiPlugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return XmiFileFilter.filter;
+		return FileFilters.xmi;
 	}
 
 	@Override
