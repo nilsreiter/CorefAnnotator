@@ -119,6 +119,7 @@ import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 
 public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
 
@@ -715,12 +716,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	protected void fireModelCreatedEvent() {
+	public void fireModelCreatedEvent(CoreferenceModel model) {
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
+		highlightManager.clearAndDrawAllAnnotations(jcas);
+		textPane.repaint();
+
 		progressBar.setValue(100);
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
@@ -759,7 +763,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		setWindowTitle();
 
-		InitializeModel im = new InitializeModel(jcas);
+		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();
 	}
 
@@ -1724,59 +1728,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				annotationSelected(getAnnotation(0));
 			else
 				annotationSelected(null);
-		}
-
-	}
-
-	class InitializeModel extends SwingWorker<CoreferenceModel, Integer> {
-
-		JCas jcas;
-
-		public InitializeModel(JCas jcas) {
-			this.jcas = jcas;
-		}
-
-		@Override
-		protected CoreferenceModel doInBackground() throws Exception {
-			CoreferenceModel cModel;
-			cModel = new CoreferenceModel(jcas, mainApplication.getPreferences());
-			cModel.addCoreferenceModelListener(DocumentWindow.this);
-
-			Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
-				cModel.add(e);
-			});
-
-			publish(60);
-			for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
-				for (int i = 0; i < eg.getMembers().size(); i++)
-					cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
-
-			publish(70);
-			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
-				cModel.registerAnnotation(m);
-			}
-			highlightManager.clearAndDrawAllAnnotations(jcas);
-			textPane.repaint();
-			publish(75);
-			return cModel;
-		}
-
-		@Override
-		protected void done() {
-			try {
-				cModel = get();
-				fireModelCreatedEvent();
-			} catch (InterruptedException | ExecutionException e) {
-				Annotator.logger.catching(e);
-			}
-		}
-
-		@Override
-		protected void process(List<Integer> chunks) {
-			for (Integer i : chunks) {
-				progressBar.setValue(i);
-			}
 		}
 
 	}
