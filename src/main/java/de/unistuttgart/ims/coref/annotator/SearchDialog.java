@@ -117,7 +117,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	JList<SearchResult> list;
 	JTextField textField;
 	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
-	int contexts = 50;
+	int contexts = Defaults.CFG_SEARCH_RESULTS_CONTEXT;
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
 
