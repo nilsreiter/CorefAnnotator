@@ -53,7 +53,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 	@Override
 	protected void done() {
 		try {
-			documentWindow.fireModelCreatedEvent(get());
+			documentWindow.setCoreferenceModel(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}

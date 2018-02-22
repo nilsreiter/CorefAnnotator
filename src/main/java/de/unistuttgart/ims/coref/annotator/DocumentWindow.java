@@ -718,7 +718,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	public void fireModelCreatedEvent(CoreferenceModel model) {
+	public void setCoreferenceModel(CoreferenceModel model) {
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
 		textPane.addKeyListener(new TextViewKeyListener());
