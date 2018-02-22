@@ -935,11 +935,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			targetFS = targetNode.getFeatureStructure();
 
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
-				PotentialAnnotation pa;
 				try {
-					pa = (PotentialAnnotation) info.getTransferable()
-							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					handlePotentialAnnotationTransfer(pa);
+					@SuppressWarnings("unchecked")
+					ImmutableList<PotentialAnnotation> paList = (ImmutableList<PotentialAnnotation>) info
+							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor);
+					for (PotentialAnnotation pa : paList)
+						handlePotentialAnnotationTransfer(pa);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}

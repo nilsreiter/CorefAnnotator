@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -19,6 +20,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -29,6 +31,7 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -38,12 +41,32 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
+	class ListTransferHandler extends TransferHandler {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Transferable createTransferable(JComponent comp) {
+			@SuppressWarnings("unchecked")
+			JList<SearchResult> list = (JList<SearchResult>) comp;
+
+			return new PotentialAnnotationTransfer(documentWindow.textPane,
+					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> new Span(sr.begin, sr.end)));
+		}
+
+		@Override
+		public int getSourceActions(JComponent c) {
+			return TransferHandler.LINK;
+		}
+	}
+
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -159,6 +182,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		list.setCellRenderer(new SearchResultRenderer());
 		list.setVisibleRowCount(10);
+		list.setTransferHandler(new ListTransferHandler());
+		list.setDragEnabled(true);
 
 		JScrollPane listScroller = new JScrollPane(list);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
