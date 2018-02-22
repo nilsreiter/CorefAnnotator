@@ -16,6 +16,11 @@ public class Span {
 		this.end = annotation.getEnd();
 	}
 
+	public Span(int begin, int end) {
+		this.begin = begin;
+		this.end = end;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(this.begin, this.end);
