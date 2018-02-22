@@ -5,7 +5,7 @@ import java.io.File;
 
 import javax.swing.Action;
 
-import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 
@@ -14,7 +14,7 @@ public class SelectedFileOpenAction extends AnnotatorAction {
 	File file;
 
 	public SelectedFileOpenAction(Annotator mApplication, File file) {
-		super(mApplication, Material.OPEN_IN_NEW);
+		super(mApplication, MaterialDesign.MDI_OPEN_IN_APP);
 		putValue(Action.NAME, file.getName());
 		putValue(Action.SHORT_DESCRIPTION, file.getPath());
 		this.file = file;

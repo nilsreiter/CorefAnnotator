@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
@@ -19,7 +19,7 @@ public class ShowSearchPanelAction extends DocumentWindowAction {
 	Annotator mainApplication;
 
 	public ShowSearchPanelAction(Annotator mainApplication, DocumentWindow dw) {
-		super(dw, Material.FIND_IN_PAGE, Constants.Strings.ACTION_SEARCH);
+		super(dw, MaterialDesign.MDI_FILE_FIND, Constants.Strings.ACTION_SEARCH);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.search.tooltip"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
