@@ -2,11 +2,11 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import de.unistuttgart.ims.coref.annotator.api.Comment;
@@ -23,7 +23,6 @@ public class CommentWindow extends JDialog {
 	CoreferenceModel.CommentsModel commentsListModel;
 
 	// Components
-	JTextArea editArea;
 	PanelList<Comment> commentList;
 
 	public CommentWindow(DocumentWindow mainWindow, CoreferenceModel documentModel) {
@@ -58,19 +57,12 @@ public class CommentWindow extends JDialog {
 		});
 		commentList.setModel(commentsListModel);
 
-		editArea = new JTextArea();
-		editArea.setRows(5);
-		editArea.setColumns(30);
-		editArea.setLineWrap(true);
-		editArea.setWrapStyleWord(true);
-
 		getContentPane().add(new JScrollPane(commentList), BorderLayout.CENTER);
 
 		setTitle("Comments");
-		setLocation(mainWindow.getLocation().x + mainWindow.getWidth(), mainWindow.getLocation().y);
-
-		getContentPane().setPreferredSize(new Dimension(200, 800));
-		setSize(new Dimension(200, 100));
+		getContentPane().setPreferredSize(new Dimension(210, mainWindow.getHeight() - 20));
+		pack();
+		setLocation(new Point(mainWindow.getX() + mainWindow.getWidth(), mainWindow.getY()));
 	}
 
 	public void enterNewComment(int begin, int end) {

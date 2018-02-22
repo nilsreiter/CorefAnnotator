@@ -48,6 +48,8 @@ public class CommentPanel extends JPanel {
 			model.update(comment);
 			saveAction.setEnabled(false);
 			textArea.setEditable(false);
+			editAction.setEnabled(true);
+			deleteAction.setEnabled(true);
 		}
 
 	}
@@ -63,13 +65,15 @@ public class CommentPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			textArea.setEditable(true);
+			saveAction.setEnabled(true);
+			deleteAction.setEnabled(false);
+			editAction.setEnabled(false);
 
 			@SuppressWarnings("unchecked")
 			PanelList<Comment> parent = (PanelList<Comment>) CommentPanel.this.getParent();
 			parent.setSelection(comment);
 
-			textArea.setEditable(true);
-			saveAction.setEnabled(true);
 			textArea.grabFocus();
 
 		}
