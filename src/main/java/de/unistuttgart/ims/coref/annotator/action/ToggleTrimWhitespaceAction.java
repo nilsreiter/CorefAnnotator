@@ -8,6 +8,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 
+@Deprecated
 public class ToggleTrimWhitespaceAction extends TogglePreferenceAction {
 	private static final long serialVersionUID = 1L;
 

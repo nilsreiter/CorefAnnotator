@@ -9,6 +9,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 
+@Deprecated
 public class ToggleKeepTreeSortedAction extends TogglePreferenceAction {
 	private static final long serialVersionUID = 1L;
 

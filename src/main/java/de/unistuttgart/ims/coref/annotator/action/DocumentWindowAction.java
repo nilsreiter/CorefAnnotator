@@ -10,8 +10,8 @@ public abstract class DocumentWindowAction extends AnnotatorAction {
 
 	DocumentWindow documentWindow;
 
-	public DocumentWindowAction(DocumentWindow dw, Ikon ikon, String stringKey) {
-		super(dw.getMainApplication(), ikon, stringKey);
+	public DocumentWindowAction(DocumentWindow dw, String stringKey, Ikon... ikon) {
+		super(dw.getMainApplication(), stringKey, ikon);
 		this.documentWindow = dw;
 	}
 
