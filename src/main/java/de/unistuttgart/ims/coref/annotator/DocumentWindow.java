@@ -755,7 +755,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
-	public void fireJCasLoadedEvent(JCas jcas) {
+	public void setJCas(JCas jcas) {
+
 		this.jcas = jcas;
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));

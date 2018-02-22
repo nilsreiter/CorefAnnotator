@@ -104,7 +104,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.documentWindow.fireJCasLoadedEvent(get());
+			this.documentWindow.setJCas(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
