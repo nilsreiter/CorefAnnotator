@@ -18,7 +18,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -42,7 +42,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
-public class SearchWindow extends JFrame implements DocumentListener, WindowListener {
+public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -123,7 +123,7 @@ public class SearchWindow extends JFrame implements DocumentListener, WindowList
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
 
-	public SearchWindow(DocumentWindow xdw, Preferences configuration) {
+	public SearchDialog(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
 		text = xdw.textPane.getText();
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
