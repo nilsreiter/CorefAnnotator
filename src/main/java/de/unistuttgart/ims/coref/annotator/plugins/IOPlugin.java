@@ -16,7 +16,11 @@ public interface IOPlugin extends Plugin {
 
 	CollectionReaderDescription getReader(File f) throws ResourceInitializationException;
 
+	AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException;
+
 	Class<? extends StylePlugin> getStylePlugin();
 
 	FileFilter getFileFilter();
+
+	String getSuffix();
 }

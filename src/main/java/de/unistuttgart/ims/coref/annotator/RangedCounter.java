@@ -4,29 +4,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
+import org.eclipse.collections.impl.block.factory.Procedures;
 import org.eclipse.collections.impl.list.Interval;
 
 public class RangedCounter {
 
-	Map<Integer, DualHashBidiMap<Integer, Object>> map = new HashMap<Integer, DualHashBidiMap<Integer, Object>>();
-
-	int max = 10;
+	Map<Integer, HashBiMap<Integer, Object>> map = new HashMap<Integer, HashBiMap<Integer, Object>>();
 
 	public void subtract(Span span, Object hi) {
-		for (int i = span.begin; i < span.end; i++)
-			map.get(i).removeValue(hi);
-
+		RichIterable<Integer> interval = Interval.fromTo(span.begin, span.end);
+		interval.forEach(Procedures.cast(i -> map.get(i).inverse().remove(hi)));
 	}
 
 	public void add(Span span, Object hilight, int level) {
-		for (int i = span.begin; i < span.end; i++) {
+		RichIterable<Integer> interval = Interval.fromTo(span.begin, span.end);
+		interval.forEach(Procedures.cast(i -> {
 			if (!map.containsKey(i)) {
-				map.put(i, new DualHashBidiMap<Integer, Object>());
+				map.put(i, HashBiMap.newMap());
 			}
 			map.get(i).put(level, hilight);
-		}
+		}));
 	}
 
 	public int getNextLevel(Span span) {
@@ -37,11 +37,8 @@ public class RangedCounter {
 
 		MutableSet<Integer> range = Interval.fromTo(from, to).toSet();
 		for (int i = span.begin; i < span.end; i++) {
-			for (Integer j : range) {
-				if (map.get(i) != null && map.get(i).containsKey(j)) {
-					range.remove(j);
-				}
-			}
+			range = range.rejectWith((Integer j, Integer k) -> map.get(k) != null && map.get(k).containsKey(j),
+					new Integer(i));
 		}
 
 		if (range.isEmpty()) {

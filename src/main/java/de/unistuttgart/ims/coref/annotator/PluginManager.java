@@ -2,9 +2,11 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.reflections.Reflections;
 
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
@@ -15,29 +17,33 @@ import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class PluginManager {
-	Set<Class<? extends IOPlugin>> ioPlugins;
-	Set<Class<? extends StylePlugin>> stylePlugins;
-	Map<Class<? extends Plugin>, Plugin> instances = new HashMap<Class<? extends Plugin>, Plugin>();
+	ImmutableSet<Class<? extends IOPlugin>> ioPlugins;
+	ImmutableSet<Class<? extends StylePlugin>> stylePlugins;
+	Map<Class<?>, Plugin> instances = new HashMap<Class<?>, Plugin>();
 
 	public void init() {
+		Annotator.logger.trace("Initialising plugin manager");
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
-		ioPlugins = reflections.getSubTypesOf(IOPlugin.class);
+		MutableSet<Class<? extends IOPlugin>> ioPlugins = Sets.mutable
+				.withAll(reflections.getSubTypesOf(IOPlugin.class));
 		// it's unclear why this is found in the first place
 		ioPlugins.remove(DefaultIOPlugin.class);
 		ioPlugins.remove(AbstractXmiPlugin.class);
-		stylePlugins = reflections.getSubTypesOf(StylePlugin.class);
+		this.ioPlugins = ioPlugins.toImmutable();
+
+		stylePlugins = Sets.immutable.withAll(reflections.getSubTypesOf(StylePlugin.class));
 		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
-		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins, ','));
+		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins.castToCollection(), ','));
 
 		instances.put(DefaultIOPlugin.class, new DefaultIOPlugin());
 		instances.put(DefaultStylePlugin.class, new DefaultStylePlugin());
 	}
 
-	public Set<Class<? extends IOPlugin>> getIOPlugins() {
+	public ImmutableSet<Class<? extends IOPlugin>> getIOPlugins() {
 		return ioPlugins;
 	}
 
-	public Set<Class<? extends StylePlugin>> getStylePlugins() {
+	public ImmutableSet<Class<? extends StylePlugin>> getStylePlugins() {
 		return stylePlugins;
 	}
 
@@ -49,12 +55,12 @@ public class PluginManager {
 		return getStylePlugin(DefaultStylePlugin.class);
 	}
 
-	public Plugin getPlugin(Class<? extends Plugin> cl) {
+	public Plugin getPlugin(Class<?> cl) {
 		if (!instances.containsKey(cl)) {
 			Plugin p;
 			try {
 				Annotator.logger.info("Creating new instance of plugin {}", cl.getName());
-				p = cl.newInstance();
+				p = (Plugin) cl.newInstance();
 				instances.put(cl, p);
 			} catch (InstantiationException | IllegalAccessException e) {
 				Annotator.logger.catching(e);
@@ -63,11 +69,11 @@ public class PluginManager {
 		return instances.get(cl);
 	}
 
-	public StylePlugin getStylePlugin(Class<? extends StylePlugin> clazz) {
+	public StylePlugin getStylePlugin(Class<?> clazz) {
 		return (StylePlugin) getPlugin(clazz);
 	}
 
-	public IOPlugin getIOPlugin(Class<? extends IOPlugin> cl) {
+	public IOPlugin getIOPlugin(Class<?> cl) {
 		return (IOPlugin) getPlugin(cl);
 	}
 

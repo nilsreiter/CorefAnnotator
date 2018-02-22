@@ -64,4 +64,14 @@ public class Plugin implements IOPlugin {
 		};
 	}
 
+	@Override
+	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
+		return null;
+	}
+
+	@Override
+	public String getSuffix() {
+		return ".txt";
+	}
+
 }
