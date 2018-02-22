@@ -7,8 +7,6 @@ public interface CoreferenceModelListener {
 
 	public void annotationChanged(Annotation m);
 
-	public void annotationSelected(Annotation m);
-
 	public void annotationRemoved(Annotation m);
 
 }

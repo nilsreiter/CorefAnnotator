@@ -822,7 +822,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.expandPath(e.getTreePath());
 	}
 
-	@Override
 	public void annotationSelected(Annotation m) {
 		if (m != null) {
 			textPane.setSelectionStart(m.getBegin());

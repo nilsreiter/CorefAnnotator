@@ -264,10 +264,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		crModelListeners.forEach(l -> l.annotationRemoved(m));
 	}
 
-	protected void fireMentionSelectedEvent(Mention m) {
-		crModelListeners.forEach(l -> l.annotationSelected(m));
-	}
-
 	public void formGroup(Entity e1, Entity e2) {
 		EntityGroup eg = createEntityGroup(e1.getLabel() + " and " + e2.getLabel(), 2);
 		eg.setMembers(0, e1);
@@ -460,7 +456,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
 		nodeChanged(fsMap.get(m));
 		fireAnnotationChangedEvent(m);
-		fireMentionSelectedEvent(m);
 	}
 
 	public void updateColor(Entity entity, Color newColor) {
