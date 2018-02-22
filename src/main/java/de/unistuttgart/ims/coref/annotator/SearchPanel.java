@@ -48,9 +48,10 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(MaterialDesign.MDI_ACCOUNT_PLUS, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
+			super(MaterialDesign.MDI_ARROW_RIGHT, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
+			this.addIkon(MaterialDesign.MDI_ACCOUNT);
 		}
 
 		@Override
@@ -59,6 +60,30 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 			for (SearchResult result : list.getSelectedValuesList()) {
 				documentWindow.cModel.addTo(node.getEntity(), result.getBegin(), result.getEnd());
+			}
+		}
+	}
+
+	class AnnotateSelectedFindingsAsNewEntity extends IkonAction {
+		private static final long serialVersionUID = 1L;
+
+		public AnnotateSelectedFindingsAsNewEntity() {
+			super(MaterialDesign.MDI_ACCOUNT_PLUS, Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY);
+			putValue(Action.SHORT_DESCRIPTION,
+					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Annotator.logger.debug("Adding search results to new entity");
+
+			Entity entity = null;
+
+			for (SearchResult result : list.getSelectedValuesList()) {
+				if (entity == null)
+					entity = documentWindow.cModel.add(result.getBegin(), result.getEnd()).getEntity();
+				else
+					documentWindow.cModel.addTo(entity, result.getBegin(), result.getEnd());
 			}
 		}
 	}
@@ -95,7 +120,8 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
 
-	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch();
+	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
+			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
 
 	public SearchPanel(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
@@ -121,6 +147,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 		bar.setFloatable(false);
 		bar.add(runSearch);
 		bar.add(annotateSelectedFindings);
+		bar.add(annotateSelectedFindingsAsNew);
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(textField);
@@ -349,6 +376,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 				}
 				listCondition = (list.getSelectedValuesList().size() > 0);
 				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
+				annotateSelectedFindingsAsNew.setEnabled(list.getSelectedValuesList().size() > 0);
 				Annotator.logger.debug("Setting listCondition to {}", listCondition);
 			}
 		}

@@ -21,8 +21,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Export into CoNLL 2012 format. All columns except surface, sentence and coreference are empty.";
 	}
 
 	@Override
