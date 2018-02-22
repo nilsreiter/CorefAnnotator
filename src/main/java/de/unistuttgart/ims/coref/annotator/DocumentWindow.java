@@ -1680,7 +1680,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		private JMenu getCommentItem(CommentAnchor anno) {
 			Comment c = cModel.getCommentsModel().get(anno);
-					StringBuilder b = new StringBuilder();
+			StringBuilder b = new StringBuilder();
 			if (c.getAuthor() != null)
 				b.append(c.getAuthor());
 			else
@@ -1693,27 +1693,27 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			action.putValue(Action.SMALL_ICON, FontIcon.of(MaterialDesign.MDI_MESSAGE_DRAW));
 			subMenu.add(action);
 			return subMenu;
-					}
+		}
 
 		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
-					String surf = m.getCoveredText();
+			String surf = m.getCoveredText();
 
-					if (dmp != null)
-						surf += " [,] " + dmp.getCoveredText();
-					if (m.getEntity().getLabel() != null)
-						b.append(": ").append(m.getEntity().getLabel());
+			if (dmp != null)
+				surf += " [,] " + dmp.getCoveredText();
+			if (m.getEntity().getLabel() != null)
+				b.append(": ").append(m.getEntity().getLabel());
 
-					JMenu mentionMenu = new JMenu(b.toString());
-					mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
-					Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-					mentionMenu.add('"' + surf + '"');
-					mentionMenu.add(a);
-					mentionMenu.add(new DeleteMentionAction(m));
+			JMenu mentionMenu = new JMenu(b.toString());
+			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
+			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+			mentionMenu.add('"' + surf + '"');
+			mentionMenu.add(a);
+			mentionMenu.add(new DeleteMentionAction(m));
 			return mentionMenu;
-				}
+		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -1792,7 +1792,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class CommentAction extends AbstractAction {
+	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -1807,9 +1807,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
-				}
-
 		}
+
+	}
 
 	/**
 	 * TODO: This should be indexed to make lookup faster
