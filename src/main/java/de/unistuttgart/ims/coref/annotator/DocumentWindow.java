@@ -908,11 +908,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Object o = info.getTransferable().getTransferData(dataFlavor);
 				System.err.println(o);
 			} catch (UnsupportedFlavorException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Annotator.logger.catching(e1);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Annotator.logger.catching(e1);
 			}
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 				PotentialAnnotation pa;
