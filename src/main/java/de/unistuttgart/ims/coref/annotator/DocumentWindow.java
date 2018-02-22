@@ -723,12 +723,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	public void setCoreferenceModel(CoreferenceModel model) {
-		this.cModel = model;
+		cModel = model;
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
 
-		// text
-
+		// UI
 		progressBar.setValue(100);
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
@@ -754,6 +753,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
+
+		// final
 		setMessage("");
 		Annotator.logger.info("Document model has been loaded.");
 	}
