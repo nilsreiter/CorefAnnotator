@@ -150,6 +150,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
+	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 
 	// controller
 	CoreferenceModel cModel;
@@ -209,12 +210,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.newEntityAction);
 		treePopupMenu.add(this.renameAction);
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.changeKeyAction);
+		treePopupMenu.add(this.mergeSelectedEntitiesAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
 
@@ -458,6 +461,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
+		entityMenu.add(new JCheckBoxMenuItem(toggleMentionNonNominal));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(newEntityAction));
@@ -1059,10 +1063,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 
 			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			Character ch = etn.getEntity().getKey().charAt(0);
+			String s = "";
+			if (etn.getEntity().getKey() != null)
+				s = etn.getEntity().getKey();
 			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
 					Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, ch);
+					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, s);
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
@@ -1142,6 +1148,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			lab1.setText(m.getCoveredText());
+			if (Util.isNonNominal(m))
+				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
+						FontIcon.of(MaterialDesign.MDI_FLAG));
 			if (Util.isDifficult(m)) {
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_DIFFICULT),
 						FontIcon.of(MaterialDesign.MDI_ALERT_BOX));
@@ -1352,9 +1361,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode e1 = ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent());
-			CATreeNode e2 = ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent());
-			cModel.merge(e1, e2);
+			CATreeNode[] nodes = new CATreeNode[tree.getSelectionPaths().length];
+			for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
+			}
+			cModel.merge(nodes);
 			registerChange();
 		}
 
@@ -1522,6 +1533,28 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel.toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
 			registerChange();
 
+		}
+
+	}
+
+	class ToggleMentionNonNominal extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleMentionNonNominal() {
+			super(MaterialDesign.MDI_FLAG, Strings.ACTION_FLAG_MENTION_NON_NOMINAL);
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (TreePath tp : tree.getSelectionPaths()) {
+				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
+				Mention m = (Mention) tn.getFeatureStructure();
+				cModel.toggleFlagMention(m, Constants.MENTION_FLAG_NON_NOMINAL);
+			}
+			registerChange();
 		}
 
 	}
@@ -1697,7 +1730,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			deleteAction
 					.setEnabled(isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf()));
 			formGroupAction.setEnabled(isDouble() && isEntity());
-			mergeSelectedEntitiesAction.setEnabled(isDouble() && isEntity());
+			mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
 			toggleMentionDifficult.setEnabled(isMention());
 			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
@@ -1706,6 +1739,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			toggleMentionAmbiguous.setEnabled(isMention());
 			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
+
+			toggleMentionNonNominal.setEnabled(isMention());
+			toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
+					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
 
 			toggleEntityDisplayed.setEnabled(isEntity());
 			toggleEntityDisplayed.putValue(Action.SELECTED_KEY, isEntity() && nodes.allSatisfy(f -> !f.isVisible()));

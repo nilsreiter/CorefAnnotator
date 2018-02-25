@@ -16,6 +16,8 @@ public class Constants {
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
 		public static final String ACTION_FLAG_MENTION_DIFFICULT = "action.flag_mention_difficult";
 		public static final String ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP = "action.flag_mention_difficult.tooltip";
+		public static final String ACTION_FLAG_MENTION_NON_NOMINAL = "action.flag_mention_non_nominal";
+		public static final String ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP = "action.flag_mention_non_nominal.tooltip";
 		public static final String ACTION_GROUP = "action.group";
 		public static final String ACTION_GROUP_TOOLTIP = "action.group.tooltip";
 		public static final String ACTION_MERGE = "action.merge";
@@ -60,6 +62,7 @@ public class Constants {
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
+		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
 		public static final String MENU_EDIT = "menu.edit";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
@@ -104,6 +107,7 @@ public class Constants {
 
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
+	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
 }
