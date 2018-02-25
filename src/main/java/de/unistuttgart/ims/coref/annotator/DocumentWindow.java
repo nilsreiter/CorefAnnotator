@@ -150,6 +150,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
+	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 
 	// controller
 	CoreferenceModel cModel;
@@ -209,6 +210,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.newEntityAction);
@@ -458,6 +460,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
+		entityMenu.add(new JCheckBoxMenuItem(toggleMentionNonNominal));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(newEntityAction));
@@ -1142,6 +1145,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			lab1.setText(m.getCoveredText());
+			if (Util.isNonNominal(m))
+				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
+						FontIcon.of(MaterialDesign.MDI_FLAG));
 			if (Util.isDifficult(m)) {
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_DIFFICULT),
 						FontIcon.of(MaterialDesign.MDI_ALERT_BOX));
@@ -1727,6 +1733,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			toggleMentionAmbiguous.setEnabled(isMention());
 			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
+
+			toggleMentionNonNominal.setEnabled(isMention());
+			toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
+					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
 
 			toggleEntityDisplayed.setEnabled(isEntity());
 			toggleEntityDisplayed.putValue(Action.SELECTED_KEY, isEntity() && nodes.allSatisfy(f -> !f.isVisible()));
