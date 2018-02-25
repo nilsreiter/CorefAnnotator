@@ -1526,6 +1526,27 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	class ToggleMentionNonNominal extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleMentionNonNominal() {
+			super(MaterialDesign.MDI_FLAG, Strings.ACTION_FLAG_MENTION_NON_NOMINAL);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (TreePath tp : tree.getSelectionPaths()) {
+				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
+				Mention m = (Mention) tn.getFeatureStructure();
+				cModel.toggleFlagMention(m, Constants.MENTION_FLAG_NON_NOMINAL);
+			}
+			registerChange();
+		}
+
+	}
+
 	class ToggleMentionAmbiguous extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
