@@ -1352,9 +1352,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode e1 = ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent());
-			CATreeNode e2 = ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent());
-			cModel.merge(e1, e2);
+			CATreeNode[] nodes = new CATreeNode[tree.getSelectionPaths().length];
+			for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
+			}
+			cModel.merge(nodes);
 			registerChange();
 		}
 
@@ -1697,7 +1699,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			deleteAction
 					.setEnabled(isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf()));
 			formGroupAction.setEnabled(isDouble() && isEntity());
-			mergeSelectedEntitiesAction.setEnabled(isDouble() && isEntity());
+			mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
 			toggleMentionDifficult.setEnabled(isMention());
 			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
