@@ -17,6 +17,7 @@ public class Constants {
 		public static final String ACTION_FLAG_MENTION_DIFFICULT = "action.flag_mention_difficult";
 		public static final String ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP = "action.flag_mention_difficult.tooltip";
 		public static final String ACTION_FLAG_MENTION_NON_NOMINAL = "action.flag_mention_non_nominal";
+		public static final String ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP = "action.flag_mention_non_nominal.tooltip";
 		public static final String ACTION_GROUP = "action.group";
 		public static final String ACTION_GROUP_TOOLTIP = "action.group.tooltip";
 		public static final String ACTION_MERGE = "action.merge";

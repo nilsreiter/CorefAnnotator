@@ -1538,6 +1538,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		public ToggleMentionNonNominal() {
 			super(MaterialDesign.MDI_FLAG, Strings.ACTION_FLAG_MENTION_NON_NOMINAL);
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
 
 		}
 
