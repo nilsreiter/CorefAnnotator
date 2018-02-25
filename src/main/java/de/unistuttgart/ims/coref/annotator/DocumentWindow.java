@@ -1059,10 +1059,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 
 			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			Character ch = etn.getEntity().getKey().charAt(0);
+			String s = "";
+			if (etn.getEntity().getKey() != null)
+				s = etn.getEntity().getKey();
 			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
 					Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, ch);
+					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, s);
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
