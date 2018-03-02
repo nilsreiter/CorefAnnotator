@@ -101,6 +101,10 @@ public class Util {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
 	}
 
+	public static boolean isNonNominal(Mention m) {
+		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_NON_NOMINAL);
+	}
+
 	public static boolean isAmbiguous(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
 	}

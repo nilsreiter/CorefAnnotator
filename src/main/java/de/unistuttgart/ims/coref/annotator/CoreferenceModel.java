@@ -493,6 +493,35 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 	};
 
+	public void merge(CATreeNode... nodes) {
+		if (nodes.length == 0)
+			return;
+		CATreeNode biggest = nodes[0];
+		int size = 0;
+		for (CATreeNode n : nodes) {
+			if (n.getChildCount() > size) {
+				size = n.getChildCount();
+				biggest = n;
+			}
+		}
+
+		for (CATreeNode n : nodes) {
+			if (n != biggest) {
+				for (int i = 0; i < n.getChildCount();) {
+					CATreeNode node = n.getChildAt(i);
+					if (node.getFeatureStructure() instanceof Mention) {
+						Mention m = (Mention) node.getFeatureStructure();
+						moveTo(m, biggest.getFeatureStructure());
+					} else {
+						i++;
+					}
+				}
+				remove(n.getEntity());
+			}
+		}
+	}
+
+	@Deprecated
 	public void merge(CATreeNode e1, CATreeNode e2) {
 		CATreeNode bigger, smaller;
 		if (e1.getChildCount() >= e2.getChildCount()) {
