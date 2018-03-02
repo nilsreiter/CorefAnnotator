@@ -262,7 +262,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
-				open(f, flavor, openDialog.getSelectedLanguage());
+				open(f, flavor, Util.getLanguage(openDialog.getSelectedLanguage()));
 			}
 			break;
 		default:

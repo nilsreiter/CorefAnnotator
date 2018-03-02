@@ -98,6 +98,8 @@ public class Constants {
 		public static final String ACTION_SEARCH = "action.search";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
+		public static final String ACTION_SET_DOCUMENT_LANGUAGE = "action.set_document_language";
+		public static final String ACTION_SET_DOCUMENT_LANGUAGE_TOOLTIP = "action.set_document_language.tooltip";
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
@@ -180,6 +182,8 @@ public class Constants {
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
+
+	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
 
 	public static final Setting<Boolean> SETTING_DELETE_EMPTY_ENTITIES = new Setting<Boolean>(CFG_DELETE_EMPTY_ENTITIES,
 			Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, true,

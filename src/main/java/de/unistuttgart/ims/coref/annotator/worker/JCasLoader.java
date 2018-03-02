@@ -36,19 +36,21 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	String language = null;
 
 	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
-			TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
+			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
 		this.inputStream = inputStream;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
+		this.language = language;
 	}
 
 	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
-			IOPlugin flavor) {
+			IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
 		this.file = file;
+		this.language = language;
 	}
 
 	private JCas readStream() {
@@ -56,6 +58,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
+			jcas.setDocumentText(language);
 		} catch (UIMAException e1) {
 			Annotator.logger.catching(e1);
 			return null;

@@ -7,12 +7,13 @@ import javax.swing.JPanel;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Util;
 
 public class XFileChooser extends JFileChooser {
 
 	private static final long serialVersionUID = 1L;
 
-	JComboBox<String> languageSelector = new JComboBox<String>(new String[] { "de", "en" });
+	JComboBox<String> languageSelector = new JComboBox<String>(Util.getSupportedLanguageNames());
 
 	public XFileChooser() {
 		super();

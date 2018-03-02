@@ -149,6 +149,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
+	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 
 	// controller
 	CoreferenceModel cModel;
@@ -420,6 +421,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
 		toolsMenu.add(showSearchPanelAction);
+		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -540,7 +542,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
-			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
+			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
+					language);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -605,6 +608,27 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(styleVariant);
 
+		}
+
+	}
+
+	class SetLanguageAction extends IkonAction {
+		private static final long serialVersionUID = 1L;
+
+		public SetLanguageAction() {
+			super(Constants.Strings.ACTION_SET_DOCUMENT_LANGUAGE, MaterialDesign.MDI_SWITCH);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this, "Set language", "Set language",
+					JOptionPane.QUESTION_MESSAGE, FontIcon.of(MaterialDesign.MDI_SWITCH),
+					Util.getSupportedLanguageNames(), Util.getLanguageName(jcas.getDocumentLanguage()));
+			if (lang != null) {
+				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
+				jcas.setDocumentLanguage(Util.getLanguage(lang));
+				registerChange();
+			}
 		}
 
 	}
