@@ -14,9 +14,10 @@ public class XFileChooser extends JFileChooser {
 	public XFileChooser() {
 		super();
 		JPanel languageSelectPanel = new JPanel();
+		languageSelectPanel.setOpaque(false);
 		languageSelectPanel.add(new JLabel("Language"));
 		languageSelectPanel.add(languageSelector);
-		((java.awt.Container) getComponent(4)).add(languageSelectPanel, 1);
+		((java.awt.Container) ((java.awt.Container) getComponent(4)).getComponent(0)).add(languageSelectPanel);
 	}
 
 	public String getSelectedLanguage() {
