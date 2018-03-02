@@ -621,9 +621,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this, "Set language", "Set language",
-					JOptionPane.QUESTION_MESSAGE, FontIcon.of(MaterialDesign.MDI_SWITCH),
-					Util.getSupportedLanguageNames(), Util.getLanguageName(jcas.getDocumentLanguage()));
+			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
+					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
+					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
+					Util.getLanguageName(jcas.getDocumentLanguage()));
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
 				jcas.setDocumentLanguage(Util.getLanguage(lang));
