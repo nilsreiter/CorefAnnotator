@@ -131,7 +131,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		JFrame opening = new JFrame();
 		opening.setLocationByPlatform(true);
 		opening.setTitle(Annotator.class.getPackage().getImplementationTitle());
-		opening.setPreferredSize(new Dimension(300, 400));
+		opening.setPreferredSize(new Dimension(300, 600));
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {

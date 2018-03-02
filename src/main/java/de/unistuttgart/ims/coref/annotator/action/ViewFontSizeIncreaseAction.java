@@ -17,7 +17,7 @@ public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ViewFontSizeIncreaseAction(DocumentWindow dw) {
-		super(dw, MaterialDesign.MDI_FORMAT_SIZE, Strings.ACTION_VIEW_INCREASE_FONT_SIZE);
+		super(dw, Strings.ACTION_VIEW_INCREASE_FONT_SIZE, MaterialDesign.MDI_FORMAT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}

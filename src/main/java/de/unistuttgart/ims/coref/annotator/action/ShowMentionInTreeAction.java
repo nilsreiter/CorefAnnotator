@@ -18,7 +18,7 @@ public class ShowMentionInTreeAction extends DocumentWindowAction {
 	Mention m;
 
 	public ShowMentionInTreeAction(DocumentWindow documentWindow, Mention m) {
-		super(documentWindow, MaterialDesign.MDI_FILE_TREE, Strings.ACTION_SHOW_MENTION_IN_TREE);
+		super(documentWindow, Strings.ACTION_SHOW_MENTION_IN_TREE, MaterialDesign.MDI_FILE_TREE);
 		this.m = m;
 	}
 

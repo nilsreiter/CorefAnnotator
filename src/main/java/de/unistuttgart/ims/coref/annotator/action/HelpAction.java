@@ -11,7 +11,7 @@ public class HelpAction extends IkonAction {
 	private static final long serialVersionUID = 1L;
 
 	public HelpAction() {
-		super(MaterialDesign.MDI_HELP, "action.help");
+		super("action.help", MaterialDesign.MDI_HELP);
 	}
 
 	@Override

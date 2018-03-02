@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator;
+package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,20 +20,22 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
-class LoadAndImport extends SwingWorker<JCas, Object> {
+public class JCasLoader extends SwingWorker<JCas, Object> {
 
-	private DocumentWindow documentWindow;
+	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
 	String language = null;
 
-	public LoadAndImport(DocumentWindow documentWindow, InputStream inputStream,
+	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
 			TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
 		this.documentWindow = documentWindow;
 		this.inputStream = inputStream;
@@ -41,7 +43,7 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 		this.flavor = flavor;
 	}
 
-	public LoadAndImport(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
+	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
 			IOPlugin flavor) {
 		this.documentWindow = documentWindow;
 		this.typeSystemDescription = typeSystemDescription;
@@ -61,7 +63,7 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 		try {
 			Annotator.logger.info("Deserialising input stream.");
 			XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-			this.documentWindow.progressBar.setValue(25);
+			this.documentWindow.setProgress(25);
 			Annotator.logger.debug("Setting loading progress to {}", 50);
 
 		} catch (SAXException | IOException e1) {
@@ -72,7 +74,7 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 			Annotator.logger.info("Applying importer from {}", flavor.getClass().getName());
 			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
 					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
-			this.documentWindow.progressBar.setValue(50);
+			documentWindow.setProgress(50);
 			Annotator.logger.debug("Setting loading progress to {}", 80);
 
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
@@ -111,8 +113,7 @@ class LoadAndImport extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.documentWindow.jcas = this.get();
-			this.documentWindow.fireJCasLoadedEvent();
+			this.documentWindow.setJCas(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
