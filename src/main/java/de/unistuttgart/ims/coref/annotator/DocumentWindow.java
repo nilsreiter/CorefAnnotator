@@ -143,7 +143,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
 	ToggleMentionDifficult toggleMentionDifficult;
 	ToggleMentionAmbiguous toggleMentionAmbiguous;
-	AbstractAction toggleEntityGeneric, toggleEntityDisplayed;
+	AbstractAction toggleEntityGeneric, toggleEntityDisplayed = new ToggleEntityVisible();
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction, showSearchPanelAction;
