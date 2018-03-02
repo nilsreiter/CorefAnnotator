@@ -15,6 +15,8 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 
 public class Util {
+	private static String[] languageNames = null;
+
 	public static String toString(TreeModel tm) {
 		return toString((TreeNode) tm.getRoot(), 0);
 	}
@@ -143,6 +145,29 @@ public class Util {
 		annotation.setBegin(b);
 		annotation.setEnd(e);
 		return annotation;
+	}
+
+	public static String[] getSupportedLanguageNames() {
+		if (languageNames == null) {
+			languageNames = new String[Constants.SUPPORTED_LANGUAGES.length];
+			for (int i = 0; i < languageNames.length; i++) {
+				languageNames[i] = Annotator.getString("language." + Constants.SUPPORTED_LANGUAGES[i]);
+			}
+		}
+		return languageNames;
+	}
+
+	public static String getLanguageName(String iso) {
+		return Annotator.getString("language." + iso);
+	}
+
+	public static String getLanguage(String languageName) {
+		getSupportedLanguageNames();
+		for (int i = 0; i < languageNames.length; i++)
+			if (languageName == languageNames[i])
+				return Constants.SUPPORTED_LANGUAGES[i];
+
+		return null;
 	}
 
 }

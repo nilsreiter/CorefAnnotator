@@ -143,12 +143,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
 	ToggleMentionDifficult toggleMentionDifficult;
 	ToggleMentionAmbiguous toggleMentionAmbiguous;
-	AbstractAction toggleEntityGeneric, toggleEntityDisplayed;
+	AbstractAction toggleEntityGeneric, toggleEntityDisplayed = new ToggleEntityVisible();
 	AbstractAction sortByAlpha;
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
+	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 
 	// controller
 	CoreferenceModel cModel;
@@ -420,6 +421,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
 		toolsMenu.add(showSearchPanelAction);
+		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -531,7 +533,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		mainApplication.close(this);
 	}
 
-	public void loadFile(File file, IOPlugin flavor) {
+	public void loadFile(File file, IOPlugin flavor, String language) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
 		else
@@ -540,7 +542,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
-			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor);
+			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
+					language);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -605,6 +608,29 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(styleVariant);
 
+		}
+
+	}
+
+	class SetLanguageAction extends IkonAction {
+		private static final long serialVersionUID = 1L;
+
+		public SetLanguageAction() {
+			super(Constants.Strings.ACTION_SET_DOCUMENT_LANGUAGE, MaterialDesign.MDI_SWITCH);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
+					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
+					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
+					Util.getLanguageName(jcas.getDocumentLanguage()));
+			if (lang != null) {
+				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
+				jcas.setDocumentLanguage(Util.getLanguage(lang));
+				registerChange();
+			}
 		}
 
 	}
@@ -942,7 +968,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					ImmutableList<PotentialAnnotation> paList = (ImmutableList<PotentialAnnotation>) info
 							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor);
 					for (PotentialAnnotation pa : paList)
-					handlePotentialAnnotationTransfer(pa);
+						handlePotentialAnnotationTransfer(pa);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1560,7 +1586,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionNonNominal() {
-			super(MaterialDesign.MDI_FLAG, Strings.ACTION_FLAG_MENTION_NON_NOMINAL);
+			super(Strings.ACTION_FLAG_MENTION_NON_NOMINAL, MaterialDesign.MDI_FLAG);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
 
 		}
