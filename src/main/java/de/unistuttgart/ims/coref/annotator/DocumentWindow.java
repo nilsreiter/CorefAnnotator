@@ -80,6 +80,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
@@ -150,6 +151,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
+	AbstractAction clearAction = new ClearAction();
 
 	// controller
 	CoreferenceModel cModel;
@@ -422,6 +424,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
 		toolsMenu.add(showSearchPanelAction);
 		toolsMenu.add(setDocumentLanguageAction);
+		toolsMenu.add(clearAction);
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -1370,6 +1373,25 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
+	class ClearAction extends IkonAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ClearAction() {
+			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			for (Mention m : JCasUtil.select(jcas, Mention.class))
+				cModel.remove(m);
+			for (Entity e : JCasUtil.select(jcas, Entity.class))
+				cModel.remove(e);
+			registerChange();
+		}
+
+	}
+
 	class CloseAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -2014,4 +2036,5 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	public StylePlugin getCurrentStyle() {
 		return currentStyle;
 	}
+
 }
