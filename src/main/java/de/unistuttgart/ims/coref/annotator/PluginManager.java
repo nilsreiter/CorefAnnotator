@@ -10,6 +10,7 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.reflections.Reflections;
 
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AutomaticCRPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -19,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 public class PluginManager {
 	ImmutableSet<Class<? extends IOPlugin>> ioPlugins;
 	ImmutableSet<Class<? extends StylePlugin>> stylePlugins;
+	ImmutableSet<Class<? extends AutomaticCRPlugin>> autoPlugins;
 	Map<Class<?>, Plugin> instances = new HashMap<Class<?>, Plugin>();
 
 	public void init() {
@@ -32,8 +34,10 @@ public class PluginManager {
 		this.ioPlugins = ioPlugins.toImmutable();
 
 		stylePlugins = Sets.immutable.withAll(reflections.getSubTypesOf(StylePlugin.class));
+		autoPlugins = Sets.immutable.withAll(reflections.getSubTypesOf(AutomaticCRPlugin.class));
 		Annotator.logger.info("Found IOPlugins: {}", StringUtils.join(ioPlugins, ','));
 		Annotator.logger.info("Found StylePlugins: {}", StringUtils.join(stylePlugins.castToCollection(), ','));
+		Annotator.logger.info("Found AutomaticCRPlugins: {}", StringUtils.join(autoPlugins.castToCollection(), ','));
 
 		instances.put(DefaultIOPlugin.class, new DefaultIOPlugin());
 		instances.put(DefaultStylePlugin.class, new DefaultStylePlugin());
