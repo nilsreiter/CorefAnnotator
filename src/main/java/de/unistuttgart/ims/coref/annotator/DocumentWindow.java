@@ -684,6 +684,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	public void setIndeterminateProgress() {
+		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
+	}
+
+	public void stopIndeterminateProgress() {
+		progressBar.setIndeterminate(false);
+		progressBar.setVisible(false);
+	}
+
 	protected void setMessage(String message) {
 		setMessage(message, false);
 	}
