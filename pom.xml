@@ -321,5 +321,12 @@
 			</artifactId>
 			<version>${version.dkpro}</version>
 		</dependency>
+		<dependency>
+			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
+			<artifactId>
+				de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl
+			</artifactId>
+			<version>${version.dkpro}</version>
+		</dependency>
 	</dependencies>
 </project>
