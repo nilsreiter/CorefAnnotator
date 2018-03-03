@@ -51,6 +51,10 @@ public class PluginManager {
 		return stylePlugins;
 	}
 
+	public ImmutableSet<Class<? extends AutomaticCRPlugin>> getAutoPlugins() {
+		return autoPlugins;
+	}
+
 	public IOPlugin getDefaultIOPlugin() {
 		return getIOPlugin(DefaultIOPlugin.class);
 	}
@@ -79,6 +83,10 @@ public class PluginManager {
 
 	public IOPlugin getIOPlugin(Class<?> cl) {
 		return (IOPlugin) getPlugin(cl);
+	}
+
+	public AutomaticCRPlugin getAutoPlugin(Class<? extends AutomaticCRPlugin> cl) {
+		return (AutomaticCRPlugin) getPlugin(cl);
 	}
 
 }
