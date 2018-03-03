@@ -97,6 +97,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.RunAutomaticResolutionAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -111,6 +112,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.plugins.AutomaticCRPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -425,6 +427,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toolsMenu.add(showSearchPanelAction);
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
+		JMenu autoMenu = new JMenu("auto");
+		for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
+			AutomaticCRPlugin auto = mainApplication.getPluginManager().getAutoPlugin(pl);
+			autoMenu.add(new RunAutomaticResolutionAction(this, auto));
+		}
+		toolsMenu.add(autoMenu);
+		toolsMenu.addSeparator();
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
