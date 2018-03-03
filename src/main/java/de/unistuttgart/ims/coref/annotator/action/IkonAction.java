@@ -32,6 +32,7 @@ public abstract class IkonAction extends AbstractAction {
 		}
 	}
 
+	@Deprecated
 	public IkonAction(String stringKey, Ikon... icon) {
 		this.ikon = Lists.mutable.of(icon);
 		putValue(Action.NAME, Annotator.getString(stringKey));
