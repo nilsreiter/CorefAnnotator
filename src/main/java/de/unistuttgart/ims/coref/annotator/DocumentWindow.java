@@ -76,6 +76,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -115,6 +116,7 @@ import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.plugins.AutomaticCRPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -154,6 +156,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
+	Map<Plugin, AbstractAction> pluginActionMap = Maps.mutable.empty();
 
 	// controller
 	CoreferenceModel cModel;
@@ -430,7 +433,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu autoMenu = new JMenu("auto");
 		for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
 			AutomaticCRPlugin auto = mainApplication.getPluginManager().getAutoPlugin(pl);
-			autoMenu.add(new RunAutomaticResolutionAction(this, auto));
+			AbstractAction aa = new RunAutomaticResolutionAction(this, auto);
+			autoMenu.add(aa);
+			pluginActionMap.put(auto, aa);
 		}
 		toolsMenu.add(autoMenu);
 		toolsMenu.addSeparator();
@@ -641,6 +646,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
 				jcas.setDocumentLanguage(Util.getLanguage(lang));
+				for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
+					AutomaticCRPlugin p = mainApplication.getPluginManager().getAutoPlugin(pl);
+					pluginActionMap.get(p)
+							.setEnabled(ArrayUtils.contains(p.getSupportedLanguages(), jcas.getDocumentLanguage()));
+				}
 				registerChange();
 			}
 		}
@@ -822,6 +832,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
+		for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
+			AutomaticCRPlugin p = mainApplication.getPluginManager().getAutoPlugin(pl);
+			pluginActionMap.get(p)
+					.setEnabled(ArrayUtils.contains(p.getSupportedLanguages(), jcas.getDocumentLanguage()));
+		}
 
 		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();

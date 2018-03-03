@@ -41,4 +41,9 @@ public class StanfordCoref implements AutomaticCRPlugin {
 		return null;
 	}
 
+	@Override
+	public String[] getSupportedLanguages() {
+		return new String[] { "en" };
+	}
+
 }
