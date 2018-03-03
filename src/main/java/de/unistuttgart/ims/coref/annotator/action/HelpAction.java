@@ -6,12 +6,12 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 
-public class HelpAction extends IkonAction {
+public class HelpAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
 	public HelpAction() {
-		super("action.help", MaterialDesign.MDI_HELP);
+		super(null, "action.help", MaterialDesign.MDI_HELP);
 	}
 
 	@Override
