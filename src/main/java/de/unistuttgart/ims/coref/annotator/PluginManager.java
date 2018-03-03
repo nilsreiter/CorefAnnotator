@@ -87,6 +87,6 @@ public class PluginManager {
 
 	public AutomaticCRPlugin getAutoPlugin(Class<? extends AutomaticCRPlugin> cl) {
 		return (AutomaticCRPlugin) getPlugin(cl);
-	}
+}
 
 }
