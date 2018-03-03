@@ -93,6 +93,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -615,11 +616,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class SetLanguageAction extends IkonAction {
+	class SetLanguageAction extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public SetLanguageAction() {
-			super(Constants.Strings.ACTION_SET_DOCUMENT_LANGUAGE, MaterialDesign.MDI_SWITCH);
+			super(null, Constants.Strings.ACTION_SET_DOCUMENT_LANGUAGE, MaterialDesign.MDI_SWITCH);
 		}
 
 		@Override
@@ -1096,12 +1097,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ChangeKeyForEntityAction extends IkonAction {
+	class ChangeKeyForEntityAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
-			super(Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
+			super(mainApplication, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 
 		}
@@ -1416,12 +1417,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class MergeSelectedEntities extends IkonAction {
+	class MergeSelectedEntities extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public MergeSelectedEntities() {
-			super(Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
+			super(mainApplication, Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_TOOLTIP));
 		}
 
@@ -1437,11 +1438,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class FormEntityGroup extends IkonAction {
+	class FormEntityGroup extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			super(Strings.ACTION_GROUP, MaterialDesign.MDI_GROUP);
+			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_GROUP);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
