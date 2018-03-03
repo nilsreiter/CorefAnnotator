@@ -271,7 +271,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public static String getString(String key) {
-		return getString(key, Locale.getDefault());
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			logger.catching(e);
+			return key;
+		}
 	}
 
 	public static String getString(String key, Locale locale) {
