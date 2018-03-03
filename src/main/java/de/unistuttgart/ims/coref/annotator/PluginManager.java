@@ -77,11 +77,11 @@ public class PluginManager {
 		return instances.get(cl);
 	}
 
-	public StylePlugin getStylePlugin(Class<?> clazz) {
+	public StylePlugin getStylePlugin(Class<? extends StylePlugin> clazz) {
 		return (StylePlugin) getPlugin(clazz);
 	}
 
-	public IOPlugin getIOPlugin(Class<?> cl) {
+	public IOPlugin getIOPlugin(Class<? extends IOPlugin> cl) {
 		return (IOPlugin) getPlugin(cl);
 	}
 
