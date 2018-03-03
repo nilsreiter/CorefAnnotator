@@ -1071,12 +1071,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ChangeColorForEntity extends IkonAction {
+	class ChangeColorForEntity extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ChangeColorForEntity() {
-			super(Strings.ACTION_SET_COLOR, MaterialDesign.MDI_FORMAT_COLOR_FILL);
+			super(null, Strings.ACTION_SET_COLOR, MaterialDesign.MDI_FORMAT_COLOR_FILL);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
 		}
 
@@ -1134,12 +1134,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class NewEntityAction extends IkonAction {
+	class NewEntityAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public NewEntityAction() {
-			super(Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
+			super(null, Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1247,11 +1247,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteAction extends IkonAction {
+	class DeleteAction extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+			super(null, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1288,14 +1288,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class DeleteMentionAction extends IkonAction {
+	class DeleteMentionAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		Mention m;
 
 		public DeleteMentionAction(Mention m) {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+			super(null, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			this.m = m;
 
@@ -1374,12 +1374,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ClearAction extends IkonAction {
+	class ClearAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ClearAction() {
-			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+			super(null, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
@@ -1491,12 +1491,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class FileSaveAsAction extends IkonAction {
+	class FileSaveAsAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public FileSaveAsAction() {
-			super(Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
+			super(null, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 		}
@@ -1528,12 +1528,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntitySortOrder extends IkonAction {
+	class ToggleEntitySortOrder extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntitySortOrder() {
-			super(Strings.ACTION_SORT_REVERT, MaterialDesign.MDI_SORT_VARIANT);
+			super(null, Strings.ACTION_SORT_REVERT, MaterialDesign.MDI_SORT_VARIANT);
 
 		}
 
@@ -1544,11 +1544,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntityGeneric extends IkonAction {
+	class ToggleEntityGeneric extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityGeneric() {
-			super(Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
+			super(null, Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC_TOOLTIP));
 		}
 
@@ -1563,11 +1563,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntityVisible extends IkonAction {
+	class ToggleEntityVisible extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityVisible() {
-			super(Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY, MaterialDesign.MDI_ACCOUNT_OUTLINE);
+			super(null, Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY, MaterialDesign.MDI_ACCOUNT_OUTLINE);
 		}
 
 		@Override
@@ -1583,12 +1583,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleMentionDifficult extends IkonAction {
+	class ToggleMentionDifficult extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionDifficult() {
-			super(Strings.ACTION_FLAG_MENTION_DIFFICULT, MaterialDesign.MDI_ALERT_BOX);
+			super(null, Strings.ACTION_FLAG_MENTION_DIFFICULT, MaterialDesign.MDI_ALERT_BOX);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP));
 
 		}
@@ -1604,12 +1604,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ToggleMentionNonNominal extends IkonAction {
+	class ToggleMentionNonNominal extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleMentionNonNominal() {
-			super(Strings.ACTION_FLAG_MENTION_NON_NOMINAL, MaterialDesign.MDI_FLAG);
+			super(null, Strings.ACTION_FLAG_MENTION_NON_NOMINAL, MaterialDesign.MDI_FLAG);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
 
 		}
@@ -1647,12 +1647,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	@Deprecated
-	class ToggleShowTextInTreeLabels extends IkonAction {
+	class ToggleShowTextInTreeLabels extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleShowTextInTreeLabels() {
-			super(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
+			super(null, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
 			putValue(Action.SELECTED_KEY,
 					mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
