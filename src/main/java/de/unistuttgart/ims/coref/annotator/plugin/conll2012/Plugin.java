@@ -13,6 +13,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
+import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
@@ -31,7 +32,9 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return null;
+		AggregateBuilder b = new AggregateBuilder();
+		b.add(AnalysisEngineFactory.createEngineDescription(ImportDKpro.class));
+		return b.createAggregateDescription();
 	}
 
 	@Override
