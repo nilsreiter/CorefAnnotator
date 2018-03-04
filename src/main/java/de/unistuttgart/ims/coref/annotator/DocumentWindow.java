@@ -240,8 +240,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.addKeyListener(treeKeyListener);
 
 		treeSearchField = new JTextField();
-		treeSearchField.getDocument().addDocumentListener(new EntityFinder());
-		treeSearchField.addKeyListener(new EntityFinder());
+		EntityFinder entityFinder = new EntityFinder();
+		treeSearchField.getDocument().addDocumentListener(entityFinder);
+		treeSearchField.addKeyListener(entityFinder);
 		rightPanel.setPreferredSize(new Dimension(300, 800));
 		rightPanel.add(treeSearchField, BorderLayout.NORTH);
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
