@@ -119,6 +119,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 	int contexts = 50;
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
+	int limit = 1000;
 
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
@@ -232,13 +233,15 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 			Pattern p = Pattern.compile(s);
 			Matcher m = p.matcher(text);
-			while (m.find()) {
+			int finding = 0;
+			while (m.find() && finding < limit) {
 				try {
 					lm.addElement(new SearchResult(m.start(), m.end()));
 					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
+				finding++;
 			}
 			list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
@@ -369,7 +372,7 @@ public class SearchPanel extends JFrame implements DocumentListener, WindowListe
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			if (e.getValueIsAdjusting()) {
+			if (!e.getValueIsAdjusting()) {
 				if (list.getSelectedIndices().length == 1) {
 					SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
 					documentWindow.textPane.setCaretPosition(result.getEnd());
