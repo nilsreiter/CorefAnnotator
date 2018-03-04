@@ -10,8 +10,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -245,7 +243,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		EntityFinder entityFinder = new EntityFinder();
 		treeSearchField.getDocument().addDocumentListener(entityFinder);
 		treeSearchField.addKeyListener(entityFinder);
-		treeSearchField.addFocusListener(entityFinder);
 		rightPanel.setPreferredSize(new Dimension(300, 800));
 		rightPanel.add(treeSearchField, BorderLayout.NORTH);
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -1888,13 +1885,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	 * TODO: This should be indexed to make lookup faster
 	 *
 	 */
-	class EntityFinder implements DocumentListener, KeyListener, FocusListener {
+	class EntityFinder implements DocumentListener, KeyListener {
 
 		Pattern pattern;
 
 		public void filter(String s) {
+			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 			if (s.length() >= 1) {
-				pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
 					CATreeNode tn = cModel.rootNode.getChildAt(i);
 					if (tn.isEntity()) {
@@ -1977,27 +1974,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-
-		}
-
-		@Override
-		public void focusGained(FocusEvent e) {
-			String selection = textPane.getSelectedText();
-			filter(selection);
-		}
-
-		@Override
-		public void focusLost(FocusEvent e) {
-			if (e.getOppositeComponent() == textPane) {
-				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
-					CATreeNode tn = cModel.rootNode.getChildAt(i);
-					if (tn.isEntity()) {
-						tn.setRank(50);
-					}
-				}
-				cModel.nodeStructureChanged(cModel.rootNode);
-				cModel.resort();
-			}
 
 		}
 
