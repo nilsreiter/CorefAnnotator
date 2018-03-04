@@ -1,16 +1,20 @@
 package de.unistuttgart.ims.coref.annotator.plugin.rankings;
 
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.set.sorted.MutableSortedSet;
+import org.eclipse.collections.impl.factory.SortedSets;
 
-import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.PotentialAnnotation;
+import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 
 public class MatchingRanker implements EntityRankingPlugin {
@@ -27,36 +31,46 @@ public class MatchingRanker implements EntityRankingPlugin {
 	}
 
 	@Override
-	public void rank(PotentialAnnotation potAnnotation, CoreferenceModel cModel, JCas jcas) {
+	public MutableSortedSet<Entity> rank(PotentialAnnotation potAnnotation, CoreferenceModel cModel, JCas jcas) {
 		String s = jcas.getDocumentText().substring(potAnnotation.getBegin(), potAnnotation.getEnd());
-		pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-		for (int i = 0; i < ((CATreeNode) cModel.getRoot()).getChildCount(); i++) {
-			CATreeNode tn = ((CATreeNode) cModel.getRoot()).getChildAt(i);
-			if (tn.isEntity()) {
-				tn.setRank(matches(s, tn) ? 60 : 40);
+		pattern = Pattern.compile(s);
+		Comparator<Entity> comparator = new Comparator<Entity>() {
+
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				boolean b1 = matches(cModel, o1);
+				boolean b2 = matches(cModel, o2);
+				if (b1 == b2) {
+					int comp = -1 * Integer.compare(cModel.getChildCount(cModel.get(o1)),
+							cModel.getChildCount(cModel.get(o2)));
+					return (comp == 0 ? -1 * cModel.toString(o1).compareTo(cModel.toString(o2)) : comp);
+				}
+				return (b1 ? -1 : 1);
 			}
-		}
+		};
+
+		return SortedSets.mutable.ofAll(comparator, JCasUtil.select(jcas, Entity.class));
+
 	}
 
-	protected boolean matches(String s, CATreeNode e) {
-		if (!e.isEntity())
-			return false;
+	protected boolean wasRecent(JCas jcas, Entity o1, int begin) {
+		for (Mention m : JCasUtil.selectPreceding(Mention.class, new Annotation(jcas, begin, begin), 20)) {
+			if (m.getEntity() == o1)
+				return true;
+		}
+		return false;
+	}
+
+	protected boolean matches(CoreferenceModel model, Entity e) {
 		Matcher m;
 
-		if (e.getEntity().getLabel() != null) {
-			m = pattern.matcher(e.getEntity().getLabel());
+		if (e.getLabel() != null) {
+			m = pattern.matcher(e.getLabel());
 			if (m.find())
 				return true;
 		}
-		StringArray flags = e.getEntity().getFlags();
-		if (flags != null)
-			for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
-				m = pattern.matcher(e.getEntity().getFlags(i));
-				if (m.find())
-					return true;
-			}
-		for (int i = 0; i < e.getChildCount(); i++) {
-			FeatureStructure child = e.getChildAt(i).getFeatureStructure();
+		for (int i = 0; i < model.get(e).getChildCount(); i++) {
+			FeatureStructure child = model.get(e).getChildAt(i).getFeatureStructure();
 			if (child instanceof Annotation) {
 				String mc = ((Annotation) child).getCoveredText();
 				m = pattern.matcher(mc);

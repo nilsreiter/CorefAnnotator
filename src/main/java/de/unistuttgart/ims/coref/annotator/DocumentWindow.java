@@ -10,6 +10,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -87,8 +88,10 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -112,7 +115,9 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
@@ -1708,37 +1713,71 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
 				Collection<Annotation> mentions = cModel.getMentions(offset);
-				if (mentions.isEmpty())
-					return;
-				textPopupMenu.add(Annotator.getString("menu.entities"));
-				for (Annotation anno : mentions) {
-					StringBuilder b = new StringBuilder();
-					b.append(anno.getAddress());
-					Mention m = null;
-					DetachedMentionPart dmp = null;
-					if (anno instanceof Mention) {
-						m = (Mention) anno;
-						dmp = m.getDiscontinuous();
-					} else if (anno instanceof DetachedMentionPart) {
-						dmp = (DetachedMentionPart) anno;
-						m = dmp.getMention();
+				if (!mentions.isEmpty()) {
+					JMenu entityMenu = new JMenu(Annotator.getString("menu.entities"));
+					for (Annotation anno : mentions) {
+						StringBuilder b = new StringBuilder();
+						b.append(anno.getAddress());
+						Mention m = null;
+						DetachedMentionPart dmp = null;
+						if (anno instanceof Mention) {
+							m = (Mention) anno;
+							dmp = m.getDiscontinuous();
+						} else if (anno instanceof DetachedMentionPart) {
+							dmp = (DetachedMentionPart) anno;
+							m = dmp.getMention();
+						}
+						String surf = m.getCoveredText();
+						if (dmp != null)
+							surf += " [,] " + dmp.getCoveredText();
+						if (m.getEntity().getLabel() != null)
+							b.append(": ").append(m.getEntity().getLabel());
+
+						JMenu mentionMenu = new JMenu(b.toString());
+						mentionMenu
+								.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
+						Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+						mentionMenu.add('"' + surf + '"');
+						mentionMenu.add(a);
+						mentionMenu.add(new DeleteMentionAction(m));
+
+						entityMenu.add(mentionMenu);
 					}
-					String surf = m.getCoveredText();
-					if (dmp != null)
-						surf += " [,] " + dmp.getCoveredText();
-					if (m.getEntity().getLabel() != null)
-						b.append(": ").append(m.getEntity().getLabel());
-
-					JMenu mentionMenu = new JMenu(b.toString());
-					mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
-					Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-					mentionMenu.add('"' + surf + '"');
-					mentionMenu.add(a);
-					mentionMenu.add(new DeleteMentionAction(m));
-
-					textPopupMenu.add(mentionMenu);
+					textPopupMenu.add(entityMenu);
 				}
-				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+					EntityRankingPlugin erp = mainApplication.getPluginManager()
+							.getEntityRankingPlugin(MatchingRanker.class);
+					MutableSortedSet<Entity> candidates = erp.rank(
+							new PotentialAnnotation(textPane, textPane.getSelectionStart(), textPane.getSelectionEnd()),
+							getCoreferenceModel(), getJcas()).take(10);
+					candidates
+							.union(Sets.mutable
+									.ofAll(JCasUtil
+											.selectPreceding(Mention.class,
+													new Annotation(jcas, textPane.getSelectionStart(),
+															textPane.getSelectionEnd()),
+													15))
+									.collect(m -> m.getEntity()));
+					JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+					candidates.forEach(entity -> {
+						JMenuItem mi = new JMenuItem(getCoreferenceModel().toString(entity));
+						mi.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								getCoreferenceModel().addTo(entity, textPane.getSelectionStart(),
+										textPane.getSelectionEnd());
+							}
+						});
+						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+						candMenu.add(mi);
+					});
+
+					textPopupMenu.add(candMenu);
+
+				}
+				if (textPopupMenu.getComponentCount() > 0)
+					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 
 			}
 		}

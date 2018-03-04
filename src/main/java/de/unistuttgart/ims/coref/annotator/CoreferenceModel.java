@@ -470,6 +470,21 @@ public class CoreferenceModel extends DefaultTreeModel {
 		fireAnnotationChangedEvent(m);
 	}
 
+	public String toString(Entity e) {
+		if (e.getLabel() != null)
+			return e.getLabel();
+		CATreeNode tn = get(e);
+		String s = "";
+		for (int i = 0; i < tn.getChildCount(); i++) {
+			if (tn.getChildAt(i).isMention()) {
+				String c = ((Annotation) tn.getChildAt(i).getFeatureStructure()).getCoveredText();
+				if (c.length() > s.length())
+					s = c;
+			}
+		}
+		return s;
+	}
+
 	public void updateColor(Entity entity, Color newColor) {
 		entity.setColor(newColor.getRGB());
 		CATreeNode entityNode = fsMap.get(entity);
