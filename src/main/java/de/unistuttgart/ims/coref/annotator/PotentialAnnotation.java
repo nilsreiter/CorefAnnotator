@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import javax.swing.text.JTextComponent;
 
+@Deprecated
 public class PotentialAnnotation {
 	int begin;
 	int end;
