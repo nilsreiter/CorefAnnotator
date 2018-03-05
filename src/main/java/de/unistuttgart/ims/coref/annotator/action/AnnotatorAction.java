@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
+import javax.swing.Action;
+
 import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -17,8 +19,9 @@ public abstract class AnnotatorAction extends IkonAction {
 	}
 
 	public AnnotatorAction(Annotator mApp, String stringKey, Ikon... ikon) {
-		super(stringKey, ikon);
+		super(ikon);
 		this.mainApplication = mApp;
+		putValue(Action.NAME, Annotator.getString(stringKey));
 
 	}
 
