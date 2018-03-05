@@ -44,4 +44,8 @@ public abstract class AbstractXmiPlugin implements IOPlugin {
 		return ".xmi";
 	}
 
+	@Override
+	public String[] getSupportedLanguages() {
+		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
 }

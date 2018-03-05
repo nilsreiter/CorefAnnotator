@@ -428,6 +428,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toolsMenu.add(showSearchPanelAction);
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
+		toolsMenu.addSeparator();
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -678,6 +679,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	public void setIndeterminateProgress() {
+		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
+	}
+
+	public void stopIndeterminateProgress() {
+		progressBar.setIndeterminate(false);
+		progressBar.setVisible(false);
+	}
+
 	protected void setMessage(String message) {
 		setMessage(message, false);
 	}
@@ -806,7 +817,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-
 		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();
 	}
@@ -1369,16 +1379,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
-					ImmutableList<Span> spans;
 					try {
-						PotentialAnnotationTransfer pat = (PotentialAnnotationTransfer) info.getTransferable();
-						spans = pat.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+						Transferable pat = info.getTransferable();
+						@SuppressWarnings("unchecked")
+						ImmutableList<Span> spans = (ImmutableList<Span>) pat
+								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
 						for (Span sp : spans)
 							cModel.addTo(m.getEntity(), sp.begin, sp.end);
 						registerChange();
 					} catch (UnsupportedFlavorException | IOException e) {
-						e.printStackTrace();
+						Annotator.logger.catching(e);
 					}
 				}
 			}

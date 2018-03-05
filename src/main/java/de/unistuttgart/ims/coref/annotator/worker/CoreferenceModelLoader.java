@@ -28,6 +28,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 
 	@Override
 	protected CoreferenceModel doInBackground() throws Exception {
+		Annotator.logger.debug("Starting loading of coreference model");
 		CoreferenceModel cModel;
 		cModel = new CoreferenceModel(jcas, documentWindow.getMainApplication().getPreferences());
 		cModel.addCoreferenceModelListener(documentWindow);
@@ -35,17 +36,21 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
 			cModel.add(e);
 		});
+		Annotator.logger.debug("Added all entities");
 
 		publish(60);
 		for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
 			for (int i = 0; i < eg.getMembers().size(); i++)
 				cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
+		Annotator.logger.debug("Added all entity groups");
 
 		publish(70);
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
 			cModel.registerAnnotation(m);
 		}
+		Annotator.logger.debug("Added all mentions");
+
 		publish(75);
 		return cModel;
 	}

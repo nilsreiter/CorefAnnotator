@@ -48,7 +48,7 @@ public class UpdateCheck {
 		long current = System.currentTimeMillis();
 		if ((current - lastCheck) > 1000 || cache == null) {
 			URL url = new URL(Constants.URL_LATEST_RELEASE_API);
-			String s = IOUtils.toString(url.openStream());
+			String s = IOUtils.toString(url.openStream(), "UTF-8");
 			cache = new JSONObject(s);
 			lastCheck = current;
 			return cache;

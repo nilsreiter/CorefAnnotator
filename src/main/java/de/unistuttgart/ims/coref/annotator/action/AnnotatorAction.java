@@ -25,4 +25,11 @@ public abstract class AnnotatorAction extends IkonAction {
 
 	}
 
+	public AnnotatorAction(Annotator mApp, String stringKey, boolean isKey, Ikon... ikon) {
+		super(ikon);
+		this.mainApplication = mApp;
+		putValue(Action.NAME, (isKey ? Annotator.getString(stringKey) : stringKey));
+
+	}
+
 }

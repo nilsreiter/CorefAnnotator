@@ -291,6 +291,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		openDialog.setFileFilter(flavor.getFileFilter());
+		if (flavor.getSupportedLanguages() == null)
+			openDialog.setLanguages();
+		else
+			openDialog.setLanguages(flavor.getSupportedLanguages());
 		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
