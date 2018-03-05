@@ -19,7 +19,7 @@ public abstract class AnnotatorAction extends IkonAction {
 	}
 
 	public AnnotatorAction(Annotator mApp, String stringKey, Ikon... ikon) {
-		super(stringKey, ikon);
+		super(ikon);
 		this.mainApplication = mApp;
 		putValue(Action.NAME, Annotator.getString(stringKey));
 
@@ -30,6 +30,6 @@ public abstract class AnnotatorAction extends IkonAction {
 		this.mainApplication = mApp;
 		putValue(Action.NAME, (isKey ? Annotator.getString(stringKey) : stringKey));
 
-	}
+    }
 
 }

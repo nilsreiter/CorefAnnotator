@@ -163,6 +163,7 @@ public class Constants {
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String STATUS_STYLE = "status.style";
+		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 
@@ -183,6 +184,8 @@ public class Constants {
 
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
+
+	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
 	public static final String PREF_RECENT = "recent_files";
 
