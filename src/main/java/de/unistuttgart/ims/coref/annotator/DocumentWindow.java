@@ -76,7 +76,6 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -100,7 +99,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.action.RunAutomaticResolutionAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -115,10 +113,8 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.plugins.AutomaticCRPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -158,7 +154,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
-	Map<Plugin, AbstractAction> pluginActionMap = Maps.mutable.empty();
 
 	// controller
 	CoreferenceModel cModel;
@@ -433,14 +428,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toolsMenu.add(showSearchPanelAction);
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
-		JMenu autoMenu = new JMenu("auto");
-		for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
-			AutomaticCRPlugin auto = mainApplication.getPluginManager().getAutoPlugin(pl);
-			AbstractAction aa = new RunAutomaticResolutionAction(this, auto);
-			autoMenu.add(aa);
-			pluginActionMap.put(auto, aa);
-		}
-		toolsMenu.add(autoMenu);
 		toolsMenu.addSeparator();
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
@@ -649,11 +636,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
 				jcas.setDocumentLanguage(Util.getLanguage(lang));
-				for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
-					AutomaticCRPlugin p = mainApplication.getPluginManager().getAutoPlugin(pl);
-					pluginActionMap.get(p)
-							.setEnabled(ArrayUtils.contains(p.getSupportedLanguages(), jcas.getDocumentLanguage()));
-				}
 				registerChange();
 			}
 		}
@@ -835,12 +817,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-		for (Class<? extends AutomaticCRPlugin> pl : mainApplication.getPluginManager().getAutoPlugins()) {
-			AutomaticCRPlugin p = mainApplication.getPluginManager().getAutoPlugin(pl);
-			pluginActionMap.get(p)
-					.setEnabled(ArrayUtils.contains(p.getSupportedLanguages(), jcas.getDocumentLanguage()));
-		}
-
 		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();
 	}
