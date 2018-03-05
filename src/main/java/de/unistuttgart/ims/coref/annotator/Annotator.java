@@ -2,10 +2,14 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -33,6 +37,8 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -44,6 +50,7 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
@@ -75,6 +82,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	JPanel recentFilesPanel;
 
 	LogWindow logWindow = null;
+	UpdateCheck updateCheck = new UpdateCheck();
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
@@ -175,11 +183,36 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		for (Component c : mainPanel.getComponents())
 			((JComponent) c).setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
-				+ Annotator.class.getPackage().getImplementationVersion());
+		JLabel versionLabel = new JLabel(Version.get().toString());
 
 		statusBar = new JPanel();
-		statusBar.add(versionLabel);
+
+		try {
+			if (updateCheck.checkForUpdate()) {
+				JButton button = new JButton();
+				button.setText(Annotator.getString(Constants.Strings.STATUS_NOW_AVAILABLE) + ": "
+						+ updateCheck.getRemoteVersion().toString());
+				button.setIcon(FontIcon.of(MaterialDesign.MDI_NEW_BOX));
+				button.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							Desktop.getDesktop().browse(updateCheck.getReleasePage());
+						} catch (IOException e1) {
+							logger.catching(e1);
+						}
+					}
+
+				});
+				statusBar.add(button);
+			} else {
+				statusBar.add(versionLabel);
+			}
+		} catch (IOException e1) {
+			logger.catching(e1);
+			statusBar.add(versionLabel);
+		}
 
 		opening.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		opening.getContentPane().add(statusBar, BorderLayout.SOUTH);
@@ -271,7 +304,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public static String getString(String key) {
-		return getString(key, Locale.getDefault());
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			logger.catching(e);
+			return key;
+		}
 	}
 
 	public static String getString(String key, Locale locale) {

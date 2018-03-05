@@ -93,6 +93,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
@@ -288,8 +289,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		messageLabel.setSize(new Dimension(1, 20));
 		statusBar.add(messageLabel);
 
-		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
-				+ Annotator.class.getPackage().getImplementationVersion());
+		JLabel versionLabel = new JLabel(
+				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
