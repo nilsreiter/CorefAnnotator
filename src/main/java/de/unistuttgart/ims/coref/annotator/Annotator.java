@@ -183,8 +183,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		for (Component c : mainPanel.getComponents())
 			((JComponent) c).setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		Version current = Version.get();
-		JLabel versionLabel = new JLabel(current.toString());
+		JLabel versionLabel = new JLabel(Version.get().toString());
 
 		statusBar = new JPanel();
 
