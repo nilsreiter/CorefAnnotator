@@ -970,10 +970,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 				try {
 					@SuppressWarnings("unchecked")
-					ImmutableList<PotentialAnnotation> paList = (ImmutableList<PotentialAnnotation>) info
-							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					for (PotentialAnnotation pa : paList)
-						handlePotentialAnnotationTransfer(pa);
+					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
+							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+					for (Span pa : paList)
+						handleSpanTransfer(pa);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -991,16 +991,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			return true;
 		}
 
-		protected boolean handlePotentialAnnotationTransfer(PotentialAnnotation potentialAnnotation) {
+		protected boolean handleSpanTransfer(Span potentialAnnotation) {
 
 			if (targetFS == null) {
-				cModel.add(potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.add(potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
-				cModel.addTo((Entity) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.addTo((Entity) targetFS, potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
 			} else if (targetFS instanceof Mention) {
-				cModel.addTo((Mention) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.addTo((Mention) targetFS, potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_PART_CREATED), true);
 			}
 			registerChange();

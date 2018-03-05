@@ -45,7 +45,7 @@ public class PotentialAnnotationTransfer implements Transferable {
 
 	@Override
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		return list.collect(span -> new PotentialAnnotation(textView, span.begin, span.end));
+		return list;
 		// return new PotentialAnnotation(textView, begin, end);
 	}
 
