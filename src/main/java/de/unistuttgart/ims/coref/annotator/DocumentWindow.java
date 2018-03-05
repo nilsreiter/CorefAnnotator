@@ -1379,16 +1379,17 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
-					ImmutableList<Span> spans;
 					try {
-						PotentialAnnotationTransfer pat = (PotentialAnnotationTransfer) info.getTransferable();
-						spans = pat.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+						Transferable pat = info.getTransferable();
+						@SuppressWarnings("unchecked")
+						ImmutableList<Span> spans = (ImmutableList<Span>) pat
+								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
 						for (Span sp : spans)
 							cModel.addTo(m.getEntity(), sp.begin, sp.end);
 						registerChange();
 					} catch (UnsupportedFlavorException | IOException e) {
-						e.printStackTrace();
+						Annotator.logger.catching(e);
 					}
 				}
 			}
