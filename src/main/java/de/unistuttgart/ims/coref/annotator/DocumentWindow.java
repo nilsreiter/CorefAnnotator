@@ -1349,15 +1349,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		@Override
-		protected void exportDone(JComponent c, Transferable t, int action) {
-
-		}
-
-		@Override
 		public boolean canImport(TransferHandler.TransferSupport info) {
 
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-
+				JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
+				Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
+				if (mentions.size() > 0)
+					return true;
 			}
 			return false;
 		}
@@ -1368,11 +1366,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				return false;
 			}
 			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-			dl.getDropPoint();
-
-			int index = dl.getIndex();
-			System.err.println(index);
-			return false;
+			Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
+			for (Annotation a : mentions) {
+				if (a instanceof Mention) {
+					ImmutableList<Span> spans;
+					try {
+						PotentialAnnotationTransfer pat = (PotentialAnnotationTransfer) info.getTransferable();
+						spans = pat.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+						Mention m = (Mention) a;
+						for (Span sp : spans)
+							cModel.addTo(m.getEntity(), sp.begin, sp.end);
+						registerChange();
+					} catch (UnsupportedFlavorException | IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return true;
 		}
 	}
 
