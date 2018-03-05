@@ -25,7 +25,7 @@ public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.pl
 
 	@Override
 	public String getName() {
-		return "Stanford Coreference Resolver";
+		return "Stanford CR";
 	}
 
 	@Override
