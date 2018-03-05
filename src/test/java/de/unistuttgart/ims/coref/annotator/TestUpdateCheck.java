@@ -1,9 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
@@ -40,9 +37,4 @@ public class TestUpdateCheck {
 		assertEquals("0.0.1-SNAPSHOT", Version.get().toString());
 	}
 
-	@Test
-	public void testUpdateCheck() throws IOException {
-		UpdateCheck uc = new UpdateCheck();
-		assertTrue(uc.checkForUpdate());
-	}
 }
