@@ -27,4 +27,17 @@ public class XFileChooser extends JFileChooser {
 	public String getSelectedLanguage() {
 		return (String) languageSelector.getSelectedItem();
 	}
+
+	public void setLanguages() {
+		languageSelector.removeAllItems();
+		for (String l : Util.getSupportedLanguageNames())
+			languageSelector.addItem(l);
+	}
+
+	public void setLanguages(String[] s) {
+		languageSelector.removeAllItems();
+		for (String str : s)
+			languageSelector.addItem(Util.getLanguageName(str));
+	};
+
 }

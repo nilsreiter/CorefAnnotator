@@ -51,4 +51,8 @@ public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.pl
 				f.getAbsolutePath(), TextReader.ENCODING_AUTO, true, TextReader.PARAM_LANGUAGE, "en");
 	}
 
+	@Override
+	public String[] getSupportedLanguages() {
+		return new String[] { "en" };
+	}
 }
