@@ -185,6 +185,8 @@ public class Constants {
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
+	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
+
 	public static final String PREF_RECENT = "recent_files";
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };

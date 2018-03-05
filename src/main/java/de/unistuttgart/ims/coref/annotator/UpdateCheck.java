@@ -13,6 +13,8 @@ import org.json.JSONObject;
 
 public class UpdateCheck {
 
+	private static final String HTML_URL = "html_url";
+	private static final String TAG_NAME = "tag_name";
 	transient JSONObject cache = null;
 	long lastCheck = Long.MIN_VALUE;
 
@@ -21,21 +23,21 @@ public class UpdateCheck {
 
 		JSONObject o;
 		o = getRemote();
-		String tagName = o.getString("tag_name");
+		String tagName = o.getString(TAG_NAME);
 		Version remote = Version.get(tagName.substring(1));
 		return current.compareTo(remote) < 0;
 	}
 
 	public Version getRemoteVersion() throws IOException {
 		JSONObject o = getRemote();
-		String tagName = o.getString("tag_name");
+		String tagName = o.getString(TAG_NAME);
 		return Version.get(tagName.substring(1));
 	}
 
 	public URI getReleasePage() throws IOException {
 		JSONObject o = getRemote();
 		try {
-			return new URI(o.getString("html_url"));
+			return new URI(o.getString(HTML_URL));
 		} catch (JSONException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -45,7 +47,7 @@ public class UpdateCheck {
 	protected JSONObject getRemote() throws IOException {
 		long current = System.currentTimeMillis();
 		if ((current - lastCheck) > 1000 || cache == null) {
-			URL url = new URL("https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest");
+			URL url = new URL(Constants.URL_LATEST_RELEASE_API);
 			String s = IOUtils.toString(url.openStream());
 			cache = new JSONObject(s);
 			lastCheck = current;
@@ -55,6 +57,8 @@ public class UpdateCheck {
 	}
 
 	public static class Version implements Comparable<Version> {
+		private static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT";
+
 		private enum Tag {
 			ALPHA, BETA, SNAPSHOT
 		};
@@ -96,7 +100,7 @@ public class UpdateCheck {
 			if (version == null) {
 				String s = Annotator.class.getPackage().getImplementationVersion();
 				if (s == null)
-					s = "0.0.1-SNAPSHOT";
+					s = DEFAULT_VERSION;
 				version = new Version(s);
 			}
 			return version;
