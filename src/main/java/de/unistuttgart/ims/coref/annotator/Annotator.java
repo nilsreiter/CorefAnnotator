@@ -18,6 +18,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -160,11 +161,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		mainPanel.add(panel);
 
+		mainPanel.add(Box.createVerticalStrut(10));
 		recentFilesPanel = new JPanel();
 		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
 		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
 		refreshRecents();
 		mainPanel.add(recentFilesPanel);
+		mainPanel.add(Box.createVerticalStrut(10));
 
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
