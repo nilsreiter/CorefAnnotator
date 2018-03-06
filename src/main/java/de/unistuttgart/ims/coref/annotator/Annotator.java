@@ -17,6 +17,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -135,11 +136,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected JFrame getOpeningDialog() {
-
+		int width = 300;
 		JFrame opening = new JFrame();
 		opening.setLocationByPlatform(true);
 		opening.setTitle(Annotator.class.getPackage().getImplementationTitle());
-		opening.setPreferredSize(new Dimension(300, 800));
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -150,22 +150,25 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.default")));
 
 		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.default")));
+		panel.setPreferredSize(new Dimension(width, 100));
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		mainPanel.add(panel);
 
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
 		recentFilesPanel = new JPanel();
+		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
+		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
 		refreshRecents();
 		mainPanel.add(recentFilesPanel);
 
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
 		panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
+		panel.setPreferredSize(new Dimension(width, 200));
 		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
 			IOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
