@@ -95,6 +95,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
+import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -466,6 +467,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(new CopyAction(this)));
 		entityMenu.add(new JMenuItem(deleteAction));
 		// entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
@@ -2059,6 +2061,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public StylePlugin getCurrentStyle() {
 		return currentStyle;
+	}
+
+	public JTextPane getTextPane() {
+		return textPane;
 	}
 
 }
