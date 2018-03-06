@@ -78,6 +78,7 @@ public class Constants {
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
