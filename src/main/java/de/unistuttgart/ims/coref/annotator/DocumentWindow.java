@@ -75,6 +75,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -1805,7 +1806,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				b.append("Unknown author");
 			JMenu subMenu = new JMenu(b.toString());
 			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
-			subMenu.add("\"" + c.getValue() + "\"");
+			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
 			subMenu.add(commentsWindow.commentList.get(c).editAction);
 			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
 			return subMenu;
