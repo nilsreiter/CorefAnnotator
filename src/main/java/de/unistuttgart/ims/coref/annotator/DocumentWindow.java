@@ -100,6 +100,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -421,6 +422,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_KEEP_TREE_SORTED)));
 		menu.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
+		menu.add(new SetAnnotatorNameAction(mainApplication));
 		return menu;
 
 	}
@@ -1745,7 +1747,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					return;
 				textPopupMenu.add(Annotator.getString("menu.entities"));
 				for (Annotation anno : mentions) {
-					StringBuilder b = new StringBuilder();
+			StringBuilder b = new StringBuilder();
 					b.append(anno.getAddress());
 					Mention m = null;
 					DetachedMentionPart dmp = null;
@@ -1755,22 +1757,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					} else if (anno instanceof DetachedMentionPart) {
 						dmp = (DetachedMentionPart) anno;
 						m = dmp.getMention();
-					}
-					String surf = m.getCoveredText();
-					if (dmp != null)
-						surf += " [,] " + dmp.getCoveredText();
-					if (m.getEntity().getLabel() != null)
-						b.append(": ").append(m.getEntity().getLabel());
+		}
+			String surf = m.getCoveredText();
+			if (dmp != null)
+				surf += " [,] " + dmp.getCoveredText();
+			if (m.getEntity().getLabel() != null)
+				b.append(": ").append(m.getEntity().getLabel());
 
-					JMenu mentionMenu = new JMenu(b.toString());
-					mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
-					Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-					mentionMenu.add('"' + surf + '"');
-					mentionMenu.add(a);
-					mentionMenu.add(new DeleteMentionAction(m));
+			JMenu mentionMenu = new JMenu(b.toString());
+			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
+			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+			mentionMenu.add('"' + surf + '"');
+			mentionMenu.add(a);
+			mentionMenu.add(new DeleteMentionAction(m));
 
 					textPopupMenu.add(mentionMenu);
-				}
+		}
 				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 
 			}
@@ -1894,7 +1896,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					com.setAnnotation(tgt);
 					com.addToIndexes();
 					highlightManager.draw(tgt, Color.YELLOW, false, true);
-				}
+		}
 				/*
 				 * else if (e.getSource() instanceof Component) { } Component
 				 * comp = (Component) e.getSource(); TreePath tp =
@@ -1910,7 +1912,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				 */
 			}
 
-		}
+	}
 
 	}
 
