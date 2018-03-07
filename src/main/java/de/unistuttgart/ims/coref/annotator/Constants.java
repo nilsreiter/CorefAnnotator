@@ -104,6 +104,7 @@ public class Constants {
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
 		public static final String ACTION_SEARCH = "action.search";
+		public static final String ACTION_SET_ANNOTATOR_NAME = "action.set_annotator_name";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
 		public static final String ACTION_SET_DOCUMENT_LANGUAGE = "action.set_document_language";
@@ -129,6 +130,7 @@ public class Constants {
 		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE = "dialog.change_key.invalid_string.message";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
