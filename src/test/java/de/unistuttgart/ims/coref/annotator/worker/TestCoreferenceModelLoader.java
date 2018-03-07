@@ -54,6 +54,9 @@ public class TestCoreferenceModelLoader {
 	public void testLoading() throws UIMAException, SAXException, IOException {
 		testResource("/rjmw.0.xmi");
 		testResource("/Text_1804.xmi");
+		testResource("/DieLeidenDesJungenWerther.xmi");
+		testResource("/Annika+Bearbeitung+4.xmi");
+		testResource("/Rowlandson_Tanja.xmi");
 	}
 
 	public void testResource(String s) throws UIMAException, SAXException, IOException {
