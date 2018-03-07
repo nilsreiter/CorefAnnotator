@@ -552,6 +552,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
+			setIndeterminateProgress();
 			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
 					language);
 			lai.execute();
@@ -784,10 +785,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setModel(cModel);
 
 		// UI
-		progressBar.setValue(100);
+		this.stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
-		progressBar.setVisible(false);
 
 		// Style
 		Meta meta = Util.getMeta(jcas);
