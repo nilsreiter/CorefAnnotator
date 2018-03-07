@@ -109,17 +109,17 @@ public class CoreferenceModel extends DefaultTreeModel {
 		public void remove(Comment c) {
 			int index = comments.indexOf(c);
 			comments.remove(index);
-			fireIntervalRemoved(this, index, index);
-			commentMap.remove(c);
 			if (c instanceof AnnotationComment) {
+				commentMap.remove(((AnnotationComment) c).getAnnotation());
 				characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
 				fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
 			}
+			fireIntervalRemoved(this, index, index);
 		}
 
 		public void update(Comment c) {
 			int index = comments.indexOf(c);
-			this.fireContentsChanged(this, index, index);
+			fireContentsChanged(this, index, index);
 		}
 	}
 
