@@ -548,14 +548,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public synchronized void saveCurrentFile() {
 		if (file != null)
-			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin());
+			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin(), false);
 	}
 
-	public synchronized void saveToFile(File f, IOPlugin plugin) {
+	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
 		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
-		progressBar.setValue(0);
+
+		if (f.exists() && ask) {
+			int answer = JOptionPane.showConfirmDialog(this,
+					Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
+			if (answer != JOptionPane.YES_OPTION) {
+				setMessage("");
+				return;
+			}
+		}
 		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
 
 		new SwingWorker<Object, Object>() {
 
@@ -567,7 +576,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected void done() {
-				progressBar.setValue(100);
 				progressBar.setVisible(false);
 				setMessage("");
 				file = f;
@@ -1416,7 +1424,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
 				File f = saveDialog.getSelectedFile();
-				saveToFile(f, plugin);
+				saveToFile(f, plugin, true);
 				break;
 			default:
 			}
@@ -1451,7 +1459,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (!f.getName().endsWith(".xmi")) {
 					f = new File(f.getAbsolutePath() + ".xmi");
 				}
-				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin());
+				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin(), true);
 				mainApplication.recentFiles.add(0, f);
 				mainApplication.refreshRecents();
 				break;
