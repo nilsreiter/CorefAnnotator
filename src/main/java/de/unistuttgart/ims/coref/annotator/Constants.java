@@ -78,10 +78,15 @@ public class Constants {
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String ACTION_COMMENT_DELETE = "action.comment.delete";
+		public static final String ACTION_COMMENT_DELETE_TOOLTIP = "action.comment.delete.tooltip";
+		public static final String ACTION_COMMENT_SAVE = "action.comment.save";
+		public static final String ACTION_COMMENT_SAVE_TOOLTIP = "action.comment.save.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
-		public static final Object ACTION_EDIT_COMMENT = "action.edit.comment";
+		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
+		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
 		public static final String ACTION_FLAG_ENTITY_GENERIC_TOOLTIP = "action.flag_entity_generic.tooltip";
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
