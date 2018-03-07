@@ -5,11 +5,13 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 public class Constants {
 	public static class Setting<T> {
+
 		public T defaultValue;
 		public Ikon[] ikon;
 		public String preferencesKey;
 		public String toggleActionStringKey;
 		public String toggleActionTooltipKey;
+
 		public Setting(String preferencesKey, String toggleActionKey, String toggleActionTooltipKey, T defaultValue,
 				Ikon... ikon) {
 			this.preferencesKey = preferencesKey;
@@ -18,21 +20,18 @@ public class Constants {
 			this.toggleActionTooltipKey = toggleActionTooltipKey;
 			this.ikon = ikon;
 		}
-	public static final String CFG_FULL_TOKENS = "full_tokens";
-	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
-	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
-	public static final String CFG_ANNOTATOR_ID = "ANNOTATOR_ID";
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
+
 		public Setting(String preferencesKey, String toggleActionKey, T defaultValue, Ikon... ikon) {
 			this.preferencesKey = preferencesKey;
 			this.toggleActionStringKey = toggleActionKey;
 			this.defaultValue = defaultValue;
 			this.ikon = ikon;
 		}
+
 		public T getDefaultValue() {
 			return defaultValue;
 		}
+
 		public Ikon[] getIkon() {
 			return ikon;
 		}
@@ -143,22 +142,25 @@ public class Constants {
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
 		public static final String MENU_EDIT = "menu.edit";
+		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
-	static class Strings {
-		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
+		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
+		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
-		public static final String MENU_VIEW = "menu.view";
+		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
 		public static final String MENU_HELP = "menu.help";
 		public static final String MENU_SETTINGS = "menu.settings";
+		public static final String MENU_TOOLS = "menu.tools";
 		public static final String MENU_VIEW = "menu.view";
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
-		public static final String STATUS_STYLE = "status.style";
-		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
-		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String MENU_VIEW_STYLE = "menu.view.style";
+		public static final String MESSAGE_CREATES_ENTITY = "message.creates_entity";
+		public static final String MESSAGE_CREATES_MENTION = "message.creates_mention";
+		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
 		public static final String MESSAGE_ENTITY_CREATED = "message.entity_created";
 		public static final String MESSAGE_LOADING = "message.loading";
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
-		public static final String MESSAGE_SAVING = "message.saving";
+		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
@@ -168,7 +170,8 @@ public class Constants {
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String ACTION_FLAG_MENTION_DIFFICULT = "action.flag_mention_difficult";
+
+	}
 
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
@@ -211,12 +214,4 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
-		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
-		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
-		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
-		public static final String ACTION_COMMENT = "action.comment";
-		public static final String MENU_COMMENTS = "menu.comments";
-		public static final String MENU_ENTITIES = "menu.entities";
-
-	}
 }
