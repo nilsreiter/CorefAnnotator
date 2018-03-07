@@ -222,6 +222,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(this.mergeSelectedEntitiesAction);
+		treePopupMenu.add(this.formGroupAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
 
@@ -1422,7 +1423,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			for (Entity e : JCasUtil.select(jcas, Entity.class))
 				cModel.remove(e);
 			registerChange();
-	}
+		}
 
 	}
 
@@ -2073,6 +2074,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public JTextPane getTextPane() {
 		return textPane;
-}
+	}
 
 }
