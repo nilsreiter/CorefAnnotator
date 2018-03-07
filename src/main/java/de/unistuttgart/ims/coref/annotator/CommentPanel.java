@@ -15,8 +15,8 @@ import javax.swing.border.TitledBorder;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel.CommentsModel;
+import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
-import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 
@@ -28,13 +28,13 @@ public class CommentPanel extends JPanel {
 	private static final Color TEXT_FOREGROUND_ENABLED = Color.BLACK;
 	private static final Color TEXT_FOREGROUND_DISABLED = Color.GRAY;
 
-	public class SaveCommentAction extends IkonAction {
+	public class SaveCommentAction extends AnnotatorAction {
 		CommentsModel model;
 		private static final long serialVersionUID = 1L;
 
 		public SaveCommentAction(CommentsModel model) {
-			super(MaterialDesign.MDI_CHECKBOX_MARKED);
-			putValue(Action.NAME, "save");
+			super(null, Constants.Strings.ACTION_COMMENT_SAVE, MaterialDesign.MDI_CHECKBOX_MARKED);
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMMENT_SAVE_TOOLTIP));
 			this.model = model;
 		}
 
@@ -55,13 +55,13 @@ public class CommentPanel extends JPanel {
 
 	}
 
-	public class EditCommentAction extends IkonAction {
+	public class EditCommentAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public EditCommentAction() {
-			super(MaterialDesign.MDI_MESSAGE_DRAW);
-			putValue(Action.NAME, "edit");
+			super(null, Constants.Strings.ACTION_EDIT_COMMENT, MaterialDesign.MDI_MESSAGE_DRAW);
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_EDIT_COMMENT_TOOLTIP));
 		}
 
 		@Override
