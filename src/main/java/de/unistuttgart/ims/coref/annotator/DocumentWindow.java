@@ -554,7 +554,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
 		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
-		progressBar.setValue(0);
+
 		if (f.exists() && ask) {
 			int answer = JOptionPane.showConfirmDialog(this,
 					Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
@@ -564,6 +564,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			}
 		}
 		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
 
 		new SwingWorker<Object, Object>() {
 
@@ -575,7 +576,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected void done() {
-				progressBar.setValue(100);
 				progressBar.setVisible(false);
 				setMessage("");
 				file = f;
