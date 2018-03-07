@@ -11,22 +11,22 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 
-public class PanelList<T> extends JPanel implements ListDataListener {
+public class PanelList<T, U extends JPanel> extends JPanel implements ListDataListener {
 
 	private static final long serialVersionUID = 1L;
 
 	ListModel<T> model;
 	int selection;
-	PanelFactory<T> factory;
-	MutableMap<T, JPanel> panelMap = Maps.mutable.empty();
+	PanelFactory<T, U> factory;
+	MutableMap<T, U> panelMap = Maps.mutable.empty();
 
-	public PanelList(PanelFactory<T> pFactory) {
+	public PanelList(PanelFactory<T, U> pFactory) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.factory = pFactory;
 		// this.setPreferredSize(new Dimension(200, 300));
 	}
 
-	public JPanel getPanel(T obj) {
+	public U getPanel(T obj) {
 		if (!panelMap.containsKey(obj)) {
 			panelMap.put(obj, factory.getPanel(obj));
 		}
@@ -78,4 +78,9 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 		}
 		contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, model.getSize()));
 	}
+
+	public U get(T c) {
+		return panelMap.get(c);
+	}
+
 }

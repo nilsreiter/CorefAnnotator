@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
@@ -23,7 +22,7 @@ public class CommentWindow extends JDialog {
 	CoreferenceModel.CommentsModel commentsListModel;
 
 	// Components
-	PanelList<Comment> commentList;
+	PanelList<Comment, CommentPanel> commentList;
 
 	public CommentWindow(DocumentWindow mainWindow, CoreferenceModel documentModel) {
 		this.mainWindow = mainWindow;
@@ -49,10 +48,10 @@ public class CommentWindow extends JDialog {
 	}
 
 	protected void initialiseWindow() {
-		commentList = new PanelList<Comment>(new PanelFactory<Comment>() {
+		commentList = new PanelList<Comment, CommentPanel>(new PanelFactory<Comment, CommentPanel>() {
 			@Override
-			public JPanel getPanel(Comment object) {
-				return new CommentPanel(commentsListModel, object);
+			public CommentPanel getPanel(Comment object) {
+				return new CommentPanel(CommentWindow.this, commentsListModel, object);
 			}
 		});
 		commentList.setModel(commentsListModel);
@@ -68,7 +67,7 @@ public class CommentWindow extends JDialog {
 	public void enterNewComment(int begin, int end) {
 		Comment c = commentsListModel.add("", mainWindow.getMainApplication().getPreferences()
 				.get(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID), begin, end);
-		((CommentPanel) commentList.getPanel(c)).fireEditAction();
+		commentList.getPanel(c).fireEditAction();
 	}
 
 }

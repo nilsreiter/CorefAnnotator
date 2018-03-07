@@ -42,7 +42,7 @@ public class CommentPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 
 			@SuppressWarnings("unchecked")
-			PanelList<Comment> parent = (PanelList<Comment>) CommentPanel.this.getParent();
+			PanelList<Comment, CommentPanel> parent = (PanelList<Comment, CommentPanel>) CommentPanel.this.getParent();
 			parent.setSelection(null);
 
 			comment.setValue(textArea.getText());
@@ -72,7 +72,7 @@ public class CommentPanel extends JPanel {
 			editAction.setEnabled(false);
 
 			@SuppressWarnings("unchecked")
-			PanelList<Comment> parent = (PanelList<Comment>) CommentPanel.this.getParent();
+			PanelList<Comment, CommentPanel> parent = (PanelList<Comment, CommentPanel>) CommentPanel.this.getParent();
 			parent.setSelection(comment);
 
 			textArea.grabFocus();
