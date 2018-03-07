@@ -97,6 +97,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -637,13 +638,12 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class ViewShowCommentsAction extends IkonAction {
+	class ViewShowCommentsAction extends DocumentWindowAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ViewShowCommentsAction() {
-			super(MaterialDesign.MDI_MESSAGE);
-			putValue(Action.NAME, Constants.Strings.ACTION_SHOW_COMMENTS);
+			super(DocumentWindow.this, Constants.Strings.ACTION_SHOW_COMMENTS, MaterialDesign.MDI_MESSAGE);
 		}
 
 		@Override
