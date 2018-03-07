@@ -214,4 +214,6 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
+
+	public static final String CFG_ANNOTATOR_ID = "ANNOTATOR_ID";
 }
