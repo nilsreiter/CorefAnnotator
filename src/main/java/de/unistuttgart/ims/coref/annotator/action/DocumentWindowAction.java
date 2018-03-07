@@ -15,6 +15,11 @@ public abstract class DocumentWindowAction extends AnnotatorAction {
 		this.documentWindow = dw;
 	}
 
+	public DocumentWindowAction(DocumentWindow dw, String stringKey, boolean isKey, Ikon... ikon) {
+		super(dw.getMainApplication(), stringKey, isKey, ikon);
+		this.documentWindow = dw;
+	}
+
 	public DocumentWindowAction(DocumentWindow dw, Ikon ikon) {
 		super(dw.getMainApplication(), ikon);
 		this.documentWindow = dw;

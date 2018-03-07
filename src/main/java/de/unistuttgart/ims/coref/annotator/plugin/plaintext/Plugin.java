@@ -74,4 +74,8 @@ public class Plugin implements IOPlugin {
 		return ".txt";
 	}
 
+	@Override
+	public String[] getSupportedLanguages() {
+		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
 }

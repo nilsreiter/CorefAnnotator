@@ -10,6 +10,7 @@ import javax.swing.SwingWorker;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.JCasIterator;
@@ -23,6 +24,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
+import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
@@ -31,21 +33,24 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
+	String language = null;
 
 	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
-			TypeSystemDescription typeSystemDescription, IOPlugin flavor) {
+			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
 		this.inputStream = inputStream;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
+		this.language = language;
 	}
 
 	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
-			IOPlugin flavor) {
+			IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
 		this.file = file;
+		this.language = language;
 	}
 
 	private JCas readStream() {
@@ -53,6 +58,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 		try {
 			jcas = JCasFactory.createJCas(typeSystemDescription);
+			jcas.setDocumentText(language);
 		} catch (UIMAException e1) {
 			Annotator.logger.catching(e1);
 			return null;
@@ -83,7 +89,13 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 	private JCas readFile() throws ResourceInitializationException {
 		JCasIterator iter;
-		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), flavor.getImporter()).iterator();
+		AggregateBuilder b = new AggregateBuilder();
+		if (getLanguage() != null)
+			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
+					getLanguage()));
+		b.add(flavor.getImporter());
+
+		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), b.createAggregateDescription()).iterator();
 		if (iter.hasNext()) {
 			return iter.next();
 		}
@@ -108,6 +120,14 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 }

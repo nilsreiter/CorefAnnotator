@@ -2,10 +2,14 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -13,6 +17,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -33,6 +39,8 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -44,12 +52,14 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
+import de.unistuttgart.ims.coref.annotator.comp.XFileChooser;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -67,13 +77,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	PluginManager pluginManager = new PluginManager();
 
-	JFileChooser openDialog;
+	XFileChooser openDialog;
 
 	JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
 	LogWindow logWindow = null;
+	UpdateCheck updateCheck = new UpdateCheck();
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
 
@@ -125,9 +136,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
+		openDialog = new XFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(FileFilters.xmi);
+
 		opening = getOpeningDialog();
 	}
 
@@ -136,11 +148,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected JFrame getOpeningDialog() {
-
+		int width = 300;
 		JFrame opening = new JFrame();
 		opening.setLocationByPlatform(true);
 		opening.setTitle(Annotator.class.getPackage().getImplementationTitle());
-		opening.setPreferredSize(new Dimension(300, 400));
 		opening.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -151,22 +162,27 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.default")));
 
 		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.default")));
+		panel.setPreferredSize(new Dimension(width, 100));
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		mainPanel.add(panel);
 
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.recent")));
+		mainPanel.add(Box.createVerticalStrut(10));
 		recentFilesPanel = new JPanel();
+		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
+		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
 		refreshRecents();
 		mainPanel.add(recentFilesPanel);
+		mainPanel.add(Box.createVerticalStrut(10));
 
-		mainPanel.add(new JLabel(Annotator.getString("dialog.splash.import")));
 		panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
+		panel.setPreferredSize(new Dimension(width, 200));
 		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
 			IOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
@@ -184,11 +200,36 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		for (Component c : mainPanel.getComponents())
 			((JComponent) c).setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
-				+ Annotator.class.getPackage().getImplementationVersion());
+		JLabel versionLabel = new JLabel(Version.get().toString());
 
 		statusBar = new JPanel();
-		statusBar.add(versionLabel);
+
+		try {
+			if (updateCheck.checkForUpdate()) {
+				JButton button = new JButton();
+				button.setText(Annotator.getString(Constants.Strings.STATUS_NOW_AVAILABLE) + ": "
+						+ updateCheck.getRemoteVersion().toString());
+				button.setIcon(FontIcon.of(MaterialDesign.MDI_NEW_BOX));
+				button.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							Desktop.getDesktop().browse(updateCheck.getReleasePage());
+						} catch (IOException e1) {
+							logger.catching(e1);
+						}
+					}
+
+				});
+				statusBar.add(button);
+			} else {
+				statusBar.add(versionLabel);
+			}
+		} catch (IOException e1) {
+			logger.catching(e1);
+			statusBar.add(versionLabel);
+		}
 
 		opening.getContentPane().add(mainPanel, BorderLayout.CENTER);
 		opening.getContentPane().add(statusBar, BorderLayout.SOUTH);
@@ -200,14 +241,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor) {
+	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				DocumentWindow v = new DocumentWindow(Annotator.this);
-				v.loadFile(file, flavor);
+				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
 					recentFiles.add(0, file);
@@ -230,7 +271,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void openFiles(OpenFilesEvent e) {
 		for (Object file : e.getFiles()) {
 			if (file instanceof File) {
-				open((File) file, new DefaultIOPlugin());
+				open((File) file, new DefaultIOPlugin(), null);
 			}
 		}
 	}
@@ -267,11 +308,15 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		openDialog.setFileFilter(flavor.getFileFilter());
+		if (flavor.getSupportedLanguages() == null)
+			openDialog.setLanguages();
+		else
+			openDialog.setLanguages(flavor.getSupportedLanguages());
 		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
-				open(f, flavor);
+				open(f, flavor, Util.getLanguage(openDialog.getSelectedLanguage()));
 			}
 			break;
 		default:
@@ -280,7 +325,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public static String getString(String key) {
-		return getString(key, Locale.getDefault());
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			logger.catching(e);
+			return key;
+		}
 	}
 
 	public static String getString(String key, Locale locale) {

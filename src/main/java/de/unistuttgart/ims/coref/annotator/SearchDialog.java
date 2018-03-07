@@ -44,7 +44,7 @@ import javax.swing.text.Highlighter;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
@@ -67,12 +67,12 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class AnnotateSelectedFindings extends IkonAction {
+	class AnnotateSelectedFindings extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
+			super(null, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			this.addIkon(MaterialDesign.MDI_ACCOUNT);
@@ -88,11 +88,11 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class AnnotateSelectedFindingsAsNewEntity extends IkonAction {
+	class AnnotateSelectedFindingsAsNewEntity extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindingsAsNewEntity() {
-			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
+			super(null, Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
 		}
@@ -112,12 +112,12 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class RunSearch extends IkonAction {
+	class RunSearch extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public RunSearch() {
-			super(Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
+			super(null, Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 			setEnabled(false);
 		}
 
@@ -143,6 +143,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	int contexts = Defaults.CFG_SEARCH_RESULTS_CONTEXT;
 	Set<Object> highlights = new HashSet<Object>();
 	TSL tsl = null;
+	int limit = 1000;
 
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
@@ -261,13 +262,15 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 			Pattern p = Pattern.compile(s);
 			Matcher m = p.matcher(text);
-			while (m.find()) {
+			int finding = 0;
+			while (m.find() && finding < limit) {
 				try {
 					lm.addElement(new SearchResult(m.start(), m.end()));
 					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
+				finding++;
 			}
 			list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
@@ -398,7 +401,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			if (e.getValueIsAdjusting()) {
+			if (!e.getValueIsAdjusting()) {
 				if (list.getSelectedIndices().length == 1) {
 					SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
 					documentWindow.textPane.setCaretPosition(result.getEnd());

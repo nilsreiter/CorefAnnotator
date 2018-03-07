@@ -22,11 +22,19 @@ public class ImportDKpro extends JCasAnnotator_ImplBase {
 			e.addToIndexes();
 			e.setColor(cp.getNextColor().getRGB());
 			CoreferenceLink link = cc.getFirst();
+			int maxLength = 0;
+			String maxLabel = null;
 			while (link != null) {
 				Mention m = AnnotationFactory.createAnnotation(jcas, link.getBegin(), link.getEnd(), Mention.class);
 				m.setEntity(e);
+				if (link.getCoveredText().length() > maxLength) {
+					maxLabel = link.getCoveredText();
+					maxLength = maxLabel.length();
+				}
 				link = link.getNext();
 			}
+			if (maxLabel != null)
+				e.setLabel(maxLabel);
 		}
 
 	}

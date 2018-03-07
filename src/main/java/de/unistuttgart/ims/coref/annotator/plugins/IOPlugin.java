@@ -23,4 +23,6 @@ public interface IOPlugin extends Plugin {
 	FileFilter getFileFilter();
 
 	String getSuffix();
+
+	String[] getSupportedLanguages();
 }
