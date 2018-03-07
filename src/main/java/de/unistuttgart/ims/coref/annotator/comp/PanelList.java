@@ -41,19 +41,23 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 			add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
 		}
 		revalidate();
+		repaint();
 	}
 
 	@Override
 	public void intervalRemoved(ListDataEvent e) {
 		Annotator.logger.debug("intervalRemoved {}", e);
-		for (int i = e.getIndex0(); i <= e.getIndex1(); i++)
+		for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
+			Annotator.logger.debug("removing {}", i);
 			this.remove(i);
+		}
+		repaint();
 		revalidate();
 	}
 
 	@Override
 	public void contentsChanged(ListDataEvent e) {
-		revalidate();
+		repaint();
 	}
 
 	public ListModel<T> getModel() {
