@@ -127,6 +127,7 @@ public class Constants {
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
 		public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
 		public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
+		public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
