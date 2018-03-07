@@ -60,7 +60,7 @@ public class CommentWindow extends JDialog {
 		getContentPane().add(new JScrollPane(commentList), BorderLayout.CENTER);
 
 		setTitle("Comments");
-		getContentPane().setPreferredSize(new Dimension(210, mainWindow.getHeight() - 20));
+		getContentPane().setPreferredSize(new Dimension(250, mainWindow.getHeight() - 20));
 		pack();
 		setLocation(new Point(mainWindow.getX() + mainWindow.getWidth(), mainWindow.getY()));
 	}

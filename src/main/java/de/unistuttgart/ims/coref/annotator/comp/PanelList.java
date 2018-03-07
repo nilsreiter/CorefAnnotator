@@ -1,7 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
-import java.awt.Dimension;
-
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
@@ -25,7 +23,7 @@ public class PanelList<T> extends JPanel implements ListDataListener {
 	public PanelList(PanelFactory<T> pFactory) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.factory = pFactory;
-		this.setPreferredSize(new Dimension(200, 300));
+		// this.setPreferredSize(new Dimension(200, 300));
 	}
 
 	public JPanel getPanel(T obj) {

@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SpringLayout;
@@ -106,15 +107,16 @@ public class CommentPanel extends JPanel {
 		textArea.setOpaque(true);
 		textArea.setRows(3);
 		textArea.setEditable(false);
+		textArea.setColumns(19);
 
 		JToolBar toolbar = new JToolBar();
 		toolbar.setOrientation(JToolBar.HORIZONTAL);
 		toolbar.setFloatable(false);
-		toolbar.add(deleteAction).setHideActionText(false);
-		toolbar.add(editAction).setHideActionText(false);
-		toolbar.add(saveAction).setHideActionText(false);
+		toolbar.add(deleteAction).setHideActionText(true);
+		toolbar.add(editAction).setHideActionText(true);
+		toolbar.add(saveAction).setHideActionText(true);
 
-		add(textArea);
+		add(new JScrollPane(textArea));
 		add(toolbar);
 
 		springs.putConstraint(SpringLayout.WEST, textArea, 10, SpringLayout.WEST, this);
@@ -122,11 +124,11 @@ public class CommentPanel extends JPanel {
 		springs.putConstraint(SpringLayout.NORTH, textArea, 10, SpringLayout.NORTH, this);
 
 		springs.putConstraint(SpringLayout.SOUTH, toolbar, -10, SpringLayout.SOUTH, this);
-		springs.putConstraint(SpringLayout.NORTH, toolbar, -10, SpringLayout.SOUTH, textArea);
+		springs.putConstraint(SpringLayout.SOUTH, textArea, 20, SpringLayout.NORTH, toolbar);
 		springs.putConstraint(SpringLayout.WEST, toolbar, 10, SpringLayout.WEST, this);
 
-		setMinimumSize(new Dimension(200, 130));
-		setMaximumSize(new Dimension(500, 130));
+		setMinimumSize(new Dimension(250, 120));
+		setMaximumSize(new Dimension(250, 120));
 		setBorder(new TitledBorder(comment.getAuthor()));
 	}
 
