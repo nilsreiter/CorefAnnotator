@@ -35,7 +35,8 @@ public abstract class AbstractXmiPlugin implements IOPlugin {
 		b.add(AnalysisEngineFactory.createEngineDescription(SetDocumentId.class, SetDocumentId.PARAM_DOCUMENT_ID,
 				f.getName().replaceAll(getSuffix(), "")));
 		b.add(AnalysisEngineFactory.createEngineDescription(XmiWriter.class, XmiWriter.PARAM_TARGET_LOCATION,
-				f.getParentFile().getAbsolutePath(), XmiWriter.PARAM_USE_DOCUMENT_ID, true));
+				f.getParentFile().getAbsolutePath(), XmiWriter.PARAM_USE_DOCUMENT_ID, true, XmiWriter.PARAM_OVERWRITE,
+				true));
 		return b.createAggregateDescription();
 	}
 
