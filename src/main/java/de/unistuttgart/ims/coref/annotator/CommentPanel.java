@@ -40,6 +40,7 @@ public class CommentPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			commentWindow.setVisible(true);
 
 			@SuppressWarnings("unchecked")
 			PanelList<Comment, CommentPanel> parent = (PanelList<Comment, CommentPanel>) CommentPanel.this.getParent();
@@ -66,6 +67,7 @@ public class CommentPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			commentWindow.setVisible(true);
 			textArea.setEditable(true);
 			saveAction.setEnabled(true);
 			deleteAction.setEnabled(false);
@@ -83,11 +85,12 @@ public class CommentPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	Comment comment;
+	CommentWindow commentWindow;
 	JTextArea textArea;
 	Action deleteAction, editAction, saveAction;
 
-	public CommentPanel(CommentsModel model, Comment c) {
-
+	public CommentPanel(CommentWindow window, CommentsModel model, Comment c) {
+		commentWindow = window;
 		deleteAction = new DeleteCommentAction(model, c);
 		editAction = new EditCommentAction();
 		saveAction = new SaveCommentAction(model);
