@@ -17,6 +17,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
+import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
+import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 
@@ -82,18 +84,36 @@ public class CommentPanel extends JPanel {
 		}
 	}
 
+	public class RevealCommentLocationAction extends DocumentWindowAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public RevealCommentLocationAction(DocumentWindow dw) {
+			super(dw, Constants.Strings.ACTION_COMMENT_REVEAL_LOCATION, MaterialDesign.MDI_CROSSHAIRS_GPS);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (comment instanceof AnnotationComment) {
+				documentWindow.annotationSelected(((AnnotationComment) comment).getAnnotation());
+			}
+		}
+
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	Comment comment;
 	CommentWindow commentWindow;
 	JTextArea textArea;
-	Action deleteAction, editAction, saveAction;
+	Action deleteAction, editAction, saveAction, revealAction;
 
 	public CommentPanel(CommentWindow window, CommentsModel model, Comment c) {
 		commentWindow = window;
 		deleteAction = new DeleteCommentAction(model, c);
 		editAction = new EditCommentAction();
 		saveAction = new SaveCommentAction(model);
+		revealAction = new RevealCommentLocationAction(commentWindow.mainWindow);
 		saveAction.setEnabled(false);
 
 		comment = c;
@@ -118,6 +138,7 @@ public class CommentPanel extends JPanel {
 		toolbar.add(deleteAction).setHideActionText(true);
 		toolbar.add(editAction).setHideActionText(true);
 		toolbar.add(saveAction).setHideActionText(true);
+		toolbar.add(revealAction);
 
 		add(new JScrollPane(textArea));
 		add(toolbar);

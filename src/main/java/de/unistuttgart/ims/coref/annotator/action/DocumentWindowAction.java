@@ -8,7 +8,7 @@ public abstract class DocumentWindowAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
-	DocumentWindow documentWindow;
+	protected DocumentWindow documentWindow;
 
 	public DocumentWindowAction(DocumentWindow dw, String stringKey, Ikon... ikon) {
 		super(dw.getMainApplication(), stringKey, ikon);
