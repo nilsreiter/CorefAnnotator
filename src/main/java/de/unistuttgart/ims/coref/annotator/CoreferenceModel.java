@@ -402,6 +402,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	public CATreeNode get(Entity e) {
+		if (!fsMap.containsKey(e)) {
+			return add(e);
+		}
 		return fsMap.get(e);
 	}
 

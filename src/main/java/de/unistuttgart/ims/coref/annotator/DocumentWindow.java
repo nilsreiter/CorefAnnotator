@@ -560,6 +560,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
+			setIndeterminateProgress();
 			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
 					language);
 			lai.execute();
@@ -808,10 +809,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setModel(cModel);
 
 		// UI
-		progressBar.setValue(100);
+		this.stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
-		progressBar.setVisible(false);
 
 		// Style
 		Meta meta = Util.getMeta(jcas);
@@ -1239,7 +1239,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
-				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_GROUP)));
+				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
 				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC), FontIcon.of(MaterialDesign.MDI_CLOUD));
@@ -1506,7 +1506,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_GROUP);
+			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

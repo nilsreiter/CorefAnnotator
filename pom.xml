@@ -193,8 +193,7 @@
 			<artifactId>
 				de.tudarmstadt.ukp.dkpro.core.api.coref-asl
 			</artifactId>
-			<version>${version.dkpro}</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
 			<artifactId>
@@ -320,6 +319,17 @@
 			<groupId>de.unistuttgart.ims</groupId>
 			<artifactId>uimautil</artifactId>
 			<version>0.7.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.1</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
