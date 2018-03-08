@@ -910,8 +910,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-			tree.expandPath(e.getTreePath());
+		tree.expandPath(e.getTreePath().getParentPath());
+
+		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+		// tree.expandPath(e.getTreePath());
 		try {
 			tree.repaint(tree.getPathBounds(e.getTreePath()));
 		} catch (NullPointerException ex) {
