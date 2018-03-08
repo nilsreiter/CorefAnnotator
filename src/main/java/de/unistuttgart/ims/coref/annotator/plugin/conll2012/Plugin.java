@@ -12,12 +12,12 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Reader;
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 
 public class Plugin implements IOPlugin {
@@ -64,11 +64,8 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return CollectionReaderFactory.createReaderDescription(Conll2012Reader.class,
-				Conll2012Reader.PARAM_SOURCE_LOCATION, f.getAbsolutePath(), Conll2012Reader.PARAM_READ_CONSTITUENT,
-				false, Conll2012Reader.PARAM_READ_NAMED_ENTITY, false, Conll2012Reader.PARAM_READ_WORD_SENSE, false,
-				Conll2012Reader.PARAM_READ_POS, false, Conll2012Reader.PARAM_READ_SEMANTIC_PREDICATE, false,
-				Conll2012Reader.PARAM_READ_LEMMA, false);
+		return CollectionReaderFactory.createReaderDescription(CoNLL2012Reader.class,
+				CoNLL2012Reader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
 	}
 
 	@Override
@@ -96,6 +93,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getSuffix() {
 		return ".conll";
+	}
+
+	@Override
+	public String[] getSupportedLanguages() {
+		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
 
 }

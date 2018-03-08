@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
 
@@ -11,6 +12,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -26,28 +28,35 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		this.jcas = jcas;
 	}
 
-	@Override
-	protected CoreferenceModel doInBackground() throws Exception {
+	protected CoreferenceModel load(CoreferenceModelListener listener, Preferences preferences) {
+		Annotator.logger.debug("Starting loading of coreference model");
+
 		CoreferenceModel cModel;
-		cModel = new CoreferenceModel(jcas, documentWindow.getMainApplication().getPreferences());
-		cModel.addCoreferenceModelListener(documentWindow);
+		cModel = new CoreferenceModel(jcas, preferences);
+		cModel.addCoreferenceModelListener(listener);
 
 		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
 			cModel.add(e);
 		});
+		Annotator.logger.debug("Added all entities");
 
-		publish(60);
 		for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
 			for (int i = 0; i < eg.getMembers().size(); i++)
 				cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
+		Annotator.logger.debug("Added all entity groups");
 
-		publish(70);
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
 			cModel.registerAnnotation(m);
 		}
-		publish(75);
+		Annotator.logger.debug("Added all mentions");
+
 		return cModel;
+	}
+
+	@Override
+	protected CoreferenceModel doInBackground() throws Exception {
+		return load(documentWindow, documentWindow.getMainApplication().getPreferences());
 	}
 
 	@Override

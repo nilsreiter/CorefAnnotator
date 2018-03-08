@@ -52,4 +52,9 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 		return FileFilters.xmi;
 	}
 
+	@Override
+	public String[] getSupportedLanguages() {
+		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
+
 }

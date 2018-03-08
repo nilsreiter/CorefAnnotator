@@ -47,7 +47,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -77,6 +76,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -88,6 +88,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -96,11 +97,15 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
+import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -108,8 +113,8 @@ import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -141,7 +146,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
-	// AbstractAction commentAction = new CommentAction(null);
+	AbstractAction commentAction = new CommentAction(null);
 	AbstractAction newEntityAction;
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
@@ -174,6 +179,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+
+	// Sub windows
+	CommentWindow commentsWindow;
 
 	Thread messageVoider;
 
@@ -225,6 +233,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		treePopupMenu.add(this.changeColorAction);
 		treePopupMenu.add(this.changeKeyAction);
 		treePopupMenu.add(this.mergeSelectedEntitiesAction);
+		treePopupMenu.add(this.formGroupAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
 
@@ -293,8 +302,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		messageLabel.setSize(new Dimension(1, 20));
 		statusBar.add(messageLabel);
 
-		JLabel versionLabel = new JLabel(Annotator.class.getPackage().getImplementationTitle() + " "
-				+ Annotator.class.getPackage().getImplementationVersion());
+		JLabel versionLabel = new JLabel(
+				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
@@ -407,6 +416,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		}
 		viewMenu.add(viewStyleMenu);
+		viewMenu.add(new ViewShowCommentsAction());
 		return viewMenu;
 
 	}
@@ -423,6 +433,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_KEEP_TREE_SORTED)));
 		menu.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
+		menu.add(new SetAnnotatorNameAction(mainApplication));
 		return menu;
 
 	}
@@ -432,6 +443,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		toolsMenu.add(showSearchPanelAction);
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
+		toolsMenu.addSeparator();
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -469,8 +481,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(new CopyAction(this)));
 		entityMenu.add(new JMenuItem(deleteAction));
-		// entityMenu.add(new JMenuItem(commentAction));
+		entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
@@ -552,6 +565,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JCasLoader lai;
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
+			setIndeterminateProgress();
 			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
 					language);
 			lai.execute();
@@ -563,14 +577,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public synchronized void saveCurrentFile() {
 		if (file != null)
-			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin());
+			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin(), false);
 	}
 
-	public synchronized void saveToFile(File f, IOPlugin plugin) {
+	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
 		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
-		progressBar.setValue(0);
+
+		if (f.exists() && ask) {
+			int answer = JOptionPane.showConfirmDialog(this,
+					Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
+			if (answer != JOptionPane.YES_OPTION) {
+				setMessage("");
+				return;
+			}
+		}
 		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
 
 		new SwingWorker<Object, Object>() {
 
@@ -582,7 +605,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			protected void done() {
-				progressBar.setValue(100);
 				progressBar.setVisible(false);
 				setMessage("");
 				file = f;
@@ -617,6 +639,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(styleVariant);
+
+		}
+
+	}
+
+	class ViewShowCommentsAction extends DocumentWindowAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewShowCommentsAction() {
+			super(DocumentWindow.this, Constants.Strings.ACTION_SHOW_COMMENTS, MaterialDesign.MDI_MESSAGE);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			commentsWindow.setVisible(true);
 
 		}
 
@@ -680,6 +718,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			cModel.resort();
 		}
 
+	}
+
+	public void setIndeterminateProgress() {
+		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
+	}
+
+	public void stopIndeterminateProgress() {
+		progressBar.setIndeterminate(false);
+		progressBar.setVisible(false);
 	}
 
 	protected void setMessage(String message) {
@@ -766,10 +814,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		tree.setModel(cModel);
 
 		// UI
-		progressBar.setValue(100);
+		this.stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
-		progressBar.setVisible(false);
 
 		// Style
 		Meta meta = Util.getMeta(jcas);
@@ -794,6 +841,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		// final
 		setMessage("");
+
+		commentsWindow = new CommentWindow(this, cModel);
+
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
@@ -810,7 +860,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-
 		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
 		im.execute();
 	}
@@ -866,8 +915,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-			tree.expandPath(e.getTreePath());
+		tree.expandPath(e.getTreePath().getParentPath());
+
+		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+		// tree.expandPath(e.getTreePath());
 		try {
 			tree.repaint(tree.getPathBounds(e.getTreePath()));
 		} catch (NullPointerException ex) {
@@ -903,12 +954,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void annotationAdded(Annotation m) {
-		highlightManager.draw(m);
+		if (m instanceof Mention)
+			highlightManager.underline(m);
+		else if (m instanceof CommentAnchor)
+			highlightManager.highlight(m);
 	}
 
 	@Override
 	public void annotationChanged(Annotation m) {
-		highlightManager.draw(m);
+		highlightManager.underline(m);
 	}
 
 	@Override
@@ -975,10 +1029,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (dataFlavor == PotentialAnnotationTransfer.dataFlavor) {
 				try {
 					@SuppressWarnings("unchecked")
-					ImmutableList<PotentialAnnotation> paList = (ImmutableList<PotentialAnnotation>) info
-							.getTransferable().getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					for (PotentialAnnotation pa : paList)
-						handlePotentialAnnotationTransfer(pa);
+					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
+							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+					for (Span pa : paList)
+						handleSpanTransfer(pa);
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -996,16 +1050,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			return true;
 		}
 
-		protected boolean handlePotentialAnnotationTransfer(PotentialAnnotation potentialAnnotation) {
+		protected boolean handleSpanTransfer(Span potentialAnnotation) {
 
 			if (targetFS == null) {
-				cModel.add(potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.add(potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
-				cModel.addTo((Entity) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.addTo((Entity) targetFS, potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
 			} else if (targetFS instanceof Mention) {
-				cModel.addTo((Mention) targetFS, potentialAnnotation.getBegin(), potentialAnnotation.getEnd());
+				cModel.addTo((Mention) targetFS, potentialAnnotation.begin, potentialAnnotation.end);
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_PART_CREATED), true);
 			}
 			registerChange();
@@ -1192,7 +1246,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
-				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_GROUP)));
+				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
 				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC), FontIcon.of(MaterialDesign.MDI_CLOUD));
@@ -1353,15 +1407,13 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		@Override
-		protected void exportDone(JComponent c, Transferable t, int action) {
-
-		}
-
-		@Override
 		public boolean canImport(TransferHandler.TransferSupport info) {
 
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-
+				JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
+				Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
+				if (mentions.size() > 0)
+					return true;
 			}
 			return false;
 		}
@@ -1372,11 +1424,24 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				return false;
 			}
 			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-			dl.getDropPoint();
-
-			int index = dl.getIndex();
-			System.err.println(index);
-			return false;
+			Collection<Annotation> mentions = cModel.getMentions(dl.getIndex());
+			for (Annotation a : mentions) {
+				if (a instanceof Mention) {
+					try {
+						Transferable pat = info.getTransferable();
+						@SuppressWarnings("unchecked")
+						ImmutableList<Span> spans = (ImmutableList<Span>) pat
+								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+						Mention m = (Mention) a;
+						for (Span sp : spans)
+							cModel.addTo(m.getEntity(), sp.begin, sp.end);
+						registerChange();
+					} catch (UnsupportedFlavorException | IOException e) {
+						Annotator.logger.catching(e);
+					}
+				}
+			}
+			return true;
 		}
 	}
 
@@ -1448,7 +1513,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_GROUP);
+			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1489,7 +1554,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
 				File f = saveDialog.getSelectedFile();
-				saveToFile(f, plugin);
+				saveToFile(f, plugin, true);
 				break;
 			default:
 			}
@@ -1524,7 +1589,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (!f.getName().endsWith(".xmi")) {
 					f = new File(f.getAbsolutePath() + ".xmi");
 				}
-				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin());
+				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin(), true);
 				mainApplication.recentFiles.add(0, f);
 				mainApplication.refreshRecents();
 				break;
@@ -1712,45 +1777,37 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (SwingUtilities.isRightMouseButton(e)) {
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
-				Collection<Annotation> mentions = cModel.getMentions(offset);
-				if (!mentions.isEmpty()) {
-					JMenu entityMenu = new JMenu(Annotator.getString("menu.entities"));
-					for (Annotation anno : mentions) {
-						StringBuilder b = new StringBuilder();
-						b.append(anno.getAddress());
-						Mention m = null;
-						DetachedMentionPart dmp = null;
-						if (anno instanceof Mention) {
-							m = (Mention) anno;
-							dmp = m.getDiscontinuous();
-						} else if (anno instanceof DetachedMentionPart) {
-							dmp = (DetachedMentionPart) anno;
-							m = dmp.getMention();
-						}
-						String surf = m.getCoveredText();
-						if (dmp != null)
-							surf += " [,] " + dmp.getCoveredText();
-						if (m.getEntity().getLabel() != null)
-							b.append(": ").append(m.getEntity().getLabel());
+				MutableList<Annotation> localAnnotations = Lists.mutable.withAll(cModel.getMentions(offset));
+				if (localAnnotations.isEmpty())
+					return;
 
-						JMenu mentionMenu = new JMenu(b.toString());
-						mentionMenu
-								.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
-						Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-						mentionMenu.add('"' + surf + '"');
-						mentionMenu.add(a);
-						mentionMenu.add(new DeleteMentionAction(m));
-
-						entityMenu.add(mentionMenu);
-					}
-					textPopupMenu.add(entityMenu);
+				MutableList<Annotation> mentions = localAnnotations
+						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+				if (!mentions.isEmpty())
+					textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+				for (Annotation anno : mentions) {
+					if (anno instanceof Mention)
+						textPopupMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+					else if (anno instanceof DetachedMentionPart)
+						textPopupMenu.add(
+								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 				}
+				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+
+				if (!comments.isEmpty())
+					textPopupMenu.add(Annotator.getString(Strings.MENU_COMMENTS));
+				for (Annotation anno : comments) {
+					if (anno instanceof CommentAnchor)
+						textPopupMenu.add(getCommentItem((CommentAnchor) anno));
+				}
+
 				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
 					EntityRankingPlugin erp = mainApplication.getPluginManager()
 							.getEntityRankingPlugin(MatchingRanker.class);
-					MutableSortedSet<Entity> candidates = erp.rank(
-							new PotentialAnnotation(textPane, textPane.getSelectionStart(), textPane.getSelectionEnd()),
-							getCoreferenceModel(), getJcas()).take(10);
+					MutableSortedSet<Entity> candidates = erp
+							.rank(new Span(textPane.getSelectionStart(), textPane.getSelectionEnd()),
+									getCoreferenceModel(), getJcas())
+							.take(10);
 					candidates
 							.union(Sets.mutable
 									.ofAll(JCasUtil
@@ -1776,10 +1833,47 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					textPopupMenu.add(candMenu);
 
 				}
+
 				if (textPopupMenu.getComponentCount() > 0)
 					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-
 			}
+
+		}
+
+		private JMenu getCommentItem(CommentAnchor anno) {
+			Comment c = cModel.getCommentsModel().get(anno);
+			StringBuilder b = new StringBuilder();
+			if (c.getAuthor() != null)
+				b.append(c.getAuthor());
+			else
+				b.append("Unknown author");
+			JMenu subMenu = new JMenu(b.toString());
+			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
+			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
+			subMenu.add(commentsWindow.commentList.get(c).editAction);
+			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
+			return subMenu;
+		}
+
+		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
+			StringBuilder b = new StringBuilder();
+			b.append(m.getAddress());
+
+			String surf = m.getCoveredText();
+
+			if (dmp != null)
+				surf += " [,] " + dmp.getCoveredText();
+			if (m.getEntity().getLabel() != null)
+				b.append(": ").append(m.getEntity().getLabel());
+
+			JMenu mentionMenu = new JMenu(b.toString());
+			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
+			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+			mentionMenu.add('"' + surf + '"');
+			mentionMenu.add(a);
+			mentionMenu.add(new DeleteMentionAction(m));
+
+			return mentionMenu;
 		}
 
 		@Override
@@ -1863,59 +1957,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class CommentAction extends AbstractAction {
+	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		Comment comment;
 
 		public CommentAction(Comment c) {
+			super(MaterialDesign.MDI_MESSAGE_PLUS);
 			putValue(Action.NAME, Annotator.getString(Strings.ACTION_COMMENT));
 			this.comment = c;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JTextArea msg = new JTextArea();
-			msg.setRows(5);
-			msg.setColumns(30);
-			msg.setLineWrap(true);
-			msg.setWrapStyleWord(true);
-			if (comment != null)
-				msg.setText(comment.getValue());
-
-			JScrollPane scrollPane = new JScrollPane(msg);
-			int r = JOptionPane.showConfirmDialog(DocumentWindow.this, scrollPane, "Enter your comment",
-					JOptionPane.OK_CANCEL_OPTION);
-			if (r == JOptionPane.OK_OPTION) {
-				if (comment != null) {
-					comment.setValue(msg.getText());
-				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
-					Annotation tgt = new Annotation(jcas);
-					tgt.setBegin(textPane.getSelectionStart());
-					tgt.setEnd(textPane.getSelectionEnd());
-					tgt.addToIndexes();
-					AnnotationComment com = new AnnotationComment(jcas);
-					com.setValue(msg.getText());
-					com.setAnnotation(tgt);
-					com.addToIndexes();
-					highlightManager.draw(tgt, Color.YELLOW, false, true);
-				}
-				/*
-				 * else if (e.getSource() instanceof Component) { } Component
-				 * comp = (Component) e.getSource(); TreePath tp =
-				 * tree.getClosestPathForLocation(comp.getX(), comp.getY());
-				 * System.err.println(tp); } else if (tree.getSelectionCount()
-				 * == 1) { CATreeNode node = (CATreeNode)
-				 * tree.getSelectionPath().getLastPathComponent(); if
-				 * (node.getFeatureStructure() instanceof Mention) {
-				 * MentionComment c = new MentionComment(jcas);
-				 * c.setValue(msg.getText()); c.setMention((Mention)
-				 * node.getFeatureStructure()); c.addToIndexes();
-				 * cModel.comments.put(node.getFeatureStructure(), c); } }
-				 */
-			}
-
+			commentsWindow.setVisible(true);
+			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
 		}
 
 	}
@@ -2076,6 +2133,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public StylePlugin getCurrentStyle() {
 		return currentStyle;
+	}
+
+	public JTextPane getTextPane() {
+		return textPane;
 	}
 
 }

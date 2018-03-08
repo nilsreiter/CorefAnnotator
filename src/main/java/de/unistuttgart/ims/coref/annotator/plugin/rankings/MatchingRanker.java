@@ -12,7 +12,7 @@ import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
-import de.unistuttgart.ims.coref.annotator.PotentialAnnotation;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
@@ -31,8 +31,8 @@ public class MatchingRanker implements EntityRankingPlugin {
 	}
 
 	@Override
-	public MutableSortedSet<Entity> rank(PotentialAnnotation potAnnotation, CoreferenceModel cModel, JCas jcas) {
-		String s = jcas.getDocumentText().substring(potAnnotation.getBegin(), potAnnotation.getEnd());
+	public MutableSortedSet<Entity> rank(Span potAnnotation, CoreferenceModel cModel, JCas jcas) {
+		String s = jcas.getDocumentText().substring(potAnnotation.begin, potAnnotation.end);
 		pattern = Pattern.compile(s);
 		Comparator<Entity> comparator = new Comparator<Entity>() {
 

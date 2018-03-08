@@ -4,9 +4,9 @@ import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
-import de.unistuttgart.ims.coref.annotator.PotentialAnnotation;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public interface EntityRankingPlugin extends Plugin {
-	MutableSortedSet<Entity> rank(PotentialAnnotation potAnnotation, CoreferenceModel cModel, JCas jcas);
+	MutableSortedSet<Entity> rank(Span potAnnotation, CoreferenceModel cModel, JCas jcas);
 }

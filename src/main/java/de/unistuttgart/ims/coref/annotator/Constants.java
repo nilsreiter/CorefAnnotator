@@ -78,8 +78,17 @@ public class Constants {
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String ACTION_COMMENT_DELETE = "action.comment.delete";
+		public static final String ACTION_COMMENT_DELETE_TOOLTIP = "action.comment.delete.tooltip";
+		public static final String ACTION_COMMENT_REVEAL_LOCATION = "action.comment.reveal_location";
+		public static final String ACTION_COMMENT_REVEAL_LOCATION_TOOLTIP = "action.comment.reveal_location.tooltip";
+		public static final String ACTION_COMMENT_SAVE = "action.comment.save";
+		public static final String ACTION_COMMENT_SAVE_TOOLTIP = "action.comment.save.tooltip";
+		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
+		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
 		public static final String ACTION_FLAG_ENTITY_GENERIC_TOOLTIP = "action.flag_entity_generic.tooltip";
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
@@ -97,12 +106,14 @@ public class Constants {
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
 		public static final String ACTION_SEARCH = "action.search";
+		public static final String ACTION_SET_ANNOTATOR_NAME = "action.set_annotator_name";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
 		public static final String ACTION_SET_DOCUMENT_LANGUAGE = "action.set_document_language";
 		public static final String ACTION_SET_DOCUMENT_LANGUAGE_TOOLTIP = "action.set_document_language.tooltip";
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
+		public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
 		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 		public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
@@ -121,11 +132,13 @@ public class Constants {
 		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE = "dialog.change_key.invalid_string.message";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
 		public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
 		public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
+		public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
@@ -137,10 +150,12 @@ public class Constants {
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
+		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
+		public static final String MENU_ENTITIES = "menu.entities";
 		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
@@ -163,12 +178,14 @@ public class Constants {
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String STATUS_STYLE = "status.style";
+		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 		public static final String MENU_ENTITIES_CANDIDATES = "menu.entities.candidates";
 
 	}
 
+	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
@@ -184,6 +201,8 @@ public class Constants {
 
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
+
+	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
 	public static final String PREF_RECENT = "recent_files";
 
