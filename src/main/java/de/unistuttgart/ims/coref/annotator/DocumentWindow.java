@@ -46,7 +46,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -76,6 +75,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -87,6 +87,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -96,6 +97,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -108,8 +110,8 @@ import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -139,7 +141,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
-	// AbstractAction commentAction = new CommentAction(null);
+	AbstractAction commentAction = new CommentAction(null);
 	AbstractAction newEntityAction;
 	AbstractAction renameAction;
 	AbstractAction changeKeyAction;
@@ -172,6 +174,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+
+	// Sub windows
+	CommentWindow commentsWindow;
 
 	Thread messageVoider;
 
@@ -406,6 +411,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		}
 		viewMenu.add(viewStyleMenu);
+		viewMenu.add(new ViewShowCommentsAction());
 		return viewMenu;
 
 	}
@@ -472,7 +478,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(new CopyAction(this)));
 		entityMenu.add(new JMenuItem(deleteAction));
-		// entityMenu.add(new JMenuItem(commentAction));
+		entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
@@ -628,6 +634,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switchStyle(styleVariant);
+
+		}
+
+	}
+
+	class ViewShowCommentsAction extends DocumentWindowAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ViewShowCommentsAction() {
+			super(DocumentWindow.this, Constants.Strings.ACTION_SHOW_COMMENTS, MaterialDesign.MDI_MESSAGE);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			commentsWindow.setVisible(true);
 
 		}
 
@@ -814,6 +836,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		// final
 		setMessage("");
+
+		commentsWindow = new CommentWindow(this, cModel);
+
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
@@ -922,12 +947,15 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void annotationAdded(Annotation m) {
-		highlightManager.draw(m);
+		if (m instanceof Mention)
+			highlightManager.underline(m);
+		else if (m instanceof CommentAnchor)
+			highlightManager.highlight(m);
 	}
 
 	@Override
 	public void annotationChanged(Annotation m) {
-		highlightManager.draw(m);
+		highlightManager.underline(m);
 	}
 
 	@Override
@@ -1742,23 +1770,56 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			if (SwingUtilities.isRightMouseButton(e)) {
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
-				Collection<Annotation> mentions = cModel.getMentions(offset);
-				if (mentions.isEmpty())
+				MutableList<Annotation> localAnnotations = Lists.mutable.withAll(cModel.getMentions(offset));
+				if (localAnnotations.isEmpty())
 					return;
-				textPopupMenu.add(Annotator.getString("menu.entities"));
+
+				MutableList<Annotation> mentions = localAnnotations
+						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+				if (!mentions.isEmpty())
+					textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
 				for (Annotation anno : mentions) {
-			StringBuilder b = new StringBuilder();
-					b.append(anno.getAddress());
-					Mention m = null;
-					DetachedMentionPart dmp = null;
-					if (anno instanceof Mention) {
-						m = (Mention) anno;
-						dmp = m.getDiscontinuous();
-					} else if (anno instanceof DetachedMentionPart) {
-						dmp = (DetachedMentionPart) anno;
-						m = dmp.getMention();
+					if (anno instanceof Mention)
+						textPopupMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+					else if (anno instanceof DetachedMentionPart)
+						textPopupMenu.add(
+								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+				}
+				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+
+				if (!comments.isEmpty())
+					textPopupMenu.add(Annotator.getString(Strings.MENU_COMMENTS));
+				for (Annotation anno : comments) {
+					if (anno instanceof CommentAnchor)
+						textPopupMenu.add(getCommentItem((CommentAnchor) anno));
+				}
+				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+
+			}
+
 		}
+
+		private JMenu getCommentItem(CommentAnchor anno) {
+			Comment c = cModel.getCommentsModel().get(anno);
+			StringBuilder b = new StringBuilder();
+			if (c.getAuthor() != null)
+				b.append(c.getAuthor());
+			else
+				b.append("Unknown author");
+			JMenu subMenu = new JMenu(b.toString());
+			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
+			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
+			subMenu.add(commentsWindow.commentList.get(c).editAction);
+			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
+			return subMenu;
+		}
+
+		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
+			StringBuilder b = new StringBuilder();
+			b.append(m.getAddress());
+
 			String surf = m.getCoveredText();
+
 			if (dmp != null)
 				surf += " [,] " + dmp.getCoveredText();
 			if (m.getEntity().getLabel() != null)
@@ -1770,12 +1831,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteMentionAction(m));
-
-					textPopupMenu.add(mentionMenu);
-		}
-				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-
-			}
+			return mentionMenu;
 		}
 
 		@Override
@@ -1859,60 +1915,23 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
-	class CommentAction extends AbstractAction {
+	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		Comment comment;
 
 		public CommentAction(Comment c) {
+			super(MaterialDesign.MDI_MESSAGE_PLUS);
 			putValue(Action.NAME, Annotator.getString(Strings.ACTION_COMMENT));
 			this.comment = c;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JTextArea msg = new JTextArea();
-			msg.setRows(5);
-			msg.setColumns(30);
-			msg.setLineWrap(true);
-			msg.setWrapStyleWord(true);
-			if (comment != null)
-				msg.setText(comment.getValue());
-
-			JScrollPane scrollPane = new JScrollPane(msg);
-			int r = JOptionPane.showConfirmDialog(DocumentWindow.this, scrollPane, "Enter your comment",
-					JOptionPane.OK_CANCEL_OPTION);
-			if (r == JOptionPane.OK_OPTION) {
-				if (comment != null) {
-					comment.setValue(msg.getText());
-				} else if (textPane.getSelectionEnd() != textPane.getSelectionStart()) {
-					Annotation tgt = new Annotation(jcas);
-					tgt.setBegin(textPane.getSelectionStart());
-					tgt.setEnd(textPane.getSelectionEnd());
-					tgt.addToIndexes();
-					AnnotationComment com = new AnnotationComment(jcas);
-					com.setValue(msg.getText());
-					com.setAnnotation(tgt);
-					com.addToIndexes();
-					highlightManager.draw(tgt, Color.YELLOW, false, true);
+			commentsWindow.setVisible(true);
+			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
 		}
-				/*
-				 * else if (e.getSource() instanceof Component) { } Component
-				 * comp = (Component) e.getSource(); TreePath tp =
-				 * tree.getClosestPathForLocation(comp.getX(), comp.getY());
-				 * System.err.println(tp); } else if (tree.getSelectionCount()
-				 * == 1) { CATreeNode node = (CATreeNode)
-				 * tree.getSelectionPath().getLastPathComponent(); if
-				 * (node.getFeatureStructure() instanceof Mention) {
-				 * MentionComment c = new MentionComment(jcas);
-				 * c.setValue(msg.getText()); c.setMention((Mention)
-				 * node.getFeatureStructure()); c.addToIndexes();
-				 * cModel.comments.put(node.getFeatureStructure(), c); } }
-				 */
-			}
-
-	}
 
 	}
 

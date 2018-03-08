@@ -78,9 +78,17 @@ public class Constants {
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
+		public static final String ACTION_COMMENT_DELETE = "action.comment.delete";
+		public static final String ACTION_COMMENT_DELETE_TOOLTIP = "action.comment.delete.tooltip";
+		public static final String ACTION_COMMENT_REVEAL_LOCATION = "action.comment.reveal_location";
+		public static final String ACTION_COMMENT_REVEAL_LOCATION_TOOLTIP = "action.comment.reveal_location.tooltip";
+		public static final String ACTION_COMMENT_SAVE = "action.comment.save";
+		public static final String ACTION_COMMENT_SAVE_TOOLTIP = "action.comment.save.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
+		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
 		public static final String ACTION_FLAG_ENTITY_GENERIC_TOOLTIP = "action.flag_entity_generic.tooltip";
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
@@ -105,6 +113,7 @@ public class Constants {
 		public static final String ACTION_SET_DOCUMENT_LANGUAGE_TOOLTIP = "action.set_document_language.tooltip";
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
+		public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
 		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 		public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
@@ -141,10 +150,12 @@ public class Constants {
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
+		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
+		public static final String MENU_ENTITIES = "menu.entities";
 		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
@@ -173,6 +184,7 @@ public class Constants {
 
 	}
 
+	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
@@ -214,6 +226,4 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
-
-	public static final String CFG_ANNOTATOR_ID = "ANNOTATOR_ID";
 }
