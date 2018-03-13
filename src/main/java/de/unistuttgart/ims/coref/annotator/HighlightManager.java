@@ -18,13 +18,14 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 class HighlightManager {
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-	Highlighter hilit;
+	DefaultHighlighter hilit;
 
 	RangedCounter spanCounter = new RangedCounter();
 	JTextComponent textComponent;
 
 	public HighlightManager(JTextComponent component) {
 		hilit = new DefaultHighlighter();
+		hilit.setDrawsLayeredHighlights(false);
 		textComponent = component;
 		textComponent.setHighlighter(hilit);
 	}
@@ -106,16 +107,19 @@ class HighlightManager {
 	}
 
 	public void underline(Mention m) {
+		hilit.setDrawsLayeredHighlights(true);
 		draw(m, new Color(m.getEntity().getColor()), false, true, null);
 		if (m.getDiscontinuous() != null)
 			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
-
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, boolean repaint) {
+		hilit.setDrawsLayeredHighlights(true);
 		draw(m, new Color(m.getEntity().getColor()), false, false, null);
 		if (m.getDiscontinuous() != null)
 			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void undraw(Annotation a) {
