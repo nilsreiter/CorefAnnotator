@@ -25,6 +25,7 @@ class HighlightManager {
 
 	public HighlightManager(JTextComponent component) {
 		hilit = new DefaultHighlighter();
+		hilit.setDrawsLayeredHighlights(false);
 		textComponent = component;
 		textComponent.setHighlighter(hilit);
 	}
@@ -96,11 +97,8 @@ class HighlightManager {
 	}
 
 	public void highlight(Annotation a) {
-		hilit.setDrawsLayeredHighlights(false);
 		draw(a, new Color(255, 255, 150), false, false,
 				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
-		hilit.setDrawsLayeredHighlights(true);
-
 	}
 
 	public void underline(Annotation a) {
@@ -109,16 +107,19 @@ class HighlightManager {
 	}
 
 	public void underline(Mention m) {
+		hilit.setDrawsLayeredHighlights(true);
 		draw(m, new Color(m.getEntity().getColor()), false, true, null);
 		if (m.getDiscontinuous() != null)
 			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
-
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, boolean repaint) {
+		hilit.setDrawsLayeredHighlights(true);
 		draw(m, new Color(m.getEntity().getColor()), false, false, null);
 		if (m.getDiscontinuous() != null)
 			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void undraw(Annotation a) {
