@@ -158,6 +158,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
+	AbstractAction copyAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -324,6 +325,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
+		textPane.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				copyAction);
 
 		highlightManager = new HighlightManager(textPane);
 
@@ -356,6 +360,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
+		this.copyAction = new CopyAction(this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -476,7 +481,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
-		entityMenu.add(new JMenuItem(new CopyAction(this)));
+		entityMenu.add(new JMenuItem(copyAction));
 		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
