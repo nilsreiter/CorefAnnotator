@@ -18,7 +18,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 class HighlightManager {
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-	Highlighter hilit;
+	DefaultHighlighter hilit;
 
 	RangedCounter spanCounter = new RangedCounter();
 	JTextComponent textComponent;
@@ -96,8 +96,11 @@ class HighlightManager {
 	}
 
 	public void highlight(Annotation a) {
+		hilit.setDrawsLayeredHighlights(false);
 		draw(a, new Color(255, 255, 150), false, false,
 				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
+		hilit.setDrawsLayeredHighlights(true);
+
 	}
 
 	public void underline(Annotation a) {
