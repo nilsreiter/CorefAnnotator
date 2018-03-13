@@ -163,6 +163,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
+	AbstractAction copyAction;
 
 	// controller
 	CoreferenceModel cModel;
@@ -329,6 +330,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
+		textPane.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				copyAction);
 
 		highlightManager = new HighlightManager(textPane);
 
@@ -361,6 +365,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
+		this.copyAction = new CopyAction(this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -481,7 +486,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
-		entityMenu.add(new JMenuItem(new CopyAction(this)));
+		entityMenu.add(new JMenuItem(copyAction));
 		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(commentAction));
 		entityMenu.addSeparator();
@@ -1778,28 +1783,31 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
 				int offset = textPane.viewToModel(e.getPoint());
 				MutableList<Annotation> localAnnotations = Lists.mutable.withAll(cModel.getMentions(offset));
-				if (localAnnotations.isEmpty())
-					return;
 
 				MutableList<Annotation> mentions = localAnnotations
 						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
-				if (!mentions.isEmpty())
-					textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+
+				JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
 				for (Annotation anno : mentions) {
 					if (anno instanceof Mention)
-						textPopupMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+						subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
 					else if (anno instanceof DetachedMentionPart)
-						textPopupMenu.add(
+						subMenu.add(
 								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 				}
-				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+				if (subMenu.getMenuComponentCount() > 0)
+					textPopupMenu.add(subMenu);
 
-				if (!comments.isEmpty())
-					textPopupMenu.add(Annotator.getString(Strings.MENU_COMMENTS));
+				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+				subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
+				subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
+
 				for (Annotation anno : comments) {
 					if (anno instanceof CommentAnchor)
-						textPopupMenu.add(getCommentItem((CommentAnchor) anno));
+						subMenu.add(getCommentItem((CommentAnchor) anno));
 				}
+				if (subMenu.getMenuComponentCount() > 0)
+					textPopupMenu.add(subMenu);
 
 				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
 					EntityRankingPlugin erp = mainApplication.getPluginManager()
@@ -1848,7 +1856,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			else
 				b.append("Unknown author");
 			JMenu subMenu = new JMenu(b.toString());
-			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
 			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
 			subMenu.add(commentsWindow.commentList.get(c).editAction);
 			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
