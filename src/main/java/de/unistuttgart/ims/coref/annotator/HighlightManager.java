@@ -43,14 +43,6 @@ class HighlightManager {
 		textComponent.repaint();
 	}
 
-	/**
-	 * @deprecated Use {@link #underline(Annotation)} instead
-	 */
-	@Deprecated
-	public void draw(Annotation a) {
-		underline(a);
-	}
-
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
 			LayeredHighlighter.LayerPainter painter) {
 		Object hi = highlightMap.get(a);
@@ -74,22 +66,6 @@ class HighlightManager {
 		} catch (BadLocationException e) {
 			Annotator.logger.catching(e);
 		}
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Mention)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m) {
-		underline(m);
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Mention,boolean)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m, boolean repaint) {
-		underline(m, repaint);
 	}
 
 	public Highlighter getHighlighter() {

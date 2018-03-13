@@ -156,18 +156,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 	 */
 	JCas jcas;
 
-	@Deprecated
-	boolean keepEmptyEntities = true;
-
-	@Deprecated
-	int key = 0;
-
-	/**
-	 * Maps shortcut characters onto entities
-	 */
-	@Deprecated
-	Map<Character, Entity> keyMap = Maps.mutable.empty();
-
 	Preferences preferences;
 
 	/**
@@ -203,9 +191,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		CATreeNode tn = new CATreeNode(e, "");
 		insertNodeInto(tn, rootNode, 0);
 		fsMap.put(e, tn);
-		if (e.getKey() != null) {
-			keyMap.put(e.getKey().charAt(0), e);
-		}
 		fireEntityAddedEvent(e);
 		return tn;
 	}
@@ -419,23 +404,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
-	@Deprecated
-	public boolean isKeyUsed(int i) {
-		return keyMap.containsKey(i);
-	}
-
-	@Deprecated
-	public void reassignKey(char keyCode, Entity e) {
-		Entity old = keyMap.get(keyCode);
-		if (old != null) {
-			old.setKey(null);
-			nodeChanged(fsMap.get(old));
-		}
-		keyMap.put(keyCode, e);
-		e.setKey(String.valueOf(keyCode));
-		nodeChanged(fsMap.get(e));
-	}
-
 	public void registerAnnotation(Annotation a) {
 		characterPosition2AnnotationMap.add(a);
 	}
@@ -487,9 +455,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 		removeNodeFromParent(etn);
 		fsMap.remove(e);
-		String k = e.getKey();
-		if (k != null)
-			keyMap.remove(k.charAt(0));
 		fireEntityRemovedEvent(e);
 		e.removeFromIndexes();
 	}
@@ -620,28 +585,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 				remove(n.getEntity());
 			}
 		}
-	}
-
-	@Deprecated
-	public void merge(CATreeNode e1, CATreeNode e2) {
-		CATreeNode bigger, smaller;
-		if (e1.getChildCount() >= e2.getChildCount()) {
-			bigger = e1;
-			smaller = e2;
-		} else {
-			smaller = e1;
-			bigger = e2;
-		}
-		for (int i = 0; i < smaller.getChildCount();) {
-			CATreeNode node = smaller.getChildAt(i);
-			if (node.getFeatureStructure() instanceof Mention) {
-				Mention m = (Mention) node.getFeatureStructure();
-				moveTo(m, bigger.getFeatureStructure());
-			} else {
-				i++;
-			}
-		}
-		remove(smaller.getEntity());
 	}
 
 	public void moveTo(Mention m, Entity newEntity) {

@@ -14,18 +14,12 @@ public class PotentialAnnotationTransfer implements Transferable {
 
 	public static DataFlavor dataFlavor = new DataFlavor(PotentialAnnotationTransfer.class, "PotentialAnnotation");
 
-	@Deprecated
-	int begin;
-	@Deprecated
-	int end;
 	JTextComponent textView;
 	ImmutableList<Span> list;
 
 	public PotentialAnnotationTransfer(JTextComponent tv, int begin, int end) {
 		this.textView = tv;
 		this.list = Lists.immutable.of(new Span(begin, end));
-		this.begin = begin;
-		this.end = end;
 	}
 
 	public PotentialAnnotationTransfer(JTextComponent tv, Iterable<Span> iterable) {
