@@ -7,18 +7,30 @@ import java.io.IOException;
 
 import javax.swing.text.JTextComponent;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
+
 public class PotentialAnnotationTransfer implements Transferable {
 
 	public static DataFlavor dataFlavor = new DataFlavor(PotentialAnnotationTransfer.class, "PotentialAnnotation");
 
+	@Deprecated
 	int begin;
+	@Deprecated
 	int end;
 	JTextComponent textView;
+	ImmutableList<Span> list;
 
 	public PotentialAnnotationTransfer(JTextComponent tv, int begin, int end) {
 		this.textView = tv;
+		this.list = Lists.immutable.of(new Span(begin, end));
 		this.begin = begin;
 		this.end = end;
+	}
+
+	public PotentialAnnotationTransfer(JTextComponent tv, Iterable<Span> iterable) {
+		this.textView = tv;
+		this.list = Lists.immutable.withAll(iterable);
 	}
 
 	@Override
@@ -32,8 +44,9 @@ public class PotentialAnnotationTransfer implements Transferable {
 	}
 
 	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		return new PotentialAnnotation(textView, begin, end);
+	public ImmutableList<Span> getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+		return list;
+		// return new PotentialAnnotation(textView, begin, end);
 	}
 
 }

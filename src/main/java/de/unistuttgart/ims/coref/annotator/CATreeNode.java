@@ -16,7 +16,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode> {
 
-	static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
+	private static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
 	private static final long serialVersionUID = 1L;
 

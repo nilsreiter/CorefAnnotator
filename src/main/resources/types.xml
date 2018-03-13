@@ -135,5 +135,10 @@
         </featureDescription>
       </features>
     </typeDescription>
+  <typeDescription>
+      <name>de.unistuttgart.ims.coref.annotator.api.CommentAnchor</name>
+      <description/>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      </typeDescription>
   </types>
 </typeSystemDescription>

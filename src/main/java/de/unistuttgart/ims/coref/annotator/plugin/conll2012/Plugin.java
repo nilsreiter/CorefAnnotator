@@ -8,13 +8,16 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
+import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 
 public class Plugin implements IOPlugin {
@@ -31,7 +34,9 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return null;
+		AggregateBuilder b = new AggregateBuilder();
+		b.add(AnalysisEngineFactory.createEngineDescription(ImportDKpro.class));
+		return b.createAggregateDescription();
 	}
 
 	@Override
@@ -59,7 +64,8 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return null;
+		return CollectionReaderFactory.createReaderDescription(CoNLL2012Reader.class,
+				CoNLL2012Reader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
 	}
 
 	@Override
@@ -87,6 +93,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getSuffix() {
 		return ".conll";
+	}
+
+	@Override
+	public String[] getSupportedLanguages() {
+		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
 
 }

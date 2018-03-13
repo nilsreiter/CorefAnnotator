@@ -18,7 +18,7 @@ public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ViewFontSizeDecreaseAction(DocumentWindow documentWindow) {
-		super(documentWindow, MaterialDesign.MDI_FORMAT_SIZE, Strings.ACTION_VIEW_DECREASE_FONT_SIZE);
+		super(documentWindow, Strings.ACTION_VIEW_DECREASE_FONT_SIZE, MaterialDesign.MDI_FORMAT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
