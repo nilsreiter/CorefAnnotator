@@ -131,14 +131,29 @@ public class Util {
 
 		int b = annotation.getBegin(), e = annotation.getEnd();
 
-		char prev = text[b - 1];
-		while (b > 0 && Character.isLetter(prev)) {
-			prev = text[(--b) - 1];
+		if (b > 0) {
+			char prev = text[b - 1];
+			while (b > 0 && Character.isLetter(prev)) {
+				b--;
+				// if we have reached the beginning, we pretend the
+				// previous character to be a white space.
+				if (b == 0)
+					prev = ' ';
+				else
+					prev = text[b - 1];
+			}
 		}
 
-		char next = text[e];
-		while (e < text.length && Character.isLetter(next))
-			next = text[(++e)];
+		if (e < text.length) {
+			char next = text[e];
+			while (e < text.length && Character.isLetter(next)) {
+				e++;
+				if (e == text.length)
+					next = ' ';
+				else
+					next = text[e];
+			}
+		}
 
 		annotation.setBegin(b);
 		annotation.setEnd(e);
