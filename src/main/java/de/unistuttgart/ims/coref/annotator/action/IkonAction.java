@@ -22,7 +22,7 @@ public abstract class IkonAction extends AbstractAction {
 	Color enabledColor = Color.BLACK;
 	Color disabledColor = Color.GRAY;
 
-	public IkonAction(Ikon icon) {
+	public IkonAction(Ikon... icon) {
 		this.ikon = Lists.mutable.of(icon);
 		try {
 			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon.get(0), enabledColor));
@@ -32,7 +32,8 @@ public abstract class IkonAction extends AbstractAction {
 		}
 	}
 
-	public IkonAction(Ikon icon, String stringKey) {
+	@Deprecated
+	public IkonAction(String stringKey, Ikon... icon) {
 		this.ikon = Lists.mutable.of(icon);
 		putValue(Action.NAME, Annotator.getString(stringKey));
 		try {

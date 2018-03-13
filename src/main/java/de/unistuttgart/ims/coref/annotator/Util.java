@@ -15,6 +15,8 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 
 public class Util {
+	private static String[] languageNames = null;
+
 	public static String toString(TreeModel tm) {
 		return toString((TreeNode) tm.getRoot(), 0);
 	}
@@ -131,18 +133,56 @@ public class Util {
 
 		int b = annotation.getBegin(), e = annotation.getEnd();
 
-		char prev = text[b - 1];
-		while (b > 0 && Character.isLetter(prev)) {
-			prev = text[(--b) - 1];
+		if (b > 0) {
+			char prev = text[b - 1];
+			while (b > 0 && Character.isLetter(prev)) {
+				b--;
+				// if we have reached the beginning, we pretend the
+				// previous character to be a white space.
+				if (b == 0)
+					prev = ' ';
+				else
+					prev = text[b - 1];
+			}
 		}
 
-		char next = text[e];
-		while (e < text.length && Character.isLetter(next))
-			next = text[(++e)];
+		if (e < text.length) {
+			char next = text[e];
+			while (e < text.length && Character.isLetter(next)) {
+				e++;
+				if (e == text.length)
+					next = ' ';
+				else
+					next = text[e];
+			}
+		}
 
 		annotation.setBegin(b);
 		annotation.setEnd(e);
 		return annotation;
+	}
+
+	public static String[] getSupportedLanguageNames() {
+		if (languageNames == null) {
+			languageNames = new String[Constants.SUPPORTED_LANGUAGES.length];
+			for (int i = 0; i < languageNames.length; i++) {
+				languageNames[i] = Annotator.getString("language." + Constants.SUPPORTED_LANGUAGES[i]);
+			}
+		}
+		return languageNames;
+	}
+
+	public static String getLanguageName(String iso) {
+		return Annotator.getString("language." + iso);
+	}
+
+	public static String getLanguage(String languageName) {
+		getSupportedLanguageNames();
+		for (int i = 0; i < languageNames.length; i++)
+			if (languageName == languageNames[i])
+				return Constants.SUPPORTED_LANGUAGES[i];
+
+		return null;
 	}
 
 }
