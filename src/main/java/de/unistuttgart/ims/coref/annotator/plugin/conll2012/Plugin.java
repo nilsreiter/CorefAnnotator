@@ -24,7 +24,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
-		return "Export into CoNLL 2012 format. All columns except surface, sentence and coreference are empty.";
+		return "Import from and Export into CoNLL 2012 format. All columns except surface, sentence and coreference are empty.";
 	}
 
 	@Override
