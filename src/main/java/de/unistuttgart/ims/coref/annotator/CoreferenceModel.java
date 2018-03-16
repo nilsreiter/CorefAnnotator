@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -28,6 +30,8 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.undo.AddOperation;
+import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
 import de.unistuttgart.ims.coref.annotator.undo.EditOperation;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
@@ -166,7 +170,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	CommentsModel commentsModel;
 
-	MutableList<EditOperation> history = Lists.mutable.empty();
+	Deque<EditOperation> history = new LinkedList<EditOperation>();
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
@@ -214,6 +218,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 		// tree model
 		addTo(addToTree(e), addToTree(m));
+
+		// entry in history
+		history.push(new AddOperation(e, m));
 		return m;
 	}
 
@@ -248,6 +255,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 		addTo(get(e), addToTree(m));
 		if (get(e).isVisible())
 			fireMentionAddedEvent(m);
+
+		// history entry
+		history.push(new AddToOperation(e, m));
 		return m;
 	}
 
@@ -606,6 +616,10 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public CommentsModel getCommentsModel() {
 		return commentsModel;
+	}
+
+	public Deque<EditOperation> getHistory() {
+		return history;
 	}
 
 }
