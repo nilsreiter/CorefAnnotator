@@ -361,7 +361,7 @@ public class DocumentWindow extends JFrame
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.copyAction = new CopyAction(this);
+		this.copyAction = new CopyAction(this, mainApplication);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
