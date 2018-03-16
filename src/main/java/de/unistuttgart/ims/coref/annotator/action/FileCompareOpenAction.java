@@ -3,8 +3,6 @@ package de.unistuttgart.ims.coref.annotator.action;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -18,17 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
-import org.apache.commons.compress.utils.IOUtils;
-import org.apache.uima.UIMAException;
-import org.apache.uima.cas.impl.XmiCasDeserializer;
-import org.apache.uima.fit.factory.JCasFactory;
-import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
-import org.apache.uima.jcas.JCas;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
-import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
+import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class FileCompareOpenAction extends AnnotatorAction {
 
@@ -98,32 +90,16 @@ public class FileCompareOpenAction extends AnnotatorAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CompareMentionsWindow cmw = new CompareMentionsWindow(mainApplication);
-			JCas jcas;
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(new File(labels[0].getText()));
-				jcas = JCasFactory.createJCas(TypeSystemDescriptionFactory.createTypeSystemDescription());
-				Annotator.logger.info("Deserialising input stream.");
-				XmiCasDeserializer.deserialize(fis, jcas.getCas(), true);
-				Annotator.logger.debug("Setting loading progress to {}", 50);
-				fis.close();
-				cmw.setJCasLeft(jcas);
 
-				fis = new FileInputStream(new File(labels[0].getText()));
-				jcas = JCasFactory.createJCas(TypeSystemDescriptionFactory.createTypeSystemDescription());
-				Annotator.logger.info("Deserialising input stream.");
-				XmiCasDeserializer.deserialize(fis, jcas.getCas(), true);
-				Annotator.logger.debug("Setting loading progress to {}", 50);
-				fis.close();
-				cmw.setJCasRight(jcas);
-				cmw.setVisible(true);
-				dialog.setVisible(false);
-			} catch (UIMAException | SAXException | IOException e1) {
-				Annotator.logger.catching(e1);
-			} finally {
-				IOUtils.closeQuietly(fis);
-			}
+			CompareMentionsWindow cmw = new CompareMentionsWindow(mainApplication);
+
+			JCasLoader leftLoader = new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText()));
+			leftLoader.execute();
+			JCasLoader rightLoader = new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[0].getText()));
+			rightLoader.execute();
+
+			cmw.setVisible(true);
+			dialog.setVisible(false);
 		}
 
 	}

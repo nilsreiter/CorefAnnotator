@@ -14,6 +14,7 @@ import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.JCasIterator;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
@@ -67,6 +68,19 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
+	public JCasLoader(Consumer<JCas> consumer, File file) {
+		this.consumer = consumer;
+		try {
+			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
+		} catch (ResourceInitializationException e) {
+			e.printStackTrace();
+		}
+		this.flavor = Annotator.app.getPluginManager().getDefaultIOPlugin();
+		this.file = file;
+		this.language = "de";
+	}
+
+	@Deprecated
 	private JCas readStream() {
 		JCas jcas = null;
 
