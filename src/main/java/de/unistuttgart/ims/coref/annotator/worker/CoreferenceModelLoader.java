@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
@@ -21,10 +22,17 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
 
 	private DocumentWindow documentWindow;
+	Consumer<CoreferenceModel> consumer = null;
 	JCas jcas;
 
+	@Deprecated
 	public CoreferenceModelLoader(DocumentWindow documentWindow, JCas jcas) {
 		this.documentWindow = documentWindow;
+		this.jcas = jcas;
+	}
+
+	public CoreferenceModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
+		this.consumer = consumer;
 		this.jcas = jcas;
 	}
 
@@ -62,7 +70,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 	@Override
 	protected void done() {
 		try {
-			documentWindow.setCoreferenceModel(get());
+			consumer.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}

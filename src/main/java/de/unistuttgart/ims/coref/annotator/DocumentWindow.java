@@ -861,7 +861,7 @@ public class DocumentWindow extends JFrame
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
+		CoreferenceModelLoader im = new CoreferenceModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
 		im.execute();
 	}
 
