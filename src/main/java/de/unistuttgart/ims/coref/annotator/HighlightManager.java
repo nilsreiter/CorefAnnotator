@@ -90,6 +90,14 @@ class HighlightManager {
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
+	public void underline(Mention m, Color color) {
+		hilit.setDrawsLayeredHighlights(true);
+		draw(m, color, false, true, null);
+		if (m.getDiscontinuous() != null)
+			draw(m.getDiscontinuous(), color, true, true, null);
+		hilit.setDrawsLayeredHighlights(false);
+	}
+
 	public void underline(Mention m, boolean repaint) {
 		hilit.setDrawsLayeredHighlights(true);
 		draw(m, new Color(m.getEntity().getColor()), false, false, null);

@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -10,10 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.StyleContext;
 
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 
 public class CompareMentionsWindow extends JFrame implements TextWindow {
@@ -24,6 +28,8 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 	CoreferenceModel[] models = new CoreferenceModel[2];
 	Annotator mainApplication;
 	JTextPane textPane;
+	StyleContext styleContext = new StyleContext();
+
 	boolean textIsSet = false;
 
 	AbstractAction copyAction;
@@ -45,6 +51,10 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		textPane.setText(jcas2.getDocumentText());
 		textPane.setCaretPosition(0);
 		textIsSet = true;
+
+		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
+		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
+
 	}
 
 	protected void initialiseWindow() {
@@ -74,6 +84,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		this.jcas[0] = jcas;
 		if (!textIsSet)
 			initialiseText(jcas);
+		drawAll(jcas, Color.red);
 		new CoreferenceModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 	}
 
@@ -81,6 +92,8 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		this.jcas[1] = jcas;
 		if (!textIsSet)
 			initialiseText(jcas);
+		drawAll(jcas, Color.blue);
+
 		new CoreferenceModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
 	}
 
@@ -101,5 +114,13 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 	}
+
+	protected void drawAll(JCas jcas, Color color) {
+		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+			highlightManager.underline(m, color);
+
+		}
+
+	};
 
 }
