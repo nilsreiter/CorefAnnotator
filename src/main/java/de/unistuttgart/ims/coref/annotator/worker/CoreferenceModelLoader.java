@@ -21,8 +21,10 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
 
-	private DocumentWindow documentWindow;
+	@Deprecated
+	DocumentWindow documentWindow;
 	Consumer<CoreferenceModel> consumer = null;
+	CoreferenceModelListener coreferenceModelListener;
 	JCas jcas;
 
 	@Deprecated
@@ -36,12 +38,13 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		this.jcas = jcas;
 	}
 
-	protected CoreferenceModel load(CoreferenceModelListener listener, Preferences preferences) {
+	protected CoreferenceModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
 		CoreferenceModel cModel;
 		cModel = new CoreferenceModel(jcas, preferences);
-		cModel.addCoreferenceModelListener(listener);
+		if (getCoreferenceModelListener() != null)
+			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
 
 		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
 			cModel.add(e);
@@ -64,7 +67,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 
 	@Override
 	protected CoreferenceModel doInBackground() throws Exception {
-		return load(documentWindow, documentWindow.getMainApplication().getPreferences());
+		return load(Annotator.app.getPreferences());
 	}
 
 	@Override
@@ -74,6 +77,14 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
+	}
+
+	public CoreferenceModelListener getCoreferenceModelListener() {
+		return coreferenceModelListener;
+	}
+
+	public void setCoreferenceModelListener(CoreferenceModelListener coreferenceModelListener) {
+		this.coreferenceModelListener = coreferenceModelListener;
 	}
 
 }
