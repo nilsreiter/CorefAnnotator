@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -82,6 +83,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 	protected void initialiseWindow() {
 		Caret caret = new Caret();
 
+		JTabbedPane tabbedPane = new JTabbedPane();
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
@@ -94,8 +96,9 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
-		add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+		tabbedPane.add("Mentions", new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		add(tabbedPane, BorderLayout.CENTER);
 
 		highlightManager = new HighlightManager(textPane);
 		setPreferredSize(new Dimension(800, 800));
@@ -152,9 +155,6 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		for (Mention m : JCasUtil.select(jcas[1], Mention.class)) {
 			map2.put(new Span(m), m);
 		}
-
-		System.err.println(map1.keySet());
-		System.err.println(map2.keySet());
 
 		for (Span s : map1.keySet()) {
 			if (map2.containsKey(s)) {
