@@ -123,7 +123,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
+public class DocumentWindow extends JFrame
+		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow {
 
 	private static final long serialVersionUID = 1L;
 
@@ -342,7 +343,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		setPreferredSize(new Dimension(800, 800));
 		pack();
-		this.setLocationRelativeTo(null);
+		setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
 	}
 
@@ -2106,6 +2107,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public JTextPane getTextPane() {
 		return textPane;
+	}
+
+	@Override
+	public String getText() {
+		return textPane.getText();
+	}
+
+	@Override
+	public Span getSelection() {
+		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 	}
 
 }
