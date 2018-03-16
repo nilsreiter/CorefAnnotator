@@ -90,6 +90,16 @@ class HighlightManager {
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
+	public void underline(Annotation m, Color color) {
+		if (m instanceof Mention)
+			underline((Mention) m, color);
+		else {
+			hilit.setDrawsLayeredHighlights(true);
+			draw(m, color, false, true, null);
+			hilit.setDrawsLayeredHighlights(false);
+		}
+	}
+
 	public void underline(Mention m, Color color) {
 		hilit.setDrawsLayeredHighlights(true);
 		draw(m, color, false, true, null);

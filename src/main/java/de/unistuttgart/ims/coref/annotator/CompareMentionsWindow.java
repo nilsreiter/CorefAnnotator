@@ -4,30 +4,47 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.StyleContext;
 
+import org.apache.uima.UIMAException;
+import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.util.CasCopier;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 
-public class CompareMentionsWindow extends JFrame implements TextWindow {
+public class CompareMentionsWindow extends JFrame implements TextWindow, CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
 
 	JCas[] jcas = new JCas[2];
+	JCas targetJCas;
 	CoreferenceModel[] models = new CoreferenceModel[2];
+	CoreferenceModel targetModel;
 	Annotator mainApplication;
 	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
@@ -39,9 +56,10 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 
 	HighlightManager highlightManager;
 
-	public CompareMentionsWindow(Annotator mainApplication) {
+	public CompareMentionsWindow(Annotator mainApplication) throws UIMAException {
 		this.mainApplication = mainApplication;
 		this.initialiseWindow();
+		this.targetJCas = JCasFactory.createJCas();
 	}
 
 	protected void initialiseActions() {
@@ -72,7 +90,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
 		textPane.setCaretPosition(0);
-		textPane.setText(null);
+		textPane.addMouseListener(new TextMouseListener());
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
@@ -90,6 +108,9 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		if (!textIsSet)
 			initialiseText(jcas);
 		drawAllAnnotations();
+		CasCopier.copyCas(jcas.getCas(), targetJCas.getCas(), true, true);
+		targetModel = new CoreferenceModel(targetJCas, mainApplication.getPreferences());
+		targetModel.addCoreferenceModelListener(this);
 		new CoreferenceModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 	}
 
@@ -158,4 +179,99 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 
 	};
 
+	class TextMouseListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (SwingUtilities.isRightMouseButton(e)) {
+				JPopupMenu pMenu = new JPopupMenu();
+				int offset = textPane.viewToModel(e.getPoint());
+
+				for (int i = 0; i < models.length; i++) {
+					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models[i].getMentions(offset));
+					MutableList<Annotation> mentions = localAnnotations
+							.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+					for (Annotation m : mentions) {
+						Mention mention = null;
+						if (m instanceof Mention) {
+							mention = (Mention) m;
+						} else if (m instanceof DetachedMentionPart) {
+							mention = ((DetachedMentionPart) m).getMention();
+						}
+						if (mention != null)
+							pMenu.add(getMentionMenu(mention, String.valueOf(i)));
+					}
+
+				}
+				pMenu.show(e.getComponent(), e.getX(), e.getY());
+
+			}
+		}
+
+		protected JMenu getMentionMenu(Mention mention, String source) {
+			JMenu menu = new JMenu(mention.getCoveredText() + "(" + source + ")");
+			menu.add(new CopyMentionAction(new Span(mention)));
+			return menu;
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+	}
+
+	@Override
+	public void annotationAdded(Annotation m) {
+		highlightManager.underline(m, Color.green);
+	}
+
+	@Override
+	public void annotationChanged(Annotation m) {
+		highlightManager.underline(m, Color.green);
+
+	}
+
+	@Override
+	public void annotationRemoved(Annotation m) {
+		highlightManager.undraw(m);
+
+	}
+
+	@Override
+	public void entityAdded(Entity entity) {
+	}
+
+	@Override
+	public void entityRemoved(Entity entity) {
+	}
+
+	class CopyMentionAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		Span span;
+
+		public CopyMentionAction(Span span) {
+			this.span = span;
+			putValue(Action.NAME, "add");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			targetModel.add(span.begin, span.end);
+		}
+
+	}
 }

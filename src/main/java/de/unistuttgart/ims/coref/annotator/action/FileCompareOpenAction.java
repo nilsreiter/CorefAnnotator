@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
+import org.apache.uima.UIMAException;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -91,14 +92,19 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			CompareMentionsWindow cmw = new CompareMentionsWindow(mainApplication);
+			CompareMentionsWindow cmw;
+			try {
+				cmw = new CompareMentionsWindow(mainApplication);
 
-			new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText())).execute();
+				new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText())).execute();
 
-			new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[1].getText())).execute();
+				new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[1].getText())).execute();
 
-			cmw.setVisible(true);
-			dialog.setVisible(false);
+				cmw.setVisible(true);
+				dialog.setVisible(false);
+			} catch (UIMAException e1) {
+				Annotator.logger.catching(e1);
+			}
 		}
 
 	}
