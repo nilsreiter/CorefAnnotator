@@ -107,6 +107,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
+import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
@@ -482,6 +483,7 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(new UndoAction(this)));
 		entityMenu.add(new JMenuItem(copyAction));
 		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(commentAction));
