@@ -567,8 +567,8 @@ public class DocumentWindow extends JFrame
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			setIndeterminateProgress();
-			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
-					language);
+			lai = new JCasLoader(jcas -> this.setJCas(jcas), file,
+					TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);

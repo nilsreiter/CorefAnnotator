@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import javax.swing.SwingWorker;
 
@@ -28,13 +29,16 @@ import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
+	@Deprecated
 	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
 	String language = null;
+	Consumer<JCas> consumer = null;
 
+	@Deprecated
 	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
 			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
@@ -44,9 +48,19 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
+	@Deprecated
 	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
 			IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
+		this.typeSystemDescription = typeSystemDescription;
+		this.flavor = flavor;
+		this.file = file;
+		this.language = language;
+	}
+
+	public JCasLoader(Consumer<JCas> consumer, File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor,
+			String language) {
+		this.consumer = consumer;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
 		this.file = file;
@@ -66,8 +80,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		try {
 			Annotator.logger.info("Deserialising input stream.");
 			XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-			this.documentWindow.setProgress(25);
-			Annotator.logger.debug("Setting loading progress to {}", 50);
 
 		} catch (SAXException | IOException e1) {
 			Annotator.logger.catching(e1);
@@ -77,8 +89,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 			Annotator.logger.info("Applying importer from {}", flavor.getClass().getName());
 			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
 					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
-			documentWindow.setProgress(50);
-			Annotator.logger.debug("Setting loading progress to {}", 80);
 
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			Annotator.logger.catching(e1);
@@ -116,7 +126,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.documentWindow.setJCas(get());
+			this.consumer.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
