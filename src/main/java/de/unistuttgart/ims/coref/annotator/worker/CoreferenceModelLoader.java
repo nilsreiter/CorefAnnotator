@@ -47,7 +47,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
 
 		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
-			cModel.add(e);
+			cModel.addToTree(e);
 		});
 		Annotator.logger.debug("Added all entities");
 
@@ -57,7 +57,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		Annotator.logger.debug("Added all entity groups");
 
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
+			cModel.addTo(cModel.get(m.getEntity()), cModel.addToTree(m));
 			cModel.registerAnnotation(m);
 		}
 		Annotator.logger.debug("Added all mentions");
