@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.undo;
 
+import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
@@ -23,5 +24,11 @@ public class AddOperation implements EditOperation {
 
 	public Mention getMention() {
 		return mention;
+	}
+
+	@Override
+	public void revert(CoreferenceModel model) {
+		model.remove(mention);
+		model.remove(entity);
 	}
 }

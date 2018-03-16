@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.undo;
 
-public interface EditOperation {
+import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 
+public interface EditOperation {
+	public void revert(CoreferenceModel model);
 }
