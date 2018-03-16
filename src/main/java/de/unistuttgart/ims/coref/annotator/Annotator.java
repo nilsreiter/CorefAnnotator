@@ -54,6 +54,7 @@ import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
+import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
@@ -87,6 +88,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	UpdateCheck updateCheck = new UpdateCheck();
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
+	AbstractAction openCompareAction;
 
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
@@ -145,6 +147,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	protected void initialiseActions() {
 		openAction = new FileOpenAction(this);
+		openCompareAction = new FileCompareOpenAction(this);
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -170,6 +173,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
+		panel.add(new JButton(openCompareAction));
 		mainPanel.add(panel);
 
 		mainPanel.add(Box.createVerticalStrut(10));
