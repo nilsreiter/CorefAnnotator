@@ -10,23 +10,30 @@ import javax.swing.KeyStroke;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.TextWindow;
 
-public class CopyAction extends DocumentWindowAction {
+public class CopyAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public CopyAction(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_COPY, MaterialDesign.MDI_CONTENT_COPY);
+	TextWindow textWindow;
+
+	public CopyAction(TextWindow dw, Annotator app) {
+		super(app, Constants.Strings.ACTION_COPY, MaterialDesign.MDI_CONTENT_COPY);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		Span span = textWindow.getSelection();
+		textWindow.getText().substring(span.begin, span.end);
+
 		Toolkit.getDefaultToolkit().getSystemClipboard()
-				.setContents(new StringSelection(documentWindow.getTextPane().getSelectedText()), null);
+				.setContents(new StringSelection(textWindow.getText().substring(span.begin, span.end)), null);
 	}
 
 }
