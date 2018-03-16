@@ -28,6 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.undo.EditOperation;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -164,6 +165,8 @@ public class CoreferenceModel extends DefaultTreeModel {
 	CATreeNode rootNode;
 
 	CommentsModel commentsModel;
+
+	MutableList<EditOperation> history = Lists.mutable.empty();
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
