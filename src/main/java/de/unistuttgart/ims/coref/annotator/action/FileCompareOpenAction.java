@@ -93,10 +93,9 @@ public class FileCompareOpenAction extends AnnotatorAction {
 
 			CompareMentionsWindow cmw = new CompareMentionsWindow(mainApplication);
 
-			JCasLoader leftLoader = new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText()));
-			leftLoader.execute();
-			JCasLoader rightLoader = new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[0].getText()));
-			rightLoader.execute();
+			new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText())).execute();
+
+			new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[1].getText())).execute();
 
 			cmw.setVisible(true);
 			dialog.setVisible(false);
@@ -120,6 +119,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser chooser = new JFileChooser();
 
+			chooser.setCurrentDirectory(new File("/Users/reiterns/Documents/CRETA/Code/coreference/annotations"));
 			int r = chooser.showOpenDialog(null);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();

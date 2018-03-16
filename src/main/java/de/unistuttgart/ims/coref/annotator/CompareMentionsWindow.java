@@ -15,6 +15,8 @@ import javax.swing.text.StyleContext;
 
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -31,6 +33,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 	StyleContext styleContext = new StyleContext();
 
 	boolean textIsSet = false;
+	int loadedJCas = 0;
 
 	AbstractAction copyAction;
 
@@ -55,6 +58,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 
+		drawAllAnnotations();
 	}
 
 	protected void initialiseWindow() {
@@ -82,18 +86,19 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 
 	public void setJCasLeft(JCas jcas) {
 		this.jcas[0] = jcas;
+		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
-		drawAll(jcas, Color.red);
+		drawAllAnnotations();
 		new CoreferenceModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 	}
 
 	public void setJCasRight(JCas jcas) {
 		this.jcas[1] = jcas;
+		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
-		drawAll(jcas, Color.blue);
-
+		drawAllAnnotations();
 		new CoreferenceModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
 	}
 
@@ -113,6 +118,36 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 	@Override
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
+	}
+
+	protected void drawAllAnnotations() {
+		if (loadedJCas < 2)
+			return;
+		MutableMap<Span, Mention> map1 = Maps.mutable.empty();
+		for (Mention m : JCasUtil.select(jcas[0], Mention.class)) {
+			map1.put(new Span(m), m);
+		}
+		MutableMap<Span, Mention> map2 = Maps.mutable.empty();
+		for (Mention m : JCasUtil.select(jcas[1], Mention.class)) {
+			map2.put(new Span(m), m);
+		}
+
+		System.err.println(map1.keySet());
+		System.err.println(map2.keySet());
+
+		for (Span s : map1.keySet()) {
+			if (map2.containsKey(s)) {
+				highlightManager.underline(map1.get(s), Color.gray.brighter());
+			} else {
+				highlightManager.underline(map1.get(s), Color.red);
+			}
+		}
+
+		for (Span s : map2.keySet()) {
+			if (!map1.containsKey(s)) {
+				highlightManager.underline(map2.get(s), Color.blue);
+			}
+		}
 	}
 
 	protected void drawAll(JCas jcas, Color color) {
