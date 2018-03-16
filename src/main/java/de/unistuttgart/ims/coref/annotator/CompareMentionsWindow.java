@@ -14,12 +14,14 @@ import javax.swing.KeyStroke;
 import org.apache.uima.jcas.JCas;
 
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 
 public class CompareMentionsWindow extends JFrame implements TextWindow {
 
 	private static final long serialVersionUID = 1L;
 
 	JCas[] jcas = new JCas[2];
+	CoreferenceModel[] models = new CoreferenceModel[2];
 	Annotator mainApplication;
 	JTextPane textPane;
 	boolean textIsSet = false;
@@ -37,8 +39,11 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		copyAction = new CopyAction(this, mainApplication);
 	}
 
-	protected void initialiseText(JCas jcas2) {
+	protected synchronized void initialiseText(JCas jcas2) {
+		if (textIsSet)
+			return;
 		textPane.setText(jcas2.getDocumentText());
+		textPane.setCaretPosition(0);
 		textIsSet = true;
 	}
 
@@ -69,12 +74,22 @@ public class CompareMentionsWindow extends JFrame implements TextWindow {
 		this.jcas[0] = jcas;
 		if (!textIsSet)
 			initialiseText(jcas);
+		new CoreferenceModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 	}
 
 	public void setJCasRight(JCas jcas) {
 		this.jcas[1] = jcas;
 		if (!textIsSet)
 			initialiseText(jcas);
+		new CoreferenceModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
+	}
+
+	public void setCoreferenceModelLeft(CoreferenceModel cm) {
+		models[0] = cm;
+	}
+
+	public void setCoreferenceModelRight(CoreferenceModel cm) {
+		models[1] = cm;
 	}
 
 	@Override
