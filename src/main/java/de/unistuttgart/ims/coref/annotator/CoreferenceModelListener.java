@@ -7,7 +7,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 
 public interface CoreferenceModelListener {
 	public enum Event {
-		Add, Remove, Update, Update_Color
+		Add, Remove, Update
 	};
 
 	void annotationEvent(Event event, Annotation annotation);
