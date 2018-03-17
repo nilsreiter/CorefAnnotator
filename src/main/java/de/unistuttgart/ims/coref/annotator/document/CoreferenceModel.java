@@ -116,6 +116,13 @@ public class CoreferenceModel {
 	public void addTo(EntityGroup eg, Entity e) {
 		// UIMA stuff
 		FSArray oldArr = eg.getMembers();
+
+		for (int i = 0; i < oldArr.size(); i++) {
+			if (oldArr.get(i) == e) {
+				return;
+			}
+		}
+
 		FSArray arr = new FSArray(jcas, eg.getMembers().size() + 1);
 		int i = 0;
 		for (; i < eg.getMembers().size(); i++) {
