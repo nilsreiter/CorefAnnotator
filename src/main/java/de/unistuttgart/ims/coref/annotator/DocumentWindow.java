@@ -1918,7 +1918,8 @@ public class DocumentWindow extends JFrame
 					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
 
 			toggleEntityDisplayed.setEnabled(isEntity());
-			toggleEntityDisplayed.putValue(Action.SELECTED_KEY, isEntity() && nodes.allSatisfy(f -> !f.isVisible()));
+			toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
+					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
