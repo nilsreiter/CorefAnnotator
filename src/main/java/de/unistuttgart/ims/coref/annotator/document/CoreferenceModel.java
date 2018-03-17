@@ -382,10 +382,14 @@ public class CoreferenceModel {
 		if (initialised)
 			return;
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
-			fireEntityEvent(Event.Add, entity);
+			if (entity instanceof EntityGroup)
+				fireEntityGroupEvent(Event.Add, (EntityGroup) entity);
+			else
+				fireEntityEvent(Event.Add, entity);
 		}
 		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
+			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
 			fireMentionAddedEvent(mention);
 		}
