@@ -118,7 +118,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -165,7 +165,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction copyAction;
 
 	// controller
-	DocumentModel cModel;
+	CoreferenceModel cModel;
 	HighlightManager highlightManager;
 
 	// Window components
@@ -812,7 +812,7 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	public void setCoreferenceModel(DocumentModel model) {
+	public void setCoreferenceModel(CoreferenceModel model) {
 		EntityTreeModel etm = new EntityTreeModel(model);
 		Annotator.logger.trace(etm.getRoot().getChildren());
 
@@ -2108,7 +2108,7 @@ public class DocumentWindow extends JFrame
 		return tree;
 	}
 
-	public DocumentModel getCoreferenceModel() {
+	public CoreferenceModel getCoreferenceModel() {
 		return cModel;
 	}
 

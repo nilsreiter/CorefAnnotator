@@ -19,19 +19,19 @@ import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 
 public class CommentsModel extends AbstractListModel<Comment> {
 
-	private final DocumentModel documentModel;
+	private final CoreferenceModel coreferenceModel;
 	MutableList<Comment> comments = Lists.mutable.empty();
 	MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
 
 	private static final long serialVersionUID = 1L;
 
-	CommentsModel(DocumentModel documentModel) {
-		this.documentModel = documentModel;
+	CommentsModel(CoreferenceModel coreferenceModel) {
+		this.coreferenceModel = coreferenceModel;
 	}
 
 	public void load() {
 
-		for (Comment comment : JCasUtil.select(this.documentModel.jcas, Comment.class)) {
+		for (Comment comment : JCasUtil.select(this.coreferenceModel.jcas, Comment.class)) {
 			register(comment);
 		}
 		Annotator.logger.debug("Comments list contains {} elements.", comments.size());
@@ -39,12 +39,12 @@ public class CommentsModel extends AbstractListModel<Comment> {
 
 	public Comment add(String text, String author, int begin, int end) {
 
-		CommentAnchor annotation = new CommentAnchor(this.documentModel.jcas);
+		CommentAnchor annotation = new CommentAnchor(this.coreferenceModel.jcas);
 		annotation.setBegin(begin);
 		annotation.setEnd(end);
 		annotation.addToIndexes();
 
-		AnnotationComment comment = new AnnotationComment(this.documentModel.jcas);
+		AnnotationComment comment = new AnnotationComment(this.coreferenceModel.jcas);
 		comment.setAuthor(author);
 		comment.setValue(text);
 		comment.setAnnotation(annotation);
@@ -71,7 +71,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 	protected void register(Comment comment) {
 		if (comment instanceof AnnotationComment) {
 			commentMap.put(((AnnotationComment) comment).getAnnotation(), comment);
-			this.documentModel.characterPosition2AnnotationMap.add(((AnnotationComment) comment).getAnnotation());
+			this.coreferenceModel.characterPosition2AnnotationMap.add(((AnnotationComment) comment).getAnnotation());
 		}
 		int ind = 0;
 		Comparator<Comment> comp = CommentSortOrder.POSITION.getComparator();
@@ -84,7 +84,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		comments.add(ind, comment);
 		fireIntervalAdded(this, ind, ind);
 		if (comment instanceof AnnotationComment)
-			this.documentModel.fireMentionAddedEvent(((AnnotationComment) comment).getAnnotation());
+			this.coreferenceModel.fireMentionAddedEvent(((AnnotationComment) comment).getAnnotation());
 
 	}
 
@@ -93,8 +93,8 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		comments.remove(index);
 		if (c instanceof AnnotationComment) {
 			commentMap.remove(((AnnotationComment) c).getAnnotation());
-			this.documentModel.characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
-			this.documentModel.fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
+			this.coreferenceModel.characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
+			this.coreferenceModel.fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
 		}
 		fireIntervalRemoved(this, index, index);
 	}

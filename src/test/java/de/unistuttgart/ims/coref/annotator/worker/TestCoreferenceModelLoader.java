@@ -16,7 +16,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
 public class TestCoreferenceModelLoader {
 	JCas jcas;
@@ -62,7 +62,7 @@ public class TestCoreferenceModelLoader {
 		XmiCasDeserializer.deserialize(getClass().getResourceAsStream(s), jcas.getCas(), true);
 		CoreferenceModelLoader cml = new CoreferenceModelLoader(cm -> {
 		}, jcas);
-		DocumentModel model = cml.load(Preferences.userRoot());
+		CoreferenceModel model = cml.load(Preferences.userRoot());
 		assertNotNull(model);
 		assertNotNull(model.getRoot());
 		assertNotNull(model.getMentions(20));

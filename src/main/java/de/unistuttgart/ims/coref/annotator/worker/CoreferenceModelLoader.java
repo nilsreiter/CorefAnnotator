@@ -11,13 +11,13 @@ import org.apache.uima.jcas.JCas;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
-public class CoreferenceModelLoader extends SwingWorker<DocumentModel, Integer> {
+public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
 
 	@Deprecated
 	DocumentWindow documentWindow;
-	Consumer<DocumentModel> consumer = null;
+	Consumer<CoreferenceModel> consumer = null;
 	CoreferenceModelListener coreferenceModelListener;
 	JCas jcas;
 
@@ -27,22 +27,22 @@ public class CoreferenceModelLoader extends SwingWorker<DocumentModel, Integer> 
 		this.jcas = jcas;
 	}
 
-	public CoreferenceModelLoader(Consumer<DocumentModel> consumer, JCas jcas) {
+	public CoreferenceModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
 		this.consumer = consumer;
 		this.jcas = jcas;
 	}
 
-	protected DocumentModel load(Preferences preferences) {
+	protected CoreferenceModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
-		DocumentModel cModel;
-		cModel = new DocumentModel(jcas, preferences);
+		CoreferenceModel cModel;
+		cModel = new CoreferenceModel(jcas, preferences);
 
 		return cModel;
 	}
 
 	@Override
-	protected DocumentModel doInBackground() throws Exception {
+	protected CoreferenceModel doInBackground() throws Exception {
 		return load(Annotator.app.getPreferences());
 	}
 

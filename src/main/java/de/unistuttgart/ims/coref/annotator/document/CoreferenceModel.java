@@ -40,7 +40,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class DocumentModel extends DefaultTreeModel {
+public class CoreferenceModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -86,7 +86,7 @@ public class DocumentModel extends DefaultTreeModel {
 
 	CommentsModel commentsModel;
 
-	public DocumentModel(JCas jcas, Preferences preferences) {
+	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
 		this.jcas = jcas;

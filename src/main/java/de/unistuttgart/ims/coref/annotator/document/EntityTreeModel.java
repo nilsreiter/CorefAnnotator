@@ -23,7 +23,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
 	private static final long serialVersionUID = 1L;
 
-	DocumentModel documentModel;
+	CoreferenceModel coreferenceModel;
 
 	/**
 	 * A map of feature structures to the tree nodes that represent them
@@ -35,10 +35,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	 */
 	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
 
-	public EntityTreeModel(DocumentModel docMod) {
+	public EntityTreeModel(CoreferenceModel docMod) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
-		this.documentModel = docMod;
-		this.documentModel.addCoreferenceModelListener(this);
+		this.coreferenceModel = docMod;
+		this.coreferenceModel.addCoreferenceModelListener(this);
 
 		this.initialise();
 
@@ -46,12 +46,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	public void initialise() {
-		Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)).forEach(e -> {
+		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJcas(), Entity.class)).forEach(e -> {
 			entityAdded(e);
 		});
 		Annotator.logger.debug("Added all entities");
 
-		for (Mention m : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
+		for (Mention m : JCasUtil.select(coreferenceModel.getJcas(), Mention.class)) {
 			annotationAdded(m);
 		}
 		Annotator.logger.debug("Added all mentions");
