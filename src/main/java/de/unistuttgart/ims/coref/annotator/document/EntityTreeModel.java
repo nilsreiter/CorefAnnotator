@@ -17,6 +17,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -67,6 +68,20 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 				insertNodeInto(node, entityNode, ind);
 				optResort();
+			} else if (a instanceof DetachedMentionPart) {
+				DetachedMentionPart dmp = (DetachedMentionPart) a;
+				CATreeNode node = new CATreeNode(dmp, dmp.getCoveredText());
+				fsMap.put(dmp, node);
+				CATreeNode mentionNode = get(dmp.getMention());
+				int ind = 0;
+				while (ind < mentionNode.getChildCount()) {
+					CATreeNode cnode = mentionNode.getChildAt(ind);
+					if (cnode.getFeatureStructure() instanceof Entity
+							|| ((Annotation) cnode.getFeatureStructure()).getBegin() > dmp.getBegin())
+						break;
+					ind++;
+				}
+				insertNodeInto(node, mentionNode, ind);
 			}
 			break;
 		case Remove:
@@ -146,7 +161,15 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			removeNodeFromParent(get(eg));
 			break;
 		case Update:
-			nodeChanged(get(eg));
+			CATreeNode egNode = get(eg);
+			for (int i = egNode.getChildCount() - 1; i >= 0; i--) {
+				CATreeNode child = egNode.getChildAt(i);
+				if (child.isEntity())
+					removeNodeFromParent(child);
+			}
+			for (int i = 0; i < eg.getMembers().size(); i++)
+				insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), egNode.getChildCount());
+			nodeStructureChanged(egNode);
 			break;
 		default:
 			break;

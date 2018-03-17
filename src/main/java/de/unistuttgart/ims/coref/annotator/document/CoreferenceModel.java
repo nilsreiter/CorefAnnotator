@@ -125,6 +125,8 @@ public class CoreferenceModel {
 		eg.setMembers(arr);
 		oldArr.removeFromIndexes();
 
+		fireEntityGroupEvent(Event.Update, eg);
+
 	}
 
 	public void addTo(Mention m, int begin, int end) {
@@ -284,6 +286,9 @@ public class CoreferenceModel {
 	}
 
 	public void remove(DetachedMentionPart dmp) {
+		fireAnnotationRemovedEvent(dmp);
+		dmp.getMention().setDiscontinuous(null);
+		dmp.removeFromIndexes();
 	}
 
 	public void remove(Entity entity) {
@@ -300,10 +305,16 @@ public class CoreferenceModel {
 	}
 
 	public void remove(Mention m) {
+		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(m.getEntity(), m);
 		fireAnnotationRemovedEvent(m);
 		m.removeFromIndexes();
+		if (entityMentionMap.get(entity).isEmpty()
+				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+			remove(entity);
+		}
+
 	}
 
 	public boolean removeCoreferenceModelListener(Object o) {
@@ -363,6 +374,9 @@ public class CoreferenceModel {
 	public void initialPainting() {
 		if (initialised)
 			return;
+		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+			fireEntityEvent(Event.Add, entity);
+		}
 		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
 			registerAnnotation(mention);

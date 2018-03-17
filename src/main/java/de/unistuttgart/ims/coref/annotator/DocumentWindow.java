@@ -1062,8 +1062,9 @@ public class DocumentWindow extends JFrame
 			Annotator.logger.debug("Moving {} things", moved.size());
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					moved.forEach(n -> documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
-							(EntityGroup) targetFS));
+					// moved.forEach(n ->
+					// documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
+					// (EntityGroup) targetFS));
 					moved.forEach(n -> documentModel.getCoreferenceModel().addTo((EntityGroup) targetFS,
 							n.getFeatureStructure()));
 				} else
@@ -1900,8 +1901,8 @@ public class DocumentWindow extends JFrame
 			toggleEntityGeneric.setEnabled(isEntity());
 			toggleEntityGeneric.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
-			deleteAction
-					.setEnabled(isDetachedMentionPart() || isMention() || isEntityGroup() || (isEntity() && isLeaf()));
+			deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
+					|| (isEntity() && isLeaf()));
 			formGroupAction.setEnabled(isDouble() && isEntity());
 			mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
@@ -2133,6 +2134,8 @@ public class DocumentWindow extends JFrame
 				highlightManager.highlight(annotation);
 			break;
 		case Remove:
+			if (annotation instanceof Mention && ((Mention) annotation).getDiscontinuous() != null)
+				highlightManager.undraw(((Mention) annotation).getDiscontinuous());
 			highlightManager.undraw(annotation);
 			break;
 		case Update:
