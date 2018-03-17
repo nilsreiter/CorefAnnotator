@@ -47,12 +47,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	public void initialise() {
-		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJcas(), Entity.class)).forEach(e -> {
+		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
 			entityEvent(Event.Add, e);
 		});
 		Annotator.logger.debug("Added all entities");
 
-		for (Mention m : JCasUtil.select(coreferenceModel.getJcas(), Mention.class)) {
+		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
 			annotationEvent(Event.Add, m);
 		}
 		Annotator.logger.debug("Added all mentions");

@@ -51,9 +51,6 @@ public class CoreferenceModel {
 
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 
-	@Deprecated
-	CommentsModel commentsModel;
-
 	/**
 	 * A list of listeners to annotation events
 	 */
@@ -98,10 +95,6 @@ public class CoreferenceModel {
 
 	public Mention add(Span selection) {
 		return add(selection.begin, selection.end);
-	}
-
-	public void add(String text, String author, int begin, int end) {
-		commentsModel.add(text, author, begin, end);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
@@ -226,12 +219,7 @@ public class CoreferenceModel {
 		eg.setMembers(1, e2);
 	}
 
-	@Deprecated
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
-	}
-
-	public JCas getJcas() {
+	public JCas getJCas() {
 		return jcas;
 	}
 
