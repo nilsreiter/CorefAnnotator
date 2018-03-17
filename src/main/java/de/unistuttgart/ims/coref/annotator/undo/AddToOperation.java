@@ -1,13 +1,21 @@
 package de.unistuttgart.ims.coref.annotator.undo;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class AddToOperation implements EditOperation {
+public class AddToOperation extends AbstractEditOperation {
 	Entity entity;
 	Mention mention;
+	Span span;
 
+	public AddToOperation(Entity entity, Span span) {
+		this.entity = entity;
+		this.span = span;
+	}
+
+	@Deprecated
 	public AddToOperation(Entity entity, Mention mention) {
 		this.entity = entity;
 		this.mention = mention;
@@ -29,6 +37,11 @@ public class AddToOperation implements EditOperation {
 	@Override
 	public void revert(CoreferenceModel model) {
 		model.remove(mention);
+	}
+
+	@Override
+	void perform(CoreferenceModel model) {
+		model.addTo(entity, span.begin, span.end);
 	}
 
 }
