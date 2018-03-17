@@ -120,7 +120,6 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -701,8 +700,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.setEntitySortOrder(EntitySortOrder.Alphabet);
-			cModel.resort();
+			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Alphabet);
+			documentModel.getTreeModel().getEntitySortOrder().descending = false;
+			documentModel.getTreeModel().resort();
+			sortDescending.putValue(Action.SELECTED_KEY, false);
 		}
 
 	}
@@ -719,10 +720,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.setEntitySortOrder(EntitySortOrder.Mentions);
-			cModel.getEntitySortOrder().descending = true;
+			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Mentions);
+			documentModel.getTreeModel().getEntitySortOrder().descending = true;
+			documentModel.getTreeModel().resort();
 			sortDescending.putValue(Action.SELECTED_KEY, true);
-			cModel.resort();
 		}
 
 	}
@@ -815,14 +816,12 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	public void setCoreferenceModel(CoreferenceModel model) {
-		EntityTreeModel etm = new EntityTreeModel(model);
-		Annotator.logger.trace(etm.getRoot().getChildren());
+	public void setCoreferenceModel(DocumentModel model) {
 
-		tree.setModel(etm);
-		etm.addTreeModelListener(this);
-		etm.resort();
-		cModel = model;
+		tree.setModel(model.getTreeModel());
+		model.getTreeModel().addTreeModelListener(this);
+		documentModel = model;
+		// cModel = model;
 
 		// UI
 		this.stopIndeterminateProgress();
@@ -853,7 +852,7 @@ public class DocumentWindow extends JFrame
 		// final
 		setMessage("");
 
-		commentsWindow = new CommentWindow(this, cModel);
+		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 
 		Annotator.logger.info("Document model has been loaded.");
 	}
@@ -934,7 +933,7 @@ public class DocumentWindow extends JFrame
 		try {
 			TreePath tp = e.getTreePath();
 			Rectangle r = tree.getPathBounds(tp);
-			// tree.repaint(r);
+			tree.repaint(r);
 		} catch (NullPointerException ex) {
 			Annotator.logger.catching(ex);
 		}
@@ -1625,8 +1624,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.getEntitySortOrder().descending = !cModel.getEntitySortOrder().descending;
-			cModel.resort();
+			documentModel.getTreeModel()
+					.getEntitySortOrder().descending = !documentModel.getTreeModel().getEntitySortOrder().descending;
+			documentModel.getTreeModel().resort();
 		}
 	}
 
@@ -1972,25 +1972,27 @@ public class DocumentWindow extends JFrame
 		public void filter(String s) {
 			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 			if (s.length() >= 1) {
-				for (int i = 0; i < cModel.getRootNode().getChildCount(); i++) {
-					CATreeNode tn = cModel.getRootNode().getChildAt(i);
+				documentModel.getTreeModel().getRoot();
+				for (int i = 0; i < documentModel.getTreeModel().getRoot().getChildCount(); i++) {
+					CATreeNode tn = documentModel.getTreeModel().getRoot().getChildAt(i);
 					if (tn.isEntity()) {
 						tn.setRank(matches(s, tn) ? 60 : 40);
 						tree.scrollRowToVisible(0);
 					}
 				}
 				// cModel.nodeStructureChanged(cModel.getRootNode());
-				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.getEntitySortOrder().getComparator()));
+				documentModel.getTreeModel().resort(EntitySortOrder
+						.getVisibilitySortOrder(documentModel.getTreeModel().getEntitySortOrder().getComparator()));
 			} else {
-				for (int i = 0; i < cModel.getRootNode().getChildCount(); i++) {
-					CATreeNode tn = cModel.getRootNode().getChildAt(i);
+				for (int i = 0; i < documentModel.getTreeModel().getRoot().getChildCount(); i++) {
+					CATreeNode tn = documentModel.getTreeModel().getRoot().getChildAt(i);
 					if (tn.isEntity()) {
 						tn.setRank(50);
 
 					}
 				}
 				// cModel.nodeStructureChanged(cModel.getRootNode());
-				cModel.resort();
+				documentModel.getTreeModel().resort();
 			}
 		}
 

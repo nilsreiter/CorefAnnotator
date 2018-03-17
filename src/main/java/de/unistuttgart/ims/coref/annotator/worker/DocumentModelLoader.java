@@ -12,12 +12,14 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
 
-public class DocumentModelLoader extends SwingWorker<CoreferenceModel, Integer> {
+public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	@Deprecated
 	DocumentWindow documentWindow;
-	Consumer<CoreferenceModel> consumer = null;
+	Consumer<DocumentModel> consumer = null;
 	CoreferenceModelListener coreferenceModelListener;
 	JCas jcas;
 
@@ -27,22 +29,29 @@ public class DocumentModelLoader extends SwingWorker<CoreferenceModel, Integer> 
 		this.jcas = jcas;
 	}
 
-	public DocumentModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
+	public DocumentModelLoader(Consumer<DocumentModel> consumer, JCas jcas) {
 		this.consumer = consumer;
 		this.jcas = jcas;
 	}
 
-	protected CoreferenceModel load(Preferences preferences) {
+	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
 		CoreferenceModel cModel;
 		cModel = new CoreferenceModel(jcas, preferences);
 
-		return cModel;
+		EntityTreeModel etm = new EntityTreeModel(cModel);
+
+		DocumentModel documentModel = new DocumentModel();
+		documentModel.setJcas(jcas);
+		documentModel.setCoreferenceModel(cModel);
+		documentModel.setTreeModel(etm);
+
+		return documentModel;
 	}
 
 	@Override
-	protected CoreferenceModel doInBackground() throws Exception {
+	protected DocumentModel doInBackground() throws Exception {
 		return load(Annotator.app.getPreferences());
 	}
 

@@ -26,10 +26,9 @@ public class CommentWindow extends JDialog {
 	// Components
 	PanelList<Comment, CommentPanel> commentList;
 
-	public CommentWindow(DocumentWindow mainWindow, CoreferenceModel coreferenceModel) {
+	public CommentWindow(DocumentWindow mainWindow, CommentsModel commentsModel) {
 		this.mainWindow = mainWindow;
-		this.coreferenceModel = coreferenceModel;
-		this.commentsListModel = coreferenceModel.getCommentsModel();
+		this.commentsListModel = commentsModel;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

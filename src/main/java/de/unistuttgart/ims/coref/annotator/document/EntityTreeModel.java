@@ -41,8 +41,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.coreferenceModel.addCoreferenceModelListener(this);
 
 		this.initialise();
+		this.resort();
 
-		nodeStructureChanged(root);
 	}
 
 	public void initialise() {
@@ -139,6 +139,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
 		this.entitySortOrder = entitySortOrder;
+	}
+
+	public EntitySortOrder getEntitySortOrder() {
+		return entitySortOrder;
 	}
 
 }
