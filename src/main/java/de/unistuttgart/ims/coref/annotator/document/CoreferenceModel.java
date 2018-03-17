@@ -204,7 +204,7 @@ public class CoreferenceModel {
 	}
 
 	protected void fireEntityGroupEvent(Event update, EntityGroup eg) {
-		crModelListeners.forEach(l -> l.entityGroupEvent(Event.Remove, eg));
+		crModelListeners.forEach(l -> l.entityGroupEvent(update, eg));
 	}
 
 	protected void fireEntityRemovedEvent(Entity e) {
@@ -216,9 +216,11 @@ public class CoreferenceModel {
 	}
 
 	public void formGroup(Entity e1, Entity e2) {
+		Annotator.logger.trace("Forming entity group with {} and {}.", e1, e2);
 		EntityGroup eg = createEntityGroup(e1.getLabel() + " and " + e2.getLabel(), 2);
 		eg.setMembers(0, e1);
 		eg.setMembers(1, e2);
+		fireEntityGroupEvent(Event.Add, eg);
 	}
 
 	public JCas getJCas() {
