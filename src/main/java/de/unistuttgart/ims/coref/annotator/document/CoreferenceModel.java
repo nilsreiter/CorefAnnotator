@@ -288,12 +288,15 @@ public class CoreferenceModel {
 
 	public void remove(Entity entity) {
 		fireEntityEvent(Event.Remove, entity);
+		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
+
 	}
 
-	public void remove(EntityGroup eg) {
-		this.fireEntityGroupEvent(Event.Remove, eg);
-		eg.removeFromIndexes();
+	public void remove(EntityGroup entity) {
+		fireEntityGroupEvent(Event.Remove, entity);
+		entityMentionMap.removeAll(entity);
+		entity.removeFromIndexes();
 	}
 
 	public void remove(Mention m) {
