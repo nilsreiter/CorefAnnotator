@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
-public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
+public class DocumentModelLoader extends SwingWorker<CoreferenceModel, Integer> {
 
 	@Deprecated
 	DocumentWindow documentWindow;
@@ -22,12 +22,12 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 	JCas jcas;
 
 	@Deprecated
-	public CoreferenceModelLoader(DocumentWindow documentWindow, JCas jcas) {
+	public DocumentModelLoader(DocumentWindow documentWindow, JCas jcas) {
 		this.documentWindow = documentWindow;
 		this.jcas = jcas;
 	}
 
-	public CoreferenceModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
+	public DocumentModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
 		this.consumer = consumer;
 		this.jcas = jcas;
 	}

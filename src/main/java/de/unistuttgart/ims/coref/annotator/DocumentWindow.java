@@ -119,11 +119,12 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
-import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
+import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class DocumentWindow extends JFrame
@@ -165,7 +166,9 @@ public class DocumentWindow extends JFrame
 	AbstractAction copyAction;
 
 	// controller
+	@Deprecated
 	CoreferenceModel cModel;
+	DocumentModel documentModel;
 	HighlightManager highlightManager;
 
 	// Window components
@@ -868,7 +871,7 @@ public class DocumentWindow extends JFrame
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-		CoreferenceModelLoader im = new CoreferenceModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
+		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
 		im.setCoreferenceModelListener(this);
 		im.execute();
 	}

@@ -60,7 +60,7 @@ public class TestCoreferenceModelLoader {
 	public void testResource(String s) throws UIMAException, SAXException, IOException {
 		jcas = JCasFactory.createJCas();
 		XmiCasDeserializer.deserialize(getClass().getResourceAsStream(s), jcas.getCas(), true);
-		CoreferenceModelLoader cml = new CoreferenceModelLoader(cm -> {
+		DocumentModelLoader cml = new DocumentModelLoader(cm -> {
 		}, jcas);
 		CoreferenceModel model = cml.load(Preferences.userRoot());
 		assertNotNull(model);
