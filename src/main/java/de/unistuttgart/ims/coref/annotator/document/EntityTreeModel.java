@@ -160,6 +160,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	@Override
 	public void entityGroupEvent(Event event, EntityGroup eg) {
+		Annotator.logger.entry();
 		switch (event) {
 		case Add:
 			CATreeNode tn = new CATreeNode(eg, eg.getLabel());
