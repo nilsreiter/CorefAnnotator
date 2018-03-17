@@ -16,6 +16,7 @@ import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Multimaps;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
@@ -56,7 +57,7 @@ public class CoreferenceModel {
 	 */
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
-	MutableSetMultimap<Object, Annotation> entityMentionMap = Multimaps.mutable.set.empty();
+	MutableSetMultimap<Object, Mention> entityMentionMap = Multimaps.mutable.set.empty();
 
 	/**
 	 * The document
@@ -82,6 +83,7 @@ public class CoreferenceModel {
 	 * @return The new mention
 	 */
 	public Mention add(int begin, int end) {
+		Annotator.logger.entry(begin, end);
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
@@ -239,7 +241,23 @@ public class CoreferenceModel {
 	}
 
 	public void merge(Entity... nodes) {
-		// TODO: Implement
+		Entity biggest = nodes[0];
+		int size = 0;
+		for (Entity n : nodes) {
+			if (entityMentionMap.get(n).size() > size) {
+				size = entityMentionMap.get(n).size();
+				biggest = n;
+			}
+		}
+
+		for (Entity n : nodes) {
+			if (n != biggest) {
+				for (Mention mention : entityMentionMap.get(n)) {
+					moveTo(mention, biggest);
+				}
+				remove(n);
+			}
+		}
 		return;
 	}
 
@@ -342,6 +360,7 @@ public class CoreferenceModel {
 			return;
 		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
+			registerAnnotation(mention);
 			fireMentionAddedEvent(mention);
 		}
 		initialised = true;
