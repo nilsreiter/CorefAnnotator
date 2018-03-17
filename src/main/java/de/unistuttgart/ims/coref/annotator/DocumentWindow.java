@@ -137,9 +137,6 @@ public class DocumentWindow extends JFrame
 	String segmentAnnotation = null;
 
 	// storing and caching
-	@Deprecated
-	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
-	RangedCounter spanCounter = new RangedCounter();
 	boolean unsavedChanges = false;
 	Feature titleFeature;
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
