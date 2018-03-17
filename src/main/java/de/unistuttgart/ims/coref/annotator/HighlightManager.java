@@ -30,6 +30,7 @@ class HighlightManager {
 		textComponent.setHighlighter(hilit);
 	}
 
+	@Deprecated
 	public void clearAndDrawAllAnnotations(JCas jcas) {
 		hilit.removeAllHighlights();
 		highlightMap.clear();

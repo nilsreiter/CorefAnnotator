@@ -137,6 +137,7 @@ public class DocumentWindow extends JFrame
 	String segmentAnnotation = null;
 
 	// storing and caching
+	@Deprecated
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	RangedCounter spanCounter = new RangedCounter();
 	boolean unsavedChanges = false;
@@ -816,15 +817,14 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	public void setCoreferenceModel(DocumentModel model) {
+	public void setDocumentModel(DocumentModel model) {
 
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		documentModel = model;
-		// cModel = model;
 
 		// UI
-		this.stopIndeterminateProgress();
+		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
 
@@ -867,10 +867,10 @@ public class DocumentWindow extends JFrame
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
 				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
 
-		highlightManager.clearAndDrawAllAnnotations(jcas);
+		// highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
+		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);
 		im.execute();
 	}
@@ -1651,9 +1651,8 @@ public class DocumentWindow extends JFrame
 			if (tree.getSelectionCount() > 0) {
 				for (TreePath tp : tree.getSelectionPaths()) {
 					CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-					tn.setVisible(!tn.isVisible());
 					Entity entity = (Entity) tn.getFeatureStructure();
-					documentModel.getCoreferenceModel().update(entity, tn.isVisible());
+					documentModel.getCoreferenceModel().toggleHidden(entity);
 				}
 			}
 		}
@@ -2139,7 +2138,12 @@ public class DocumentWindow extends JFrame
 			highlightManager.undraw(annotation);
 			break;
 		case Update:
-			highlightManager.underline(annotation);
+			if (annotation instanceof Mention) {
+				if (((Mention) annotation).getEntity().getHidden())
+					highlightManager.undraw(annotation);
+				else
+					highlightManager.underline(annotation);
+			}
 			break;
 		default:
 			break;
