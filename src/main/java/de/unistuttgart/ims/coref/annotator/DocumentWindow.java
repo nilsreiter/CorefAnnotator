@@ -2149,8 +2149,7 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void entityGroupEvent(Event event, EntityGroup entity) {
-		// TODO Auto-generated method stub
-
+		entityEvent(event, entity);
 	}
 
 	@Override
