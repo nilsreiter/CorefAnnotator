@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
 public class TestCoreferenceModelLoader {
@@ -27,23 +28,27 @@ public class TestCoreferenceModelLoader {
 		modelListener = new CoreferenceModelListener() {
 
 			@Override
-			public void annotationAdded(Annotation m) {
+			public void annotationEvent(Event event, Annotation annotation) {
+				// TODO Auto-generated method stub
+
 			}
 
 			@Override
-			public void annotationChanged(Annotation m) {
+			public void entityEvent(Event event, Entity entity) {
+				// TODO Auto-generated method stub
+
 			}
 
 			@Override
-			public void annotationRemoved(Annotation m) {
+			public void entityGroupEvent(Event event, EntityGroup entity) {
+				// TODO Auto-generated method stub
+
 			}
 
 			@Override
-			public void entityAdded(Entity entity) {
-			}
+			public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
+				// TODO Auto-generated method stub
 
-			@Override
-			public void entityRemoved(Entity entity) {
 			}
 		};
 	}
@@ -62,9 +67,8 @@ public class TestCoreferenceModelLoader {
 		XmiCasDeserializer.deserialize(getClass().getResourceAsStream(s), jcas.getCas(), true);
 		DocumentModelLoader cml = new DocumentModelLoader(cm -> {
 		}, jcas);
-		CoreferenceModel model = cml.load(Preferences.userRoot());
+		CoreferenceModel model = cml.load(Preferences.userRoot()).getCoreferenceModel();
 		assertNotNull(model);
-		assertNotNull(model.getRoot());
 		assertNotNull(model.getMentions(20));
 	}
 }

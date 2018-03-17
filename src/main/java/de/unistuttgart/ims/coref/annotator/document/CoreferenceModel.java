@@ -2,11 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.prefs.Preferences;
-
-import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.cas.FeatureStructure;
@@ -16,16 +12,14 @@ import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
+import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener.Event;
 import de.unistuttgart.ims.coref.annotator.Defaults;
-import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -40,8 +34,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel extends DefaultTreeModel {
-	private static final long serialVersionUID = 1L;
+public class CoreferenceModel {
 
 	/**
 	 * A mapping from character positions to annotations
@@ -52,6 +45,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 	 * Assigns colors to new entities
 	 */
 	ColorProvider colorMap = new ColorProvider();
+
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 
 	/**
@@ -60,63 +54,19 @@ public class CoreferenceModel extends DefaultTreeModel {
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
 	/**
-	 * A map of feature structures to the tree nodes that represent them
-	 */
-	@Deprecated
-	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
-
-	/**
-	 * The sort order for the tree nodes
-	 */
-	@Deprecated
-	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
-
-	/**
 	 * The document
 	 */
 	JCas jcas;
 
 	Preferences preferences;
 
-	/**
-	 * root node of tree
-	 */
-	@Deprecated
-	CATreeNode rootNode;
-
 	CommentsModel commentsModel;
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
-		super(new CATreeNode(null, Annotator.getString("tree.root")));
-		this.rootNode = (CATreeNode) getRoot();
 		this.jcas = jcas;
 		this.preferences = preferences;
 		this.commentsModel = new CommentsModel(this);
 
-	}
-
-	@Deprecated
-	public CATreeNode addToTree(DetachedMentionPart dmp) {
-		CATreeNode node = new CATreeNode(dmp, dmp.getCoveredText());
-		fsMap.put(dmp, node);
-		return node;
-	}
-
-	@Deprecated
-	public CATreeNode addToTree(Mention m) {
-		CATreeNode node = new CATreeNode(m, m.getCoveredText());
-		fsMap.put(m, node);
-		registerAnnotation(m);
-		return node;
-	}
-
-	@Deprecated
-	public CATreeNode addToTree(Entity e) {
-		CATreeNode tn = new CATreeNode(e, "");
-		insertNodeInto(tn, rootNode, 0);
-		fsMap.put(e, tn);
-		fireEntityAddedEvent(e);
-		return tn;
 	}
 
 	/**
@@ -132,9 +82,9 @@ public class CoreferenceModel extends DefaultTreeModel {
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
+		fireEntityAddedEvent(e);
 		m.setEntity(e);
 
-		fireEntityAddedEvent(e);
 		fireMentionAddedEvent(m);
 		return m;
 	}
@@ -147,58 +97,22 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return crModelListeners.add(e);
 	}
 
-	public void addTo(Mention m, DetachedMentionPart dmp) {
-		// tree model
-		CATreeNode node = addToTree(dmp);
-		insertNodeInto(node, get(m), 0);
-
-		// notify text view
-		fireAnnotationChangedEvent(m);
-	}
-
 	public void addTo(Mention m, int begin, int end) {
 		// document model
 		DetachedMentionPart d = createDetachedMentionPart(begin, end);
 		d.setMention(m);
 		m.setDiscontinuous(d);
 
-		addTo(m, d);
+		fireAnnotationChangedEvent(m);
+		fireMentionAddedEvent(d);
 	}
 
 	public Mention addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
-		addTo(get(e), addToTree(m));
-		if (get(e).isVisible())
-			fireMentionAddedEvent(m);
-		return m;
-	}
-
-	@Deprecated
-	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
-
-		Mention m = mentionNode.getFeatureStructure();
-		Entity e = entityNode.getFeatureStructure();
 		m.setEntity(e);
-		CATreeNode tn = addToTree(m);
-		int ind = 0;
-		while (ind < entityNode.getChildCount()) {
-			CATreeNode node = entityNode.getChildAt(ind);
-			if (node.getFeatureStructure() instanceof Entity
-					|| ((Annotation) node.getFeatureStructure()).getBegin() > m.getBegin())
-				break;
-			ind++;
-		}
-
-		insertNodeInto(tn, entityNode, ind);
-
-		if (m.getDiscontinuous() != null) {
-			CATreeNode discNode = getOrCreate(m.getDiscontinuous());
-			insertNodeInto(discNode, tn, 0);
-		}
-		if (entityNode.isVisible())
-			fireAnnotationChangedEvent(m);
-		if (preferences.getBoolean(Constants.CFG_KEEP_TREE_SORTED, Defaults.CFG_KEEP_TREE_SORTED))
-			resort();
+		fireEntityEvent(Event.Update, e);
+		fireMentionAddedEvent(m);
+		return m;
 	}
 
 	public void addTo(EntityGroup eg, Entity e) {
@@ -213,8 +127,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		eg.setMembers(arr);
 		oldArr.removeFromIndexes();
 
-		// tree stuff
-		insertNodeInto(new CATreeNode(e, e.getLabel()), fsMap.get(eg), 0);
 	}
 
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
@@ -264,64 +176,41 @@ public class CoreferenceModel extends DefaultTreeModel {
 	}
 
 	protected void fireMentionAddedEvent(Annotation annotation) {
-		crModelListeners.forEach(l -> l.annotationAdded(annotation));
+		crModelListeners.forEach(l -> l.annotationEvent(Event.Add, annotation));
 	}
 
 	protected void fireAnnotationChangedEvent(Annotation m) {
-		crModelListeners.forEach(l -> l.annotationChanged(m));
+		crModelListeners.forEach(l -> l.annotationEvent(Event.Update, m));
 	}
 
 	protected void fireAnnotationRemovedEvent(Annotation m) {
-		crModelListeners.forEach(l -> l.annotationRemoved(m));
+		crModelListeners.forEach(l -> l.annotationEvent(Event.Remove, m));
+	}
+
+	protected void fireAnnotationMovedEvent(Annotation m, Object from, Object to) {
+		crModelListeners.forEach(l -> l.annotationMovedEvent(m, from, to));
 	}
 
 	protected void fireEntityRemovedEvent(Entity e) {
-		crModelListeners.forEach(l -> l.entityRemoved(e));
+		crModelListeners.forEach(l -> l.entityEvent(Event.Remove, e));
 	}
 
 	protected void fireEntityAddedEvent(Entity e) {
-		crModelListeners.forEach(l -> l.entityAdded(e));
+		crModelListeners.forEach(l -> l.entityEvent(Event.Add, e));
+	}
+
+	protected void fireEntityEvent(Event evt, Entity e) {
+		crModelListeners.forEach(l -> l.entityEvent(evt, e));
 	}
 
 	public void formGroup(Entity e1, Entity e2) {
 		EntityGroup eg = createEntityGroup(e1.getLabel() + " and " + e2.getLabel(), 2);
 		eg.setMembers(0, e1);
 		eg.setMembers(1, e2);
-
-		CATreeNode gtn = addToTree(eg);
-
-		insertNodeInto(new CATreeNode(e1, e1.getLabel()), gtn, 0);
-		insertNodeInto(new CATreeNode(e2, e2.getLabel()), gtn, 1);
-
 	}
 
 	public JCas getJcas() {
 		return jcas;
-	}
-
-	@Deprecated
-	public CATreeNode get(DetachedMentionPart m) {
-		return fsMap.get(m);
-	}
-
-	@Deprecated
-	public CATreeNode getOrCreate(DetachedMentionPart m) {
-		if (!fsMap.containsKey(m))
-			return addToTree(m);
-		return fsMap.get(m);
-	}
-
-	@Deprecated
-	public CATreeNode get(Mention m) {
-		return fsMap.get(m);
-	}
-
-	@Deprecated
-	public CATreeNode get(Entity e) {
-		if (!fsMap.containsKey(e)) {
-			return addToTree(e);
-		}
-		return fsMap.get(e);
 	}
 
 	/**
@@ -343,115 +232,41 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return crModelListeners.remove(o);
 	}
 
-	@Deprecated
-	protected void remove(Mention m, CATreeNode node) {
-		CATreeNode parent = node.getParent();
-
-		// removing from tree
-		removeNodeFromParent(node);
-
-		// document
-		fsMap.remove(m);
-		m.removeFromIndexes();
-
-		if (preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
-			if (parent.isEntity() && parent.isLeaf()) {
-				remove(parent.getEntity(), parent);
-			}
-		}
-
-		// fire event
-		fireAnnotationRemovedEvent(m);
-
-	}
-
-	@Deprecated
-	protected void remove(DetachedMentionPart m, CATreeNode node) {
-		m.getMention().setDiscontinuous(null);
-		m.setMention(null);
-
-		// tree
-		removeNodeFromParent(node);
-		fireAnnotationRemovedEvent(m);
-
-		// document
-		fsMap.remove(m);
-		m.removeFromIndexes();
-	}
-
-	@Deprecated
-	protected void remove(Entity e, CATreeNode etn) {
-		for (int i = 0; i < etn.getChildCount(); i++) {
-			etn.removeAllChildren();
-			CATreeNode n = etn.getChildAt(i);
-			if (n.getFeatureStructure() instanceof Mention)
-				remove((Mention) n.getFeatureStructure(), n);
-		}
-		removeNodeFromParent(etn);
-		fsMap.remove(e);
-		fireEntityRemovedEvent(e);
-		e.removeFromIndexes();
+	public void remove(Entity entity) {
+		fireEntityEvent(Event.Remove, entity);
+		entity.removeFromIndexes();
 	}
 
 	public void remove(DetachedMentionPart dmp) {
-		remove(dmp, get(dmp));
 	}
 
-	public DetachedMentionPart removeFrom(Mention m) {
-		DetachedMentionPart dmp = m.getDiscontinuous();
-		m.setDiscontinuous(null);
-		dmp.setMention(null);
-
-		removeNodeFromParent(fsMap.get(dmp));
-		return dmp;
-	}
-
-	public void remove(Entity e) {
-		remove(e, get(e));
-	}
-
-	@Deprecated
-	public void removeFrom(EntityGroup eg, CATreeNode e) {
-		removeNodeFromParent(e);
+	public void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
 		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
 		for (int i = 0; i < oldArray.size() - 1; i++) {
-			if (eg.getMembers(i) == e.getFeatureStructure()) {
+			if (eg.getMembers(i) == entity) {
 				i--;
 			} else {
 				arr.set(i, eg.getMembers(i));
 			}
 		}
 		eg.setMembers(arr);
+		fireEntityGroupEvent(Event.Update, eg);
+	}
+
+	protected void fireEntityGroupEvent(Event update, EntityGroup eg) {
+		crModelListeners.forEach(l -> l.entityGroupEvent(Event.Remove, eg));
 	}
 
 	public void remove(EntityGroup eg) {
-		CATreeNode etn = fsMap.get(eg);
-		for (int i = 0; i < etn.getChildCount(); i++) {
-			FeatureStructure fs = etn.getChildAt(i).getFeatureStructure();
-			if (fs instanceof Mention)
-				remove((Mention) fs);
-		}
-		removeNodeFromParent(etn);
+		this.fireEntityGroupEvent(Event.Remove, eg);
 		eg.removeFromIndexes();
-
 	}
 
 	public void remove(Mention m) {
-		remove(m, get(m));
 		characterPosition2AnnotationMap.remove(m);
-	}
-
-	@Deprecated
-	public void resort() {
-		resort(entitySortOrder.getComparator());
-	}
-
-	@Deprecated
-	public void resort(Comparator<CATreeNode> comparator) {
-		Annotator.logger.trace("Sorting entity tree with {}", comparator.toString());
-		rootNode.getChildren().sort(comparator);
-		nodeStructureChanged(rootNode);
+		fireAnnotationRemovedEvent(m);
+		m.removeFromIndexes();
 	}
 
 	public void toggleFlagEntity(Entity m, String flag) {
@@ -459,9 +274,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
 		} else
 			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
-		nodeChanged(fsMap.get(m));
-		// fireMentionChangedEvent(m);
-		// fireMentionSelectedEvent(m);
+		fireEntityEvent(Event.Update, m);
 	}
 
 	public void toggleFlagMention(Mention m, String flag) {
@@ -469,72 +282,43 @@ public class CoreferenceModel extends DefaultTreeModel {
 			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
 		} else
 			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
-		nodeChanged(fsMap.get(m));
 		fireAnnotationChangedEvent(m);
 	}
 
 	public void updateColor(Entity entity, Color newColor) {
 		entity.setColor(newColor.getRGB());
-		CATreeNode entityNode = fsMap.get(entity);
-		this.nodeChanged(entityNode);
-		for (int i = 0; i < entityNode.getChildCount(); i++) {
-			FeatureStructure child = entityNode.getChildAt(i).getFeatureStructure();
-			if (child instanceof Annotation)
-				fireAnnotationChangedEvent((Mention) child);
-		}
+		fireEntityEvent(Event.Update, entity);
+	}
+
+	public void setHidden(Entity entity, boolean hidden) {
+		entity.setHidden(hidden);
+		fireEntityEvent(Event.Update, entity);
 	}
 
 	public void update(Entity entity, boolean displayed) {
-		CATreeNode node = get(entity);
-		for (int i = 0; i < node.getChildCount(); i++) {
-			CATreeNode child = node.getChildAt(i);
-			if (child.isMention())
-				if (displayed)
-					fireMentionAddedEvent(child.getFeatureStructure());
-				else
-					fireAnnotationRemovedEvent(child.getFeatureStructure());
-		}
+		// TODO: Implement
+		return;
+
 	};
 
-	@Deprecated
-	public void merge(CATreeNode... nodes) {
-		if (nodes.length == 0)
-			return;
-		CATreeNode biggest = nodes[0];
-		int size = 0;
-		for (CATreeNode n : nodes) {
-			if (n.getChildCount() > size) {
-				size = n.getChildCount();
-				biggest = n;
-			}
-		}
-
-		for (CATreeNode n : nodes) {
-			if (n != biggest) {
-				for (int i = 0; i < n.getChildCount();) {
-					CATreeNode node = n.getChildAt(i);
-					if (node.getFeatureStructure() instanceof Mention) {
-						Mention m = (Mention) node.getFeatureStructure();
-						moveTo(m, biggest.getFeatureStructure());
-					} else {
-						i++;
-					}
-				}
-				remove(n.getEntity());
-			}
-		}
+	public void merge(Entity... nodes) {
+		// TODO: Implement
+		return;
 	}
 
 	public void moveTo(Mention m, Entity newEntity) {
-		CATreeNode mentionNode = get(m);
-		// remove mention from old entity
-		removeNodeFromParent(mentionNode);
-		fsMap.remove(m);
+		Entity oldEntity = m.getEntity();
+		m.setEntity(newEntity);
+		fireAnnotationMovedEvent(m, oldEntity, newEntity);
+		fireAnnotationChangedEvent(m);
+	}
 
-		// attach it to the new entity
-		addTo(get(newEntity), mentionNode);
+	public void moveTo(DetachedMentionPart dmp, Mention m) {
+		Mention old = dmp.getMention();
+		dmp.setMention(m);
 
-		// fire event
+		fireAnnotationChangedEvent(old);
+		fireAnnotationChangedEvent(dmp);
 		fireAnnotationChangedEvent(m);
 	}
 
@@ -542,19 +326,12 @@ public class CoreferenceModel extends DefaultTreeModel {
 		return commentsModel;
 	}
 
-	@Deprecated
-	public CATreeNode getRootNode() {
-		return rootNode;
+	public Mention add(Span selection) {
+		return add(selection.begin, selection.end);
 	}
 
-	@Deprecated
-	public EntitySortOrder getEntitySortOrder() {
-		return entitySortOrder;
-	}
-
-	@Deprecated
-	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
-		this.entitySortOrder = entitySortOrder;
+	public Preferences getPreferences() {
+		return preferences;
 	}
 
 }

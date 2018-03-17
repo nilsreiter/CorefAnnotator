@@ -26,6 +26,7 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	String label;
 
+	@Deprecated
 	boolean visible = true;
 	int rank = 50;
 

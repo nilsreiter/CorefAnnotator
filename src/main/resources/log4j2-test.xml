@@ -5,7 +5,7 @@
 		<Property name="loggername">de.unistuttgart.ims.coref.annotator.Annotator</Property>
 	</Properties>
 	<Appenders>
-		<Console name="Console" target="SYSTEM_OUT">
+		<Console name="Console" target="SYSTEM_ERR">
 		 	<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY"/>
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>

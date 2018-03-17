@@ -13,6 +13,7 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
@@ -47,84 +48,94 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJcas(), Entity.class)).forEach(e -> {
-			entityAdded(e);
+			entityEvent(Event.Add, e);
 		});
 		Annotator.logger.debug("Added all entities");
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJcas(), Mention.class)) {
-			annotationAdded(m);
+			annotationEvent(Event.Add, m);
 		}
 		Annotator.logger.debug("Added all mentions");
 	}
 
 	@Override
-	public void annotationAdded(Annotation a) {
-		if (a instanceof Mention) {
-			Mention mention = (Mention) a;
-			CATreeNode node = new CATreeNode(mention, mention.getCoveredText());
-			fsMap.put(mention, node);
-			CATreeNode entityNode = get(mention.getEntity());
+	public void annotationEvent(Event event, Annotation a) {
+		switch (event) {
+		case Add:
+			if (a instanceof Mention) {
+				Mention mention = (Mention) a;
+				CATreeNode node = new CATreeNode(mention, mention.getCoveredText());
+				fsMap.put(mention, node);
+				CATreeNode entityNode = get(mention.getEntity());
 
-			int ind = 0;
-			while (ind < entityNode.getChildCount()) {
-				CATreeNode cnode = entityNode.getChildAt(ind);
-				if (cnode.getFeatureStructure() instanceof Entity
-						|| ((Annotation) cnode.getFeatureStructure()).getBegin() > mention.getBegin())
-					break;
-				ind++;
+				int ind = 0;
+				while (ind < entityNode.getChildCount()) {
+					CATreeNode cnode = entityNode.getChildAt(ind);
+					if (cnode.getFeatureStructure() instanceof Entity
+							|| ((Annotation) cnode.getFeatureStructure()).getBegin() > mention.getBegin())
+						break;
+					ind++;
+				}
+
+				insertNodeInto(node, entityNode, ind);
+				optResort();
 			}
-
-			insertNodeInto(node, entityNode, ind);
+			break;
+		case Remove:
+			removeNodeFromParent(get(a));
+			break;
+		case Update:
+			nodeChanged(get(a));
+			break;
+		default:
+			break;
 		}
 	}
 
 	@Override
-	public void annotationChanged(Annotation m) {
-		nodeChanged(get(m));
-	}
-
-	@Override
-	public void annotationRemoved(Annotation m) {
-		removeNodeFromParent(get(m));
-	}
-
-	@Override
-	public void entityAdded(Entity entity) {
-		// if (fsMap.containsKey(entity))
-		// return;
-		CATreeNode tn = new CATreeNode(entity, entity.getLabel());
-		fsMap.put(entity, tn);
-		insertNodeInto(tn, getRoot(), 0);
-		if (entity instanceof EntityGroup) {
-			EntityGroup eg = (EntityGroup) entity;
-			for (int i = 0; i < eg.getMembers().size(); i++)
-				insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), 0);
+	public void entityEvent(Event event, Entity entity) {
+		switch (event) {
+		case Add:
+			CATreeNode tn = new CATreeNode(entity, entity.getLabel());
+			fsMap.put(entity, tn);
+			insertNodeInto(tn, getRoot(), 0);
+			if (entity instanceof EntityGroup) {
+				EntityGroup eg = (EntityGroup) entity;
+				for (int i = 0; i < eg.getMembers().size(); i++)
+					insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), 0);
+			}
+			optResort();
+			break;
+		case Remove:
+			CATreeNode etn = fsMap.get(entity);
+			for (int i = 0; i < etn.getChildCount(); i++) {
+				etn.removeAllChildren();
+			}
+			removeNodeFromParent(etn);
+			fsMap.remove(entity);
+			optResort();
+			break;
+		case Update_Color:
+		case Update:
+			nodeChanged(get(entity));
+			break;
+		default:
+			break;
 		}
 	}
 
-	@Override
-	public void entityRemoved(Entity entity) {
-		CATreeNode etn = fsMap.get(entity);
-		for (int i = 0; i < etn.getChildCount(); i++) {
-			etn.removeAllChildren();
-		}
-		removeNodeFromParent(etn);
-		fsMap.remove(entity);
-	}
-
-	protected CATreeNode get(Annotation m) {
+	protected CATreeNode get(Object m) {
 		return fsMap.get(m);
-	}
-
-	protected CATreeNode get(Entity e) {
-		// if (!fsMap.containsKey(e))
-		// entityAdded(e);
-		return fsMap.get(e);
 	}
 
 	@Override
 	public CATreeNode getRoot() {
 		return (CATreeNode) root;
+	}
+
+	public void optResort() {
+		if (coreferenceModel.getPreferences().getBoolean(Constants.CFG_KEEP_TREE_SORTED, Defaults.CFG_KEEP_TREE_SORTED))
+			resort();
 	}
 
 	public void resort() {
@@ -133,8 +144,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void resort(Comparator<CATreeNode> comparator) {
 		Annotator.logger.trace("Sorting entity tree with {}", comparator.toString());
-		getRoot().getChildren().sort(comparator);
-		nodeStructureChanged(getRoot());
+		if (!getRoot().isLeaf()) {
+			getRoot().getChildren().sort(comparator);
+			nodeStructureChanged(getRoot());
+		}
 	}
 
 	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
@@ -143,6 +156,51 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public EntitySortOrder getEntitySortOrder() {
 		return entitySortOrder;
+	}
+
+	@Override
+	public void entityGroupEvent(Event event, EntityGroup eg) {
+		switch (event) {
+		case Add:
+			CATreeNode tn = new CATreeNode(eg, eg.getLabel());
+			fsMap.put(eg, tn);
+			insertNodeInto(tn, getRoot(), 0);
+			for (int i = 0; i < eg.getMembers().size(); i++)
+				insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), 0);
+			optResort();
+			break;
+		case Remove:
+			break;
+		case Update:
+			break;
+		default:
+			break;
+
+		}
+
+	}
+
+	@Override
+	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
+		CATreeNode node = get(annotation);
+		CATreeNode newParent = get(to);
+		removeNodeFromParent(node);
+
+		int ind = 0;
+		while (ind < newParent.getChildCount()) {
+			CATreeNode cnode = newParent.getChildAt(ind);
+			if (cnode.getFeatureStructure() instanceof Entity
+					|| ((Annotation) cnode.getFeatureStructure()).getBegin() > annotation.getBegin())
+				break;
+			ind++;
+		}
+		insertNodeInto(node, newParent, ind);
+		resort();
+
+	}
+
+	public Object[] getPathToRoot(FeatureStructure fs) {
+		return getPathToRoot(get(fs));
 	}
 
 }

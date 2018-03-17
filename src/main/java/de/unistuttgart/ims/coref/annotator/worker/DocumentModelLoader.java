@@ -37,8 +37,8 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
-		CoreferenceModel cModel;
-		cModel = new CoreferenceModel(jcas, preferences);
+		CoreferenceModel cModel = new CoreferenceModel(jcas, preferences);
+		cModel.addCoreferenceModelListener(getCoreferenceModelListener());
 
 		EntityTreeModel etm = new EntityTreeModel(cModel);
 
