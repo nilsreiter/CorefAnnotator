@@ -862,6 +862,7 @@ public class DocumentWindow extends JFrame
 
 		setWindowTitle();
 		CoreferenceModelLoader im = new CoreferenceModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
+		im.setCoreferenceModelListener(this);
 		im.execute();
 	}
 
