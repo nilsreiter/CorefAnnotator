@@ -181,6 +181,7 @@ public class Constants {
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 
 	}
 

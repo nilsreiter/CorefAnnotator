@@ -274,7 +274,10 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			}
 			list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
-			searchResultsLabel.setText(lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+
+			searchResultsLabel.setText(
+					(m.find() ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " " : "")
+							+ lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
 
 		}
 
