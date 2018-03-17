@@ -60,7 +60,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
-import de.unistuttgart.ims.coref.annotator.comp.XFileChooser;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -78,7 +77,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	PluginManager pluginManager = new PluginManager();
 
-	XFileChooser openDialog;
+	JFileChooser openDialog;
 
 	JFrame opening;
 	JPanel statusBar;
@@ -138,7 +137,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new XFileChooser();
+		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(FileFilters.xmi);
 
@@ -312,15 +311,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		openDialog.setFileFilter(flavor.getFileFilter());
-		if (flavor.getSupportedLanguages() == null)
-			openDialog.setLanguages();
-		else
-			openDialog.setLanguages(flavor.getSupportedLanguages());
 		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
-				open(f, flavor, Util.getLanguage(openDialog.getSelectedLanguage()));
+				open(f, flavor, "de");
 			}
 			break;
 		default:
