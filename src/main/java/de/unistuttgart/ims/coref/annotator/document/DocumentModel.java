@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator;
+package de.unistuttgart.ims.coref.annotator.document;
 
 import java.awt.Color;
 import java.util.Collection;
@@ -6,24 +6,28 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import javax.swing.AbstractListModel;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.CATreeNode;
+import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
+import de.unistuttgart.ims.coref.annotator.Defaults;
+import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
+import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
-import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -36,94 +40,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-@Deprecated
-public class CoreferenceModel extends DefaultTreeModel {
-	public class CommentsModel extends AbstractListModel<Comment> {
-
-		MutableList<Comment> comments = Lists.mutable.empty();
-		MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
-
-		private static final long serialVersionUID = 1L;
-
-		private CommentsModel() {
-		}
-
-		public void load() {
-
-			for (Comment comment : JCasUtil.select(jcas, Comment.class)) {
-				register(comment);
-			}
-			Annotator.logger.debug("Comments list contains {} elements.", comments.size());
-		}
-
-		public Comment add(String text, String author, int begin, int end) {
-
-			CommentAnchor annotation = new CommentAnchor(jcas);
-			annotation.setBegin(begin);
-			annotation.setEnd(end);
-			annotation.addToIndexes();
-
-			AnnotationComment comment = new AnnotationComment(jcas);
-			comment.setAuthor(author);
-			comment.setValue(text);
-			comment.setAnnotation(annotation);
-			comment.addToIndexes();
-
-			register(comment);
-			return comment;
-		}
-
-		public Comment get(CommentAnchor ca) {
-			return commentMap.get(ca);
-		}
-
-		@Override
-		public int getSize() {
-			return comments.size();
-		}
-
-		@Override
-		public Comment getElementAt(int index) {
-			return comments.get(index);
-		}
-
-		protected void register(Comment comment) {
-			if (comment instanceof AnnotationComment) {
-				commentMap.put(((AnnotationComment) comment).getAnnotation(), comment);
-				characterPosition2AnnotationMap.add(((AnnotationComment) comment).getAnnotation());
-			}
-			int ind = 0;
-			Comparator<Comment> comp = CommentSortOrder.POSITION.getComparator();
-			while (ind < comments.size()) {
-				if (comp.compare(comment, comments.get(ind)) < 0) {
-					break;
-				}
-				ind++;
-			}
-			comments.add(ind, comment);
-			fireIntervalAdded(this, ind, ind);
-			if (comment instanceof AnnotationComment)
-				fireMentionAddedEvent(((AnnotationComment) comment).getAnnotation());
-
-		}
-
-		public void remove(Comment c) {
-			int index = comments.indexOf(c);
-			comments.remove(index);
-			if (c instanceof AnnotationComment) {
-				commentMap.remove(((AnnotationComment) c).getAnnotation());
-				characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
-				fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
-			}
-			fireIntervalRemoved(this, index, index);
-		}
-
-		public void update(Comment c) {
-			int index = comments.indexOf(c);
-			fireContentsChanged(this, index, index);
-		}
-	}
-
+public class DocumentModel extends DefaultTreeModel {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -166,12 +83,12 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	CommentsModel commentsModel;
 
-	public CoreferenceModel(JCas jcas, Preferences preferences) {
+	public DocumentModel(JCas jcas, Preferences preferences) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.rootNode = (CATreeNode) getRoot();
 		this.jcas = jcas;
 		this.preferences = preferences;
-		this.commentsModel = new CommentsModel();
+		this.commentsModel = new CommentsModel(this);
 
 	}
 
@@ -604,6 +521,18 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public CommentsModel getCommentsModel() {
 		return commentsModel;
+	}
+
+	public CATreeNode getRootNode() {
+		return rootNode;
+	}
+
+	public EntitySortOrder getEntitySortOrder() {
+		return entitySortOrder;
+	}
+
+	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
+		this.entitySortOrder = entitySortOrder;
 	}
 
 }

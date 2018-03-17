@@ -117,6 +117,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -162,7 +163,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction copyAction;
 
 	// controller
-	CoreferenceModel cModel;
+	DocumentModel cModel;
 	HighlightManager highlightManager;
 
 	// Window components
@@ -695,7 +696,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.entitySortOrder = EntitySortOrder.Alphabet;
+			cModel.setEntitySortOrder(EntitySortOrder.Alphabet);
 			cModel.resort();
 		}
 
@@ -713,8 +714,8 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.entitySortOrder = EntitySortOrder.Mentions;
-			cModel.entitySortOrder.descending = true;
+			cModel.setEntitySortOrder(EntitySortOrder.Mentions);
+			cModel.getEntitySortOrder().descending = true;
 			sortDescending.putValue(Action.SELECTED_KEY, true);
 			cModel.resort();
 		}
@@ -809,7 +810,7 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	public void setCoreferenceModel(CoreferenceModel model) {
+	public void setCoreferenceModel(DocumentModel model) {
 		cModel = model;
 		cModel.addTreeModelListener(this);
 		tree.setModel(cModel);
@@ -1299,7 +1300,7 @@ public class DocumentWindow extends JFrame
 				return handleEntity(panel, mainLabel, treeNode.getEntity());
 			else if (treeNode.isMention()) {
 				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
-			} else if (cModel != null && treeNode == cModel.rootNode)
+			} else if (cModel != null && treeNode == cModel.getRootNode())
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
 			else if (cModel != null && treeNode.getFeatureStructure() instanceof DetachedMentionPart)
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
@@ -1612,7 +1613,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			cModel.entitySortOrder.descending = !cModel.entitySortOrder.descending;
+			cModel.getEntitySortOrder().descending = !cModel.getEntitySortOrder().descending;
 			cModel.resort();
 		}
 	}
@@ -1959,24 +1960,24 @@ public class DocumentWindow extends JFrame
 		public void filter(String s) {
 			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 			if (s.length() >= 1) {
-				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
-					CATreeNode tn = cModel.rootNode.getChildAt(i);
+				for (int i = 0; i < cModel.getRootNode().getChildCount(); i++) {
+					CATreeNode tn = cModel.getRootNode().getChildAt(i);
 					if (tn.isEntity()) {
 						tn.setRank(matches(s, tn) ? 60 : 40);
 						tree.scrollRowToVisible(0);
 					}
 				}
-				cModel.nodeStructureChanged(cModel.rootNode);
-				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.entitySortOrder.getComparator()));
+				cModel.nodeStructureChanged(cModel.getRootNode());
+				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.getEntitySortOrder().getComparator()));
 			} else {
-				for (int i = 0; i < cModel.rootNode.getChildCount(); i++) {
-					CATreeNode tn = cModel.rootNode.getChildAt(i);
+				for (int i = 0; i < cModel.getRootNode().getChildCount(); i++) {
+					CATreeNode tn = cModel.getRootNode().getChildAt(i);
 					if (tn.isEntity()) {
 						tn.setRank(50);
 
 					}
 				}
-				cModel.nodeStructureChanged(cModel.rootNode);
+				cModel.nodeStructureChanged(cModel.getRootNode());
 				cModel.resort();
 			}
 		}
@@ -2098,7 +2099,7 @@ public class DocumentWindow extends JFrame
 		return tree;
 	}
 
-	public CoreferenceModel getCoreferenceModel() {
+	public DocumentModel getCoreferenceModel() {
 		return cModel;
 	}
 

@@ -12,18 +12,18 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
+public class CoreferenceModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	@Deprecated
 	DocumentWindow documentWindow;
-	Consumer<CoreferenceModel> consumer = null;
+	Consumer<DocumentModel> consumer = null;
 	CoreferenceModelListener coreferenceModelListener;
 	JCas jcas;
 
@@ -33,16 +33,16 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		this.jcas = jcas;
 	}
 
-	public CoreferenceModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
+	public CoreferenceModelLoader(Consumer<DocumentModel> consumer, JCas jcas) {
 		this.consumer = consumer;
 		this.jcas = jcas;
 	}
 
-	protected CoreferenceModel load(Preferences preferences) {
+	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
-		CoreferenceModel cModel;
-		cModel = new CoreferenceModel(jcas, preferences);
+		DocumentModel cModel;
+		cModel = new DocumentModel(jcas, preferences);
 		if (getCoreferenceModelListener() != null)
 			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
 
@@ -66,7 +66,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 	}
 
 	@Override
-	protected CoreferenceModel doInBackground() throws Exception {
+	protected DocumentModel doInBackground() throws Exception {
 		return load(Annotator.app.getPreferences());
 	}
 
