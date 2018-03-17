@@ -59,7 +59,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
-import de.unistuttgart.ims.coref.annotator.comp.XFileChooser;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -136,7 +135,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new XFileChooser();
+		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
 		openDialog.setFileFilter(FileFilters.xmi);
 
