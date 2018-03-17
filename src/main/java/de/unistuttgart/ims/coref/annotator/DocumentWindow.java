@@ -103,6 +103,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowHistoryAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -446,6 +447,7 @@ public class DocumentWindow extends JFrame
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
 		toolsMenu.addSeparator();
+		toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
