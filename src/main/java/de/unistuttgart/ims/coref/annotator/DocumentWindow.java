@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -118,6 +119,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -811,9 +813,13 @@ public class DocumentWindow extends JFrame
 	}
 
 	public void setCoreferenceModel(DocumentModel model) {
+		EntityTreeModel etm = new EntityTreeModel(model);
+		Annotator.logger.trace(etm.getRoot().getChildren());
+
+		tree.setModel(etm);
+		etm.addTreeModelListener(this);
+		etm.resort();
 		cModel = model;
-		cModel.addTreeModelListener(this);
-		tree.setModel(cModel);
 
 		// UI
 		this.stopIndeterminateProgress();
@@ -918,12 +924,14 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath().getParentPath());
+		tree.expandPath(e.getTreePath());
 
 		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
 		// tree.expandPath(e.getTreePath());
 		try {
-			tree.repaint(tree.getPathBounds(e.getTreePath()));
+			TreePath tp = e.getTreePath();
+			Rectangle r = tree.getPathBounds(tp);
+			// tree.repaint(r);
 		} catch (NullPointerException ex) {
 			Annotator.logger.catching(ex);
 		}
@@ -1127,7 +1135,8 @@ public class DocumentWindow extends JFrame
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 			if (newLabel != null) {
 				etn.getEntity().setLabel(newLabel);
-				cModel.nodeChanged(etn);
+				// TODO: Update tree
+				// cModel.nodeChanged(etn);
 				registerChange();
 			}
 		}
@@ -1300,7 +1309,7 @@ public class DocumentWindow extends JFrame
 				return handleEntity(panel, mainLabel, treeNode.getEntity());
 			else if (treeNode.isMention()) {
 				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
-			} else if (cModel != null && treeNode == cModel.getRootNode())
+			} else if (cModel != null && treeNode == tree.getModel().getRoot())
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
 			else if (cModel != null && treeNode.getFeatureStructure() instanceof DetachedMentionPart)
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
@@ -1967,7 +1976,7 @@ public class DocumentWindow extends JFrame
 						tree.scrollRowToVisible(0);
 					}
 				}
-				cModel.nodeStructureChanged(cModel.getRootNode());
+				// cModel.nodeStructureChanged(cModel.getRootNode());
 				cModel.resort(EntitySortOrder.getVisibilitySortOrder(cModel.getEntitySortOrder().getComparator()));
 			} else {
 				for (int i = 0; i < cModel.getRootNode().getChildCount(); i++) {
@@ -1977,7 +1986,7 @@ public class DocumentWindow extends JFrame
 
 					}
 				}
-				cModel.nodeStructureChanged(cModel.getRootNode());
+				// cModel.nodeStructureChanged(cModel.getRootNode());
 				cModel.resort();
 			}
 		}

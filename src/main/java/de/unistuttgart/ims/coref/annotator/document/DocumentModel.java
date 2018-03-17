@@ -62,11 +62,13 @@ public class DocumentModel extends DefaultTreeModel {
 	/**
 	 * A map of feature structures to the tree nodes that represent them
 	 */
+	@Deprecated
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 
 	/**
 	 * The sort order for the tree nodes
 	 */
+	@Deprecated
 	EntitySortOrder entitySortOrder = Defaults.CFG_ENTITY_SORT_ORDER;
 
 	/**
@@ -79,6 +81,7 @@ public class DocumentModel extends DefaultTreeModel {
 	/**
 	 * root node of tree
 	 */
+	@Deprecated
 	CATreeNode rootNode;
 
 	CommentsModel commentsModel;
@@ -92,12 +95,14 @@ public class DocumentModel extends DefaultTreeModel {
 
 	}
 
+	@Deprecated
 	public CATreeNode addToTree(DetachedMentionPart dmp) {
 		CATreeNode node = new CATreeNode(dmp, dmp.getCoveredText());
 		fsMap.put(dmp, node);
 		return node;
 	}
 
+	@Deprecated
 	public CATreeNode addToTree(Mention m) {
 		CATreeNode node = new CATreeNode(m, m.getCoveredText());
 		fsMap.put(m, node);
@@ -105,6 +110,7 @@ public class DocumentModel extends DefaultTreeModel {
 		return node;
 	}
 
+	@Deprecated
 	public CATreeNode addToTree(Entity e) {
 		CATreeNode tn = new CATreeNode(e, "");
 		insertNodeInto(tn, rootNode, 0);
@@ -126,9 +132,10 @@ public class DocumentModel extends DefaultTreeModel {
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
+		m.setEntity(e);
 
-		// tree model
-		addTo(addToTree(e), addToTree(m));
+		fireEntityAddedEvent(e);
+		fireMentionAddedEvent(m);
 		return m;
 	}
 
@@ -166,6 +173,7 @@ public class DocumentModel extends DefaultTreeModel {
 		return m;
 	}
 
+	@Deprecated
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
 
 		Mention m = mentionNode.getFeatureStructure();
@@ -291,20 +299,24 @@ public class DocumentModel extends DefaultTreeModel {
 		return jcas;
 	}
 
+	@Deprecated
 	public CATreeNode get(DetachedMentionPart m) {
 		return fsMap.get(m);
 	}
 
+	@Deprecated
 	public CATreeNode getOrCreate(DetachedMentionPart m) {
 		if (!fsMap.containsKey(m))
 			return addToTree(m);
 		return fsMap.get(m);
 	}
 
+	@Deprecated
 	public CATreeNode get(Mention m) {
 		return fsMap.get(m);
 	}
 
+	@Deprecated
 	public CATreeNode get(Entity e) {
 		if (!fsMap.containsKey(e)) {
 			return addToTree(e);
@@ -331,6 +343,7 @@ public class DocumentModel extends DefaultTreeModel {
 		return crModelListeners.remove(o);
 	}
 
+	@Deprecated
 	protected void remove(Mention m, CATreeNode node) {
 		CATreeNode parent = node.getParent();
 
@@ -352,6 +365,7 @@ public class DocumentModel extends DefaultTreeModel {
 
 	}
 
+	@Deprecated
 	protected void remove(DetachedMentionPart m, CATreeNode node) {
 		m.getMention().setDiscontinuous(null);
 		m.setMention(null);
@@ -365,6 +379,7 @@ public class DocumentModel extends DefaultTreeModel {
 		m.removeFromIndexes();
 	}
 
+	@Deprecated
 	protected void remove(Entity e, CATreeNode etn) {
 		for (int i = 0; i < etn.getChildCount(); i++) {
 			etn.removeAllChildren();
@@ -395,6 +410,7 @@ public class DocumentModel extends DefaultTreeModel {
 		remove(e, get(e));
 	}
 
+	@Deprecated
 	public void removeFrom(EntityGroup eg, CATreeNode e) {
 		removeNodeFromParent(e);
 		FSArray oldArray = eg.getMembers();
@@ -426,10 +442,12 @@ public class DocumentModel extends DefaultTreeModel {
 		characterPosition2AnnotationMap.remove(m);
 	}
 
+	@Deprecated
 	public void resort() {
 		resort(entitySortOrder.getComparator());
 	}
 
+	@Deprecated
 	public void resort(Comparator<CATreeNode> comparator) {
 		Annotator.logger.trace("Sorting entity tree with {}", comparator.toString());
 		rootNode.getChildren().sort(comparator);
@@ -478,6 +496,7 @@ public class DocumentModel extends DefaultTreeModel {
 		}
 	};
 
+	@Deprecated
 	public void merge(CATreeNode... nodes) {
 		if (nodes.length == 0)
 			return;
@@ -523,14 +542,17 @@ public class DocumentModel extends DefaultTreeModel {
 		return commentsModel;
 	}
 
+	@Deprecated
 	public CATreeNode getRootNode() {
 		return rootNode;
 	}
 
+	@Deprecated
 	public EntitySortOrder getEntitySortOrder() {
 		return entitySortOrder;
 	}
 
+	@Deprecated
 	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
 		this.entitySortOrder = entitySortOrder;
 	}

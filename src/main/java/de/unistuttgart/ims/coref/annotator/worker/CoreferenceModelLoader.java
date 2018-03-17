@@ -6,17 +6,11 @@ import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
 
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public class CoreferenceModelLoader extends SwingWorker<DocumentModel, Integer> {
@@ -43,24 +37,6 @@ public class CoreferenceModelLoader extends SwingWorker<DocumentModel, Integer> 
 
 		DocumentModel cModel;
 		cModel = new DocumentModel(jcas, preferences);
-		if (getCoreferenceModelListener() != null)
-			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
-
-		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
-			cModel.addToTree(e);
-		});
-		Annotator.logger.debug("Added all entities");
-
-		for (EntityGroup eg : JCasUtil.select(jcas, EntityGroup.class))
-			for (int i = 0; i < eg.getMembers().size(); i++)
-				cModel.insertNodeInto(new CATreeNode(eg.getMembers(i)), cModel.get(eg), 0);
-		Annotator.logger.debug("Added all entity groups");
-
-		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			cModel.addTo(cModel.get(m.getEntity()), cModel.addToTree(m));
-			cModel.registerAnnotation(m);
-		}
-		Annotator.logger.debug("Added all mentions");
 
 		return cModel;
 	}
