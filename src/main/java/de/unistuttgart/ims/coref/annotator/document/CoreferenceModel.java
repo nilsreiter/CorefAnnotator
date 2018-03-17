@@ -51,6 +51,7 @@ public class CoreferenceModel {
 
 	HashSetValuedHashMap<FeatureStructure, Comment> comments = new HashSetValuedHashMap<FeatureStructure, Comment>();
 
+	@Deprecated
 	CommentsModel commentsModel;
 
 	/**
@@ -72,7 +73,6 @@ public class CoreferenceModel {
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 		this.preferences = preferences;
-		this.commentsModel = new CommentsModel(this);
 	}
 
 	/**
@@ -226,6 +226,7 @@ public class CoreferenceModel {
 		eg.setMembers(1, e2);
 	}
 
+	@Deprecated
 	public CommentsModel getCommentsModel() {
 		return commentsModel;
 	}

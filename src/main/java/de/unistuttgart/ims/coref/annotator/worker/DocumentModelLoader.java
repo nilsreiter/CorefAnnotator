@@ -11,6 +11,7 @@ import org.apache.uima.jcas.JCas;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
@@ -47,6 +48,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 		documentModel.setJcas(jcas);
 		documentModel.setCoreferenceModel(cModel);
 		documentModel.setTreeModel(etm);
+		documentModel.setCommentsModel(new CommentsModel(cModel));
 
 		return documentModel;
 	}

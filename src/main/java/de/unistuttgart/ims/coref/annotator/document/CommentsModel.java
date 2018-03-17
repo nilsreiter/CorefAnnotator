@@ -19,13 +19,13 @@ import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 
 public class CommentsModel extends AbstractListModel<Comment> {
 
-	private final CoreferenceModel coreferenceModel;
+	CoreferenceModel coreferenceModel;
 	MutableList<Comment> comments = Lists.mutable.empty();
 	MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
 
 	private static final long serialVersionUID = 1L;
 
-	CommentsModel(CoreferenceModel coreferenceModel) {
+	public CommentsModel(CoreferenceModel coreferenceModel) {
 		this.coreferenceModel = coreferenceModel;
 	}
 

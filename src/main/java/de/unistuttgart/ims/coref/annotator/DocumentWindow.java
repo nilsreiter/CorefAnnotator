@@ -1814,7 +1814,7 @@ public class DocumentWindow extends JFrame
 		}
 
 		private JMenu getCommentItem(CommentAnchor anno) {
-			Comment c = documentModel.getCoreferenceModel().getCommentsModel().get(anno);
+			Comment c = documentModel.getCommentsModel().get(anno);
 			StringBuilder b = new StringBuilder();
 			if (c.getAuthor() != null)
 				b.append(c.getAuthor());
