@@ -1,9 +1,9 @@
 package de.unistuttgart.ims.coref.annotator.undo;
 
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
 public class AddOperation extends AbstractEditOperation {
 	Span span;

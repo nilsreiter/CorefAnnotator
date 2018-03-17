@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
 public class BatchOperation extends AbstractEditOperation {
 

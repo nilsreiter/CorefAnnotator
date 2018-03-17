@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
 	<Properties>
-		<Property name="filename">${user.home}/.CorefAnnotator.log</Property>
 		<Property name="loggername">de.unistuttgart.ims.coref.annotator.Annotator</Property>
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-		 	<ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} %method - %msg%n" />
 		</Console>
 		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} - %msg%n" />
 		</File>
 	</Appenders>
 	<Loggers>
-		<Logger name="${loggername}" level="info">
-			<AppenderRef ref="File" />
-		</Logger>
-		<Root level="trace">
-			<AppenderRef ref="Console" />	
+		<Root level="ALL">
 		</Root>
+		<Logger name="${loggername}">
+			<AppenderRef ref="File"  level="INFO"/>
+			<AppenderRef ref="Console" level="ALL" />
+		</Logger>
 	</Loggers>
 </Configuration>

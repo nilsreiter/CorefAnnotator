@@ -54,6 +54,11 @@
           <rangeTypeName>uima.cas.StringArray</rangeTypeName>
           <multipleReferencesAllowed>true</multipleReferencesAllowed>
         </featureDescription>
+      <featureDescription>
+          <name>Hidden</name>
+          <description/>
+          <rangeTypeName>uima.cas.Boolean</rangeTypeName>
+        </featureDescription>
       </features>
     </typeDescription>
   <typeDescription>

@@ -6,7 +6,6 @@ import javax.swing.tree.TreePath;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -24,8 +23,7 @@ public class ShowMentionInTreeAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		CATreeNode node = documentWindow.getCoreferenceModel().get(m);
-		Object[] path = documentWindow.getCoreferenceModel().getPathToRoot(node);
+		Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
 		TreePath tp = new TreePath(path);
 		this.documentWindow.getTree().setSelectionPath(tp);
 		this.documentWindow.getTree().scrollPathToVisible(tp);
