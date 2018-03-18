@@ -21,7 +21,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 	@Deprecated
 	DocumentWindow documentWindow;
 	Consumer<DocumentModel> consumer = null;
-	CoreferenceModelListener coreferenceModelListener;
+	CoreferenceModelListener coreferenceModelListener = null;
 	JCas jcas;
 
 	@Deprecated
