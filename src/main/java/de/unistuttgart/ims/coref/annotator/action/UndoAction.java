@@ -26,6 +26,9 @@ public class UndoAction extends DocumentWindowAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		documentWindow.getDocumentModel().getCoreferenceModel().undo();
+		// TODO: working mechanism to disable the button
+		// setEnabled(documentWindow.getCoreferenceModel().getHistory().size() >
+		// 0);
 	}
 
 }
