@@ -8,15 +8,15 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public interface Op {
 
-	public class BatchAddOperationDescription implements Op {
+	public class AddMentionsToNewEntity implements Op {
 		ImmutableList<Span> spans;
 		Entity entity;
 
-		public BatchAddOperationDescription(Span... span) {
+		public AddMentionsToNewEntity(Span... span) {
 			this.spans = Lists.immutable.of(span);
 		}
 
-		public BatchAddOperationDescription(Iterable<Span> span) {
+		public AddMentionsToNewEntity(Iterable<Span> span) {
 			this.spans = Lists.immutable.withAll(span);
 		}
 
