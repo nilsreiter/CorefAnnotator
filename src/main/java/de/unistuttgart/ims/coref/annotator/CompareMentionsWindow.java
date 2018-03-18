@@ -49,7 +49,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 	CoreferenceModel[] models = new CoreferenceModel[2];
 	CoreferenceModel targetModel;
 	Annotator mainApplication;
-	JTextPane textPane;
+	JTextPane mentionsTextPane;
 	StyleContext styleContext = new StyleContext();
 
 	boolean textIsSet = false;
@@ -72,12 +72,12 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 	protected synchronized void initialiseText(JCas jcas2) {
 		if (textIsSet)
 			return;
-		textPane.setText(jcas2.getDocumentText());
-		textPane.setCaretPosition(0);
+		mentionsTextPane.setText(jcas2.getDocumentText());
+		mentionsTextPane.setCaretPosition(0);
 		textIsSet = true;
 
-		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
-		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
+		StyleManager.styleCharacter(mentionsTextPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
+		StyleManager.styleParagraph(mentionsTextPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 
 		drawAllAnnotations();
 	}
@@ -86,23 +86,23 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		Caret caret = new Caret();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		textPane = new JTextPane();
-		textPane.setPreferredSize(new Dimension(500, 800));
-		textPane.setDragEnabled(true);
-		textPane.setEditable(false);
-		textPane.setCaret(caret);
-		textPane.getCaret().setVisible(true);
-		textPane.addFocusListener(caret);
-		textPane.setCaretPosition(0);
-		textPane.addMouseListener(new TextMouseListener());
-		textPane.getInputMap().put(
+		mentionsTextPane = new JTextPane();
+		mentionsTextPane.setPreferredSize(new Dimension(500, 800));
+		mentionsTextPane.setDragEnabled(true);
+		mentionsTextPane.setEditable(false);
+		mentionsTextPane.setCaret(caret);
+		mentionsTextPane.getCaret().setVisible(true);
+		mentionsTextPane.addFocusListener(caret);
+		mentionsTextPane.setCaretPosition(0);
+		mentionsTextPane.addMouseListener(new TextMouseListener());
+		mentionsTextPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
-		tabbedPane.add("Mentions", new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		tabbedPane.add("Mentions", new JScrollPane(mentionsTextPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		add(tabbedPane, BorderLayout.CENTER);
 
-		highlightManager = new HighlightManager(textPane);
+		highlightManager = new HighlightManager(mentionsTextPane);
 		setPreferredSize(new Dimension(800, 800));
 		pack();
 	}
@@ -139,12 +139,12 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 
 	@Override
 	public String getText() {
-		return textPane.getText();
+		return mentionsTextPane.getText();
 	}
 
 	@Override
 	public Span getSelection() {
-		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
+		return new Span(mentionsTextPane.getSelectionStart(), mentionsTextPane.getSelectionEnd());
 	}
 
 	protected void drawAllAnnotations() {
@@ -188,7 +188,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
 				JPopupMenu pMenu = new JPopupMenu();
-				int offset = textPane.viewToModel(e.getPoint());
+				int offset = mentionsTextPane.viewToModel(e.getPoint());
 
 				for (int i = 0; i < models.length; i++) {
 					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models[i].getMentions(offset));
