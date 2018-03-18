@@ -33,6 +33,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
@@ -225,8 +226,12 @@ public class CoreferenceModel {
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
-			remove(op.getMention(), true);
+			remove(op.getMention(), false);
 			op.setMentions(null);
+			history.push(op);
+		} else if (operation instanceof Op.RemoveEntities) {
+			Op.RemoveEntities op = (RemoveEntities) operation;
+			op.getEntities().forEach(e -> remove(e));
 			history.push(op);
 		} else {
 			throw new UnsupportedOperationException();
@@ -251,6 +256,12 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			addTo(op.getEntity(), op.getSpan());
+		} else if (operation instanceof Op.RemoveEntities) {
+			Op.RemoveEntities op = (RemoveEntities) operation;
+			op.getEntities().forEach(e -> {
+				e.addToIndexes();
+				fireEntityEvent(Event.Add, e);
+			});
 		}
 	}
 
@@ -360,7 +371,7 @@ public class CoreferenceModel {
 		dmp.removeFromIndexes();
 	}
 
-	public void remove(Entity entity) {
+	private void remove(Entity entity) {
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
 			fireAnnotationRemovedEvent(m);

@@ -9,6 +9,23 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
+	public class RemoveEntities implements Op {
+		ImmutableList<Entity> entities;
+
+		public RemoveEntities(Entity... entities) {
+			this.entities = Lists.immutable.of(entities);
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+	}
+
 	public class RemoveMention implements Op {
 		ImmutableList<Mention> mentions;
 		Entity entity;

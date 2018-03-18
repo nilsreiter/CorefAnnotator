@@ -1344,7 +1344,7 @@ public class DocumentWindow extends JFrame
 				if (parentFs instanceof EntityGroup) {
 					documentModel.getCoreferenceModel().removeFrom((EntityGroup) parentFs, tn.getEntity());
 				} else if (tn.isLeaf()) {
-					documentModel.getCoreferenceModel().remove(tn.getEntity());
+					documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getEntity()));
 				}
 			}
 		}
@@ -1460,7 +1460,7 @@ public class DocumentWindow extends JFrame
 			for (Mention m : JCasUtil.select(jcas, Mention.class))
 				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 			for (Entity e : JCasUtil.select(jcas, Entity.class))
-				documentModel.getCoreferenceModel().remove(e);
+				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(e));
 			registerChange();
 		}
 
