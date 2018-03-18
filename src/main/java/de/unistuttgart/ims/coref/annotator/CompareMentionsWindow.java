@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -50,6 +51,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 	CoreferenceModel targetModel;
 	Annotator mainApplication;
 	JTextPane mentionsTextPane;
+	JPanel mentionsInfoPane;
 	StyleContext styleContext = new StyleContext();
 
 	boolean textIsSet = false;
