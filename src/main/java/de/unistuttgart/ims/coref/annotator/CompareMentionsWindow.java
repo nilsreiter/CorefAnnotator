@@ -26,7 +26,6 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
-import org.apache.uima.util.CasCopier;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -35,8 +34,11 @@ import org.eclipse.collections.impl.factory.Maps;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends JFrame implements TextWindow, CoreferenceModelListener {
 
@@ -111,10 +113,11 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		if (!textIsSet)
 			initialiseText(jcas);
 		drawAllAnnotations();
-		CasCopier.copyCas(jcas.getCas(), targetJCas.getCas(), true, true);
-		targetModel = new CoreferenceModel(targetJCas, mainApplication.getPreferences());
-		targetModel.addCoreferenceModelListener(this);
-		new CoreferenceModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
+		// CasCopier.copyCas(jcas.getCas(), targetJCas.getCas(), true, true);
+		// targetModel = new CoreferenceModel(targetJCas,
+		// mainApplication.getPreferences());
+		// targetModel.addCoreferenceModelListener(this);
+		new DocumentModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 	}
 
 	public void setJCasRight(JCas jcas) {
@@ -123,15 +126,15 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		if (!textIsSet)
 			initialiseText(jcas);
 		drawAllAnnotations();
-		new CoreferenceModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
+		new DocumentModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
 	}
 
-	public void setCoreferenceModelLeft(CoreferenceModel cm) {
-		models[0] = cm;
+	public void setCoreferenceModelLeft(DocumentModel cm) {
+		models[0] = cm.getCoreferenceModel();
 	}
 
-	public void setCoreferenceModelRight(CoreferenceModel cm) {
-		models[1] = cm;
+	public void setCoreferenceModelRight(DocumentModel cm) {
+		models[1] = cm.getCoreferenceModel();
 	}
 
 	@Override
@@ -232,31 +235,6 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		}
 	}
 
-	@Override
-	public void annotationAdded(Annotation m) {
-		highlightManager.underline(m, Color.green);
-	}
-
-	@Override
-	public void annotationChanged(Annotation m) {
-		highlightManager.underline(m, Color.green);
-
-	}
-
-	@Override
-	public void annotationRemoved(Annotation m) {
-		highlightManager.undraw(m);
-
-	}
-
-	@Override
-	public void entityAdded(Entity entity) {
-	}
-
-	@Override
-	public void entityRemoved(Entity entity) {
-	}
-
 	class CopyMentionAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -272,6 +250,38 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		public void actionPerformed(ActionEvent e) {
 			targetModel.add(span.begin, span.end);
 		}
+
+	}
+
+	@Override
+	public void annotationEvent(Event event, Annotation annotation) {
+		switch (event) {
+		case Add:
+			highlightManager.underline(annotation, Color.green);
+			break;
+		case Update:
+			highlightManager.underline(annotation, Color.green);
+			break;
+		case Remove:
+			highlightManager.undraw(annotation);
+		}
+	}
+
+	@Override
+	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void entityEvent(Event event, Entity entity) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void entityGroupEvent(Event event, EntityGroup entity) {
+		// TODO Auto-generated method stub
 
 	}
 }
