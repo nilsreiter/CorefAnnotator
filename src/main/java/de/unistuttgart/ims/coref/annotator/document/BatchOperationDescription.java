@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.undo;
+package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Collection;
 

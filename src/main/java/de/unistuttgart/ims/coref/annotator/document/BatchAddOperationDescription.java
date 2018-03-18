@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.undo;
+package de.unistuttgart.ims.coref.annotator.document;
 
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;

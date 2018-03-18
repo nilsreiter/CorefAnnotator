@@ -32,10 +32,6 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
-import de.unistuttgart.ims.coref.annotator.undo.BatchAddOperationDescription;
-import de.unistuttgart.ims.coref.annotator.undo.EditOperationDescription;
-import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**

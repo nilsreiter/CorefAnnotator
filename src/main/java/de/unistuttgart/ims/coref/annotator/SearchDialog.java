@@ -46,8 +46,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
-import de.unistuttgart.ims.coref.annotator.undo.BatchAddOperationDescription;
+import de.unistuttgart.ims.coref.annotator.document.AddToOperation;
+import de.unistuttgart.ims.coref.annotator.document.BatchAddOperationDescription;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
 	class ListTransferHandler extends TransferHandler {

@@ -1,6 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.undo;
-
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+package de.unistuttgart.ims.coref.annotator.document;
 
 public abstract class AbstractEditOperation implements EditOperationDescription {
 	boolean run = false;

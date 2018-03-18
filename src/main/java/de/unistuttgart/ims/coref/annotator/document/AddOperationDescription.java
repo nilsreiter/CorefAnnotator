@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.undo;
+package de.unistuttgart.ims.coref.annotator.document;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Mention;

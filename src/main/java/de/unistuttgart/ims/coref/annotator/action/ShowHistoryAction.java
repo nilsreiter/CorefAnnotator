@@ -11,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.undo.EditOperationDescription;
+import de.unistuttgart.ims.coref.annotator.document.EditOperationDescription;
 
 public class ShowHistoryAction extends DocumentWindowAction {
 
