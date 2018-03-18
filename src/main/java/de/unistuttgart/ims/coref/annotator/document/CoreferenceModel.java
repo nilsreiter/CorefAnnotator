@@ -225,7 +225,7 @@ public class CoreferenceModel {
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
-			remove(op.getMention());
+			remove(op.getMention(), true);
 			op.setMentions(null);
 			history.push(op);
 		} else {
@@ -238,6 +238,7 @@ public class CoreferenceModel {
 	}
 
 	protected void undo(Op operation) {
+		Annotator.logger.entry(operation);
 		if (operation instanceof Op.RenameEntity) {
 			Op.RenameEntity op = (Op.RenameEntity) operation;
 			op.getEntity().setLabel(op.getOldLabel());
@@ -246,7 +247,7 @@ public class CoreferenceModel {
 			remove(op.getEntity());
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (AddMentionsToEntity) operation;
-			op.getMentions().forEach(m -> remove(m));
+			op.getMentions().forEach(m -> remove(m, false));
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			addTo(op.getEntity(), op.getSpan());
@@ -360,8 +361,11 @@ public class CoreferenceModel {
 	}
 
 	public void remove(Entity entity) {
-		for (Mention m : entityMentionMap.get(entity))
-			remove(m);
+		for (Mention m : entityMentionMap.get(entity)) {
+			characterPosition2AnnotationMap.remove(m);
+			fireAnnotationRemovedEvent(m);
+			m.removeFromIndexes();
+		}
 		fireEntityEvent(Event.Remove, entity);
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
@@ -374,13 +378,13 @@ public class CoreferenceModel {
 		entity.removeFromIndexes();
 	}
 
-	private void remove(Mention m) {
+	private void remove(Mention m, boolean autoRemove) {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
-		entityMentionMap.remove(m.getEntity(), m);
+		entityMentionMap.remove(entity, m);
 		fireAnnotationRemovedEvent(m);
 		m.removeFromIndexes();
-		if (entityMentionMap.get(entity).isEmpty()
+		if (autoRemove && entityMentionMap.get(entity).isEmpty()
 				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
 			remove(entity);
 		}
