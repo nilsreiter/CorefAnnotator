@@ -5,9 +5,36 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
+
+	public class GroupEntities implements Op {
+		ImmutableList<Entity> entities;
+		EntityGroup entityGroup;
+
+		public GroupEntities(Entity... entities) {
+			this.entities = Lists.immutable.of(entities);
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+		public EntityGroup getEntityGroup() {
+			return entityGroup;
+		}
+
+		public void setEntityGroup(EntityGroup entityGroup) {
+			this.entityGroup = entityGroup;
+		}
+
+	}
 
 	public class RemoveEntities implements Op {
 		ImmutableList<Entity> entities;

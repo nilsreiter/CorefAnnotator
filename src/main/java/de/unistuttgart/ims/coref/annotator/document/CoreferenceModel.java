@@ -33,6 +33,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
@@ -233,6 +234,16 @@ public class CoreferenceModel {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> remove(e));
 			history.push(op);
+		} else if (operation instanceof Op.GroupEntities) {
+			Op.GroupEntities op = (GroupEntities) operation;
+			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
+			EntityGroup eg = createEntityGroup(op.getEntities().subList(0, 2).select(e -> e.getLabel() != null)
+					.collect(e -> e.getLabel()).makeString(" and "), op.getEntities().size());
+			for (int i = 0; i < op.getEntities().size(); i++)
+				eg.setMembers(i, op.getEntities().get(i));
+			fireEntityGroupEvent(Event.Add, eg);
+			op.setEntityGroup(eg);
+			history.push(op);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -262,6 +273,8 @@ public class CoreferenceModel {
 				e.addToIndexes();
 				fireEntityEvent(Event.Add, e);
 			});
+		} else if (operation instanceof Op.GroupEntities) {
+			remove(((Op.GroupEntities) operation).getEntityGroup());
 		}
 	}
 
@@ -295,14 +308,6 @@ public class CoreferenceModel {
 
 	protected void fireMentionAddedEvent(Annotation annotation) {
 		crModelListeners.forEach(l -> l.annotationEvent(Event.Add, annotation));
-	}
-
-	public void formGroup(Entity e1, Entity e2) {
-		Annotator.logger.trace("Forming entity group with {} and {}.", e1, e2);
-		EntityGroup eg = createEntityGroup(e1.getLabel() + " and " + e2.getLabel(), 2);
-		eg.setMembers(0, e1);
-		eg.setMembers(1, e2);
-		fireEntityGroupEvent(Event.Add, eg);
 	}
 
 	public JCas getJCas() {
@@ -383,7 +388,7 @@ public class CoreferenceModel {
 
 	}
 
-	public void remove(EntityGroup entity) {
+	private void remove(EntityGroup entity) {
 		fireEntityGroupEvent(Event.Remove, entity);
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();

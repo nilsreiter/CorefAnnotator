@@ -1334,7 +1334,7 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
 				tree.setSelectionRow(row);
 			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-				documentModel.getCoreferenceModel().remove((EntityGroup) tn.getFeatureStructure());
+				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getFeatureStructure()));
 			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
 				// highlightManager.undraw(dmp);
@@ -1531,7 +1531,7 @@ public class DocumentWindow extends JFrame
 					.getFeatureStructure();
 			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
-			documentModel.getCoreferenceModel().formGroup(e1, e2);
+			documentModel.getCoreferenceModel().edit(new Op.GroupEntities(e1, e2));
 			registerChange();
 		}
 
