@@ -84,7 +84,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to entity");
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 
-			Op.AddToOperation op = new Op.AddToOperation(node.getEntity(),
+			Op.AddMentionsToEntity op = new Op.AddMentionsToEntity(node.getEntity(),
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getCoreferenceModel().edit(op);
 		}

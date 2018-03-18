@@ -9,17 +9,17 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
-	public class AddToOperation implements Op {
+	public class AddMentionsToEntity implements Op {
 		Entity entity;
 		ImmutableList<Span> spans;
 		ImmutableList<Mention> mentions = null;
 
-		public AddToOperation(Entity entity, Span... spans) {
+		public AddMentionsToEntity(Entity entity, Span... spans) {
 			this.spans = Lists.immutable.of(spans);
 			this.entity = entity;
 		}
 
-		public AddToOperation(Entity entity, Iterable<Span> spans) {
+		public AddMentionsToEntity(Entity entity, Iterable<Span> spans) {
 			this.spans = Lists.immutable.withAll(spans);
 			this.entity = entity;
 		}

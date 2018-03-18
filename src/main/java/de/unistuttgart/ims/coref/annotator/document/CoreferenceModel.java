@@ -215,8 +215,8 @@ public class CoreferenceModel {
 					addTo(op.getEntity(), span);
 			}
 			history.add(op);
-		} else if (operation instanceof Op.AddToOperation) {
-			Op.AddToOperation op = (Op.AddToOperation) operation;
+		} else if (operation instanceof Op.AddMentionsToEntity) {
+			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
 			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
 			history.add(op);
 		} else {
