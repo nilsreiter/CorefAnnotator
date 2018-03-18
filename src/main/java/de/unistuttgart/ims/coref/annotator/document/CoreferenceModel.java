@@ -32,7 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.coref.annotator.undo.AddOperation;
+import de.unistuttgart.ims.coref.annotator.undo.AddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
 import de.unistuttgart.ims.coref.annotator.undo.EditOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
@@ -100,7 +100,7 @@ public class CoreferenceModel {
 		entityMentionMap.put(e, m);
 		fireMentionAddedEvent(m);
 
-		history.push(new AddOperation(m));
+		history.push(new AddOperationDescription(m));
 
 		return m;
 	}

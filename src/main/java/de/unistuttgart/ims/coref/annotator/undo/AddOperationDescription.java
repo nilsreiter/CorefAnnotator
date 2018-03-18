@@ -2,10 +2,10 @@ package de.unistuttgart.ims.coref.annotator.undo;
 
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class AddOperation implements EditOperationDescription {
+public class AddOperationDescription implements EditOperationDescription {
 	Mention mention;
 
-	public AddOperation(Mention span) {
+	public AddOperationDescription(Mention span) {
 		this.mention = span;
 	}
 
