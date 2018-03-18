@@ -3,15 +3,19 @@ package de.unistuttgart.ims.coref.annotator;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 
 public interface CoreferenceModelListener {
-	public void annotationAdded(Annotation m);
+	public enum Event {
+		Add, Remove, Update
+	};
 
-	public void annotationChanged(Annotation m);
+	void annotationEvent(Event event, Annotation annotation);
 
-	public void annotationRemoved(Annotation m);
+	void annotationMovedEvent(Annotation annotation, Object from, Object to);
 
-	public void entityAdded(Entity entity);
+	void entityEvent(Event event, Entity entity);
 
-	public void entityRemoved(Entity entity);
+	void entityGroupEvent(Event event, EntityGroup entity);
+
 }

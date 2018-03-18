@@ -97,7 +97,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 		} catch (SAXException | IOException e1) {
 			Annotator.logger.catching(e1);
-			System.exit(1);
 		}
 		try {
 			Annotator.logger.info("Applying importer from {}", flavor.getClass().getName());

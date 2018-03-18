@@ -14,13 +14,13 @@ import javax.swing.border.TitledBorder;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
 import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
+import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
 public class CommentPanel extends JPanel {
 

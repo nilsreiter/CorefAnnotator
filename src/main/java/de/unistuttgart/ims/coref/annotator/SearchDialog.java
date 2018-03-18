@@ -83,7 +83,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to entity");
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 			for (SearchResult result : list.getSelectedValuesList()) {
-				documentWindow.cModel.addTo(node.getEntity(), result.getBegin(), result.getEnd());
+				documentWindow.getCoreferenceModel().addTo(node.getEntity(), result.getBegin(), result.getEnd());
 			}
 		}
 	}
@@ -105,9 +105,9 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 			for (SearchResult result : list.getSelectedValuesList()) {
 				if (entity == null)
-					entity = documentWindow.cModel.add(result.getBegin(), result.getEnd()).getEntity();
+					entity = documentWindow.getCoreferenceModel().add(result.getBegin(), result.getEnd()).getEntity();
 				else
-					documentWindow.cModel.addTo(entity, result.getBegin(), result.getEnd());
+					documentWindow.getCoreferenceModel().addTo(entity, result.getBegin(), result.getEnd());
 			}
 		}
 	}
@@ -274,7 +274,10 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			}
 			list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
-			searchResultsLabel.setText(lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+
+			searchResultsLabel.setText(
+					(m.find() ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " " : "")
+							+ lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
 
 		}
 
