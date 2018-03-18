@@ -70,7 +70,7 @@ public class CoreferenceModel {
 
 	boolean initialised = false;
 
-	Deque<EditOperationDescription> history = new LinkedList<EditOperationDescription>();
+	Deque<Op> history = new LinkedList<Op>();
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
@@ -201,7 +201,7 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public void edit(EditOperationDescription operation) {
+	public void edit(Op operation) {
 		if (operation instanceof RenameOperationDescription) {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getNewLabel());
@@ -228,7 +228,7 @@ public class CoreferenceModel {
 		undo(history.pop());
 	}
 
-	protected void undo(EditOperationDescription operation) {
+	protected void undo(Op operation) {
 		if (operation instanceof RenameOperationDescription) {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getOldLabel());
@@ -442,7 +442,7 @@ public class CoreferenceModel {
 		initialised = true;
 	}
 
-	public Deque<EditOperationDescription> getHistory() {
+	public Deque<Op> getHistory() {
 		return history;
 	}
 

@@ -6,7 +6,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
-public class BatchAddOperationDescription implements EditOperationDescription {
+public class BatchAddOperationDescription implements Op {
 	ImmutableList<Span> spans;
 	Entity entity;
 

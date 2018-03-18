@@ -7,7 +7,7 @@ import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class AddToOperation implements EditOperationDescription {
+public class AddToOperation implements Op {
 	Entity entity;
 	ImmutableList<Span> spans;
 	ImmutableList<Mention> mentions = null;

@@ -4,7 +4,7 @@ import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 @Deprecated
-public class AddOperationDescription extends BatchAddOperationDescription implements EditOperationDescription {
+public class AddOperationDescription extends BatchAddOperationDescription implements Op {
 	Mention mention;
 
 	public AddOperationDescription(Span span) {

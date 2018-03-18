@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 
-public class RenameOperationDescription implements EditOperationDescription {
+public class RenameOperationDescription implements Op {
 
 	Entity entity;
 	String newLabel;

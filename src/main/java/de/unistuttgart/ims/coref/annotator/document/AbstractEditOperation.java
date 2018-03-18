@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-public abstract class AbstractEditOperation implements EditOperationDescription {
+public abstract class AbstractEditOperation implements Op {
 	boolean run = false;
 
 	public void run(CoreferenceModel model) {
