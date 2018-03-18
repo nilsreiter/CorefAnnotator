@@ -4,17 +4,17 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
 
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 
 public class MatchingRanker implements EntityRankingPlugin {
@@ -41,9 +41,9 @@ public class MatchingRanker implements EntityRankingPlugin {
 				boolean b1 = matches(cModel, o1);
 				boolean b2 = matches(cModel, o2);
 				if (b1 == b2) {
-					int comp = -1 * Integer.compare(cModel.getChildCount(cModel.get(o1)),
-							cModel.getChildCount(cModel.get(o2)));
-					return (comp == 0 ? -1 * cModel.toString(o1).compareTo(cModel.toString(o2)) : comp);
+					int comp = -1 * Integer.compare(cModel.get(o1).size(), cModel.get(o2).size());
+					return (comp == 0 ? -1 * Util.toString(o1.getLabel()).compareTo(Util.toString(o2.getLabel()))
+							: comp);
 				}
 				return (b1 ? -1 : 1);
 			}
@@ -69,14 +69,12 @@ public class MatchingRanker implements EntityRankingPlugin {
 			if (m.find())
 				return true;
 		}
-		for (int i = 0; i < model.get(e).getChildCount(); i++) {
-			FeatureStructure child = model.get(e).getChildAt(i).getFeatureStructure();
-			if (child instanceof Annotation) {
-				String mc = ((Annotation) child).getCoveredText();
-				m = pattern.matcher(mc);
-				if (m.find())
-					return true;
-			}
+		for (Mention child : model.get(e)) {
+			String mc = ((Annotation) child).getCoveredText();
+			m = pattern.matcher(mc);
+			if (m.find())
+				return true;
+
 		}
 		return false;
 
