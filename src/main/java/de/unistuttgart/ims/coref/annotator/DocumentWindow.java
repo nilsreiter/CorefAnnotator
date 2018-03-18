@@ -124,6 +124,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
 import de.unistuttgart.ims.coref.annotator.undo.BatchAddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
@@ -1052,8 +1053,8 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new BatchAddOperationDescription(getSelection()));
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
-				documentModel.getCoreferenceModel().addTo((Entity) targetFS, potentialAnnotation.begin,
-						potentialAnnotation.end);
+				documentModel.getCoreferenceModel().edit(new AddToOperation((Entity) targetFS, getSelection()));
+
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
 			} else if (targetFS instanceof Mention) {
 				documentModel.getCoreferenceModel().addTo((Mention) targetFS, potentialAnnotation.begin,
@@ -1375,12 +1376,10 @@ public class DocumentWindow extends JFrame
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			JTextComponent ta = (JTextComponent) e.getSource();
 			if (keyMap.containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.getCoreferenceModel().addTo(keyMap.get(e.getKeyChar()), ta.getSelectionStart(),
-						ta.getSelectionEnd());
-				registerChange();
+				documentModel.getCoreferenceModel()
+						.edit(new AddToOperation(keyMap.get(e.getKeyChar()), getSelection()));
 			}
 		}
 
@@ -1437,8 +1436,7 @@ public class DocumentWindow extends JFrame
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						for (Span sp : spans)
-							documentModel.getCoreferenceModel().addTo(m.getEntity(), sp.begin, sp.end);
+						documentModel.getCoreferenceModel().edit(new AddToOperation(m.getEntity(), spans));
 						registerChange();
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
@@ -2078,7 +2076,8 @@ public class DocumentWindow extends JFrame
 					for (TreePath tp : tree.getSelectionPaths()) {
 						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.getCoreferenceModel().addTo(etn.getEntity(), b, e);
+							documentModel.getCoreferenceModel()
+									.edit(new AddToOperation(etn.getEntity(), new Span(b, e)));
 						}
 					}
 					treeSearchField.setText("");

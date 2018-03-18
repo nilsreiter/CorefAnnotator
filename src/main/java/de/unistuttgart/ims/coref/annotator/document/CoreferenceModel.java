@@ -115,15 +115,13 @@ public class CoreferenceModel {
 		return addTo(e, span.begin, span.end);
 	}
 
-	public Mention addTo(Entity e, int begin, int end) {
+	private Mention addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
 
 		fireEntityEvent(Event.Update, e);
 		fireMentionAddedEvent(m);
-
-		history.push(new AddToOperation(e, m));
 
 		return m;
 	}
@@ -220,6 +218,10 @@ public class CoreferenceModel {
 				else
 					addTo(op.getEntity(), span);
 			}
+			history.add(op);
+		} else if (operation instanceof AddToOperation) {
+			AddToOperation op = (AddToOperation) operation;
+			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
 			history.add(op);
 		} else {
 			throw new UnsupportedOperationException();
