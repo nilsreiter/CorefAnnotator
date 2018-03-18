@@ -26,7 +26,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	String label;
 
-	boolean visible = true;
 	int rank = 50;
 
 	public CATreeNode(FeatureStructure featureStructure, String label) {
@@ -112,14 +111,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 			}
 
 		};
-	}
-
-	public boolean isVisible() {
-		return visible;
-	}
-
-	public void setVisible(boolean visible) {
-		this.visible = visible;
 	}
 
 	@SuppressWarnings("unchecked")

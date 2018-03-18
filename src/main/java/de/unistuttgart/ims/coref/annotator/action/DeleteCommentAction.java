@@ -8,16 +8,16 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
 public class DeleteCommentAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 	Comment comment;
-	CoreferenceModel.CommentsModel model;
+	CommentsModel model;
 
-	public DeleteCommentAction(CoreferenceModel.CommentsModel model, Comment comment) {
+	public DeleteCommentAction(CommentsModel model, Comment comment) {
 		super(null, Constants.Strings.ACTION_COMMENT_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMMENT_DELETE_TOOLTIP));
 		this.comment = comment;

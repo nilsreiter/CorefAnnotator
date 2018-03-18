@@ -6,15 +6,14 @@
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-		 	<ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
 		</Console>
 		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
 		</File>
 	</Appenders>
 	<Loggers>
-		<Logger name="${loggername}" level="debug">
+		<Logger name="${loggername}" level="info">
 			<AppenderRef ref="File" />
 		</Logger>
 		<Root level="warn">
