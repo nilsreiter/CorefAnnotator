@@ -9,13 +9,13 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
-	public class RenameOperationDescription implements Op {
+	public class RenameEntity implements Op {
 
 		Entity entity;
 		String newLabel;
 		String oldLabel;
 
-		public RenameOperationDescription(Entity entity, String newName) {
+		public RenameEntity(Entity entity, String newName) {
 			this.entity = entity;
 			this.oldLabel = entity.getLabel();
 			this.newLabel = newName;

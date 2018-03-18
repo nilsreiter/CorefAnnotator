@@ -1126,7 +1126,7 @@ public class DocumentWindow extends JFrame
 					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 			if (newLabel != null) {
-				Op.RenameOperationDescription op = new Op.RenameOperationDescription(etn.getEntity(), newLabel);
+				Op.RenameEntity op = new Op.RenameEntity(etn.getEntity(), newLabel);
 				documentModel.getCoreferenceModel().edit(op);
 				registerChange();
 			}
