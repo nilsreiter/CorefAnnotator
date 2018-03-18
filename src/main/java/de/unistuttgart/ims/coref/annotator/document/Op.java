@@ -148,6 +148,48 @@ public interface Op {
 
 	}
 
+	public class MoveMentionsToEntity implements Op {
+		ImmutableList<Mention> mentions;
+		Entity target;
+		Entity source;
+
+		public MoveMentionsToEntity(Entity target, Mention... mention) {
+			this.mentions = Lists.immutable.of(mention);
+			this.source = mentions.getFirst().getEntity();
+			this.target = target;
+		}
+
+		public MoveMentionsToEntity(Entity target, Iterable<Mention> mention) {
+			this.mentions = Lists.immutable.withAll(mention);
+			this.source = mentions.getFirst().getEntity();
+			this.target = target;
+		}
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
+
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
+		}
+
+		public Entity getTarget() {
+			return target;
+		}
+
+		public void setTarget(Entity target) {
+			this.target = target;
+		}
+
+		public Entity getSource() {
+			return source;
+		}
+
+		public void setSource(Entity source) {
+			this.source = source;
+		}
+	}
+
 	public class AddMentionsToNewEntity implements Op {
 		ImmutableList<Span> spans;
 		Entity entity;

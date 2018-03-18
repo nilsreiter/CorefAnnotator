@@ -1074,11 +1074,11 @@ public class DocumentWindow extends JFrame
 					moved.forEach(n -> documentModel.getCoreferenceModel().addTo((EntityGroup) targetFS,
 							n.getFeatureStructure()));
 				} else
-					moved.forEach(n -> documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
-							(Entity) targetFS));
+					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
+							moved.collect(n -> (n.getFeatureStructure()))));
 			} else if (targetFS instanceof Mention)
-				moved.forEach(
-						n -> documentModel.getCoreferenceModel().moveTo((Mention) targetFS, n.getFeatureStructure()));
+				moved.forEach(n -> documentModel.getCoreferenceModel()
+						.moveTo((DetachedMentionPart) n.getFeatureStructure(), (Mention) targetFS));
 			else
 				return false;
 			registerChange();

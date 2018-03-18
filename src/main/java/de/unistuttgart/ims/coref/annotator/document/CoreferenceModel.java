@@ -34,6 +34,7 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
+import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
@@ -225,6 +226,10 @@ public class CoreferenceModel {
 			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
 			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
 			history.push(op);
+		} else if (operation instanceof Op.MoveMentionsToEntity) {
+			Op.MoveMentionsToEntity op = (Op.MoveMentionsToEntity) operation;
+			op.getMentions().forEach(m -> moveTo(m, op.getTarget()));
+			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			remove(op.getMention(), false);
@@ -264,6 +269,9 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
+		} else if (operation instanceof Op.MoveMentionsToEntity) {
+			Op.MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
+			op.getMentions().forEach(m -> moveTo(m, op.getSource()));
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			addTo(op.getEntity(), op.getSpan());
@@ -359,7 +367,7 @@ public class CoreferenceModel {
 		fireAnnotationChangedEvent(m);
 	}
 
-	public void moveTo(Mention m, Entity newEntity) {
+	private void moveTo(Mention m, Entity newEntity) {
 		Entity oldEntity = m.getEntity();
 		m.setEntity(newEntity);
 		fireAnnotationMovedEvent(m, oldEntity, newEntity);
