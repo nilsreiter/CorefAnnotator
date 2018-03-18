@@ -124,6 +124,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.undo.AddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -1048,7 +1049,7 @@ public class DocumentWindow extends JFrame
 		protected boolean handleSpanTransfer(Span potentialAnnotation) {
 
 			if (targetFS == null) {
-				documentModel.getCoreferenceModel().add(potentialAnnotation.begin, potentialAnnotation.end);
+				documentModel.getCoreferenceModel().edit(new AddOperationDescription(getSelection()));
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
 				documentModel.getCoreferenceModel().addTo((Entity) targetFS, potentialAnnotation.begin,
@@ -1210,9 +1211,8 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().add(getSelection());
-			registerChange();
-
+			AddOperationDescription op = new AddOperationDescription(getSelection());
+			documentModel.getCoreferenceModel().edit(op);
 		}
 
 	}

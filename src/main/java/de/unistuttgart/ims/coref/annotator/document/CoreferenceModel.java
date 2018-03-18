@@ -90,7 +90,7 @@ public class CoreferenceModel {
 	 *            End of mention
 	 * @return The new mention
 	 */
-	public Mention add(int begin, int end) {
+	private Mention add(int begin, int end) {
 		Annotator.logger.entry(begin, end);
 		// document model
 		Mention m = createMention(begin, end);
@@ -99,8 +99,6 @@ public class CoreferenceModel {
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
 		fireMentionAddedEvent(m);
-
-		history.push(new AddOperationDescription(m));
 
 		return m;
 	}
@@ -210,6 +208,12 @@ public class CoreferenceModel {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.add(op);
+		} else if (operation instanceof AddOperationDescription) {
+			AddOperationDescription op = (AddOperationDescription) operation;
+			op.setMention(add(op.getSpan()));
+			history.add(op);
+		} else {
+			throw new UnsupportedOperationException();
 		}
 	}
 
