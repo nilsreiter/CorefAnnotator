@@ -4,11 +4,84 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
+
+	public class RemovePart implements Op {
+		Mention mention;
+		Span span;
+		DetachedMentionPart part;
+
+		public RemovePart(Mention mention, DetachedMentionPart part) {
+			this.mention = mention;
+			this.part = part;
+			this.span = new Span(part);
+		}
+
+		public Mention getMention() {
+			return mention;
+		}
+
+		public void setMention(Mention mention) {
+			this.mention = mention;
+		}
+
+		public Span getSpan() {
+			return span;
+		}
+
+		public void setSpan(Span span) {
+			this.span = span;
+		}
+
+		public DetachedMentionPart getPart() {
+			return part;
+		}
+
+		public void setPart(DetachedMentionPart part) {
+			this.part = part;
+		}
+
+	}
+
+	public class AttachPart implements Op {
+		Mention mention;
+		Span span;
+		DetachedMentionPart part;
+
+		public AttachPart(Mention mention, Span span) {
+			this.mention = mention;
+			this.span = span;
+		}
+
+		public Mention getMention() {
+			return mention;
+		}
+
+		public void setMention(Mention mention) {
+			this.mention = mention;
+		}
+
+		public Span getSpan() {
+			return span;
+		}
+
+		public void setSpan(Span span) {
+			this.span = span;
+		}
+
+		public DetachedMentionPart getPart() {
+			return part;
+		}
+
+		public void setPart(DetachedMentionPart part) {
+			this.part = part;
+		}
+	}
 
 	public class GroupEntities implements Op {
 		ImmutableList<Entity> entities;

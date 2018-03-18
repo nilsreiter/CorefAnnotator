@@ -1056,8 +1056,7 @@ public class DocumentWindow extends JFrame
 
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
 			} else if (targetFS instanceof Mention) {
-				documentModel.getCoreferenceModel().addTo((Mention) targetFS, potentialAnnotation.begin,
-						potentialAnnotation.end);
+				documentModel.getCoreferenceModel().edit(new Op.AttachPart((Mention) targetFS, potentialAnnotation));
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_PART_CREATED), true);
 			}
 			registerChange();
@@ -1068,9 +1067,6 @@ public class DocumentWindow extends JFrame
 			Annotator.logger.debug("Moving {} things", moved.size());
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					// moved.forEach(n ->
-					// documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
-					// (EntityGroup) targetFS));
 					moved.forEach(n -> documentModel.getCoreferenceModel().addTo((EntityGroup) targetFS,
 							n.getFeatureStructure()));
 				} else
@@ -1337,8 +1333,7 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getFeatureStructure()));
 			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-				// highlightManager.undraw(dmp);
-				documentModel.getCoreferenceModel().remove(dmp);
+				documentModel.getCoreferenceModel().edit(new Op.RemovePart(dmp.getMention(), dmp));
 			} else if (tn.isEntity()) {
 				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
