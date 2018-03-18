@@ -156,18 +156,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 	 */
 	JCas jcas;
 
-	@Deprecated
-	boolean keepEmptyEntities = true;
-
-	@Deprecated
-	int key = 0;
-
-	/**
-	 * Maps shortcut characters onto entities
-	 */
-	@Deprecated
-	Map<Character, Entity> keyMap = Maps.mutable.empty();
-
 	Preferences preferences;
 
 	/**
@@ -186,26 +174,23 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	}
 
-	public CATreeNode add(DetachedMentionPart dmp) {
+	public CATreeNode addToTree(DetachedMentionPart dmp) {
 		CATreeNode node = new CATreeNode(dmp, dmp.getCoveredText());
 		fsMap.put(dmp, node);
 		return node;
 	}
 
-	public CATreeNode add(Mention m) {
+	public CATreeNode addToTree(Mention m) {
 		CATreeNode node = new CATreeNode(m, m.getCoveredText());
 		fsMap.put(m, node);
-		characterPosition2AnnotationMap.add(m);
+		registerAnnotation(m);
 		return node;
 	}
 
-	public CATreeNode add(Entity e) {
+	public CATreeNode addToTree(Entity e) {
 		CATreeNode tn = new CATreeNode(e, "");
 		insertNodeInto(tn, rootNode, 0);
 		fsMap.put(e, tn);
-		if (e.getKey() != null) {
-			keyMap.put(e.getKey().charAt(0), e);
-		}
 		fireEntityAddedEvent(e);
 		return tn;
 	}
@@ -225,7 +210,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		Entity e = createEntity(m.getCoveredText());
 
 		// tree model
-		addTo(add(e), add(m));
+		addTo(addToTree(e), addToTree(m));
 		return m;
 	}
 
@@ -239,7 +224,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public void addTo(Mention m, DetachedMentionPart dmp) {
 		// tree model
-		CATreeNode node = add(dmp);
+		CATreeNode node = addToTree(dmp);
 		insertNodeInto(node, get(m), 0);
 
 		// notify text view
@@ -255,11 +240,12 @@ public class CoreferenceModel extends DefaultTreeModel {
 		addTo(m, d);
 	}
 
-	public void addTo(Entity e, int begin, int end) {
+	public Mention addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
-		addTo(get(e), add(m));
+		addTo(get(e), addToTree(m));
 		if (get(e).isVisible())
 			fireMentionAddedEvent(m);
+		return m;
 	}
 
 	public void addTo(CATreeNode entityNode, CATreeNode mentionNode) {
@@ -267,7 +253,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		Mention m = mentionNode.getFeatureStructure();
 		Entity e = entityNode.getFeatureStructure();
 		m.setEntity(e);
-		CATreeNode tn = add(m);
+		CATreeNode tn = addToTree(m);
 		int ind = 0;
 		while (ind < entityNode.getChildCount()) {
 			CATreeNode node = entityNode.getChildAt(ind);
@@ -376,7 +362,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 		eg.setMembers(0, e1);
 		eg.setMembers(1, e2);
 
-		CATreeNode gtn = add(eg);
+		CATreeNode gtn = addToTree(eg);
 
 		insertNodeInto(new CATreeNode(e1, e1.getLabel()), gtn, 0);
 		insertNodeInto(new CATreeNode(e2, e2.getLabel()), gtn, 1);
@@ -393,7 +379,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public CATreeNode getOrCreate(DetachedMentionPart m) {
 		if (!fsMap.containsKey(m))
-			return add(m);
+			return addToTree(m);
 		return fsMap.get(m);
 	}
 
@@ -403,7 +389,7 @@ public class CoreferenceModel extends DefaultTreeModel {
 
 	public CATreeNode get(Entity e) {
 		if (!fsMap.containsKey(e)) {
-			return add(e);
+			return addToTree(e);
 		}
 		return fsMap.get(e);
 	}
@@ -417,23 +403,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 	 */
 	public Collection<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
-	}
-
-	@Deprecated
-	public boolean isKeyUsed(int i) {
-		return keyMap.containsKey(i);
-	}
-
-	@Deprecated
-	public void reassignKey(char keyCode, Entity e) {
-		Entity old = keyMap.get(keyCode);
-		if (old != null) {
-			old.setKey(null);
-			nodeChanged(fsMap.get(old));
-		}
-		keyMap.put(keyCode, e);
-		e.setKey(String.valueOf(keyCode));
-		nodeChanged(fsMap.get(e));
 	}
 
 	public void registerAnnotation(Annotation a) {
@@ -487,9 +456,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 		}
 		removeNodeFromParent(etn);
 		fsMap.remove(e);
-		String k = e.getKey();
-		if (k != null)
-			keyMap.remove(k.charAt(0));
 		fireEntityRemovedEvent(e);
 		e.removeFromIndexes();
 	}
@@ -635,28 +601,6 @@ public class CoreferenceModel extends DefaultTreeModel {
 				remove(n.getEntity());
 			}
 		}
-	}
-
-	@Deprecated
-	public void merge(CATreeNode e1, CATreeNode e2) {
-		CATreeNode bigger, smaller;
-		if (e1.getChildCount() >= e2.getChildCount()) {
-			bigger = e1;
-			smaller = e2;
-		} else {
-			smaller = e1;
-			bigger = e2;
-		}
-		for (int i = 0; i < smaller.getChildCount();) {
-			CATreeNode node = smaller.getChildAt(i);
-			if (node.getFeatureStructure() instanceof Mention) {
-				Mention m = (Mention) node.getFeatureStructure();
-				moveTo(m, bigger.getFeatureStructure());
-			} else {
-				i++;
-			}
-		}
-		remove(smaller.getEntity());
 	}
 
 	public void moveTo(Mention m, Entity newEntity) {

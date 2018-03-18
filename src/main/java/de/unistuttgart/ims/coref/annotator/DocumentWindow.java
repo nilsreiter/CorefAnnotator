@@ -128,7 +128,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.CoreferenceModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener {
+public class DocumentWindow extends JFrame
+		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow {
 
 	private static final long serialVersionUID = 1L;
 
@@ -347,7 +348,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		setPreferredSize(new Dimension(800, 800));
 		pack();
-		this.setLocationRelativeTo(null);
+		setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
 	}
 
@@ -365,7 +366,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.copyAction = new CopyAction(this);
+		this.copyAction = new CopyAction(this, mainApplication);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -571,8 +572,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			setIndeterminateProgress();
-			lai = new JCasLoader(this, file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor,
-					language);
+			lai = new JCasLoader(jcas -> this.setJCas(jcas), file,
+					TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language);
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -865,7 +866,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		setWindowTitle();
-		CoreferenceModelLoader im = new CoreferenceModelLoader(this, jcas);
+		CoreferenceModelLoader im = new CoreferenceModelLoader(cm -> this.setCoreferenceModel(cm), jcas);
+		im.setCoreferenceModelListener(this);
 		im.execute();
 	}
 
@@ -2144,6 +2146,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	public JTextPane getTextPane() {
 		return textPane;
+	}
+
+	@Override
+	public String getText() {
+		return textPane.getText();
+	}
+
+	@Override
+	public Span getSelection() {
+		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 	}
 
 }

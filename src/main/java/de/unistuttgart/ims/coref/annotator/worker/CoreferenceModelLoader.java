@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
@@ -20,23 +21,33 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Integer> {
 
-	private DocumentWindow documentWindow;
+	@Deprecated
+	DocumentWindow documentWindow;
+	Consumer<CoreferenceModel> consumer = null;
+	CoreferenceModelListener coreferenceModelListener;
 	JCas jcas;
 
+	@Deprecated
 	public CoreferenceModelLoader(DocumentWindow documentWindow, JCas jcas) {
 		this.documentWindow = documentWindow;
 		this.jcas = jcas;
 	}
 
-	protected CoreferenceModel load(CoreferenceModelListener listener, Preferences preferences) {
+	public CoreferenceModelLoader(Consumer<CoreferenceModel> consumer, JCas jcas) {
+		this.consumer = consumer;
+		this.jcas = jcas;
+	}
+
+	protected CoreferenceModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
 
 		CoreferenceModel cModel;
 		cModel = new CoreferenceModel(jcas, preferences);
-		cModel.addCoreferenceModelListener(listener);
+		if (getCoreferenceModelListener() != null)
+			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
 
 		Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)).forEach(e -> {
-			cModel.add(e);
+			cModel.addToTree(e);
 		});
 		Annotator.logger.debug("Added all entities");
 
@@ -46,7 +57,7 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 		Annotator.logger.debug("Added all entity groups");
 
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			cModel.addTo(cModel.get(m.getEntity()), cModel.add(m));
+			cModel.addTo(cModel.get(m.getEntity()), cModel.addToTree(m));
 			cModel.registerAnnotation(m);
 		}
 		Annotator.logger.debug("Added all mentions");
@@ -56,16 +67,24 @@ public class CoreferenceModelLoader extends SwingWorker<CoreferenceModel, Intege
 
 	@Override
 	protected CoreferenceModel doInBackground() throws Exception {
-		return load(documentWindow, documentWindow.getMainApplication().getPreferences());
+		return load(Annotator.app.getPreferences());
 	}
 
 	@Override
 	protected void done() {
 		try {
-			documentWindow.setCoreferenceModel(get());
+			consumer.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
+	}
+
+	public CoreferenceModelListener getCoreferenceModelListener() {
+		return coreferenceModelListener;
+	}
+
+	public void setCoreferenceModelListener(CoreferenceModelListener coreferenceModelListener) {
+		this.coreferenceModelListener = coreferenceModelListener;
 	}
 
 }

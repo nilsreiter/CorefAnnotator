@@ -15,6 +15,7 @@ import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordParser;
 import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordPosTagger;
 import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
+import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.plaintext.Plugin {
 
@@ -32,6 +33,8 @@ public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.pl
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
 		try {
 			AggregateBuilder b = new AggregateBuilder();
+			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
+					"en"));
 			b.add(AnalysisEngineFactory.createEngineDescription(StanfordSegmenter.class));
 			b.add(AnalysisEngineFactory.createEngineDescription(StanfordPosTagger.class));
 			b.add(AnalysisEngineFactory.createEngineDescription(StanfordParser.class));
