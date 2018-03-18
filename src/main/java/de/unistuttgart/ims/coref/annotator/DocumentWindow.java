@@ -123,7 +123,6 @@ import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.document.RenameOperationDescription;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -1127,7 +1126,7 @@ public class DocumentWindow extends JFrame
 					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 			if (newLabel != null) {
-				RenameOperationDescription op = new RenameOperationDescription(etn.getEntity(), newLabel);
+				Op.RenameOperationDescription op = new Op.RenameOperationDescription(etn.getEntity(), newLabel);
 				documentModel.getCoreferenceModel().edit(op);
 				registerChange();
 			}

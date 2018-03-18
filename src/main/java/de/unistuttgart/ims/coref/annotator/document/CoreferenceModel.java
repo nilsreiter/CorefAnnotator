@@ -32,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Op.RenameOperationDescription;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -229,8 +230,8 @@ public class CoreferenceModel {
 	}
 
 	protected void undo(Op operation) {
-		if (operation instanceof RenameOperationDescription) {
-			RenameOperationDescription op = (RenameOperationDescription) operation;
+		if (operation instanceof Op.RenameOperationDescription) {
+			Op.RenameOperationDescription op = (Op.RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getOldLabel());
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
