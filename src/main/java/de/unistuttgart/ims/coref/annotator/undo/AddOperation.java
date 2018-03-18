@@ -37,7 +37,6 @@ public class AddOperation extends AbstractEditOperation {
 
 	@Override
 	public void revert(CoreferenceModel model) {
-		model.remove(mention);
 		model.remove(mention.getEntity());
 	}
 
