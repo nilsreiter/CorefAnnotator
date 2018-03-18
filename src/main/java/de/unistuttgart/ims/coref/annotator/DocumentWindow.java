@@ -119,7 +119,6 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.document.AddToOperation;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Op;
@@ -1054,7 +1053,7 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToNewEntity(getSelection()));
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
-				documentModel.getCoreferenceModel().edit(new AddToOperation((Entity) targetFS, getSelection()));
+				documentModel.getCoreferenceModel().edit(new Op.AddToOperation((Entity) targetFS, getSelection()));
 
 				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
 			} else if (targetFS instanceof Mention) {
@@ -1380,7 +1379,7 @@ public class DocumentWindow extends JFrame
 			if (keyMap.containsKey(e.getKeyChar())) {
 				e.consume();
 				documentModel.getCoreferenceModel()
-						.edit(new AddToOperation(keyMap.get(e.getKeyChar()), getSelection()));
+						.edit(new Op.AddToOperation(keyMap.get(e.getKeyChar()), getSelection()));
 			}
 		}
 
@@ -1437,7 +1436,7 @@ public class DocumentWindow extends JFrame
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.getCoreferenceModel().edit(new AddToOperation(m.getEntity(), spans));
+						documentModel.getCoreferenceModel().edit(new Op.AddToOperation(m.getEntity(), spans));
 						registerChange();
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
@@ -2078,7 +2077,7 @@ public class DocumentWindow extends JFrame
 						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
 							documentModel.getCoreferenceModel()
-									.edit(new AddToOperation(etn.getEntity(), new Span(b, e)));
+									.edit(new Op.AddToOperation(etn.getEntity(), new Span(b, e)));
 						}
 					}
 					treeSearchField.setText("");

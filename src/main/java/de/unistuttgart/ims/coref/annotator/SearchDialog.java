@@ -46,7 +46,6 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.document.AddToOperation;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
@@ -85,7 +84,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to entity");
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 
-			AddToOperation op = new AddToOperation(node.getEntity(),
+			Op.AddToOperation op = new Op.AddToOperation(node.getEntity(),
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getCoreferenceModel().edit(op);
 		}
