@@ -181,7 +181,15 @@ public class Constants {
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String STAT_KEY_AGR_PERC = "stat.key.agr_perc";
+		public static final String STAT_KEY_AGREED = "stat.key.agreed";
+		public static final String STAT_KEY_TOTAL = "stat.key.total";
+		public static final String STAT_KEY_COLOR = "stat.key.color";
+		public static final String STAT_KEY_ENTITIES = "stat.key.entities";
+		public static final String STAT_KEY_MENTIONS = "stat.key.mentions";
+		public static final String STAT_KEY_POSITION = "stat.key.position";
 		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
+		public static final String STAT_AGR_TITLE = "stat.agr.title";
 
 	}
 

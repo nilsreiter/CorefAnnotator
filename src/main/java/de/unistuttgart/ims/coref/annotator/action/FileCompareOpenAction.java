@@ -28,6 +28,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 	private static final long serialVersionUID = 1L;
 
 	JDialog dialog;
+	JTextField[] names = new JTextField[2];
 	JLabel[] labels = new JLabel[2];
 
 	public FileCompareOpenAction(Annotator mApp) {
@@ -56,7 +57,8 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
 		panel.setLayout(bl);
 		panel.setBorder(BorderFactory.createTitledBorder("left"));
-		panel.add(new JTextField());
+		names[0] = new JTextField();
+		panel.add(names[0]);
 		panel.add(new JButton(new SelectFileAction(panel, 0)));
 		labels[0] = new JLabel();
 		labels[0].setVisible(false);
@@ -67,7 +69,8 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
 		panel.setLayout(bl);
 		panel.setBorder(BorderFactory.createTitledBorder("right"));
-		panel.add(new JTextField());
+		names[1] = new JTextField();
+		panel.add(names[1]);
 		panel.add(new JButton(new SelectFileAction(panel, 1)));
 		labels[1] = new JLabel();
 		labels[1].setVisible(false);
@@ -96,11 +99,14 @@ public class FileCompareOpenAction extends AnnotatorAction {
 			try {
 				cmw = new CompareMentionsWindow(mainApplication);
 
-				new JCasLoader(jcas -> cmw.setJCasLeft(jcas), new File(labels[0].getText())).execute();
+				new JCasLoader(jcas -> cmw.setJCasLeft(jcas, names[0].getText()), new File(labels[0].getText()))
+						.execute();
 
-				new JCasLoader(jcas -> cmw.setJCasRight(jcas), new File(labels[1].getText())).execute();
+				new JCasLoader(jcas -> cmw.setJCasRight(jcas, names[1].getText()), new File(labels[1].getText()))
+						.execute();
 
 				cmw.setVisible(true);
+				cmw.pack();
 				dialog.setVisible(false);
 			} catch (UIMAException e1) {
 				Annotator.logger.catching(e1);
