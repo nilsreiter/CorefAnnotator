@@ -206,8 +206,8 @@ public class CoreferenceModel {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.add(op);
-		} else if (operation instanceof BatchAddOperationDescription) {
-			BatchAddOperationDescription op = (BatchAddOperationDescription) operation;
+		} else if (operation instanceof Op.BatchAddOperationDescription) {
+			Op.BatchAddOperationDescription op = (Op.BatchAddOperationDescription) operation;
 			for (Span span : op.getSpans()) {
 				if (op.getEntity() == null)
 					op.setEntity(add(span).getEntity());
@@ -232,8 +232,8 @@ public class CoreferenceModel {
 		if (operation instanceof RenameOperationDescription) {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getOldLabel());
-		} else if (operation instanceof BatchAddOperationDescription) {
-			BatchAddOperationDescription op = (BatchAddOperationDescription) operation;
+		} else if (operation instanceof Op.BatchAddOperationDescription) {
+			Op.BatchAddOperationDescription op = (Op.BatchAddOperationDescription) operation;
 			remove(op.getEntity());
 		}
 	}

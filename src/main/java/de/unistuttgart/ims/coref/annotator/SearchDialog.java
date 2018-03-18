@@ -47,7 +47,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.document.AddToOperation;
-import de.unistuttgart.ims.coref.annotator.document.BatchAddOperationDescription;
+import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
 	class ListTransferHandler extends TransferHandler {
@@ -104,7 +104,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to new entity");
 
-			BatchAddOperationDescription op = new BatchAddOperationDescription(
+			Op.BatchAddOperationDescription op = new Op.BatchAddOperationDescription(
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getCoreferenceModel().edit(op);
 		}
