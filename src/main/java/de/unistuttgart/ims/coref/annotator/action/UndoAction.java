@@ -1,6 +1,11 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -13,6 +18,9 @@ public class UndoAction extends DocumentWindowAction {
 
 	public UndoAction(DocumentWindow dw) {
 		super(dw, Constants.Strings.ACTION_UNDO, MaterialDesign.MDI_UNDO);
+		putValue(Action.ACCELERATOR_KEY,
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
 	}
 
 	@Override
