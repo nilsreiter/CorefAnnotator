@@ -9,6 +9,42 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
+	public class RemoveMention implements Op {
+		Mention mention;
+		Entity entity;
+		Span span;
+
+		public RemoveMention(Mention mention) {
+			this.mention = mention;
+			this.span = new Span(mention);
+			this.entity = mention.getEntity();
+		}
+
+		public Mention getMention() {
+			return mention;
+		}
+
+		public void setMention(Mention mention) {
+			this.mention = mention;
+		}
+
+		public Span getSpan() {
+			return span;
+		}
+
+		public void setSpan(Span span) {
+			this.span = span;
+		}
+
+		public Entity getEntity() {
+			return entity;
+		}
+
+		public void setEntity(Entity entity) {
+			this.entity = entity;
+		}
+	}
+
 	public class RenameEntity implements Op {
 
 		Entity entity;

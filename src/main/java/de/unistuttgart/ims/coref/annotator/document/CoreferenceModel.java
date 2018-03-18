@@ -32,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
@@ -203,6 +204,7 @@ public class CoreferenceModel {
 	}
 
 	public void edit(Op operation) {
+		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
@@ -220,6 +222,11 @@ public class CoreferenceModel {
 			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
 			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
 			history.add(op);
+		} else if (operation instanceof Op.RemoveMention) {
+			Op.RemoveMention op = (RemoveMention) operation;
+			remove(op.getMention());
+			op.setMention(null);
+			history.add(op);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -236,6 +243,9 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
 			remove(op.getEntity());
+		} else if (operation instanceof Op.RemoveMention) {
+			Op.RemoveMention op = (RemoveMention) operation;
+			addTo(op.getEntity(), op.getSpan());
 		}
 	}
 
@@ -358,7 +368,7 @@ public class CoreferenceModel {
 		entity.removeFromIndexes();
 	}
 
-	public void remove(Mention m) {
+	private void remove(Mention m) {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(m.getEntity(), m);

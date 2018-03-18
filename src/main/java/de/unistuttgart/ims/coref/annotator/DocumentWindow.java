@@ -1331,7 +1331,7 @@ public class DocumentWindow extends JFrame
 		private void deleteSingle(CATreeNode tn) {
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
-				documentModel.getCoreferenceModel().remove((Mention) tn.getFeatureStructure());
+				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
 				tree.setSelectionRow(row);
 			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
 				documentModel.getCoreferenceModel().remove((EntityGroup) tn.getFeatureStructure());
@@ -1367,7 +1367,7 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			registerChange();
-			documentModel.getCoreferenceModel().remove(m);
+			documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 		}
 
 	}
@@ -1456,8 +1456,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
+			// TODO: New operation for clearing
 			for (Mention m : JCasUtil.select(jcas, Mention.class))
-				documentModel.getCoreferenceModel().remove(m);
+				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 			for (Entity e : JCasUtil.select(jcas, Entity.class))
 				documentModel.getCoreferenceModel().remove(e);
 			registerChange();
