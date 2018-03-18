@@ -3,12 +3,12 @@ package de.unistuttgart.ims.coref.annotator.undo;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-public class AddOperationDescription implements EditOperationDescription {
+@Deprecated
+public class AddOperationDescription extends BatchAddOperationDescription implements EditOperationDescription {
 	Mention mention;
-	Span span;
 
 	public AddOperationDescription(Span span) {
-		this.span = span;
+		super(span);
 	}
 
 	@Override
@@ -25,11 +25,7 @@ public class AddOperationDescription implements EditOperationDescription {
 	}
 
 	public Span getSpan() {
-		return span;
-	}
-
-	public void setSpan(Span span) {
-		this.span = span;
+		return spans.getFirst();
 	}
 
 }

@@ -124,7 +124,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
-import de.unistuttgart.ims.coref.annotator.undo.AddOperationDescription;
+import de.unistuttgart.ims.coref.annotator.undo.BatchAddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -1049,7 +1049,7 @@ public class DocumentWindow extends JFrame
 		protected boolean handleSpanTransfer(Span potentialAnnotation) {
 
 			if (targetFS == null) {
-				documentModel.getCoreferenceModel().edit(new AddOperationDescription(getSelection()));
+				documentModel.getCoreferenceModel().edit(new BatchAddOperationDescription(getSelection()));
 				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
 			} else if (targetFS instanceof Entity) {
 				documentModel.getCoreferenceModel().addTo((Entity) targetFS, potentialAnnotation.begin,
@@ -1211,7 +1211,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			AddOperationDescription op = new AddOperationDescription(getSelection());
+			BatchAddOperationDescription op = new BatchAddOperationDescription(getSelection());
 			documentModel.getCoreferenceModel().edit(op);
 		}
 

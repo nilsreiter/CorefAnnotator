@@ -2,22 +2,22 @@ package de.unistuttgart.ims.coref.annotator.undo;
 
 import java.util.Collection;
 
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 public class BatchOperationDescription implements EditOperationDescription {
 
-	ImmutableSet<EditOperationDescription> edits;
+	ImmutableList<EditOperationDescription> edits;
 
 	public BatchOperationDescription(EditOperationDescription... edits) {
-		this.edits = Sets.immutable.of(edits);
+		this.edits = Lists.immutable.of(edits);
 	}
 
 	public BatchOperationDescription(Collection<EditOperationDescription> edits) {
-		this.edits = Sets.immutable.withAll(edits);
+		this.edits = Lists.immutable.withAll(edits);
 	}
 
-	public ImmutableSet<EditOperationDescription> getEdits() {
+	public ImmutableList<EditOperationDescription> getEdits() {
 		return edits;
 	}
 

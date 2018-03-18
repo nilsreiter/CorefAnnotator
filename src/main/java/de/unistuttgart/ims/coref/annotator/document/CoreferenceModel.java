@@ -32,8 +32,8 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.coref.annotator.undo.AddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
+import de.unistuttgart.ims.coref.annotator.undo.BatchAddOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.EditOperationDescription;
 import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
@@ -103,12 +103,16 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public Mention add(Span selection) {
+	private Mention add(Span selection) {
 		return add(selection.begin, selection.end);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
 		return crModelListeners.add(e);
+	}
+
+	private Mention addTo(Entity e, Span span) {
+		return addTo(e, span.begin, span.end);
 	}
 
 	public Mention addTo(Entity e, int begin, int end) {
@@ -208,9 +212,14 @@ public class CoreferenceModel {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.add(op);
-		} else if (operation instanceof AddOperationDescription) {
-			AddOperationDescription op = (AddOperationDescription) operation;
-			op.setMention(add(op.getSpan()));
+		} else if (operation instanceof BatchAddOperationDescription) {
+			BatchAddOperationDescription op = (BatchAddOperationDescription) operation;
+			for (Span span : op.getSpans()) {
+				if (op.getEntity() == null)
+					op.setEntity(add(span).getEntity());
+				else
+					addTo(op.getEntity(), span);
+			}
 			history.add(op);
 		} else {
 			throw new UnsupportedOperationException();
@@ -225,6 +234,9 @@ public class CoreferenceModel {
 		if (operation instanceof RenameOperationDescription) {
 			RenameOperationDescription op = (RenameOperationDescription) operation;
 			op.getEntity().setLabel(op.getOldLabel());
+		} else if (operation instanceof BatchAddOperationDescription) {
+			BatchAddOperationDescription op = (BatchAddOperationDescription) operation;
+			remove(op.getEntity());
 		}
 	}
 
