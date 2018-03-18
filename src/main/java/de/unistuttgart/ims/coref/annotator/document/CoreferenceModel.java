@@ -34,7 +34,8 @@ import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.undo.AddOperation;
 import de.unistuttgart.ims.coref.annotator.undo.AddToOperation;
-import de.unistuttgart.ims.coref.annotator.undo.EditOperation;
+import de.unistuttgart.ims.coref.annotator.undo.EditOperationDescription;
+import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -73,7 +74,7 @@ public class CoreferenceModel {
 
 	boolean initialised = false;
 
-	Deque<EditOperation> history = new LinkedList<EditOperation>();
+	Deque<EditOperationDescription> history = new LinkedList<EditOperationDescription>();
 
 	public CoreferenceModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
@@ -99,7 +100,7 @@ public class CoreferenceModel {
 		entityMentionMap.put(e, m);
 		fireMentionAddedEvent(m);
 
-		history.push(new AddOperation(new Span(begin, end)));
+		history.push(new AddOperation(m));
 
 		return m;
 	}
@@ -120,7 +121,7 @@ public class CoreferenceModel {
 		fireEntityEvent(Event.Update, e);
 		fireMentionAddedEvent(m);
 
-		history.push(new AddToOperation(e, new Span(begin, end)));
+		history.push(new AddToOperation(e, m));
 
 		return m;
 	}
@@ -202,6 +203,25 @@ public class CoreferenceModel {
 			m = Util.extend(m);
 		registerAnnotation(m);
 		return m;
+	}
+
+	public void edit(EditOperationDescription operation) {
+		if (operation instanceof RenameOperationDescription) {
+			RenameOperationDescription op = (RenameOperationDescription) operation;
+			op.getEntity().setLabel(op.getNewLabel());
+			history.add(op);
+		}
+	}
+
+	public void undo() {
+		undo(history.pop());
+	}
+
+	protected void undo(EditOperationDescription operation) {
+		if (operation instanceof RenameOperationDescription) {
+			RenameOperationDescription op = (RenameOperationDescription) operation;
+			op.getEntity().setLabel(op.getOldLabel());
+		}
 	}
 
 	protected void fireAnnotationChangedEvent(Annotation m) {
@@ -408,7 +428,7 @@ public class CoreferenceModel {
 		initialised = true;
 	}
 
-	public Deque<EditOperation> getHistory() {
+	public Deque<EditOperationDescription> getHistory() {
 		return history;
 	}
 

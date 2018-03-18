@@ -124,6 +124,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.undo.RenameOperationDescription;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
@@ -1124,9 +1125,8 @@ public class DocumentWindow extends JFrame
 					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 			if (newLabel != null) {
-				etn.getEntity().setLabel(newLabel);
-				// TODO: Update tree
-				// cModel.nodeChanged(etn);
+				RenameOperationDescription op = new RenameOperationDescription(etn.getEntity(), newLabel);
+				documentModel.getCoreferenceModel().edit(op);
 				registerChange();
 			}
 		}

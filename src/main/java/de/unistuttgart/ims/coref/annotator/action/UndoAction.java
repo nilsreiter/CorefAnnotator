@@ -6,7 +6,6 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.undo.EditOperation;
 
 public class UndoAction extends DocumentWindowAction {
 
@@ -18,8 +17,7 @@ public class UndoAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		EditOperation oper = documentWindow.getCoreferenceModel().getHistory().removeFirst();
-		oper.revert(documentWindow.getCoreferenceModel());
+		documentWindow.getDocumentModel().getCoreferenceModel().undo();
 	}
 
 }
