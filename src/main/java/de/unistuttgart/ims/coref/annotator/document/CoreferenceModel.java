@@ -32,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
@@ -208,7 +209,7 @@ public class CoreferenceModel {
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
-			history.add(op);
+			history.push(op);
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
 			for (Span span : op.getSpans()) {
@@ -217,16 +218,16 @@ public class CoreferenceModel {
 				else
 					addTo(op.getEntity(), span);
 			}
-			history.add(op);
+			history.push(op);
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
 			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
-			history.add(op);
+			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			remove(op.getMention());
-			op.setMention(null);
-			history.add(op);
+			op.setMentions(null);
+			history.push(op);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -243,6 +244,9 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
 			remove(op.getEntity());
+		} else if (operation instanceof Op.AddMentionsToEntity) {
+			Op.AddMentionsToEntity op = (AddMentionsToEntity) operation;
+			op.getMentions().forEach(m -> remove(m));
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			addTo(op.getEntity(), op.getSpan());
@@ -356,6 +360,8 @@ public class CoreferenceModel {
 	}
 
 	public void remove(Entity entity) {
+		for (Mention m : entityMentionMap.get(entity))
+			remove(m);
 		fireEntityEvent(Event.Remove, entity);
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();

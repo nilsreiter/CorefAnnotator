@@ -10,30 +10,26 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 public interface Op {
 
 	public class RemoveMention implements Op {
-		Mention mention;
+		ImmutableList<Mention> mentions;
 		Entity entity;
-		Span span;
+		ImmutableList<Span> spans;
 
-		public RemoveMention(Mention mention) {
-			this.mention = mention;
-			this.span = new Span(mention);
-			this.entity = mention.getEntity();
+		public RemoveMention(Mention... mention) {
+			this.mentions = Lists.immutable.of(mention);
+			this.spans = mentions.collect(m -> new Span(m));
+			this.entity = mentions.getFirst().getEntity();
 		}
 
 		public Mention getMention() {
-			return mention;
+			return mentions.getFirst();
 		}
 
-		public void setMention(Mention mention) {
-			this.mention = mention;
+		public void setMentions(ImmutableList<Mention> mention) {
+			this.mentions = mention;
 		}
 
 		public Span getSpan() {
-			return span;
-		}
-
-		public void setSpan(Span span) {
-			this.span = span;
+			return spans.getFirst();
 		}
 
 		public Entity getEntity() {
@@ -42,6 +38,10 @@ public interface Op {
 
 		public void setEntity(Entity entity) {
 			this.entity = entity;
+		}
+
+		public ImmutableList<Span> getSpans() {
+			return spans;
 		}
 	}
 
@@ -126,6 +126,11 @@ public interface Op {
 
 		public ImmutableList<Span> getSpans() {
 			return spans;
+		}
+
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "(" + spans.makeString(",") + ")";
 		}
 
 	}
