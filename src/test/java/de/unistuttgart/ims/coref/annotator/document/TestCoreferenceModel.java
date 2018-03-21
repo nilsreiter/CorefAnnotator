@@ -12,6 +12,8 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
+import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.impl.factory.Sets;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -161,5 +163,36 @@ public class TestCoreferenceModel {
 		assertFalse(model.getMentions(2).isEmpty());
 		assertTrue(model.getMentions(3).isEmpty());
 
+	}
+
+	@Test
+	public void testEditMergeEntities() {
+		model.edit(new Op.AddMentionsToNewEntity(new Span(0, 1), new Span(2, 3)));
+		model.edit(new Op.AddMentionsToNewEntity(new Span(4, 5), new Span(6, 7)));
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
+
+		model.edit(new Op.MergeEntities(JCasUtil.select(jcas, Entity.class).toArray(new Entity[2])));
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
+		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
+		for (Mention m : JCasUtil.select(jcas, Mention.class))
+			assertEquals(e, m.getEntity());
+
+		model.undo();
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
+
+		MutableSetMultimap<Entity, Mention> map = Sets.mutable.withAll(JCasUtil.select(jcas, Mention.class))
+				.groupBy(m -> m.getEntity());
+		assertEquals(2, map.keySet().size());
 	}
 }

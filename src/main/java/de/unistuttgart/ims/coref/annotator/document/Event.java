@@ -6,7 +6,7 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public interface Event {
 	public enum Type {
-		Add, Remove, Update, Move
+		Add, Remove, Update, Move, Merge
 	};
 
 	Type getType();

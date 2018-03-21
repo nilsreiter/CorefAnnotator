@@ -35,6 +35,7 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
+import de.unistuttgart.ims.coref.annotator.document.Op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
@@ -261,6 +262,13 @@ public class CoreferenceModel {
 			fireEntityEvent(Event.Type.Add, eg);
 			op.setEntityGroup(eg);
 			history.push(op);
+		} else if (operation instanceof Op.MergeEntities) {
+			Op.MergeEntities op = (MergeEntities) operation;
+			MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
+			op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
+			op.setPreviousState(currentState.toImmutable());
+			op.setEntity(merge(op.getEntities()));
+			history.push(op);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -299,6 +307,16 @@ public class CoreferenceModel {
 				e.addToIndexes();
 				fireEntityEvent(Event.Type.Add, e);
 			});
+		} else if (operation instanceof Op.MergeEntities) {
+			Op.MergeEntities op = (MergeEntities) operation;
+			for (Entity oldEntity : op.getEntities()) {
+				if (op.getEntity() != oldEntity) {
+					oldEntity.addToIndexes();
+					for (Mention m : op.getPreviousState().get(oldEntity)) {
+						moveTo(m, oldEntity);
+					}
+				}
+			}
 		} else if (operation instanceof Op.GroupEntities) {
 			remove(((Op.GroupEntities) operation).getEntityGroup());
 		}
@@ -351,8 +369,8 @@ public class CoreferenceModel {
 		return preferences;
 	}
 
-	public void merge(Entity... nodes) {
-		Entity biggest = nodes[0];
+	private Entity merge(Iterable<Entity> nodes) {
+		Entity biggest = null;
 		int size = 0;
 		for (Entity n : nodes) {
 			if (entityMentionMap.get(n).size() > size) {
@@ -360,16 +378,16 @@ public class CoreferenceModel {
 				biggest = n;
 			}
 		}
-
-		for (Entity n : nodes) {
-			if (n != biggest) {
-				for (Mention mention : entityMentionMap.get(n)) {
-					moveTo(mention, biggest);
+		final Entity tgt = biggest;
+		if (biggest != null)
+			for (Entity n : nodes) {
+				if (n != tgt) {
+					entityMentionMap.get(n).toSet().forEach(m -> moveTo(m, tgt));
+					remove(n);
 				}
-				remove(n);
 			}
-		}
-		return;
+		fireEntityEvent(Event.Type.Update, tgt);
+		return biggest;
 	}
 
 	public void moveTo(DetachedMentionPart dmp, Mention m) {
@@ -384,8 +402,9 @@ public class CoreferenceModel {
 	private void moveTo(Mention m, Entity newEntity) {
 		Entity oldEntity = m.getEntity();
 		m.setEntity(newEntity);
+		entityMentionMap.remove(oldEntity, m);
+		entityMentionMap.put(newEntity, m);
 		fireAnnotationMovedEvent(m, oldEntity, newEntity);
-		fireAnnotationChangedEvent(m);
 	}
 
 	public void registerAnnotation(Annotation a) {

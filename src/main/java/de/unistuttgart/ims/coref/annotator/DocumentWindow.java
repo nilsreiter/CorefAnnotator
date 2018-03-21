@@ -1525,7 +1525,7 @@ public class DocumentWindow extends JFrame
 				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
 				entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 			}
-			documentModel.getCoreferenceModel().merge(entities);
+			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(entities));
 			registerChange();
 		}
 

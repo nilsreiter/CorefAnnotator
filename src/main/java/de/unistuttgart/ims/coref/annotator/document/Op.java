@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.multimap.set.ImmutableSetMultimap;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Span;
@@ -11,47 +12,74 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
-	public class RemovePart implements Op {
-		Mention mention;
-		Span span;
-		DetachedMentionPart part;
+	public class AddMentionsToEntity implements Op {
+		Entity entity;
+		ImmutableList<Mention> mentions = null;
+		ImmutableList<Span> spans;
 
-		public RemovePart(Mention mention, DetachedMentionPart part) {
-			this.mention = mention;
-			this.part = part;
-			this.span = new Span(part);
+		public AddMentionsToEntity(Entity entity, Iterable<Span> spans) {
+			this.spans = Lists.immutable.withAll(spans);
+			this.entity = entity;
 		}
 
-		public Mention getMention() {
-			return mention;
+		public AddMentionsToEntity(Entity entity, Span... spans) {
+			this.spans = Lists.immutable.of(spans);
+			this.entity = entity;
 		}
 
-		public void setMention(Mention mention) {
-			this.mention = mention;
+		public Entity getEntity() {
+			return entity;
 		}
 
-		public Span getSpan() {
-			return span;
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
 		}
 
-		public void setSpan(Span span) {
-			this.span = span;
+		public ImmutableList<Span> getSpans() {
+			return spans;
 		}
 
-		public DetachedMentionPart getPart() {
-			return part;
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
 		}
 
-		public void setPart(DetachedMentionPart part) {
-			this.part = part;
+	}
+
+	public class AddMentionsToNewEntity implements Op {
+		Entity entity;
+		ImmutableList<Span> spans;
+
+		public AddMentionsToNewEntity(Iterable<Span> span) {
+			this.spans = Lists.immutable.withAll(span);
+		}
+
+		public AddMentionsToNewEntity(Span... span) {
+			this.spans = Lists.immutable.of(span);
+		}
+
+		public Entity getEntity() {
+			return entity;
+		}
+
+		public ImmutableList<Span> getSpans() {
+			return spans;
+		}
+
+		public void setEntity(Entity entity) {
+			this.entity = entity;
+		}
+
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "(" + spans.makeString(",") + ")";
 		}
 
 	}
 
 	public class AttachPart implements Op {
 		Mention mention;
-		Span span;
 		DetachedMentionPart part;
+		Span span;
 
 		public AttachPart(Mention mention, Span span) {
 			this.mention = mention;
@@ -62,24 +90,24 @@ public interface Op {
 			return mention;
 		}
 
-		public void setMention(Mention mention) {
-			this.mention = mention;
+		public DetachedMentionPart getPart() {
+			return part;
 		}
 
 		public Span getSpan() {
 			return span;
 		}
 
-		public void setSpan(Span span) {
-			this.span = span;
-		}
-
-		public DetachedMentionPart getPart() {
-			return part;
+		public void setMention(Mention mention) {
+			this.mention = mention;
 		}
 
 		public void setPart(DetachedMentionPart part) {
 			this.part = part;
+		}
+
+		public void setSpan(Span span) {
+			this.span = span;
 		}
 	}
 
@@ -95,18 +123,90 @@ public interface Op {
 			return entities;
 		}
 
-		public void setEntities(ImmutableList<Entity> entities) {
-			this.entities = entities;
-		}
-
 		public EntityGroup getEntityGroup() {
 			return entityGroup;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
 		}
 
 		public void setEntityGroup(EntityGroup entityGroup) {
 			this.entityGroup = entityGroup;
 		}
 
+	}
+
+	public class MergeEntities implements Op {
+		ImmutableList<Entity> entities;
+		Entity entity;
+		ImmutableSetMultimap<Entity, Mention> previousState;
+
+		public MergeEntities(Entity... entities) {
+			this.entities = Lists.immutable.of(entities);
+		}
+
+		public ImmutableSetMultimap<Entity, Mention> getPreviousState() {
+			return previousState;
+		}
+
+		public void setPreviousState(ImmutableSetMultimap<Entity, Mention> previousState) {
+			this.previousState = previousState;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public Entity getEntity() {
+			return entity;
+		}
+
+		public void setEntity(Entity entity) {
+			this.entity = entity;
+		}
+	}
+
+	public class MoveMentionsToEntity implements Op {
+		ImmutableList<Mention> mentions;
+		Entity source;
+		Entity target;
+
+		public MoveMentionsToEntity(Entity target, Iterable<Mention> mention) {
+			this.mentions = Lists.immutable.withAll(mention);
+			this.source = mentions.getFirst().getEntity();
+			this.target = target;
+		}
+
+		public MoveMentionsToEntity(Entity target, Mention... mention) {
+			this.mentions = Lists.immutable.of(mention);
+			this.source = mentions.getFirst().getEntity();
+			this.target = target;
+		}
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
+
+		public Entity getSource() {
+			return source;
+		}
+
+		public Entity getTarget() {
+			return target;
+		}
+
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
+		}
+
+		public void setSource(Entity source) {
+			this.source = source;
+		}
+
+		public void setTarget(Entity target) {
+			this.target = target;
+		}
 	}
 
 	public class RemoveEntities implements Op {
@@ -127,8 +227,8 @@ public interface Op {
 	}
 
 	public class RemoveMention implements Op {
-		ImmutableList<Mention> mentions;
 		Entity entity;
+		ImmutableList<Mention> mentions;
 		ImmutableList<Span> spans;
 
 		public RemoveMention(Mention... mention) {
@@ -137,29 +237,66 @@ public interface Op {
 			this.entity = mentions.getFirst().getEntity();
 		}
 
-		public Mention getMention() {
-			return mentions.getFirst();
+		public Entity getEntity() {
+			return entity;
 		}
 
-		public void setMentions(ImmutableList<Mention> mention) {
-			this.mentions = mention;
+		public Mention getMention() {
+			return mentions.getFirst();
 		}
 
 		public Span getSpan() {
 			return spans.getFirst();
 		}
 
-		public Entity getEntity() {
-			return entity;
+		public ImmutableList<Span> getSpans() {
+			return spans;
 		}
 
 		public void setEntity(Entity entity) {
 			this.entity = entity;
 		}
 
-		public ImmutableList<Span> getSpans() {
-			return spans;
+		public void setMentions(ImmutableList<Mention> mention) {
+			this.mentions = mention;
 		}
+	}
+
+	public class RemovePart implements Op {
+		Mention mention;
+		DetachedMentionPart part;
+		Span span;
+
+		public RemovePart(Mention mention, DetachedMentionPart part) {
+			this.mention = mention;
+			this.part = part;
+			this.span = new Span(part);
+		}
+
+		public Mention getMention() {
+			return mention;
+		}
+
+		public DetachedMentionPart getPart() {
+			return part;
+		}
+
+		public Span getSpan() {
+			return span;
+		}
+
+		public void setMention(Mention mention) {
+			this.mention = mention;
+		}
+
+		public void setPart(DetachedMentionPart part) {
+			this.part = part;
+		}
+
+		public void setSpan(Span span) {
+			this.span = span;
+		}
+
 	}
 
 	public class RenameEntity implements Op {
@@ -174,122 +311,16 @@ public interface Op {
 			this.newLabel = newName;
 		}
 
+		public Entity getEntity() {
+			return entity;
+		}
+
 		public String getNewLabel() {
 			return newLabel;
 		}
 
 		public String getOldLabel() {
 			return oldLabel;
-		}
-
-		public Entity getEntity() {
-			return entity;
-		}
-
-	}
-
-	public class AddMentionsToEntity implements Op {
-		Entity entity;
-		ImmutableList<Span> spans;
-		ImmutableList<Mention> mentions = null;
-
-		public AddMentionsToEntity(Entity entity, Span... spans) {
-			this.spans = Lists.immutable.of(spans);
-			this.entity = entity;
-		}
-
-		public AddMentionsToEntity(Entity entity, Iterable<Span> spans) {
-			this.spans = Lists.immutable.withAll(spans);
-			this.entity = entity;
-		}
-
-		public Entity getEntity() {
-			return entity;
-		}
-
-		public ImmutableList<Mention> getMentions() {
-			return mentions;
-		}
-
-		public void setMentions(ImmutableList<Mention> mentions) {
-			this.mentions = mentions;
-		}
-
-		public ImmutableList<Span> getSpans() {
-			return spans;
-		}
-
-	}
-
-	public class MoveMentionsToEntity implements Op {
-		ImmutableList<Mention> mentions;
-		Entity target;
-		Entity source;
-
-		public MoveMentionsToEntity(Entity target, Mention... mention) {
-			this.mentions = Lists.immutable.of(mention);
-			this.source = mentions.getFirst().getEntity();
-			this.target = target;
-		}
-
-		public MoveMentionsToEntity(Entity target, Iterable<Mention> mention) {
-			this.mentions = Lists.immutable.withAll(mention);
-			this.source = mentions.getFirst().getEntity();
-			this.target = target;
-		}
-
-		public ImmutableList<Mention> getMentions() {
-			return mentions;
-		}
-
-		public void setMentions(ImmutableList<Mention> mentions) {
-			this.mentions = mentions;
-		}
-
-		public Entity getTarget() {
-			return target;
-		}
-
-		public void setTarget(Entity target) {
-			this.target = target;
-		}
-
-		public Entity getSource() {
-			return source;
-		}
-
-		public void setSource(Entity source) {
-			this.source = source;
-		}
-	}
-
-	public class AddMentionsToNewEntity implements Op {
-		ImmutableList<Span> spans;
-		Entity entity;
-
-		public AddMentionsToNewEntity(Span... span) {
-			this.spans = Lists.immutable.of(span);
-		}
-
-		public AddMentionsToNewEntity(Iterable<Span> span) {
-			this.spans = Lists.immutable.withAll(span);
-		}
-
-		public Entity getEntity() {
-			return entity;
-		}
-
-		public void setEntity(Entity entity) {
-			this.entity = entity;
-		}
-
-		public ImmutableList<Span> getSpans() {
-			return spans;
-		}
-
-		@Override
-		public String toString() {
-			return getClass().getSimpleName() + "(" + spans.makeString(",") + ")";
 		}
 
 	}
