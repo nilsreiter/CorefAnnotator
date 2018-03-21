@@ -146,6 +146,11 @@
 					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
 					<version>1.0.0-SNAPSHOT</version>
 				</dependency>
+				<dependency>
+					<groupId>de.unistuttgart.ims</groupId>
+					<artifactId>de.unistuttgart.ims.drama.io.core</artifactId>
+					<version>1.0.0-SNAPSHOT</version>
+				</dependency>
 			</dependencies>
 			<build>
 				<plugins>
@@ -193,7 +198,7 @@
 			<artifactId>
 				de.tudarmstadt.ukp.dkpro.core.api.coref-asl
 			</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
 			<artifactId>
