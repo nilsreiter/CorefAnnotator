@@ -28,7 +28,7 @@ import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.drama.api.Speech;
 import de.unistuttgart.ims.drama.api.StageDirection;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
-import de.unistuttgart.quadrama.io.core.GenericXmlReader;
+import de.unistuttgart.ims.uimautil.GenericXmlReader;
 
 public class TeiReader extends ResourceCollectionReaderBase {
 
