@@ -49,7 +49,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
-	public void annotationEvent(AnnotationEvent evt) {
+	public void annotationEvent(AnnotationEvent<?> evt) {
 		Type event = evt.getType();
 		Annotation a = evt.getAnnotation();
 
@@ -95,7 +95,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			nodeChanged(get(a));
 			break;
 		case Move:
-			AnnotationMoveEvent moveEvent = (AnnotationMoveEvent) evt;
+			AnnotationMoveEvent<?> moveEvent = (AnnotationMoveEvent<?>) evt;
 			CATreeNode node = get(a);
 			CATreeNode newParent = get(moveEvent.getTo());
 			removeNodeFromParent(node);
@@ -143,9 +143,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
+	public void entityEvent(FeatureStructureEvent<Entity> event) {
 		Event.Type eventType = event.getType();
-		Entity entity = (Entity) event.getFeatureStructure();
+		Entity entity = event.getFeatureStructure();
 		switch (eventType) {
 		case Add:
 			CATreeNode tn = new CATreeNode(entity, entity.getLabel());

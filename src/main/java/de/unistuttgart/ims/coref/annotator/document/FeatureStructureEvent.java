@@ -2,11 +2,11 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import org.apache.uima.cas.FeatureStructure;
 
-public class FeatureStructureEvent implements Event {
-	FeatureStructure featureStructure;
+public class FeatureStructureEvent<T extends FeatureStructure> implements Event {
+	T featureStructure;
 	Type eventType;
 
-	public FeatureStructureEvent(Type eventType, FeatureStructure featureStructure) {
+	public FeatureStructureEvent(Type eventType, T featureStructure) {
 		this.eventType = eventType;
 		this.featureStructure = featureStructure;
 	}
@@ -16,11 +16,11 @@ public class FeatureStructureEvent implements Event {
 		return eventType;
 	}
 
-	public FeatureStructure getFeatureStructure() {
+	public T getFeatureStructure() {
 		return featureStructure;
 	}
 
-	public void setFeatureStructure(FeatureStructure featureStructure) {
+	public void setFeatureStructure(T featureStructure) {
 		this.featureStructure = featureStructure;
 	}
 

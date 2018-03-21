@@ -2,15 +2,16 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class AnnotationEvent implements Event {
+public class AnnotationEvent<T extends Annotation> implements Event {
 	Type type;
-	Annotation annotation;
+	T annotation;
 
-	public AnnotationEvent(Type type, Annotation annotation) {
+	public AnnotationEvent(Type type, T annotation) {
 		this.type = type;
 		this.annotation = annotation;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}
@@ -19,11 +20,11 @@ public class AnnotationEvent implements Event {
 		this.type = type;
 	}
 
-	public Annotation getAnnotation() {
+	public T getAnnotation() {
 		return annotation;
 	}
 
-	public void setAnnotation(Annotation annotation) {
+	public void setAnnotation(T annotation) {
 		this.annotation = annotation;
 	}
 }

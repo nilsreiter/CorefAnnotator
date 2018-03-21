@@ -818,9 +818,9 @@ public class DocumentWindow extends JFrame
 
 	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
+	public void entityEvent(FeatureStructureEvent<Entity> event) {
 		Event.Type eventType = event.getType();
-		Entity entity = (Entity) event.getFeatureStructure();
+		Entity entity = event.getFeatureStructure();
 		switch (eventType) {
 		case Add:
 			if (entity.getKey() != null) {
@@ -2146,7 +2146,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	@Override
-	public void annotationEvent(AnnotationEvent event) {
+	public void annotationEvent(AnnotationEvent<? extends Annotation> event) {
 		Annotation annotation = event.getAnnotation();
 		switch (event.getType()) {
 		case Add:

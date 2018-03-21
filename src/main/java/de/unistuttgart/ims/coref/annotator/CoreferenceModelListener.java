@@ -17,12 +17,12 @@ public interface CoreferenceModelListener {
 	@Deprecated
 	void annotationEvent(EventType eventType, Annotation annotation);
 
-	void annotationEvent(AnnotationEvent event);
+	void annotationEvent(AnnotationEvent<? extends Annotation> event);
 
 	@Deprecated
 	void annotationMovedEvent(Annotation annotation, Object from, Object to);
 
-	void entityEvent(FeatureStructureEvent event);
+	void entityEvent(FeatureStructureEvent<Entity> event);
 
 	@Deprecated
 	void entityEvent(EventType eventType, Entity entity);
