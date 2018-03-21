@@ -312,6 +312,7 @@ public class CoreferenceModel {
 			for (Entity oldEntity : op.getEntities()) {
 				if (op.getEntity() != oldEntity) {
 					oldEntity.addToIndexes();
+					fireEntityEvent(Event.Type.Add, oldEntity);
 					for (Mention m : op.getPreviousState().get(oldEntity)) {
 						moveTo(m, oldEntity);
 					}
