@@ -194,8 +194,7 @@ public class CoreferenceModel {
 	}
 
 	/**
-	 * Creates a new mention annotation in the document and adds it to the
-	 * indexes
+	 * Creates a new mention annotation in the document and adds it to the indexes
 	 * 
 	 * @param b
 	 *            the begin character position
@@ -402,6 +401,7 @@ public class CoreferenceModel {
 		fireAnnotationRemovedEvent(dmp);
 		dmp.getMention().setDiscontinuous(null);
 		dmp.removeFromIndexes();
+		characterPosition2AnnotationMap.remove(dmp);
 	}
 
 	private void remove(Entity entity) {
