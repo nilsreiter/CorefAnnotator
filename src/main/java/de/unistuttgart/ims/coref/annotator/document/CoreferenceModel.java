@@ -12,6 +12,7 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
@@ -177,6 +178,7 @@ public class CoreferenceModel {
 		Entity e = new Entity(jcas);
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
+		e.setFlags(new StringArray(jcas, 0));
 		e.addToIndexes();
 		return e;
 	}
@@ -185,6 +187,7 @@ public class CoreferenceModel {
 		EntityGroup e = new EntityGroup(jcas);
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
+		e.setFlags(new StringArray(jcas, 0));
 		e.addToIndexes();
 		e.setMembers(new FSArray(jcas, initialSize));
 		return e;
