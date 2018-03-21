@@ -17,7 +17,9 @@ import org.xml.sax.SAXException;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.document.AnnotationEvent;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 
 public class TestCoreferenceModelLoader {
 	JCas jcas;
@@ -28,25 +30,37 @@ public class TestCoreferenceModelLoader {
 		modelListener = new CoreferenceModelListener() {
 
 			@Override
-			public void annotationEvent(Event event, Annotation annotation) {
+			public void annotationEvent(EventType eventType, Annotation annotation) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void entityEvent(Event event, Entity entity) {
+			public void entityEvent(EventType eventType, Entity entity) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void entityGroupEvent(Event event, EntityGroup entity) {
+			public void entityGroupEvent(EventType eventType, EntityGroup entity) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void annotationEvent(AnnotationEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void entityEvent(FeatureStructureEvent event) {
 				// TODO Auto-generated method stub
 
 			}

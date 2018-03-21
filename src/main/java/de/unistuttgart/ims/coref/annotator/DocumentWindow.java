@@ -119,8 +119,11 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.document.AnnotationEvent;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -797,8 +800,28 @@ public class DocumentWindow extends JFrame
 
 	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void entityEvent(Event event, Entity entity) {
-		switch (event) {
+	@Deprecated
+	public void entityEvent(EventType eventType, Entity entity) {
+		switch (eventType) {
+		case Add:
+			if (entity.getKey() != null) {
+				keyMap.put(entity.getKey().charAt(0), entity);
+			}
+			break;
+		case Remove:
+			if (entity.getKey() != null) {
+				keyMap.remove(entity.getKey().charAt(0));
+			}
+			break;
+		}
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	public void entityEvent(FeatureStructureEvent event) {
+		Event.Type eventType = event.getType();
+		Entity entity = (Entity) event.getFeatureStructure();
+		switch (eventType) {
 		case Add:
 			if (entity.getKey() != null) {
 				keyMap.put(entity.getKey().charAt(0), entity);
@@ -934,9 +957,9 @@ public class DocumentWindow extends JFrame
 		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
 		// tree.expandPath(e.getTreePath());
 		/*
-		 * try { TreePath tp = e.getTreePath(); Rectangle r =
-		 * tree.getPathBounds(tp); tree.repaint(r); } catch
-		 * (NullPointerException ex) { Annotator.logger.catching(ex); }
+		 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
+		 * tree.repaint(r); } catch (NullPointerException ex) {
+		 * Annotator.logger.catching(ex); }
 		 */
 	}
 
@@ -2123,8 +2146,41 @@ public class DocumentWindow extends JFrame
 	}
 
 	@Override
-	public void annotationEvent(Event event, Annotation annotation) {
-		switch (event) {
+	public void annotationEvent(AnnotationEvent event) {
+		Annotation annotation = event.getAnnotation();
+		switch (event.getType()) {
+		case Add:
+			if (annotation instanceof Mention)
+				highlightManager.underline(annotation);
+			else if (annotation instanceof CommentAnchor)
+				highlightManager.highlight(annotation);
+			break;
+		case Remove:
+			if (annotation instanceof Mention && ((Mention) annotation).getDiscontinuous() != null)
+				highlightManager.undraw(((Mention) annotation).getDiscontinuous());
+			highlightManager.undraw(annotation);
+			break;
+		case Update:
+			if (annotation instanceof Mention) {
+				if (((Mention) annotation).getEntity().getHidden())
+					highlightManager.undraw(annotation);
+				else
+					highlightManager.underline(annotation);
+			}
+			break;
+		case Move:
+
+			// TODO: redraw annotation
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	@Deprecated
+	public void annotationEvent(EventType eventType, Annotation annotation) {
+		switch (eventType) {
 		case Add:
 			if (annotation instanceof Mention)
 				highlightManager.underline(annotation);
@@ -2150,14 +2206,15 @@ public class DocumentWindow extends JFrame
 	}
 
 	@Override
-	public void entityGroupEvent(Event event, EntityGroup entity) {
-		entityEvent(event, entity);
+	@Deprecated
+	public void entityGroupEvent(EventType eventType, EntityGroup entity) {
+		entityEvent(eventType, entity);
 	}
 
 	@Override
+	@Deprecated
 	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
-		// TODO Auto-generated method stub
-
+		// TODO redraw annotations
 	}
 
 	public DocumentModel getDocumentModel() {

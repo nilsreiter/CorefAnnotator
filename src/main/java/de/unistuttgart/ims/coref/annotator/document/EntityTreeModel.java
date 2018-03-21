@@ -21,6 +21,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
 	private static final long serialVersionUID = 1L;
@@ -48,7 +49,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
-	public void annotationEvent(Event event, Annotation a) {
+	public void annotationEvent(AnnotationEvent evt) {
+		Type event = evt.getType();
+		Annotation a = evt.getAnnotation();
+
 		switch (event) {
 		case Add:
 			if (a instanceof Mention) {
@@ -90,12 +94,36 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		case Update:
 			nodeChanged(get(a));
 			break;
+		case Move:
+			AnnotationMoveEvent moveEvent = (AnnotationMoveEvent) evt;
+			CATreeNode node = get(a);
+			CATreeNode newParent = get(moveEvent.getTo());
+			removeNodeFromParent(node);
+
+			int ind = 0;
+			while (ind < newParent.getChildCount()) {
+				CATreeNode cnode = newParent.getChildAt(ind);
+				if (cnode.getFeatureStructure() instanceof Entity
+						|| ((Annotation) cnode.getFeatureStructure()).getBegin() > a.getBegin())
+					break;
+				ind++;
+			}
+			insertNodeInto(node, newParent, ind);
+			resort();
+			break;
 		default:
 			break;
 		}
 	}
 
+	@Deprecated
 	@Override
+	public void annotationEvent(EventType eventType, Annotation a) {
+
+	}
+
+	@Override
+	@Deprecated
 	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
 		CATreeNode node = get(annotation);
 		CATreeNode newParent = get(to);
@@ -115,8 +143,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
-	public void entityEvent(Event event, Entity entity) {
-		switch (event) {
+	public void entityEvent(FeatureStructureEvent event) {
+		Event.Type eventType = event.getType();
+		Entity entity = (Entity) event.getFeatureStructure();
+		switch (eventType) {
 		case Add:
 			CATreeNode tn = new CATreeNode(entity, entity.getLabel());
 			fsMap.put(entity, tn);
@@ -146,9 +176,42 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
-	public void entityGroupEvent(Event event, EntityGroup eg) {
+	@Deprecated
+	public void entityEvent(EventType eventType, Entity entity) {
+		switch (eventType) {
+		case Add:
+			CATreeNode tn = new CATreeNode(entity, entity.getLabel());
+			fsMap.put(entity, tn);
+			insertNodeInto(tn, getRoot(), 0);
+			if (entity instanceof EntityGroup) {
+				EntityGroup eg = (EntityGroup) entity;
+				for (int i = 0; i < eg.getMembers().size(); i++)
+					insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), 0);
+			}
+			optResort();
+			break;
+		case Remove:
+			CATreeNode etn = fsMap.get(entity);
+			for (int i = 0; i < etn.getChildCount(); i++) {
+				etn.removeAllChildren();
+			}
+			removeNodeFromParent(etn);
+			fsMap.remove(entity);
+			optResort();
+			break;
+		case Update:
+			nodeChanged(get(entity));
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	@Deprecated
+	public void entityGroupEvent(EventType eventType, EntityGroup eg) {
 		Annotator.logger.entry();
-		switch (event) {
+		switch (eventType) {
 		case Add:
 			CATreeNode tn = new CATreeNode(eg, eg.getLabel());
 			fsMap.put(eg, tn);
@@ -197,12 +260,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
-			entityEvent(Event.Add, e);
+			entityEvent(Event.get(Event.Type.Add, e));
 		});
 		Annotator.logger.debug("Added all entities");
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
-			annotationEvent(Event.Add, m);
+			annotationEvent(Event.get(Event.Type.Add, m));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}
