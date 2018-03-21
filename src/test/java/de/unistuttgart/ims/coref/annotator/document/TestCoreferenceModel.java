@@ -131,4 +131,35 @@ public class TestCoreferenceModel {
 		assertTrue(model.getMentions(6).isEmpty());
 
 	}
+
+	@Test
+	public void testEditRemoveMention() {
+		Mention m = model.createMention(1, 3);
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(model.getMentions(0).isEmpty());
+		assertFalse(model.getMentions(1).isEmpty());
+		assertFalse(model.getMentions(2).isEmpty());
+		assertTrue(model.getMentions(3).isEmpty());
+
+		model.edit(new Op.RemoveMention(m));
+
+		assertFalse(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(model.getMentions(0).isEmpty());
+		assertTrue(model.getMentions(1).isEmpty());
+		assertTrue(model.getMentions(2).isEmpty());
+		assertTrue(model.getMentions(3).isEmpty());
+
+		model.undo();
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(model.getMentions(0).isEmpty());
+		assertFalse(model.getMentions(1).isEmpty());
+		assertFalse(model.getMentions(2).isEmpty());
+		assertTrue(model.getMentions(3).isEmpty());
+
+	}
 }
