@@ -1,9 +1,11 @@
 package de.unistuttgart.ims.coref.annotator.plugin.tei;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
@@ -21,6 +23,11 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
+		try {
+			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return "";
 	}
 
