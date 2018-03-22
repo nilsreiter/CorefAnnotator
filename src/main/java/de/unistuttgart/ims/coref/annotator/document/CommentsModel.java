@@ -19,8 +19,6 @@ import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 
 public class CommentsModel extends AbstractListModel<Comment> {
 
-	@Deprecated
-	CoreferenceModel coreferenceModel;
 	MutableList<Comment> comments = Lists.mutable.empty();
 	MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
 	DocumentModel documentModel;
@@ -28,7 +26,6 @@ public class CommentsModel extends AbstractListModel<Comment> {
 
 	public CommentsModel(DocumentModel documentModel) {
 		this.documentModel = documentModel;
-		this.coreferenceModel = documentModel.getCoreferenceModel();
 	}
 
 	public void load() {
@@ -53,6 +50,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		comment.addToIndexes();
 
 		register(comment);
+		documentModel.fireDocumentChangedEvent();
 		return comment;
 	}
 

@@ -56,8 +56,7 @@ public class DocumentModel {
 	}
 
 	protected void fireDocumentChangedEvent() {
-		documentStateListeners
-				.forEach(l -> l.documentStateEvent(new DocumentState(coreferenceModel.getHistory().size())));
+		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
 }
