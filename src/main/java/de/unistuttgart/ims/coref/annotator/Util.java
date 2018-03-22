@@ -9,6 +9,8 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -183,6 +185,13 @@ public class Util {
 				return Constants.SUPPORTED_LANGUAGES[i];
 
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends FeatureStructure> MutableList<T> toList(FSArray arr) {
+		MutableList<T> list = Lists.mutable.empty();
+		arr.forEach(fs -> list.add((T) fs));
+		return list;
 	}
 
 }

@@ -32,12 +32,14 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
+import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
@@ -131,7 +133,8 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public void addTo(EntityGroup eg, Entity e) {
+	@Deprecated
+	private void addTo(EntityGroup eg, Entity e) {
 		// UIMA stuff
 		FSArray oldArr = eg.getMembers();
 
@@ -218,6 +221,29 @@ public class CoreferenceModel {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.push(op);
+		} else if (operation instanceof Op.AddEntityToEntityGroup) {
+			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
+			MutableList<Entity> oldArr = Util.toList(op.getEntityGroup().getMembers());
+
+			MutableList<Entity> newMembers = Lists.mutable.withAll(op.getEntities());
+			newMembers.removeAll(oldArr);
+
+			op.setEntities(newMembers.toImmutable());
+
+			FSArray arr = new FSArray(jcas, op.getEntityGroup().getMembers().size() + newMembers.size());
+			int i = 0;
+			for (; i < op.getEntityGroup().getMembers().size(); i++) {
+				arr.set(i, op.getEntityGroup().getMembers(i));
+			}
+			int oldSize = i;
+			for (; i < arr.size(); i++) {
+				arr.set(i, newMembers.get(i - oldSize));
+			}
+			arr.addToIndexes();
+			op.getEntityGroup().removeFromIndexes();
+			op.getEntityGroup().setMembers(arr);
+			fireEntityEvent(Event.get(op));
+			history.add(op);
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
 			for (Span span : op.getSpans()) {
@@ -247,6 +273,10 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.RemoveEntities) {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> remove(e));
+			history.push(op);
+		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
+			Op.RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
+			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
 			history.push(op);
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (Op.RemovePart) operation;
@@ -283,6 +313,9 @@ public class CoreferenceModel {
 		if (operation instanceof Op.RenameEntity) {
 			Op.RenameEntity op = (Op.RenameEntity) operation;
 			op.getEntity().setLabel(op.getOldLabel());
+		} else if (operation instanceof Op.AddEntityToEntityGroup) {
+			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
+			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
 			remove(op.getEntity());
@@ -307,6 +340,17 @@ public class CoreferenceModel {
 				e.addToIndexes();
 				fireEntityEvent(Event.Type.Add, e);
 			});
+		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
+			Op.RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
+			FSArray oldArr = op.getEntityGroup().getMembers();
+			FSArray newArr = new FSArray(jcas, oldArr.size() + op.getEntities().size());
+			int i = 0;
+			for (; i < oldArr.size(); i++) {
+				newArr.set(i, oldArr.get(i));
+			}
+			for (; i < newArr.size(); i++) {
+				newArr.set(i, op.getEntities().get(i - oldArr.size()));
+			}
 		} else if (operation instanceof Op.MergeEntities) {
 			Op.MergeEntities op = (MergeEntities) operation;
 			for (Entity oldEntity : op.getEntities()) {
@@ -454,7 +498,7 @@ public class CoreferenceModel {
 		return crModelListeners.remove(o);
 	};
 
-	public void removeFrom(EntityGroup eg, Entity entity) {
+	private void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
 		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
 		for (int i = 0; i < oldArray.size() - 1; i++) {

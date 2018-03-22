@@ -12,6 +12,33 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public interface Op {
 
+	public class AddEntityToEntityGroup implements Op {
+		EntityGroup entityGroup;
+		ImmutableList<Entity> entities;
+
+		public AddEntityToEntityGroup(EntityGroup entityGroup, Iterable<Entity> entities) {
+			this.entityGroup = entityGroup;
+			this.entities = Lists.immutable.withAll(entities);
+		}
+
+		public EntityGroup getEntityGroup() {
+			return entityGroup;
+		}
+
+		public void setEntityGroup(EntityGroup entityGroup) {
+			this.entityGroup = entityGroup;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+	}
+
 	public class AddMentionsToEntity implements Op {
 		Entity entity;
 		ImmutableList<Mention> mentions = null;
@@ -222,6 +249,38 @@ public interface Op {
 
 		public void setEntities(ImmutableList<Entity> entities) {
 			this.entities = entities;
+		}
+
+	}
+
+	public class RemoveEntitiesFromEntityGroup implements Op {
+		ImmutableList<Entity> entities;
+		EntityGroup entityGroup;
+
+		public RemoveEntitiesFromEntityGroup(EntityGroup entityGroup, Iterable<Entity> entities) {
+			this.entities = Lists.immutable.withAll(entities);
+			this.entityGroup = entityGroup;
+		}
+
+		public RemoveEntitiesFromEntityGroup(EntityGroup entityGroup, Entity... entities) {
+			this.entities = Lists.immutable.of(entities);
+			this.entityGroup = entityGroup;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+		public EntityGroup getEntityGroup() {
+			return entityGroup;
+		}
+
+		public void setEntityGroup(EntityGroup entityGroup) {
+			this.entityGroup = entityGroup;
 		}
 
 	}
