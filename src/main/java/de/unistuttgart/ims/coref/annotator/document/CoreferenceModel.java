@@ -360,7 +360,7 @@ public class CoreferenceModel {
 				}
 			}
 		} else if (operation instanceof Op.GroupEntities) {
-			remove(((Op.GroupEntities) operation).getEntityGroup());
+			fireEvent(Event.get(Event.Type.Remove, null, ((Op.GroupEntities) operation).getEntities()));
 		}
 	}
 
@@ -422,6 +422,7 @@ public class CoreferenceModel {
 		return preferences;
 	}
 
+	@Deprecated
 	private Entity merge(Iterable<Entity> nodes) {
 		Entity biggest = null;
 		int size = 0;
