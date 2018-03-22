@@ -57,9 +57,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				insertNodeInto(tn, arg0, getInsertPosition(arg0, event.getArgument(i)));
 				if (event.getArgument(i) instanceof EntityGroup) {
 					EntityGroup eg = (EntityGroup) event.getArgument(i);
-					for (int j = 0; i < eg.getMembers().size(); j++)
-						insertNodeInto(new CATreeNode(eg.getMembers(j)), tn,
-								getInsertPosition(tn, event.getArgument(i)));
+					for (int j = 0; j < eg.getMembers().size(); j++)
+						insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
 
 				}
 			}
