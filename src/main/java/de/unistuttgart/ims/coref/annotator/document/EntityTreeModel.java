@@ -51,7 +51,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void annotationEvent(AnnotationEvent<?> evt) {
 		Type event = evt.getType();
-		Annotation a = evt.getFeatureStructure();
+		Annotation a = evt.getArgument1();
 
 		switch (event) {
 		case Add:
@@ -145,7 +145,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent<Entity> event) {
 		Event.Type eventType = event.getType();
-		Entity entity = event.getFeatureStructure();
+		Entity entity = event.getArgument1();
 		switch (eventType) {
 		case Add:
 			CATreeNode tn = new CATreeNode(entity, entity.getLabel());

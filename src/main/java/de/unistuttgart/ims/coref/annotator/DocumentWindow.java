@@ -820,7 +820,7 @@ public class DocumentWindow extends JFrame
 	@Override
 	public void entityEvent(FeatureStructureEvent<Entity> event) {
 		Event.Type eventType = event.getType();
-		Entity entity = event.getFeatureStructure();
+		Entity entity = event.getArgument1();
 		switch (eventType) {
 		case Add:
 			if (entity.getKey() != null) {
@@ -2153,7 +2153,7 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void annotationEvent(AnnotationEvent<? extends Annotation> event) {
-		Annotation annotation = event.getFeatureStructure();
+		Annotation annotation = event.getArgument1();
 		switch (event.getType()) {
 		case Add:
 			if (annotation instanceof Mention)
