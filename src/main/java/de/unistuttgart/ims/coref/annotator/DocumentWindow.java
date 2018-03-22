@@ -2153,7 +2153,7 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void annotationEvent(AnnotationEvent<? extends Annotation> event) {
-		Annotation annotation = event.getAnnotation();
+		Annotation annotation = event.getFeatureStructure();
 		switch (event.getType()) {
 		case Add:
 			if (annotation instanceof Mention)
