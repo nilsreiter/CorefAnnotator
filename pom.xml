@@ -140,13 +140,6 @@
 					<value>release</value>
 				</property>
 			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-					<version>0.5.1</version>
-				</dependency>
-			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -175,6 +168,11 @@
 		</profile>
 	</profiles>
 	<dependencies>
+		<dependency>
+			<groupId>de.unistuttgart.ims</groupId>
+			<artifactId>de.unistuttgart.ims.drama.api</artifactId>
+			<version>0.5.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimafit-core</artifactId>
