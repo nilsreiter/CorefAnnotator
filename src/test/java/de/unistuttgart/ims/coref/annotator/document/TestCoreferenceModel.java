@@ -42,7 +42,7 @@ public class TestCoreferenceModel {
 	@Before
 	public void setUp() throws UIMAException {
 		jcas = JCasFactory.createText("the dog barks.");
-		model = new CoreferenceModel(jcas, preferences);
+		model = new CoreferenceModel(new DocumentModel(jcas), preferences);
 	}
 
 	@Test

@@ -72,8 +72,6 @@ public class CoreferenceModel {
 	 */
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
-	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
-
 	MutableSetMultimap<Object, Mention> entityMentionMap = Multimaps.mutable.set.empty();
 
 	/**
@@ -87,9 +85,12 @@ public class CoreferenceModel {
 
 	Deque<Op> history = new LinkedList<Op>();
 
-	public CoreferenceModel(JCas jcas, Preferences preferences) {
-		this.jcas = jcas;
+	DocumentModel documentModel;
+
+	public CoreferenceModel(DocumentModel documentModel, Preferences preferences) {
+		this.jcas = documentModel.getJcas();
 		this.preferences = preferences;
+		this.documentModel = documentModel;
 	}
 
 	/**
@@ -119,10 +120,6 @@ public class CoreferenceModel {
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
 		return crModelListeners.add(e);
-	}
-
-	public boolean addDocumentStateListener(DocumentStateListener e) {
-		return documentStateListeners.add(e);
 	}
 
 	/**
@@ -329,13 +326,13 @@ public class CoreferenceModel {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		this.fireDocumentChangedEvent();
+		documentModel.fireDocumentChangedEvent();
 	}
 
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
-			fireDocumentChangedEvent();
+			documentModel.fireDocumentChangedEvent();
 		}
 	}
 
@@ -416,10 +413,6 @@ public class CoreferenceModel {
 
 	protected void fireEvent(FeatureStructureEvent event) {
 		crModelListeners.forEach(l -> l.entityEvent(event));
-	}
-
-	protected void fireDocumentChangedEvent() {
-		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(history.size())));
 	}
 
 	public JCas getJCas() {

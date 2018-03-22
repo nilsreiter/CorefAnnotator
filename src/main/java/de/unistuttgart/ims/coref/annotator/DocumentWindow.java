@@ -857,7 +857,7 @@ public class DocumentWindow extends JFrame
 
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
-		model.getCoreferenceModel().addDocumentStateListener(this);
+		model.addDocumentStateListener(this);
 		documentModel = model;
 
 		// UI
