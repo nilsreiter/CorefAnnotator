@@ -48,7 +48,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 		documentModel.setCoreferenceModel(cModel);
 		documentModel.setTreeModel(etm);
-		documentModel.setCommentsModel(new CommentsModel(cModel));
+		documentModel.setCommentsModel(new CommentsModel(documentModel));
 
 		return documentModel;
 	}
