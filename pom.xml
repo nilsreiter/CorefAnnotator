@@ -144,12 +144,7 @@
 				<dependency>
 					<groupId>de.unistuttgart.ims</groupId>
 					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-				</dependency>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>de.unistuttgart.ims.drama.io.core</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>0.5.1</version>
 				</dependency>
 			</dependencies>
 			<build>
