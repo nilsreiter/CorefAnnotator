@@ -27,4 +27,9 @@ public class AnnotationEvent<T extends Annotation> implements Event {
 	public void setAnnotation(T annotation) {
 		this.annotation = annotation;
 	}
+
+	@Override
+	public Op getOp() {
+		return null;
+	}
 }

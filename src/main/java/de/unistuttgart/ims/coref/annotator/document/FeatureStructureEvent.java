@@ -27,4 +27,9 @@ public class FeatureStructureEvent<T extends FeatureStructure> implements Event 
 	public void setType(Type eventType) {
 		this.eventType = eventType;
 	}
+
+	@Override
+	public Op getOp() {
+		return null;
+	}
 }

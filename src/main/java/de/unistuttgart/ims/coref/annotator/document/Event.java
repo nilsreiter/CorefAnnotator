@@ -6,10 +6,12 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public interface Event {
 	public enum Type {
-		Add, Remove, Update, Move, Merge
+		Add, Remove, Update, Move, Merge, Op
 	};
 
 	Type getType();
+
+	Op getOp();
 
 	public static <T extends Annotation> AnnotationEvent<T> get(Type type, T annotation) {
 		return new AnnotationEvent<T>(type, annotation);
