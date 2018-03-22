@@ -17,6 +17,7 @@ public interface CoreferenceModelListener {
 	@Deprecated
 	void annotationEvent(EventType eventType, Annotation annotation);
 
+	@Deprecated
 	void annotationEvent(AnnotationEvent event);
 
 	@Deprecated

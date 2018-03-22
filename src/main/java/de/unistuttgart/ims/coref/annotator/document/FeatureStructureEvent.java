@@ -1,14 +1,24 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Iterator;
+
 import org.apache.uima.cas.FeatureStructure;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 public class FeatureStructureEvent implements Event {
-	FeatureStructure[] arguments;
+	ImmutableList<FeatureStructure> arguments;
 	Type eventType;
 
 	public FeatureStructureEvent(Type eventType, FeatureStructure... args) {
 		this.eventType = eventType;
-		this.arguments = args;
+		this.arguments = Lists.immutable.of(args);
+	}
+
+	public FeatureStructureEvent(Type eventType, Iterable<FeatureStructure> args) {
+		this.eventType = eventType;
+		this.arguments = Lists.immutable.withAll(args);
+
 	}
 
 	@Override
@@ -17,11 +27,7 @@ public class FeatureStructureEvent implements Event {
 	}
 
 	public FeatureStructure getArgument1() {
-		return arguments[0];
-	}
-
-	public void setArgument1(FeatureStructure featureStructure) {
-		this.arguments[0] = featureStructure;
+		return arguments.get(0);
 	}
 
 	public void setType(Type eventType) {
@@ -34,14 +40,25 @@ public class FeatureStructureEvent implements Event {
 	}
 
 	public FeatureStructure getArgument2() {
-		return arguments[1];
-	}
-
-	public void setArgument2(FeatureStructure argument2) {
-		this.arguments[1] = argument2;
+		return arguments.get(1);
 	}
 
 	public FeatureStructure getArgument(int i) {
-		return this.arguments[i];
+		return this.arguments.get(i);
+	}
+
+	@Override
+	public int getArity() {
+		return arguments.size();
+
+	}
+
+	@Override
+	public Iterator<FeatureStructure> iterator() {
+		return arguments.iterator();
+	}
+
+	public Iterator<FeatureStructure> iterator(int start) {
+		return arguments.subList(1, arguments.size()).iterator();
 	}
 }

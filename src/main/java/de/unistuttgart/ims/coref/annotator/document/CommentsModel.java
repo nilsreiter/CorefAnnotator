@@ -84,7 +84,8 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		comments.add(ind, comment);
 		fireIntervalAdded(this, ind, ind);
 		if (comment instanceof AnnotationComment)
-			this.coreferenceModel.fireMentionAddedEvent(((AnnotationComment) comment).getAnnotation());
+			this.coreferenceModel
+					.fireEvent(Event.get(Event.Type.Add, null, ((AnnotationComment) comment).getAnnotation()));
 
 	}
 
@@ -94,7 +95,8 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		if (c instanceof AnnotationComment) {
 			commentMap.remove(((AnnotationComment) c).getAnnotation());
 			this.coreferenceModel.characterPosition2AnnotationMap.remove(((AnnotationComment) c).getAnnotation());
-			this.coreferenceModel.fireAnnotationRemovedEvent(((AnnotationComment) c).getAnnotation());
+			this.coreferenceModel
+					.fireEvent(Event.get(Event.Type.Remove, null, ((AnnotationComment) c).getAnnotation()));
 		}
 		fireIntervalRemoved(this, index, index);
 	}

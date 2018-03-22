@@ -49,6 +49,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	@Override
+	@Deprecated
 	public void annotationEvent(AnnotationEvent evt) {
 		Type event = evt.getType();
 		Annotation a = (Annotation) evt.getArgument1();
@@ -145,34 +146,70 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
-		Entity entity = (Entity) event.getArgument1();
 		switch (eventType) {
 		case Add:
-			CATreeNode tn = new CATreeNode(entity, entity.getLabel());
-			fsMap.put(entity, tn);
-			insertNodeInto(tn, getRoot(), 0);
-			if (entity instanceof EntityGroup) {
-				EntityGroup eg = (EntityGroup) entity;
-				for (int i = 0; i < eg.getMembers().size(); i++)
-					insertNodeInto(new CATreeNode(eg.getMembers(i)), get(eg), 0);
+			for (int i = 1; i < event.getArity(); i++) {
+				if (event.getArgument(i) instanceof Entity) {
+					CATreeNode tn = createNode(event.getArgument(i));
+					insertNodeInto(tn, get(event.getArgument(0)), 0);
+				}
+				if (event.getArgument(i) instanceof EntityGroup) {
+					EntityGroup eg = (EntityGroup) event.getArgument(i);
+					for (int j = 0; i < eg.getMembers().size(); j++)
+						insertNodeInto(new CATreeNode(eg.getMembers(j)), get(eg), 0);
+				}
 			}
 			optResort();
 			break;
 		case Remove:
-			CATreeNode etn = fsMap.get(entity);
-			for (int i = 0; i < etn.getChildCount(); i++) {
+			for (int i = 1; i < event.getArity(); i++) {
+				CATreeNode etn = fsMap.get(event.getArgument(i));
 				etn.removeAllChildren();
+				removeNodeFromParent(etn);
+				fsMap.remove(event.getArgument(i));
 			}
-			removeNodeFromParent(etn);
-			fsMap.remove(entity);
 			optResort();
 			break;
 		case Update:
-			nodeChanged(get(entity));
+			for (int i = 0; i < event.getArity(); i++)
+				nodeChanged(get(event.getArgument(i)));
+			break;
+		case Move:
+			for (int i = 2; i < event.getArity(); i++) {
+				FeatureStructure fs = event.getArgument(i);
+				CATreeNode node = get(fs);
+				CATreeNode newParent = get(event.getArgument(1));
+				removeNodeFromParent(node);
+
+				int ind = 0;
+				if (fs instanceof Annotation) {
+					while (ind < newParent.getChildCount()) {
+						CATreeNode cnode = newParent.getChildAt(ind);
+						if (cnode.getFeatureStructure() instanceof Entity
+								|| ((Annotation) cnode.getFeatureStructure()).getBegin() > ((Annotation) fs).getBegin())
+							break;
+						ind++;
+					}
+				}
+				insertNodeInto(node, newParent, ind);
+			}
+			optResort();
 			break;
 		default:
 			break;
 		}
+	}
+
+	private CATreeNode createNode(FeatureStructure fs) {
+		CATreeNode node = null;
+		if (fs instanceof Entity) {
+			node = new CATreeNode(fs, ((Entity) fs).getLabel());
+		} else if (fs instanceof Annotation) {
+			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		}
+		if (node != null)
+			fsMap.put(fs, node);
+		return node;
 	}
 
 	@Override
@@ -242,6 +279,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	protected CATreeNode get(Object m) {
+		if (m == null)
+			return getRoot();
 		return fsMap.get(m);
 	}
 
@@ -260,12 +299,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
-			entityEvent(Event.get(Event.Type.Add, e));
+			entityEvent(Event.get(Event.Type.Add, null, e));
 		});
 		Annotator.logger.debug("Added all entities");
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
-			annotationEvent(Event.get(Event.Type.Add, m));
+			entityEvent(Event.get(Event.Type.Add, m.getEntity(), m));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}

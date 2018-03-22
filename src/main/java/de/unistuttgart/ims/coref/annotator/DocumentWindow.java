@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -820,19 +821,50 @@ public class DocumentWindow extends JFrame
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
-		Entity entity = (Entity) event.getArgument1();
+		Iterator<FeatureStructure> iter = event.iterator(1);
 		switch (eventType) {
 		case Add:
-			if (entity.getKey() != null) {
-				keyMap.put(entity.getKey().charAt(0), entity);
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Entity) {
+					Entity entity = (Entity) fs;
+					if (entity.getKey() != null) {
+						keyMap.put(entity.getKey().charAt(0), entity);
+					}
+				} else if (fs instanceof Mention) {
+					highlightManager.underline((Annotation) fs);
+				} else if (fs instanceof CommentAnchor) {
+					highlightManager.highlight((Annotation) fs);
+				}
 			}
 			break;
 		case Remove:
-			if (entity.getKey() != null) {
-				keyMap.remove(entity.getKey().charAt(0));
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Entity)
+					keyMap.remove(((Entity) fs).getKey().charAt(0));
+				else if (fs instanceof Mention) {
+					if (((Mention) fs).getDiscontinuous() != null)
+						highlightManager.undraw(((Mention) fs).getDiscontinuous());
+					highlightManager.undraw((Annotation) fs);
+				}
+
 			}
 			break;
+		case Update:
+			for (FeatureStructure fs : event) {
+				if (fs instanceof Mention) {
+					if (((Mention) fs).getEntity().getHidden())
+						highlightManager.undraw((Annotation) fs);
+					else
+						highlightManager.underline((Annotation) fs);
+				} else if (fs instanceof Entity) {
+					if (((Entity) fs).getKey() != null)
+						keyMap.put(((Entity) fs).getKey().charAt(0), (Entity) fs);
+				}
+			}
 		}
+
 	}
 
 	protected synchronized void registerChange() {
@@ -2152,6 +2184,7 @@ public class DocumentWindow extends JFrame
 	}
 
 	@Override
+	@Deprecated
 	public void annotationEvent(AnnotationEvent event) {
 		Annotation annotation = (Annotation) event.getArgument1();
 		switch (event.getType()) {
