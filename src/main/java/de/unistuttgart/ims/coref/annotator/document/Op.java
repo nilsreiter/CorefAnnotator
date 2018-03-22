@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.multimap.set.ImmutableSetMultimap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -194,7 +195,7 @@ public interface Op {
 		}
 	}
 
-	public abstract class MoveOp<M, C> implements Op {
+	public abstract class MoveOp<M extends FeatureStructure, C extends FeatureStructure> implements Op {
 		ImmutableList<M> objects;
 		C source;
 		C target;
@@ -234,6 +235,14 @@ public interface Op {
 
 		public void setTarget(C target) {
 			this.target = target;
+		}
+
+		public FeatureStructureEvent toEvent() {
+			return Event.get(Event.Type.Move, getSource(), getTarget(), getObjects());
+		}
+
+		public FeatureStructureEvent toReversedEvent() {
+			return Event.get(Event.Type.Move, getTarget(), getSource(), getObjects());
 		}
 	}
 

@@ -238,6 +238,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (Op.MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
+			fireEvent(op.toEvent());
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionPartToMention) {
 			Op.MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
@@ -246,6 +247,7 @@ public class CoreferenceModel {
 				op.getTarget().setDiscontinuous(d);
 				op.getSource().setDiscontinuous(null);
 			});
+			fireEvent(op.toEvent());
 			fireEvent(Event.get(Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
@@ -316,10 +318,11 @@ public class CoreferenceModel {
 				d.setMention(op.getSource());
 				op.getTarget().setDiscontinuous(null);
 			});
-			fireEvent(Event.get(Event.Type.Move, op.getTarget(), op.getSource(), op.getObjects()));
+			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
+			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (RemovePart) operation;
 			addTo(op.getMention(), op.getSpan().begin, op.getSpan().end);
@@ -411,7 +414,6 @@ public class CoreferenceModel {
 			entityMentionMap.remove(oldEntity, m);
 			entityMentionMap.put(newEntity, m);
 		}
-		fireEvent(Event.get(Event.Type.Move, oldEntity, newEntity, Lists.immutable.of(mentions)));
 	}
 
 	public void registerAnnotation(Annotation a) {
