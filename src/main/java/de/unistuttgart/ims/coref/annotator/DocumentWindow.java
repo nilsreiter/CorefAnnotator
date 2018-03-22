@@ -120,7 +120,6 @@ import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.document.AnnotationEvent;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
@@ -797,24 +796,6 @@ public class DocumentWindow extends JFrame
 			searchPanel = new SearchDialog(this, mainApplication.getPreferences());
 		}
 		searchPanel.setVisible(true);
-	}
-
-	@SuppressWarnings("incomplete-switch")
-	@Override
-	@Deprecated
-	public void entityEvent(EventType eventType, Entity entity) {
-		switch (eventType) {
-		case Add:
-			if (entity.getKey() != null) {
-				keyMap.put(entity.getKey().charAt(0), entity);
-			}
-			break;
-		case Remove:
-			if (entity.getKey() != null) {
-				keyMap.remove(entity.getKey().charAt(0));
-			}
-			break;
-		}
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -2181,79 +2162,6 @@ public class DocumentWindow extends JFrame
 	@Override
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
-	}
-
-	@Override
-	@Deprecated
-	public void annotationEvent(AnnotationEvent event) {
-		Annotation annotation = (Annotation) event.getArgument1();
-		switch (event.getType()) {
-		case Add:
-			if (annotation instanceof Mention)
-				highlightManager.underline(annotation);
-			else if (annotation instanceof CommentAnchor)
-				highlightManager.highlight(annotation);
-			break;
-		case Remove:
-			if (annotation instanceof Mention && ((Mention) annotation).getDiscontinuous() != null)
-				highlightManager.undraw(((Mention) annotation).getDiscontinuous());
-			highlightManager.undraw(annotation);
-			break;
-		case Update:
-			if (annotation instanceof Mention) {
-				if (((Mention) annotation).getEntity().getHidden())
-					highlightManager.undraw(annotation);
-				else
-					highlightManager.underline(annotation);
-			}
-			break;
-		case Move:
-
-			// TODO: redraw annotation
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	@Deprecated
-	public void annotationEvent(EventType eventType, Annotation annotation) {
-		switch (eventType) {
-		case Add:
-			if (annotation instanceof Mention)
-				highlightManager.underline(annotation);
-			else if (annotation instanceof CommentAnchor)
-				highlightManager.highlight(annotation);
-			break;
-		case Remove:
-			if (annotation instanceof Mention && ((Mention) annotation).getDiscontinuous() != null)
-				highlightManager.undraw(((Mention) annotation).getDiscontinuous());
-			highlightManager.undraw(annotation);
-			break;
-		case Update:
-			if (annotation instanceof Mention) {
-				if (((Mention) annotation).getEntity().getHidden())
-					highlightManager.undraw(annotation);
-				else
-					highlightManager.underline(annotation);
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	@Deprecated
-	public void entityGroupEvent(EventType eventType, EntityGroup entity) {
-		entityEvent(eventType, entity);
-	}
-
-	@Override
-	@Deprecated
-	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
-		// TODO redraw annotations
 	}
 
 	public DocumentModel getDocumentModel() {

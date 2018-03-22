@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -36,10 +35,6 @@ public interface Event extends Iterable<FeatureStructure> {
 	Op getOp();
 
 	int getArity();
-
-	public static <T extends Annotation> AnnotationEvent get(Type type, T annotation) {
-		return new AnnotationEvent(type, annotation);
-	}
 
 	public static FeatureStructureEvent get(Type type, FeatureStructure... fs) {
 		return new FeatureStructureEvent(type, fs);

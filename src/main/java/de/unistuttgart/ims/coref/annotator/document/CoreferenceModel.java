@@ -131,30 +131,6 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	@Deprecated
-	private void addTo(EntityGroup eg, Entity e) {
-		// UIMA stuff
-		FSArray oldArr = eg.getMembers();
-
-		for (int i = 0; i < oldArr.size(); i++) {
-			if (oldArr.get(i) == e) {
-				return;
-			}
-		}
-
-		FSArray arr = new FSArray(jcas, eg.getMembers().size() + 1);
-		int i = 0;
-		for (; i < eg.getMembers().size(); i++) {
-			arr.set(i, eg.getMembers(i));
-		}
-		arr.set(i, e);
-		eg.setMembers(arr);
-		oldArr.removeFromIndexes();
-
-		fireEntityEvent(Event.Type.Update, eg);
-
-	}
-
 	private DetachedMentionPart addTo(Mention m, int begin, int end) {
 		// document model
 		DetachedMentionPart d = createDetachedMentionPart(begin, end);
@@ -364,43 +340,8 @@ public class CoreferenceModel {
 		}
 	}
 
-	@Deprecated
-	protected void fireAnnotationChangedEvent(Annotation m) {
-		crModelListeners.forEach(l -> l.annotationEvent(Event.get(Event.Type.Update, m)));
-	}
-
-	@Deprecated
-	protected void fireAnnotationMovedEvent(Annotation m, FeatureStructure from, FeatureStructure to) {
-		crModelListeners.forEach(l -> l.annotationEvent((AnnotationEvent) Event.get(Event.Type.Move, m, from, to)));
-	}
-
-	@Deprecated
-	protected void fireAnnotationRemovedEvent(Annotation m) {
-		crModelListeners.forEach(l -> l.annotationEvent(Event.get(Event.Type.Remove, m)));
-	}
-
-	@Deprecated
-	protected void fireEntityAddedEvent(Entity e) {
-		crModelListeners.forEach(l -> l.entityEvent(Event.get(Event.Type.Add, e)));
-	}
-
 	protected void fireEvent(FeatureStructureEvent event) {
 		crModelListeners.forEach(l -> l.entityEvent(event));
-	}
-
-	@Deprecated
-	protected void fireEntityEvent(Event.Type evt, Entity e) {
-		crModelListeners.forEach(l -> l.entityEvent(Event.get(evt, e)));
-	}
-
-	@Deprecated
-	protected void fireEntityRemovedEvent(Entity e) {
-		crModelListeners.forEach(l -> l.entityEvent(Event.get(Event.Type.Remove, e)));
-	}
-
-	@Deprecated
-	protected void fireMentionAddedEvent(Annotation annotation) {
-		crModelListeners.forEach(l -> l.annotationEvent(Event.get(Event.Type.Add, annotation)));
 	}
 
 	public JCas getJCas() {
@@ -422,7 +363,6 @@ public class CoreferenceModel {
 		return preferences;
 	}
 
-	@Deprecated
 	private Entity merge(Iterable<Entity> nodes) {
 		Entity biggest = null;
 		int size = 0;
@@ -438,10 +378,9 @@ public class CoreferenceModel {
 				if (n != tgt) {
 					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
 					remove(n);
+					fireEvent(Event.get(Event.Type.Remove, n));
 				}
 			}
-
-		fireEntityEvent(Event.Type.Update, tgt);
 		return biggest;
 	}
 
@@ -467,7 +406,7 @@ public class CoreferenceModel {
 	}
 
 	private void remove(DetachedMentionPart dmp) {
-		fireAnnotationRemovedEvent(dmp);
+		fireEvent(Event.get(Event.Type.Remove, dmp.getMention(), dmp));
 		dmp.getMention().setDiscontinuous(null);
 		dmp.removeFromIndexes();
 		characterPosition2AnnotationMap.remove(dmp);
@@ -483,13 +422,6 @@ public class CoreferenceModel {
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
 
-	}
-
-	@Deprecated
-	private void remove(EntityGroup entity) {
-		fireEntityEvent(Event.Type.Remove, entity);
-		entityMentionMap.removeAll(entity);
-		entity.removeFromIndexes();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {

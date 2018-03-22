@@ -9,15 +9,11 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.document.AnnotationEvent;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 
@@ -28,36 +24,6 @@ public class TestCoreferenceModelLoader {
 	@Before
 	public void setUp() {
 		modelListener = new CoreferenceModelListener() {
-
-			@Override
-			public void annotationEvent(EventType eventType, Annotation annotation) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void entityEvent(EventType eventType, Entity entity) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void entityGroupEvent(EventType eventType, EntityGroup entity) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void annotationEvent(AnnotationEvent event) {
-				// TODO Auto-generated method stub
-
-			}
 
 			@Override
 			public void entityEvent(FeatureStructureEvent event) {
