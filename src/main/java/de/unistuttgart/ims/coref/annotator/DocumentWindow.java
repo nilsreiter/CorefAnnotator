@@ -1064,8 +1064,19 @@ public class DocumentWindow extends JFrame
 					@SuppressWarnings("unchecked")
 					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					for (Span pa : paList)
-						handleSpanTransfer(pa);
+					Op op = null;
+					if (targetFS == null) {
+						op = new Op.AddMentionsToNewEntity(paList);
+					} else if (targetFS instanceof Entity) {
+						op = new Op.AddMentionsToEntity((Entity) targetFS, paList);
+					} else if (targetFS instanceof Mention) {
+						op = new Op.AttachPart((Mention) targetFS, paList.getFirst());
+					}
+					if (op != null) {
+						documentModel.getCoreferenceModel().edit(op);
+						registerChange();
+					}
+
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1080,23 +1091,6 @@ public class DocumentWindow extends JFrame
 				}
 			}
 
-			return true;
-		}
-
-		protected boolean handleSpanTransfer(Span potentialAnnotation) {
-
-			if (targetFS == null) {
-				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToNewEntity(getSelection()));
-				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
-			} else if (targetFS instanceof Entity) {
-				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity((Entity) targetFS, getSelection()));
-
-				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
-			} else if (targetFS instanceof Mention) {
-				documentModel.getCoreferenceModel().edit(new Op.AttachPart((Mention) targetFS, potentialAnnotation));
-				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_PART_CREATED), true);
-			}
-			registerChange();
 			return true;
 		}
 

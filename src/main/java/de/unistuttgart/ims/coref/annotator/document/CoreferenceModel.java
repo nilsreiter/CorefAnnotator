@@ -119,16 +119,30 @@ public class CoreferenceModel {
 		return crModelListeners.add(e);
 	}
 
+	/**
+	 * does not fire events
+	 * 
+	 * @param e
+	 * @param span
+	 * @return
+	 */
 	private Mention addTo(Entity e, Span span) {
 		return addTo(e, span.begin, span.end);
 	}
 
+	/**
+	 * does not fire events
+	 * 
+	 * @param e
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
 	private Mention addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
 
-		fireEvent(Event.get(Event.Type.Add, e, m));
 		return m;
 	}
 
@@ -220,16 +234,23 @@ public class CoreferenceModel {
 			history.add(op);
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
+			MutableList<Mention> ms = Lists.mutable.empty();
 			for (Span span : op.getSpans()) {
-				if (op.getEntity() == null)
-					op.setEntity(add(span).getEntity());
-				else
-					addTo(op.getEntity(), span);
+				if (op.getEntity() == null) {
+					Mention fst = add(span);
+					ms.add(fst);
+					op.setEntity(fst.getEntity());
+				} else
+					ms.add(addTo(op.getEntity(), span));
 			}
+			fireEvent(Event.get(Event.Type.Add, op.getEntity(), ms.toImmutable()));
 			history.push(op);
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
-			op.setMentions(op.getSpans().collect(sp -> addTo(op.getEntity(), sp)));
+			op.setMentions(op.getSpans().collect(sp -> {
+				return addTo(op.getEntity(), sp);
+			}));
+			fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
 			history.push(op);
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
@@ -307,6 +328,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
+			fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
 			remove(op.getPart());
@@ -443,7 +465,7 @@ public class CoreferenceModel {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(entity, m);
-		fireEvent(Event.get(Event.Type.Remove, m.getEntity(), m));
+		// fireEvent(Event.get(Event.Type.Remove, m.getEntity(), m));
 		m.removeFromIndexes();
 		if (autoRemove && entityMentionMap.get(entity).isEmpty()
 				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
