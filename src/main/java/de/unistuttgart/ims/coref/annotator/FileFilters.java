@@ -31,4 +31,18 @@ public class FileFilters {
 		}
 
 	};
+
+	static public FileFilter xml = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".xml");
+		}
+
+		@Override
+		public String getDescription() {
+			return "XML files";
+		}
+
+	};
 }
