@@ -242,7 +242,6 @@ public class CoreferenceModel {
 			arr.addToIndexes();
 			op.getEntityGroup().removeFromIndexes();
 			op.getEntityGroup().setMembers(arr);
-			fireEntityEvent(Event.get(op));
 			history.add(op);
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;

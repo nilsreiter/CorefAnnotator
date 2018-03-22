@@ -1088,10 +1088,11 @@ public class DocumentWindow extends JFrame
 
 		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
 			Annotator.logger.debug("Moving {} things", moved.size());
+			Op operation = null;
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					moved.forEach(n -> documentModel.getCoreferenceModel().addTo((EntityGroup) targetFS,
-							n.getFeatureStructure()));
+					operation = new Op.AddEntityToEntityGroup((EntityGroup) targetFS,
+							moved.collect(n -> n.getFeatureStructure()));
 				} else
 					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
 							moved.collect(n -> (n.getFeatureStructure()))));
@@ -1100,6 +1101,8 @@ public class DocumentWindow extends JFrame
 						.moveTo((DetachedMentionPart) n.getFeatureStructure(), (Mention) targetFS));
 			else
 				return false;
+			if (operation != null)
+				documentModel.getCoreferenceModel().edit(operation);
 			registerChange();
 			return true;
 		}
@@ -1348,6 +1351,7 @@ public class DocumentWindow extends JFrame
 		}
 
 		private void deleteSingle(CATreeNode tn) {
+			Op operation = null;
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
 				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
@@ -1360,11 +1364,13 @@ public class DocumentWindow extends JFrame
 			} else if (tn.isEntity()) {
 				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
-					documentModel.getCoreferenceModel().removeFrom((EntityGroup) parentFs, tn.getEntity());
+					operation = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
 				} else if (tn.isLeaf()) {
 					documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getEntity()));
 				}
 			}
+			if (operation != null)
+				documentModel.getCoreferenceModel().edit(operation);
 		}
 
 	}
