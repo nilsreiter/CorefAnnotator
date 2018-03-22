@@ -829,7 +829,8 @@ public class DocumentWindow extends JFrame
 					if (((Mention) fs).getDiscontinuous() != null)
 						highlightManager.undraw(((Mention) fs).getDiscontinuous());
 					highlightManager.undraw((Annotation) fs);
-				}
+				} else if (fs instanceof Annotation)
+					highlightManager.undraw((Annotation) fs);
 
 			}
 			break;

@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.List;
+
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -36,10 +38,6 @@ public interface Event extends Iterable<FeatureStructure> {
 
 	int getArity();
 
-	public static FeatureStructureEvent get(Type type, FeatureStructure... fs) {
-		return new FeatureStructureEvent(type, fs);
-	}
-
 	public static FeatureStructureEvent get(Type type, FeatureStructure fs,
 			ImmutableList<? extends FeatureStructure> fsi) {
 		MutableList<FeatureStructure> l = Lists.mutable.withAll(fsi);
@@ -55,7 +53,15 @@ public interface Event extends Iterable<FeatureStructure> {
 		return new FeatureStructureEvent(type, l);
 	}
 
-	public static FeatureStructureEvent get(Type type, Iterable<FeatureStructure> fs) {
+	public static FeatureStructureEvent get(Type type, Iterable<? extends FeatureStructure> fs) {
+		return new FeatureStructureEvent(type, fs);
+	}
+
+	public static FeatureStructureEvent get(Type type, List<FeatureStructure> fs) {
+		return new FeatureStructureEvent(type, fs);
+	}
+
+	public static FeatureStructureEvent get(Type type, FeatureStructure... fs) {
 		return new FeatureStructureEvent(type, fs);
 	}
 

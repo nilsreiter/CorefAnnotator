@@ -8,6 +8,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
@@ -65,12 +66,23 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			optResort();
 			break;
 		case Remove:
-			for (int i = 1; i < event.getArity(); i++) {
-				CATreeNode etn = fsMap.get(event.getArgument(i));
-				etn.removeAllChildren();
-				removeNodeFromParent(etn);
-				fsMap.remove(event.getArgument(i));
-			}
+			if (event.getArgument1() instanceof EntityGroup) {
+				CATreeNode gn = fsMap.get(event.getArgument1());
+				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
+						.collect(n -> n.getFeatureStructure());
+				for (int i = members.size() - 1; i >= 0; i--) {
+					if (event.arguments.contains(members.get(i)))
+						removeNodeFromParent(gn.getChildAt(i));
+				}
+			} else
+				for (int i = 1; i < event.getArity(); i++) {
+					CATreeNode etn = fsMap.get(event.getArgument(i));
+					if (etn != null) {
+						etn.removeAllChildren();
+						removeNodeFromParent(etn);
+					}
+					fsMap.remove(event.getArgument(i));
+				}
 			optResort();
 			break;
 		case Update:

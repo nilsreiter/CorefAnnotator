@@ -15,7 +15,7 @@ public class FeatureStructureEvent implements Event {
 		this.arguments = Lists.immutable.of(args);
 	}
 
-	public FeatureStructureEvent(Type eventType, Iterable<FeatureStructure> args) {
+	public FeatureStructureEvent(Type eventType, Iterable<? extends FeatureStructure> args) {
 		this.eventType = eventType;
 		this.arguments = Lists.immutable.withAll(args);
 

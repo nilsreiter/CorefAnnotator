@@ -355,6 +355,10 @@ public interface Op {
 		public void setMentions(ImmutableList<Mention> mention) {
 			this.mentions = mention;
 		}
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
 	}
 
 	public class RemovePart implements Op {

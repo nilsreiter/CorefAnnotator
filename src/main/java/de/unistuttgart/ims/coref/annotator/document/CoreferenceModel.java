@@ -32,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.AttachPart;
@@ -90,7 +91,8 @@ public class CoreferenceModel {
 	}
 
 	/**
-	 * Create a new entity e and a new mention m, and add m to e.
+	 * Create a new entity e and a new mention m, and add m to e. Does not fire any
+	 * events.
 	 * 
 	 * @param begin
 	 *            Begin of mention
@@ -105,8 +107,6 @@ public class CoreferenceModel {
 		Entity e = createEntity(m.getCoveredText());
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
-		fireEvent(Event.get(Event.Type.Add, null, e));
-		fireEvent(Event.get(Event.Type.Add, e, m));
 
 		return m;
 	}
@@ -146,13 +146,20 @@ public class CoreferenceModel {
 		return m;
 	}
 
+	/**
+	 * does not fire events
+	 * 
+	 * @param m
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
 	private DetachedMentionPart addTo(Mention m, int begin, int end) {
 		// document model
 		DetachedMentionPart d = createDetachedMentionPart(begin, end);
 		d.setMention(m);
 		m.setDiscontinuous(d);
 
-		fireEvent(Event.get(Event.Type.Add, m, d));
 		return d;
 	}
 
@@ -243,6 +250,7 @@ public class CoreferenceModel {
 				} else
 					ms.add(addTo(op.getEntity(), span));
 			}
+			fireEvent(Event.get(Event.Type.Add, null, op.getEntity()));
 			fireEvent(Event.get(Event.Type.Add, op.getEntity(), ms.toImmutable()));
 			history.push(op);
 		} else if (operation instanceof Op.AddMentionsToEntity) {
@@ -255,10 +263,12 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
 			op.setPart(addTo(op.getMention(), op.getSpan().begin, op.getSpan().end));
+			fireEvent(Event.get(Event.Type.Add, op.getMention(), op.getPart()));
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (Op.MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
+			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
 			fireEvent(op.toEvent());
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionPartToMention) {
@@ -273,7 +283,10 @@ public class CoreferenceModel {
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
-			remove(op.getMention(), false);
+			op.getMentions().forEach(m -> {
+				remove(m, false);
+			});
+			fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
 			op.setMentions(null);
 			history.push(op);
 		} else if (operation instanceof Op.RemoveEntities) {
@@ -287,6 +300,8 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (Op.RemovePart) operation;
 			remove(op.getPart());
+			fireEvent(Event.get(Type.Remove, op.getMention(), op.getPart()));
+			op.setPart(null);
 			history.push(op);
 		} else if (operation instanceof Op.GroupEntities) {
 			Op.GroupEntities op = (GroupEntities) operation;
@@ -344,19 +359,22 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
+			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
 			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (RemovePart) operation;
-			addTo(op.getMention(), op.getSpan().begin, op.getSpan().end);
+			op.setPart(addTo(op.getMention(), op.getSpan().begin, op.getSpan().end));
+			fireEvent(Event.get(Type.Add, op.getMention(), op.getPart()));
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
-			addTo(op.getEntity(), op.getSpan());
+			op.setMentions(op.getSpans().collect(s -> addTo(op.getEntity(), s)));
+			fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
 		} else if (operation instanceof Op.RemoveEntities) {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> {
 				e.addToIndexes();
-				fireEvent(Event.get(Event.Type.Add, null, e));
 			});
+			fireEvent(Event.get(Event.Type.Add, null, op.getEntities()));
 		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
 			Op.RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
 			FSArray oldArr = op.getEntityGroup().getMembers();
@@ -380,7 +398,9 @@ public class CoreferenceModel {
 				}
 			}
 		} else if (operation instanceof Op.GroupEntities) {
-			fireEvent(Event.get(Event.Type.Remove, null, ((Op.GroupEntities) operation).getEntities()));
+			Op.GroupEntities op = (GroupEntities) operation;
+			remove(op.getEntityGroup());
+			fireEvent(Event.get(Event.Type.Remove, null, op.getEntityGroup()));
 		}
 	}
 
@@ -442,8 +462,12 @@ public class CoreferenceModel {
 		characterPosition2AnnotationMap.add(a);
 	}
 
+	/**
+	 * does not fire evetns
+	 * 
+	 * @param dmp
+	 */
 	private void remove(DetachedMentionPart dmp) {
-		fireEvent(Event.get(Event.Type.Remove, dmp.getMention(), dmp));
 		dmp.getMention().setDiscontinuous(null);
 		dmp.removeFromIndexes();
 		characterPosition2AnnotationMap.remove(dmp);
@@ -478,15 +502,23 @@ public class CoreferenceModel {
 		return crModelListeners.remove(o);
 	};
 
+	/**
+	 * TODO: this could have a unit test
+	 * 
+	 * @param eg
+	 * @param entity
+	 */
 	private void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
 		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
-		for (int i = 0; i < oldArray.size() - 1; i++) {
+
+		for (int i = 0, j = 0; i < oldArray.size() - 1 && j < arr.size() - 1; i++, j++) {
+
 			if (eg.getMembers(i) == entity) {
-				i--;
-			} else {
-				arr.set(i, eg.getMembers(i));
+				i++;
 			}
+			arr.set(j, eg.getMembers(i));
+
 		}
 		eg.setMembers(arr);
 		fireEvent(Event.get(Event.Type.Remove, eg, entity));
