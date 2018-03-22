@@ -812,7 +812,7 @@ public class DocumentWindow extends JFrame
 					if (entity.getKey() != null) {
 						keyMap.put(entity.getKey().charAt(0), entity);
 					}
-				} else if (fs instanceof Mention) {
+				} else if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
 					highlightManager.underline((Annotation) fs);
 				} else if (fs instanceof CommentAnchor) {
 					highlightManager.highlight((Annotation) fs);
@@ -822,9 +822,10 @@ public class DocumentWindow extends JFrame
 		case Remove:
 			while (iter.hasNext()) {
 				FeatureStructure fs = iter.next();
-				if (fs instanceof Entity)
-					keyMap.remove(((Entity) fs).getKey().charAt(0));
-				else if (fs instanceof Mention) {
+				if (fs instanceof Entity) {
+					if (((Entity) fs).getKey() != null)
+						keyMap.remove(((Entity) fs).getKey().charAt(0));
+				} else if (fs instanceof Mention) {
 					if (((Mention) fs).getDiscontinuous() != null)
 						highlightManager.undraw(((Mention) fs).getDiscontinuous());
 					highlightManager.undraw((Annotation) fs);
@@ -1110,8 +1111,7 @@ public class DocumentWindow extends JFrame
 					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
 							moved.collect(n -> (n.getFeatureStructure()))));
 			} else if (targetFS instanceof Mention)
-				moved.forEach(n -> documentModel.getCoreferenceModel()
-						.moveTo((DetachedMentionPart) n.getFeatureStructure(), (Mention) targetFS));
+				operation = new Op.MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
 				return false;
 			if (operation != null)

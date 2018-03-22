@@ -194,46 +194,73 @@ public interface Op {
 		}
 	}
 
-	public class MoveMentionsToEntity implements Op {
-		ImmutableList<Mention> mentions;
-		Entity source;
-		Entity target;
+	public abstract class MoveOp<M, C> implements Op {
+		ImmutableList<M> objects;
+		C source;
+		C target;
 
-		public MoveMentionsToEntity(Entity target, Iterable<Mention> mention) {
-			this.mentions = Lists.immutable.withAll(mention);
-			this.source = mentions.getFirst().getEntity();
+		public MoveOp(C source, C target, Iterable<M> mention) {
+			this.objects = Lists.immutable.withAll(mention);
+			this.source = source;
 			this.target = target;
 		}
 
-		public MoveMentionsToEntity(Entity target, Mention... mention) {
-			this.mentions = Lists.immutable.of(mention);
-			this.source = mentions.getFirst().getEntity();
+		@SafeVarargs
+		public MoveOp(C source, C target, M... mention) {
+			this.objects = Lists.immutable.of(mention);
+			this.source = source;
 			this.target = target;
 		}
 
-		public ImmutableList<Mention> getMentions() {
-			return mentions;
+		public ImmutableList<M> getObjects() {
+			return objects;
 		}
 
-		public Entity getSource() {
+		public void setObjects(ImmutableList<M> objects) {
+			this.objects = objects;
+		}
+
+		public C getSource() {
 			return source;
 		}
 
-		public Entity getTarget() {
-			return target;
-		}
-
-		public void setMentions(ImmutableList<Mention> mentions) {
-			this.mentions = mentions;
-		}
-
-		public void setSource(Entity source) {
+		public void setSource(C source) {
 			this.source = source;
 		}
 
-		public void setTarget(Entity target) {
+		public C getTarget() {
+			return target;
+		}
+
+		public void setTarget(C target) {
 			this.target = target;
 		}
+	}
+
+	public class MoveMentionsToEntity extends MoveOp<Mention, Entity> {
+
+		public MoveMentionsToEntity(Entity target, Iterable<Mention> mention) {
+			super(mention.iterator().next().getEntity(), target, mention);
+		}
+
+		public MoveMentionsToEntity(Entity target, Mention... mention) {
+			super(mention[0].getEntity(), target, mention);
+		}
+
+		public ImmutableList<Mention> getMentions() {
+			return objects;
+		}
+
+	}
+
+	public class MoveMentionPartToMention extends MoveOp<DetachedMentionPart, Mention> {
+		Mention from, to;
+		DetachedMentionPart part;
+
+		public MoveMentionPartToMention(Mention target, DetachedMentionPart part) {
+			super(part.getMention(), target, part);
+		}
+
 	}
 
 	public class RemoveEntities implements Op {

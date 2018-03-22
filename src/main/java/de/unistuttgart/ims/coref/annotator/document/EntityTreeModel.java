@@ -49,17 +49,18 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
+		CATreeNode arg0 = get(event.getArgument(0));
 		switch (eventType) {
 		case Add:
 			for (int i = 1; i < event.getArity(); i++) {
-				if (event.getArgument(i) instanceof Entity) {
-					CATreeNode tn = createNode(event.getArgument(i));
-					insertNodeInto(tn, get(event.getArgument(0)), 0);
-				}
+				CATreeNode tn = createNode(event.getArgument(i));
+				insertNodeInto(tn, arg0, getInsertPosition(arg0, event.getArgument(i)));
 				if (event.getArgument(i) instanceof EntityGroup) {
 					EntityGroup eg = (EntityGroup) event.getArgument(i);
 					for (int j = 0; i < eg.getMembers().size(); j++)
-						insertNodeInto(new CATreeNode(eg.getMembers(j)), get(eg), 0);
+						insertNodeInto(new CATreeNode(eg.getMembers(j)), tn,
+								getInsertPosition(tn, event.getArgument(i)));
+
 				}
 			}
 			optResort();
@@ -84,16 +85,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				CATreeNode newParent = get(event.getArgument(1));
 				removeNodeFromParent(node);
 
-				int ind = 0;
-				if (fs instanceof Annotation) {
-					while (ind < newParent.getChildCount()) {
-						CATreeNode cnode = newParent.getChildAt(ind);
-						if (cnode.getFeatureStructure() instanceof Entity
-								|| ((Annotation) cnode.getFeatureStructure()).getBegin() > ((Annotation) fs).getBegin())
-							break;
-						ind++;
-					}
-				}
+				int ind = getInsertPosition(newParent, fs);
 				insertNodeInto(node, newParent, ind);
 			}
 			optResort();
@@ -101,6 +93,19 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		default:
 			break;
 		}
+	}
+
+	private int getInsertPosition(CATreeNode newParent, FeatureStructure newChildFS) {
+		int ind = 0;
+		if (newChildFS instanceof Annotation)
+			while (ind < newParent.getChildCount()) {
+				CATreeNode cnode = newParent.getChildAt(ind);
+				if (cnode.getFeatureStructure() instanceof Entity
+						|| ((Annotation) cnode.getFeatureStructure()).getBegin() > ((Annotation) newChildFS).getBegin())
+					break;
+				ind++;
+			}
+		return ind;
 	}
 
 	private CATreeNode createNode(FeatureStructure fs) {

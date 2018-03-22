@@ -37,6 +37,7 @@ import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MergeEntities;
+import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntitiesFromEntityGroup;
@@ -238,6 +239,15 @@ public class CoreferenceModel {
 			Op.MoveMentionsToEntity op = (Op.MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
 			history.push(op);
+		} else if (operation instanceof Op.MoveMentionPartToMention) {
+			Op.MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
+			op.getObjects().forEach(d -> {
+				d.setMention(op.getTarget());
+				op.getTarget().setDiscontinuous(d);
+				op.getSource().setDiscontinuous(null);
+			});
+			fireEvent(Event.get(Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
+			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			Op.RemoveMention op = (RemoveMention) operation;
 			remove(op.getMention(), false);
@@ -298,6 +308,15 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
 			remove(op.getPart());
+			fireEvent(Event.get(Event.Type.Remove, op.getMention(), op.getPart()));
+		} else if (operation instanceof Op.MoveMentionPartToMention) {
+			Op.MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
+			op.getObjects().forEach(d -> {
+				op.getSource().setDiscontinuous(d);
+				d.setMention(op.getSource());
+				op.getTarget().setDiscontinuous(null);
+			});
+			fireEvent(Event.get(Event.Type.Move, op.getTarget(), op.getSource(), op.getObjects()));
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
@@ -384,12 +403,6 @@ public class CoreferenceModel {
 		return biggest;
 	}
 
-	public void moveTo(DetachedMentionPart dmp, Mention m) {
-		Mention old = dmp.getMention();
-		dmp.setMention(m);
-		fireEvent(Event.get(Event.Type.Move, old, m, dmp));
-	}
-
 	private void moveTo(Entity newEntity, Mention... mentions) {
 		Entity oldEntity = null;
 		for (Mention m : mentions) {
@@ -428,7 +441,7 @@ public class CoreferenceModel {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(entity, m);
-		fireEvent(Event.get(Event.Type.Remove, m));
+		fireEvent(Event.get(Event.Type.Remove, m.getEntity(), m));
 		m.removeFromIndexes();
 		if (autoRemove && entityMentionMap.get(entity).isEmpty()
 				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
