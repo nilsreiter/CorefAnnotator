@@ -72,7 +72,7 @@ public class TestCoreferenceModelLoader {
 		testResource("/rjmw.0.xmi");
 		testResource("/Text_1804.xmi");
 		testResource("/DieLeidenDesJungenWerther.xmi");
-		testResource("/Annika+Bearbeitung+4.xmi");
+		// testResource("/Annika+Bearbeitung+4.xmi");
 		testResource("/Rowlandson_Tanja.xmi");
 	}
 
