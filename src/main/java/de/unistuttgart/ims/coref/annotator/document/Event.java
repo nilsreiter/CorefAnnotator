@@ -1,28 +1,33 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
-
-import de.unistuttgart.ims.coref.annotator.api.Entity;
 
 public interface Event {
 	public enum Type {
-		Add, Remove, Update, Move, Merge, Op
+		/**
+		 * This event creates a new object under an existing one. Argument 1: newly
+		 * created object, argument 2: the parent. If the second argument is null, we
+		 * assume to create a new top level thing.
+		 */
+		Add, Remove, Update,
+		/**
+		 * This describes moving arg1 from arg2 to arg3. Arg3 becomes the new parent,
+		 * arg2 is the old one.
+		 */
+		Move, Merge, Op
 	};
 
 	Type getType();
 
 	Op getOp();
 
-	public static <T extends Annotation> AnnotationEvent<T> get(Type type, T annotation) {
-		return new AnnotationEvent<T>(type, annotation);
+	public static <T extends Annotation> AnnotationEvent get(Type type, T annotation) {
+		return new AnnotationEvent(type, annotation);
 	}
 
-	public static <T extends Annotation> AnnotationEvent<T> get(T annotation, Object from, Object to) {
-		return new AnnotationMoveEvent<T>(annotation, from, to);
-	}
-
-	public static FeatureStructureEvent<Entity> get(Type type, Entity fs) {
-		return new FeatureStructureEvent<Entity>(type, fs);
+	public static FeatureStructureEvent get(Type type, FeatureStructure... fs) {
+		return new FeatureStructureEvent(type, fs);
 	}
 
 }

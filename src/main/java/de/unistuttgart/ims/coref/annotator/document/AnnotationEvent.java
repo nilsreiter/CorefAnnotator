@@ -2,9 +2,9 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class AnnotationEvent<T extends Annotation> extends FeatureStructureEvent<T> {
+public class AnnotationEvent extends FeatureStructureEvent {
 
-	public AnnotationEvent(Type type, T annotation) {
+	public AnnotationEvent(Type type, Annotation annotation) {
 		super(type, annotation);
 	}
 

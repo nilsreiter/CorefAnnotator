@@ -370,8 +370,8 @@ public class CoreferenceModel {
 		crModelListeners.forEach(l -> l.annotationEvent(Event.get(Event.Type.Update, m)));
 	}
 
-	protected void fireAnnotationMovedEvent(Annotation m, Object from, Object to) {
-		crModelListeners.forEach(l -> l.annotationEvent(Event.get(m, from, to)));
+	protected void fireAnnotationMovedEvent(Annotation m, FeatureStructure from, FeatureStructure to) {
+		crModelListeners.forEach(l -> l.annotationEvent((AnnotationEvent) Event.get(Event.Type.Move, m, from, to)));
 	}
 
 	protected void fireAnnotationRemovedEvent(Annotation m) {

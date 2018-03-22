@@ -2,7 +2,8 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class AnnotationMoveEvent<T extends Annotation> extends AnnotationEvent<T> {
+@Deprecated
+public class AnnotationMoveEvent<T extends Annotation> extends AnnotationEvent {
 
 	Object from;
 	Object to;
