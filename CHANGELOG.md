@@ -1,11 +1,14 @@
 # Changelog
 
+Issue numbers (e.g., #43) refer to GitHub issues:
+https://github.com/nilsreiter/CorefAnnotator/issues
+
 ## 1.3
 
 - Add TEI import plugin. In TEI files, everything that as a `ref` 
   attribute is considered a mention. Elements with `who` attribute are 
   treated specially, because dramas (i.e., the sub-ordinate `speaker`-
-  element is considered the mention).
+  element is considered the mention). #72
 
 ## 1.2.1
 
