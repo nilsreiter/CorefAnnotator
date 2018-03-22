@@ -122,6 +122,8 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.DocumentState;
+import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
@@ -133,7 +135,7 @@ import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class DocumentWindow extends JFrame
-		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow {
+		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow, DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -166,7 +168,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
-	AbstractAction copyAction;
+	AbstractAction copyAction, undoAction;
 
 	// controller
 	DocumentModel documentModel;
@@ -369,6 +371,7 @@ public class DocumentWindow extends JFrame
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
 		this.copyAction = new CopyAction(this, mainApplication);
+		this.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -687,7 +690,7 @@ public class DocumentWindow extends JFrame
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
 				jcas.setDocumentLanguage(Util.getLanguage(lang));
-				registerChange();
+
 			}
 		}
 
@@ -850,18 +853,11 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	protected synchronized void registerChange() {
-		if (unsavedChanges == false) {
-			unsavedChanges = true;
-			setWindowTitle();
-			fileSaveAction.setEnabled(file != null);
-		}
-	}
-
 	public void setDocumentModel(DocumentModel model) {
 
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
+		model.getCoreferenceModel().addDocumentStateListener(this);
 		documentModel = model;
 
 		// UI
@@ -1075,7 +1071,6 @@ public class DocumentWindow extends JFrame
 					}
 					if (op != null) {
 						documentModel.getCoreferenceModel().edit(op);
-						registerChange();
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -1111,7 +1106,6 @@ public class DocumentWindow extends JFrame
 				return false;
 			if (operation != null)
 				documentModel.getCoreferenceModel().edit(operation);
-			registerChange();
 			return true;
 		}
 
@@ -1158,7 +1152,7 @@ public class DocumentWindow extends JFrame
 			if (newLabel != null) {
 				Op.RenameEntity op = new Op.RenameEntity(etn.getEntity(), newLabel);
 				documentModel.getCoreferenceModel().edit(op);
-				registerChange();
+
 			}
 		}
 
@@ -1183,7 +1177,7 @@ public class DocumentWindow extends JFrame
 					Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
 			if (color != newColor) {
 				documentModel.getCoreferenceModel().updateColor(etn.getFeatureStructure(), newColor);
-				registerChange();
+
 			}
 
 		}
@@ -1215,7 +1209,6 @@ public class DocumentWindow extends JFrame
 					Character newChar = newKey.charAt(0);
 					etn.getEntity().setKey(newKey.substring(0, 1));
 					keyMap.put(newChar, etn.getFeatureStructure());
-					registerChange();
 
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
@@ -1353,7 +1346,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			registerChange();
+
 			for (TreePath tp : tree.getSelectionPaths())
 				deleteSingle((CATreeNode) tp.getLastPathComponent());
 		}
@@ -1398,7 +1391,7 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			registerChange();
+
 			documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 		}
 
@@ -1468,7 +1461,7 @@ public class DocumentWindow extends JFrame
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
 						documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(m.getEntity(), spans));
-						registerChange();
+
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
 					}
@@ -1493,7 +1486,7 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 			for (Entity e : JCasUtil.select(jcas, Entity.class))
 				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(e));
-			registerChange();
+
 		}
 
 	}
@@ -1540,7 +1533,7 @@ public class DocumentWindow extends JFrame
 				entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 			}
 			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(entities));
-			registerChange();
+
 		}
 
 	}
@@ -1564,7 +1557,7 @@ public class DocumentWindow extends JFrame
 			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
 			documentModel.getCoreferenceModel().edit(new Op.GroupEntities(e1, e2));
-			registerChange();
+
 		}
 
 	}
@@ -1667,7 +1660,7 @@ public class DocumentWindow extends JFrame
 				Entity entity = (Entity) tn.getFeatureStructure();
 				documentModel.getCoreferenceModel().toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
 			}
-			registerChange();
+
 		}
 	}
 
@@ -1705,7 +1698,6 @@ public class DocumentWindow extends JFrame
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
-			registerChange();
 
 		}
 
@@ -1728,7 +1720,7 @@ public class DocumentWindow extends JFrame
 				Mention m = (Mention) tn.getFeatureStructure();
 				documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_NON_NOMINAL);
 			}
-			registerChange();
+
 		}
 
 	}
@@ -1747,7 +1739,6 @@ public class DocumentWindow extends JFrame
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
 			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
-			registerChange();
 
 		}
 
@@ -2161,6 +2152,14 @@ public class DocumentWindow extends JFrame
 
 	public DocumentModel getDocumentModel() {
 		return documentModel;
+	}
+
+	@Override
+	public void documentStateEvent(DocumentState state) {
+		undoAction.setEnabled(state.getHistorySize() > 0);
+		fileSaveAction.setEnabled(state.getHistorySize() > 0);
+		unsavedChanges = (state.getHistorySize() > 0);
+		setWindowTitle();
 	}
 
 }
