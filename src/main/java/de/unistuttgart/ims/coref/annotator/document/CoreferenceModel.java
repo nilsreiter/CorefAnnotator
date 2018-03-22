@@ -326,7 +326,8 @@ public class CoreferenceModel {
 	}
 
 	public void undo() {
-		undo(history.pop());
+		if (!history.isEmpty())
+			undo(history.pop());
 	}
 
 	protected void undo(Op operation) {
