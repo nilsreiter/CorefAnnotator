@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,7 +91,6 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -130,6 +130,7 @@ import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
+import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -1813,20 +1814,13 @@ public class DocumentWindow extends JFrame
 					textPopupMenu.add(subMenu);
 
 				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-					EntityRankingPlugin erp = mainApplication.getPluginManager()
-							.getEntityRankingPlugin(MatchingRanker.class);
-					MutableSortedSet<Entity> candidates = erp
-							.rank(new Span(textPane.getSelectionStart(), textPane.getSelectionEnd()),
-									getCoreferenceModel(), getJcas())
-							.take(10);
-					candidates
-							.union(Sets.mutable
-									.ofAll(JCasUtil
-											.selectPreceding(Mention.class,
-													new Annotation(jcas, textPane.getSelectionStart(),
-															textPane.getSelectionEnd()),
-													15))
-									.collect(m -> m.getEntity()));
+
+					Set<Entity> candidates = Sets.mutable.empty();
+					for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
+							mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
+							mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
+						candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
+					}
 					JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
 					candidates.forEach(entity -> {
 						JMenuItem mi = new JMenuItem(Util.toString(entity.getLabel()));
