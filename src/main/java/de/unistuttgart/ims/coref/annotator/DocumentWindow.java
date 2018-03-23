@@ -841,7 +841,7 @@ public class DocumentWindow extends JFrame
 		case Update:
 			for (FeatureStructure fs : event) {
 				if (fs instanceof Mention) {
-					if (((Mention) fs).getEntity().getHidden())
+					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 						highlightManager.undraw((Annotation) fs);
 					else
 						highlightManager.underline((Annotation) fs);
@@ -1259,7 +1259,7 @@ public class DocumentWindow extends JFrame
 
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
-			if (entity.getHidden() || treeNode.getRank() < 50) {
+			if (Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50) {
 				lab1.setForeground(Color.GRAY);
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_OUTLINE, Color.GRAY));
 			} else {
@@ -1656,14 +1656,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (TreePath tp : tree.getSelectionPaths()) {
-				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-				Entity entity = (Entity) tn.getFeatureStructure();
-
-				documentModel.getCoreferenceModel()
-						.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, entity));
-			}
-
+			documentModel.getCoreferenceModel().edit(
+					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, Lists.immutable.of(tree.getSelectionPaths())
+							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
@@ -1676,13 +1671,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (tree.getSelectionCount() > 0) {
-				for (TreePath tp : tree.getSelectionPaths()) {
-					CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-					Entity entity = (Entity) tn.getFeatureStructure();
-					documentModel.getCoreferenceModel().toggleHidden(entity);
-				}
-			}
+			documentModel.getCoreferenceModel().edit(
+					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN, Lists.immutable.of(tree.getSelectionPaths())
+							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
@@ -1698,10 +1689,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT, m));
-
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}
@@ -1718,13 +1709,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (TreePath tp : tree.getSelectionPaths()) {
-				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-				Mention m = (Mention) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel()
-						.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL, m));
-			}
-
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}
@@ -1740,9 +1728,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS, m));
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}

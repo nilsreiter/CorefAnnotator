@@ -569,7 +569,8 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Remove, eg, entity));
 	}
 
-	public void setHidden(Entity entity, boolean hidden) {
+	@Deprecated
+	private void setHidden(Entity entity, boolean hidden) {
 		entity.setHidden(hidden);
 		fireEvent(Event.get(Event.Type.Update, entity, entityMentionMap.get(entity).toList().toImmutable()));
 	}
@@ -594,6 +595,7 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
+	@Deprecated
 	public void toggleHidden(Entity entity) {
 		setHidden(entity, !entity.getHidden());
 	}

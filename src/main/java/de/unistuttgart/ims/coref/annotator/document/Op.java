@@ -400,7 +400,7 @@ public interface Op {
 
 	public class ToggleEntityFlag extends ToggleFlag<Entity> {
 
-		public ToggleEntityFlag(String flag, Entity... objects) {
+		public ToggleEntityFlag(String flag, Iterable<Entity> objects) {
 			super(flag, objects);
 		}
 
@@ -408,7 +408,7 @@ public interface Op {
 
 	public class ToggleMentionFlag extends ToggleFlag<Mention> {
 
-		public ToggleMentionFlag(String flag, Mention... objects) {
+		public ToggleMentionFlag(String flag, Iterable<Mention> objects) {
 			super(flag, objects);
 		}
 
@@ -420,6 +420,11 @@ public interface Op {
 
 		@SafeVarargs
 		public ToggleFlag(String flag, T... objects) {
+			super(objects);
+			this.flag = flag;
+		}
+
+		public ToggleFlag(String flag, Iterable<T> objects) {
 			super(objects);
 			this.flag = flag;
 		}
@@ -465,6 +470,10 @@ public interface Op {
 		@SafeVarargs
 		public UpdateOp(T... objects) {
 			this.objects = Lists.immutable.of(objects);
+		}
+
+		public UpdateOp(Iterable<T> objects) {
+			this.objects = Lists.immutable.withAll(objects);
 		}
 
 		public ImmutableList<T> getObjects() {

@@ -97,6 +97,14 @@ public class Util {
 
 	}
 
+	public static boolean isX(FeatureStructure fs, String flag) {
+		if (fs instanceof Entity)
+			return Util.contains(((Entity) fs).getFlags(), flag);
+		if (fs instanceof Mention)
+			return Util.contains(((Mention) fs).getFlags(), flag);
+		return false;
+	}
+
 	public static boolean isGeneric(Entity e) {
 		return Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC);
 	}

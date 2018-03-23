@@ -199,6 +199,7 @@ public class Constants {
 	public static final String CFG_WINDOWTITLE = "Windowtitle";
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
+	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
