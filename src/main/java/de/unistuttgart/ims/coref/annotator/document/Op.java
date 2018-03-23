@@ -398,20 +398,55 @@ public interface Op {
 
 	}
 
-	public class RenameEntity implements Op {
+	public class ToggleEntityFlag extends ToggleFlag<Entity> {
 
-		Entity entity;
+		public ToggleEntityFlag(String flag, Entity... objects) {
+			super(flag, objects);
+		}
+
+	}
+
+	public class ToggleMentionFlag extends ToggleFlag<Mention> {
+
+		public ToggleMentionFlag(String flag, Mention... objects) {
+			super(flag, objects);
+		}
+
+	}
+
+	public abstract class ToggleFlag<T extends FeatureStructure> extends UpdateOp<T> {
+
+		String flag;
+
+		@SafeVarargs
+		public ToggleFlag(String flag, T... objects) {
+			super(objects);
+			this.flag = flag;
+		}
+
+		public String getFlag() {
+			return flag;
+		}
+
+		public void setFlag(String flag) {
+			this.flag = flag;
+		}
+
+	}
+
+	public class RenameEntity extends UpdateOp<Entity> {
+
 		String newLabel;
 		String oldLabel;
 
 		public RenameEntity(Entity entity, String newName) {
-			this.entity = entity;
+			super(entity);
 			this.oldLabel = entity.getLabel();
 			this.newLabel = newName;
 		}
 
 		public Entity getEntity() {
-			return entity;
+			return this.getObjects().getFirst();
 		}
 
 		public String getNewLabel() {
@@ -420,6 +455,24 @@ public interface Op {
 
 		public String getOldLabel() {
 			return oldLabel;
+		}
+
+	}
+
+	public abstract class UpdateOp<T extends FeatureStructure> implements Op {
+		ImmutableList<T> objects;
+
+		@SafeVarargs
+		public UpdateOp(T... objects) {
+			this.objects = Lists.immutable.of(objects);
+		}
+
+		public ImmutableList<T> getObjects() {
+			return objects;
+		}
+
+		public void setObjects(ImmutableList<T> objects) {
+			this.objects = objects;
 		}
 
 	}

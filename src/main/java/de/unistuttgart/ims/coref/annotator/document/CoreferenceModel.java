@@ -45,6 +45,8 @@ import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
+import de.unistuttgart.ims.coref.annotator.document.Op.ToggleEntityFlag;
+import de.unistuttgart.ims.coref.annotator.document.Op.ToggleMentionFlag;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -222,6 +224,12 @@ public class CoreferenceModel {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.push(op);
+		} else if (operation instanceof Op.ToggleEntityFlag) {
+			edit((Op.ToggleEntityFlag) operation);
+			history.push(operation);
+		} else if (operation instanceof Op.ToggleMentionFlag) {
+			edit((Op.ToggleMentionFlag) operation);
+			history.push(operation);
 		} else if (operation instanceof Op.AddEntityToEntityGroup) {
 			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			MutableList<Entity> oldArr = Util.toList(op.getEntityGroup().getMembers());
@@ -337,6 +345,10 @@ public class CoreferenceModel {
 		if (operation instanceof Op.RenameEntity) {
 			Op.RenameEntity op = (Op.RenameEntity) operation;
 			op.getEntity().setLabel(op.getOldLabel());
+		} else if (operation instanceof Op.ToggleEntityFlag) {
+			edit((ToggleEntityFlag) operation);
+		} else if (operation instanceof Op.ToggleMentionFlag) {
+			edit((ToggleMentionFlag) operation);
 		} else if (operation instanceof Op.AddEntityToEntityGroup) {
 			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
@@ -562,20 +574,24 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Update, entity, entityMentionMap.get(entity).toList().toImmutable()));
 	}
 
-	public void toggleFlagEntity(Entity m, String flag) {
-		if (Util.contains(m.getFlags(), flag)) {
-			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
-		} else
-			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
-		fireEvent(Event.get(Event.Type.Update, m));
+	private void edit(Op.ToggleEntityFlag operation) {
+		operation.getObjects().forEach(e -> {
+			if (Util.contains(e.getFlags(), operation.getFlag())) {
+				e.setFlags(Util.removeFrom(jcas, e.getFlags(), operation.getFlag()));
+			} else
+				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
+		});
+		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
-	public void toggleFlagMention(Mention m, String flag) {
-		if (Util.contains(m.getFlags(), flag)) {
-			m.setFlags(Util.removeFrom(jcas, m.getFlags(), flag));
-		} else
-			m.setFlags(Util.addTo(jcas, m.getFlags(), flag));
-		fireEvent(Event.get(Event.Type.Update, m));
+	private void edit(Op.ToggleMentionFlag operation) {
+		operation.getObjects().forEach(m -> {
+			if (Util.contains(m.getFlags(), operation.getFlag())) {
+				m.setFlags(Util.removeFrom(jcas, m.getFlags(), operation.getFlag()));
+			} else
+				m.setFlags(Util.addTo(jcas, m.getFlags(), operation.getFlag()));
+		});
+		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
 	public void toggleHidden(Entity entity) {

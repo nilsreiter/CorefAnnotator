@@ -1659,7 +1659,9 @@ public class DocumentWindow extends JFrame
 			for (TreePath tp : tree.getSelectionPaths()) {
 				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
 				Entity entity = (Entity) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
+
+				documentModel.getCoreferenceModel()
+						.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, entity));
 			}
 
 		}
@@ -1698,7 +1700,7 @@ public class DocumentWindow extends JFrame
 		public void actionPerformed(ActionEvent e) {
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
+			documentModel.getCoreferenceModel().edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT, m));
 
 		}
 
@@ -1719,7 +1721,8 @@ public class DocumentWindow extends JFrame
 			for (TreePath tp : tree.getSelectionPaths()) {
 				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
 				Mention m = (Mention) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_NON_NOMINAL);
+				documentModel.getCoreferenceModel()
+						.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL, m));
 			}
 
 		}
@@ -1739,8 +1742,7 @@ public class DocumentWindow extends JFrame
 		public void actionPerformed(ActionEvent e) {
 			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
 			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
-
+			documentModel.getCoreferenceModel().edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS, m));
 		}
 
 	}
