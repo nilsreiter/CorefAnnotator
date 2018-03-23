@@ -1823,7 +1823,7 @@ public class DocumentWindow extends JFrame
 					}
 					JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
 					candidates.forEach(entity -> {
-						JMenuItem mi = new JMenuItem(Util.toString(entity.getLabel()));
+						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
 						mi.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {

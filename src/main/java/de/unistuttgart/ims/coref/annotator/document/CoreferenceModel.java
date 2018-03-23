@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,6 +16,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
@@ -504,8 +504,15 @@ public class CoreferenceModel {
 		crModelListeners.forEach(l -> l.entityEvent(event));
 	}
 
-	public Set<Mention> get(Entity entity) {
-		return entityMentionMap.get(entity);
+	public String getLabel(Entity entity) {
+		if (entity.getLabel() != null)
+			return entity.getLabel();
+
+		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
+	}
+
+	public ImmutableSet<Mention> get(Entity entity) {
+		return entityMentionMap.get(entity).toImmutable();
 	}
 
 	public JCas getJCas() {

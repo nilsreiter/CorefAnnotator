@@ -33,7 +33,7 @@ public class PreceedingRanker implements EntityRankingPlugin {
 				.collect(m -> m.getEntity()).toSortedSet(new Comparator<Entity>() {
 					@Override
 					public int compare(Entity o1, Entity o2) {
-						return o1.getLabel().compareTo(o2.getLabel());
+						return cModel.getLabel(o1).compareTo(cModel.getLabel(o2));
 					}
 				});
 	}
