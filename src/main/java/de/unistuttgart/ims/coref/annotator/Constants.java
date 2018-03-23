@@ -114,6 +114,7 @@ public class Constants {
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
 		public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
+		public static final String ACTION_SHOW_HISTORY = "action.show.history";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
 		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 		public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
@@ -178,12 +179,11 @@ public class Constants {
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
+		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String ACTION_SHOW_HISTORY = "action.show.history";
-		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 
 	}
 
