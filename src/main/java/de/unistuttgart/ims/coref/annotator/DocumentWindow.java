@@ -385,6 +385,7 @@ public class DocumentWindow extends JFrame
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
 		toggleEntityDisplayed.setEnabled(false);
+		undoAction.setEnabled(false);
 		Annotator.logger.trace("Actions initialised.");
 
 	}
