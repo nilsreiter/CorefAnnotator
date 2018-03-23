@@ -9,6 +9,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   attribute is considered a mention. Elements with `who` attribute are 
   treated specially, because dramas (i.e., the sub-ordinate `speaker`-
   element is considered the mention). #72
+- Undo support. Pressing ctrl/cmd-z undos the last action. The history 
+  is saved as long as the document is left open. #65
 
 ## 1.2.1
 

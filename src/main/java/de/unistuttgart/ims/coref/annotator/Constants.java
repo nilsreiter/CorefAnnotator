@@ -114,6 +114,7 @@ public class Constants {
 		public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 		public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
 		public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
+		public static final String ACTION_SHOW_HISTORY = "action.show.history";
 		public static final String ACTION_SHOW_LOG = "action.show.log";
 		public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 		public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
@@ -130,6 +131,7 @@ public class Constants {
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 		public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 		public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
+		public static final String ACTION_UNDO = "action.undo";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
 		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
@@ -139,8 +141,8 @@ public class Constants {
 		public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
 		public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
 		public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
-		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
+		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
 		public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
@@ -175,13 +177,13 @@ public class Constants {
 		public static final String MESSAGE_SAVING = "message.saving";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
+		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
+		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 		public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 		public static final String STATUS_STYLE = "status.style";
-		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 
 	}
 
@@ -197,16 +199,13 @@ public class Constants {
 	public static final String CFG_WINDOWTITLE = "Windowtitle";
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
+	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
-	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
-
 	public static final String PREF_RECENT = "recent_files";
-
-	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
 
 	public static final Setting<Boolean> SETTING_DELETE_EMPTY_ENTITIES = new Setting<Boolean>(CFG_DELETE_EMPTY_ENTITIES,
 			Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, true,
@@ -227,4 +226,8 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
+
+	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
+
+	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 }

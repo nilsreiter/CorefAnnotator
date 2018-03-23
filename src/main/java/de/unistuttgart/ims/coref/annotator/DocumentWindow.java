@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,7 +90,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -107,6 +107,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
+import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
@@ -119,6 +120,12 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.DocumentState;
+import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -126,7 +133,7 @@ import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class DocumentWindow extends JFrame
-		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow {
+		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow, DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -139,7 +146,6 @@ public class DocumentWindow extends JFrame
 	// storing and caching
 	boolean unsavedChanges = false;
 	Feature titleFeature;
-	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
 	AbstractAction commentAction = new CommentAction(null);
@@ -159,7 +165,7 @@ public class DocumentWindow extends JFrame
 	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
-	AbstractAction copyAction;
+	AbstractAction copyAction, undoAction;
 
 	// controller
 	DocumentModel documentModel;
@@ -362,6 +368,7 @@ public class DocumentWindow extends JFrame
 		this.fileSaveAction = new FileSaveAction(this);
 		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
 		this.copyAction = new CopyAction(this, mainApplication);
+		this.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
 		newEntityAction.setEnabled(false);
@@ -375,6 +382,7 @@ public class DocumentWindow extends JFrame
 		toggleMentionAmbiguous.setEnabled(false);
 		toggleEntityGeneric.setEnabled(false);
 		toggleEntityDisplayed.setEnabled(false);
+		undoAction.setEnabled(false);
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -445,6 +453,7 @@ public class DocumentWindow extends JFrame
 		toolsMenu.add(setDocumentLanguageAction);
 		toolsMenu.add(clearAction);
 		toolsMenu.addSeparator();
+		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
 		return toolsMenu;
 	}
@@ -482,6 +491,7 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(undoAction));
 		entityMenu.add(new JMenuItem(copyAction));
 		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(commentAction));
@@ -678,7 +688,7 @@ public class DocumentWindow extends JFrame
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
 				jcas.setDocumentLanguage(Util.getLanguage(lang));
-				registerChange();
+
 			}
 		}
 
@@ -791,33 +801,50 @@ public class DocumentWindow extends JFrame
 
 	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void entityEvent(Event event, Entity entity) {
-		switch (event) {
+	public void entityEvent(FeatureStructureEvent event) {
+		Event.Type eventType = event.getType();
+		Iterator<FeatureStructure> iter = event.iterator(1);
+		switch (eventType) {
 		case Add:
-			if (entity.getKey() != null) {
-				keyMap.put(entity.getKey().charAt(0), entity);
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+					highlightManager.underline((Annotation) fs);
+				} else if (fs instanceof CommentAnchor) {
+					highlightManager.highlight((Annotation) fs);
+				}
 			}
 			break;
 		case Remove:
-			if (entity.getKey() != null) {
-				keyMap.remove(entity.getKey().charAt(0));
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Mention) {
+					if (((Mention) fs).getDiscontinuous() != null)
+						highlightManager.undraw(((Mention) fs).getDiscontinuous());
+					highlightManager.undraw((Annotation) fs);
+				} else if (fs instanceof Annotation)
+					highlightManager.undraw((Annotation) fs);
+
 			}
 			break;
+		case Update:
+			for (FeatureStructure fs : event) {
+				if (fs instanceof Mention) {
+					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+						highlightManager.undraw((Annotation) fs);
+					else
+						highlightManager.underline((Annotation) fs);
+				}
+			}
 		}
-	}
 
-	protected synchronized void registerChange() {
-		if (unsavedChanges == false) {
-			unsavedChanges = true;
-			setWindowTitle();
-			fileSaveAction.setEnabled(file != null);
-		}
 	}
 
 	public void setDocumentModel(DocumentModel model) {
 
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
+		model.addDocumentStateListener(this);
 		documentModel = model;
 
 		// UI
@@ -928,9 +955,9 @@ public class DocumentWindow extends JFrame
 		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
 		// tree.expandPath(e.getTreePath());
 		/*
-		 * try { TreePath tp = e.getTreePath(); Rectangle r =
-		 * tree.getPathBounds(tp); tree.repaint(r); } catch
-		 * (NullPointerException ex) { Annotator.logger.catching(ex); }
+		 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
+		 * tree.repaint(r); } catch (NullPointerException ex) {
+		 * Annotator.logger.catching(ex); }
 		 */
 	}
 
@@ -1021,8 +1048,18 @@ public class DocumentWindow extends JFrame
 					@SuppressWarnings("unchecked")
 					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					for (Span pa : paList)
-						handleSpanTransfer(pa);
+					Op op = null;
+					if (targetFS == null) {
+						op = new Op.AddMentionsToNewEntity(paList);
+					} else if (targetFS instanceof Entity) {
+						op = new Op.AddMentionsToEntity((Entity) targetFS, paList);
+					} else if (targetFS instanceof Mention) {
+						op = new Op.AttachPart((Mention) targetFS, paList.getFirst());
+					}
+					if (op != null) {
+						documentModel.getCoreferenceModel().edit(op);
+					}
+
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1040,42 +1077,22 @@ public class DocumentWindow extends JFrame
 			return true;
 		}
 
-		protected boolean handleSpanTransfer(Span potentialAnnotation) {
-
-			if (targetFS == null) {
-				documentModel.getCoreferenceModel().add(potentialAnnotation.begin, potentialAnnotation.end);
-				setMessage(Annotator.getString(Strings.MESSAGE_ENTITY_CREATED), true);
-			} else if (targetFS instanceof Entity) {
-				documentModel.getCoreferenceModel().addTo((Entity) targetFS, potentialAnnotation.begin,
-						potentialAnnotation.end);
-				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_CREATED), true);
-			} else if (targetFS instanceof Mention) {
-				documentModel.getCoreferenceModel().addTo((Mention) targetFS, potentialAnnotation.begin,
-						potentialAnnotation.end);
-				setMessage(Annotator.getString(Strings.MESSAGE_MENTION_PART_CREATED), true);
-			}
-			registerChange();
-			return true;
-		}
-
 		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
 			Annotator.logger.debug("Moving {} things", moved.size());
+			Op operation = null;
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					// moved.forEach(n ->
-					// documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
-					// (EntityGroup) targetFS));
-					moved.forEach(n -> documentModel.getCoreferenceModel().addTo((EntityGroup) targetFS,
-							n.getFeatureStructure()));
+					operation = new Op.AddEntityToEntityGroup((EntityGroup) targetFS,
+							moved.collect(n -> n.getFeatureStructure()));
 				} else
-					moved.forEach(n -> documentModel.getCoreferenceModel().moveTo(n.getFeatureStructure(),
-							(Entity) targetFS));
+					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
+							moved.collect(n -> (n.getFeatureStructure()))));
 			} else if (targetFS instanceof Mention)
-				moved.forEach(
-						n -> documentModel.getCoreferenceModel().moveTo((Mention) targetFS, n.getFeatureStructure()));
+				operation = new Op.MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
 				return false;
-			registerChange();
+			if (operation != null)
+				documentModel.getCoreferenceModel().edit(operation);
 			return true;
 		}
 
@@ -1120,10 +1137,9 @@ public class DocumentWindow extends JFrame
 					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 			if (newLabel != null) {
-				etn.getEntity().setLabel(newLabel);
-				// TODO: Update tree
-				// cModel.nodeChanged(etn);
-				registerChange();
+				Op.RenameEntity op = new Op.RenameEntity(etn.getEntity(), newLabel);
+				documentModel.getCoreferenceModel().edit(op);
+
 			}
 		}
 
@@ -1147,8 +1163,7 @@ public class DocumentWindow extends JFrame
 			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
 					Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
 			if (color != newColor) {
-				documentModel.getCoreferenceModel().updateColor(etn.getFeatureStructure(), newColor);
-				registerChange();
+				documentModel.getCoreferenceModel().edit(new Op.UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
 			}
 
 		}
@@ -1178,10 +1193,7 @@ public class DocumentWindow extends JFrame
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					etn.getEntity().setKey(newKey.substring(0, 1));
-					keyMap.put(newChar, etn.getFeatureStructure());
-					registerChange();
-
+					documentModel.getCoreferenceModel().edit(new Op.UpdateEntityKey(newChar, etn.getEntity()));
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
@@ -1206,9 +1218,8 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().add(getSelection());
-			registerChange();
-
+			AddMentionsToNewEntity op = new AddMentionsToNewEntity(getSelection());
+			documentModel.getCoreferenceModel().edit(op);
 		}
 
 	}
@@ -1231,7 +1242,7 @@ public class DocumentWindow extends JFrame
 
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
-			if (entity.getHidden() || treeNode.getRank() < 50) {
+			if (Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50) {
 				lab1.setForeground(Color.GRAY);
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_OUTLINE, Color.GRAY));
 			} else {
@@ -1319,30 +1330,32 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			registerChange();
+
 			for (TreePath tp : tree.getSelectionPaths())
 				deleteSingle((CATreeNode) tp.getLastPathComponent());
 		}
 
 		private void deleteSingle(CATreeNode tn) {
+			Op operation = null;
 			if (tn.getFeatureStructure() instanceof Mention) {
 				int row = tree.getLeadSelectionRow() - 1;
-				documentModel.getCoreferenceModel().remove((Mention) tn.getFeatureStructure());
+				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
 				tree.setSelectionRow(row);
 			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-				documentModel.getCoreferenceModel().remove((EntityGroup) tn.getFeatureStructure());
+				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getFeatureStructure()));
 			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-				// highlightManager.undraw(dmp);
-				documentModel.getCoreferenceModel().remove(dmp);
+				documentModel.getCoreferenceModel().edit(new Op.RemovePart(dmp.getMention(), dmp));
 			} else if (tn.isEntity()) {
 				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
 				if (parentFs instanceof EntityGroup) {
-					documentModel.getCoreferenceModel().removeFrom((EntityGroup) parentFs, tn.getEntity());
+					operation = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
 				} else if (tn.isLeaf()) {
-					documentModel.getCoreferenceModel().remove(tn.getEntity());
+					documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getEntity()));
 				}
 			}
+			if (operation != null)
+				documentModel.getCoreferenceModel().edit(operation);
 		}
 
 	}
@@ -1362,8 +1375,8 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			registerChange();
-			documentModel.getCoreferenceModel().remove(m);
+
+			documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 		}
 
 	}
@@ -1371,12 +1384,10 @@ public class DocumentWindow extends JFrame
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			JTextComponent ta = (JTextComponent) e.getSource();
-			if (keyMap.containsKey(e.getKeyChar())) {
+			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.getCoreferenceModel().addTo(keyMap.get(e.getKeyChar()), ta.getSelectionStart(),
-						ta.getSelectionEnd());
-				registerChange();
+				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
+						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			}
 		}
 
@@ -1433,9 +1444,8 @@ public class DocumentWindow extends JFrame
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						for (Span sp : spans)
-							documentModel.getCoreferenceModel().addTo(m.getEntity(), sp.begin, sp.end);
-						registerChange();
+						documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(m.getEntity(), spans));
+
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
 					}
@@ -1455,11 +1465,12 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
+			// TODO: New operation for clearing
 			for (Mention m : JCasUtil.select(jcas, Mention.class))
-				documentModel.getCoreferenceModel().remove(m);
+				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
 			for (Entity e : JCasUtil.select(jcas, Entity.class))
-				documentModel.getCoreferenceModel().remove(e);
-			registerChange();
+				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(e));
+
 		}
 
 	}
@@ -1505,8 +1516,8 @@ public class DocumentWindow extends JFrame
 				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
 				entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 			}
-			documentModel.getCoreferenceModel().merge(entities);
-			registerChange();
+			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(entities));
+
 		}
 
 	}
@@ -1529,8 +1540,8 @@ public class DocumentWindow extends JFrame
 					.getFeatureStructure();
 			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
 					.getFeatureStructure();
-			documentModel.getCoreferenceModel().formGroup(e1, e2);
-			registerChange();
+			documentModel.getCoreferenceModel().edit(new Op.GroupEntities(e1, e2));
+
 		}
 
 	}
@@ -1628,12 +1639,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (TreePath tp : tree.getSelectionPaths()) {
-				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-				Entity entity = (Entity) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().toggleFlagEntity(entity, Constants.ENTITY_FLAG_GENERIC);
-			}
-			registerChange();
+			documentModel.getCoreferenceModel().edit(
+					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, Lists.immutable.of(tree.getSelectionPaths())
+							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
@@ -1646,13 +1654,9 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (tree.getSelectionCount() > 0) {
-				for (TreePath tp : tree.getSelectionPaths()) {
-					CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-					Entity entity = (Entity) tn.getFeatureStructure();
-					documentModel.getCoreferenceModel().toggleHidden(entity);
-				}
-			}
+			documentModel.getCoreferenceModel().edit(
+					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN, Lists.immutable.of(tree.getSelectionPaths())
+							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
@@ -1668,11 +1672,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_DIFFICULT);
-			registerChange();
-
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}
@@ -1689,12 +1692,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (TreePath tp : tree.getSelectionPaths()) {
-				CATreeNode tn = (CATreeNode) tp.getLastPathComponent();
-				Mention m = (Mention) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_NON_NOMINAL);
-			}
-			registerChange();
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}
@@ -1710,11 +1711,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode tn = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			Mention m = (Mention) tn.getFeatureStructure();
-			documentModel.getCoreferenceModel().toggleFlagMention(m, Constants.MENTION_FLAG_AMBIGUOUS);
-			registerChange();
-
+			documentModel.getCoreferenceModel()
+					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
+							Lists.immutable.of(tree.getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 
 	}
@@ -2074,7 +2074,8 @@ public class DocumentWindow extends JFrame
 					for (TreePath tp : tree.getSelectionPaths()) {
 						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.getCoreferenceModel().addTo(etn.getEntity(), b, e);
+							documentModel.getCoreferenceModel()
+									.edit(new Op.AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
 						}
 					}
 					treeSearchField.setText("");
@@ -2124,46 +2125,16 @@ public class DocumentWindow extends JFrame
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 	}
 
-	@Override
-	public void annotationEvent(Event event, Annotation annotation) {
-		switch (event) {
-		case Add:
-			if (annotation instanceof Mention)
-				highlightManager.underline(annotation);
-			else if (annotation instanceof CommentAnchor)
-				highlightManager.highlight(annotation);
-			break;
-		case Remove:
-			if (annotation instanceof Mention && ((Mention) annotation).getDiscontinuous() != null)
-				highlightManager.undraw(((Mention) annotation).getDiscontinuous());
-			highlightManager.undraw(annotation);
-			break;
-		case Update:
-			if (annotation instanceof Mention) {
-				if (((Mention) annotation).getEntity().getHidden())
-					highlightManager.undraw(annotation);
-				else
-					highlightManager.underline(annotation);
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void entityGroupEvent(Event event, EntityGroup entity) {
-		entityEvent(event, entity);
-	}
-
-	@Override
-	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public DocumentModel getDocumentModel() {
 		return documentModel;
+	}
+
+	@Override
+	public void documentStateEvent(DocumentState state) {
+		undoAction.setEnabled(state.getHistorySize() > 0);
+		fileSaveAction.setEnabled(state.getHistorySize() > 0);
+		unsavedChanges = (state.getHistorySize() > 0);
+		setWindowTitle();
 	}
 
 }
