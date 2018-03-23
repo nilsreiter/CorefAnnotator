@@ -166,11 +166,14 @@ public class CoreferenceModel {
 		return d;
 	}
 
+	private DetachedMentionPart addTo(Mention m, Span sp) {
+		return addTo(m, sp.begin, sp.end);
+	}
+
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
 		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(jcas, b, e, DetachedMentionPart.class);
 		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			dmp = AnnotationUtil.trim(dmp);
-
 		registerAnnotation(dmp);
 		return dmp;
 	}
@@ -265,7 +268,7 @@ public class CoreferenceModel {
 			history.push(op);
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
-			op.setPart(addTo(op.getMention(), op.getSpan().begin, op.getSpan().end));
+			op.setPart(addTo(op.getMention(), op.getSpan()));
 			fireEvent(Event.get(Event.Type.Add, op.getMention(), op.getPart()));
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
@@ -285,13 +288,7 @@ public class CoreferenceModel {
 			fireEvent(Event.get(Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
-			Op.RemoveMention op = (RemoveMention) operation;
-			op.getMentions().forEach(m -> {
-				remove(m, false);
-			});
-			fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
-			op.setMentions(null);
-			history.push(op);
+			edit((RemoveMention) operation);
 		} else if (operation instanceof Op.RemoveEntities) {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> remove(e));
@@ -304,7 +301,6 @@ public class CoreferenceModel {
 			Op.RemovePart op = (Op.RemovePart) operation;
 			remove(op.getPart());
 			fireEvent(Event.get(Type.Remove, op.getMention(), op.getPart()));
-			op.setPart(null);
 			history.push(op);
 		} else if (operation instanceof Op.GroupEntities) {
 			Op.GroupEntities op = (GroupEntities) operation;
@@ -370,12 +366,11 @@ public class CoreferenceModel {
 			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (RemovePart) operation;
-			op.setPart(addTo(op.getMention(), op.getSpan().begin, op.getSpan().end));
+			op.getPart().setMention(op.getMention());
+			op.getMention().setDiscontinuous(op.getPart());
 			fireEvent(Event.get(Type.Add, op.getMention(), op.getPart()));
 		} else if (operation instanceof Op.RemoveMention) {
-			Op.RemoveMention op = (RemoveMention) operation;
-			op.setMentions(op.getSpans().collect(s -> addTo(op.getEntity(), s)));
-			fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
+			undo((RemoveMention) operation);
 		} else if (operation instanceof Op.RemoveEntities) {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> {
@@ -409,6 +404,39 @@ public class CoreferenceModel {
 			remove(op.getEntityGroup());
 			fireEvent(Event.get(Event.Type.Remove, null, op.getEntityGroup()));
 		}
+	}
+
+	private void edit(Op.RemoveMention op) {
+		op.getMentions().forEach(m -> {
+			remove(m, false);
+			if (m.getDiscontinuous() != null) {
+				DetachedMentionPart dmp = m.getDiscontinuous();
+				remove(dmp);
+				fireEvent(Event.get(Type.Remove, m, dmp));
+			}
+		});
+		fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
+		history.push(op);
+	}
+
+	private void undo(Op.RemoveMention op) {
+		// re-create all mentions and set them to the op
+		op.getMentions().forEach(m -> {
+			m.addToIndexes();
+			m.setEntity(op.getEntity());
+			entityMentionMap.put(op.getEntity(), m);
+			characterPosition2AnnotationMap.add(m);
+			if (m.getDiscontinuous() != null) {
+				m.getDiscontinuous().addToIndexes();
+				characterPosition2AnnotationMap.add(m.getDiscontinuous());
+			}
+		});
+		// fire event to draw them
+		fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
+		// re-create attached parts (if any)
+		op.getMentions().select(m -> m.getDiscontinuous() != null)
+				.forEach(m -> fireEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous())));
+
 	}
 
 	protected void fireEvent(FeatureStructureEvent event) {
@@ -475,7 +503,6 @@ public class CoreferenceModel {
 	 * @param dmp
 	 */
 	private void remove(DetachedMentionPart dmp) {
-		dmp.getMention().setDiscontinuous(null);
 		dmp.removeFromIndexes();
 		characterPosition2AnnotationMap.remove(dmp);
 	}
@@ -496,7 +523,6 @@ public class CoreferenceModel {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(entity, m);
-		// fireEvent(Event.get(Event.Type.Remove, m.getEntity(), m));
 		m.removeFromIndexes();
 		if (autoRemove && entityMentionMap.get(entity).isEmpty()
 				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
