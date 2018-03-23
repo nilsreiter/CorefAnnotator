@@ -1070,8 +1070,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			Annotator.logger.debug("Moving {} things", moved.size());
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (EntityGroup) targetFS));
-					moved.forEach(n -> cModel.addTo((EntityGroup) targetFS, n.getFeatureStructure()));
+					moved.select(n -> n.getFeatureStructure() instanceof Mention)
+							.forEach(n -> cModel.moveTo((Mention) n.getFeatureStructure(), (EntityGroup) targetFS));
+					moved.select(n -> n.getFeatureStructure() instanceof Entity)
+							.forEach(n -> cModel.addTo((EntityGroup) targetFS, n.getFeatureStructure()));
 				} else
 					moved.forEach(n -> cModel.moveTo(n.getFeatureStructure(), (Entity) targetFS));
 			} else if (targetFS instanceof Mention)
