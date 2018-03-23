@@ -46,6 +46,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
 	class ListTransferHandler extends TransferHandler {
@@ -58,7 +59,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
 			return new PotentialAnnotationTransfer(documentWindow.textPane,
-					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> new Span(sr.begin, sr.end)));
+					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
 		}
 
 		@Override
@@ -82,9 +83,10 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to entity");
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
-			for (SearchResult result : list.getSelectedValuesList()) {
-				documentWindow.getCoreferenceModel().addTo(node.getEntity(), result.getBegin(), result.getEnd());
-			}
+
+			Op.AddMentionsToEntity op = new Op.AddMentionsToEntity(node.getEntity(),
+					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
+			documentWindow.getCoreferenceModel().edit(op);
 		}
 	}
 
@@ -100,15 +102,9 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to new entity");
-
-			Entity entity = null;
-
-			for (SearchResult result : list.getSelectedValuesList()) {
-				if (entity == null)
-					entity = documentWindow.getCoreferenceModel().add(result.getBegin(), result.getEnd()).getEntity();
-				else
-					documentWindow.getCoreferenceModel().addTo(entity, result.getBegin(), result.getEnd());
-			}
+			Op.AddMentionsToNewEntity op = new Op.AddMentionsToNewEntity(
+					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
+			documentWindow.getCoreferenceModel().edit(op);
 		}
 	}
 
@@ -285,25 +281,29 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	}
 
 	class SearchResult {
+		Span span;
+
 		public SearchResult(int begin, int end) {
 			super();
-			this.begin = begin;
-			this.end = end;
+			this.span = new Span(begin, end);
 		}
 
-		int begin, end;
-
 		public int getBegin() {
-			return begin;
+			return span.begin;
 		}
 
 		public int getEnd() {
-			return end;
+			return span.end;
 		}
 
 		@Override
 		public String toString() {
-			return text.substring(Integer.max(begin - contexts, 0), Integer.min(end + contexts, text.length() - 1));
+			return text.substring(Integer.max(span.begin - contexts, 0),
+					Integer.min(span.end + contexts, text.length() - 1));
+		}
+
+		public Span getSpan() {
+			return span;
 		}
 	}
 
@@ -329,12 +329,14 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 				panel.setBackground(list.getBackground());
 				panel.setForeground(list.getForeground());
 			}
-			JLabel left = new JLabel(text.substring(Integer.max(value.begin - contexts, 0), value.begin));
-			JLabel right = new JLabel(text.substring(value.end, Integer.min(value.end + contexts, text.length() - 1)));
+			JLabel left = new JLabel(
+					text.substring(Integer.max(value.getSpan().begin - contexts, 0), value.getSpan().begin));
+			JLabel right = new JLabel(text.substring(value.getSpan().end,
+					Integer.min(value.getSpan().end + contexts, text.length() - 1)));
 			left.setFont(contextFont);
 			right.setFont(contextFont);
 
-			JLabel center = new JLabel(text.substring(value.begin, value.end));
+			JLabel center = new JLabel(text.substring(value.getSpan().begin, value.getSpan().end));
 			center.setFont(centerFont);
 			panel.add(left);
 			panel.add(center);
