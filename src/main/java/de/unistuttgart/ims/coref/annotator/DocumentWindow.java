@@ -90,7 +90,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -148,7 +147,6 @@ public class DocumentWindow extends JFrame
 	// storing and caching
 	boolean unsavedChanges = false;
 	Feature titleFeature;
-	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	// actions
 	AbstractAction commentAction = new CommentAction(null);
@@ -811,12 +809,7 @@ public class DocumentWindow extends JFrame
 		case Add:
 			while (iter.hasNext()) {
 				FeatureStructure fs = iter.next();
-				if (fs instanceof Entity) {
-					Entity entity = (Entity) fs;
-					if (entity.getKey() != null) {
-						keyMap.put(entity.getKey().charAt(0), entity);
-					}
-				} else if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
 					highlightManager.underline((Annotation) fs);
 				} else if (fs instanceof CommentAnchor) {
 					highlightManager.highlight((Annotation) fs);
@@ -826,10 +819,7 @@ public class DocumentWindow extends JFrame
 		case Remove:
 			while (iter.hasNext()) {
 				FeatureStructure fs = iter.next();
-				if (fs instanceof Entity) {
-					if (((Entity) fs).getKey() != null)
-						keyMap.remove(((Entity) fs).getKey().charAt(0));
-				} else if (fs instanceof Mention) {
+				if (fs instanceof Mention) {
 					if (((Mention) fs).getDiscontinuous() != null)
 						highlightManager.undraw(((Mention) fs).getDiscontinuous());
 					highlightManager.undraw((Annotation) fs);
@@ -845,9 +835,6 @@ public class DocumentWindow extends JFrame
 						highlightManager.undraw((Annotation) fs);
 					else
 						highlightManager.underline((Annotation) fs);
-				} else if (fs instanceof Entity) {
-					if (((Entity) fs).getKey() != null)
-						keyMap.put(((Entity) fs).getKey().charAt(0), (Entity) fs);
 				}
 			}
 		}
@@ -1177,8 +1164,7 @@ public class DocumentWindow extends JFrame
 			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
 					Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
 			if (color != newColor) {
-				documentModel.getCoreferenceModel().updateColor(etn.getFeatureStructure(), newColor);
-
+				documentModel.getCoreferenceModel().edit(new Op.UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
 			}
 
 		}
@@ -1208,9 +1194,7 @@ public class DocumentWindow extends JFrame
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					etn.getEntity().setKey(newKey.substring(0, 1));
-					keyMap.put(newChar, etn.getFeatureStructure());
-
+					documentModel.getCoreferenceModel().edit(new Op.UpdateEntityKey(newChar, etn.getEntity()));
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
@@ -1401,10 +1385,10 @@ public class DocumentWindow extends JFrame
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if (keyMap.containsKey(e.getKeyChar())) {
+			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.getCoreferenceModel()
-						.edit(new Op.AddMentionsToEntity(keyMap.get(e.getKeyChar()), getSelection()));
+				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
+						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			}
 		}
 

@@ -5,6 +5,7 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 public class DocumentModel {
+
 	JCas jcas;
 
 	CommentsModel commentsModel;

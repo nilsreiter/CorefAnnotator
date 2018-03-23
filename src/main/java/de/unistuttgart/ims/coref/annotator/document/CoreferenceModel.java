@@ -1,9 +1,9 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -17,6 +17,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -47,6 +48,8 @@ import de.unistuttgart.ims.coref.annotator.document.Op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.Op.RenameEntity;
 import de.unistuttgart.ims.coref.annotator.document.Op.ToggleEntityFlag;
 import de.unistuttgart.ims.coref.annotator.document.Op.ToggleMentionFlag;
+import de.unistuttgart.ims.coref.annotator.document.Op.UpdateEntityColor;
+import de.unistuttgart.ims.coref.annotator.document.Op.UpdateEntityKey;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -75,6 +78,8 @@ public class CoreferenceModel {
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
 	MutableSetMultimap<Object, Mention> entityMentionMap = Multimaps.mutable.set.empty();
+
+	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
 	/**
 	 * The document
@@ -224,6 +229,26 @@ public class CoreferenceModel {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.push(op);
+		} else if (operation instanceof Op.UpdateEntityKey) {
+			Op.UpdateEntityKey op = (UpdateEntityKey) operation;
+			if (keyMap.containsKey(op.getNewKey())) {
+				Entity prev = keyMap.get(op.getNewKey());
+				op.setPreviousOwner(prev);
+				prev.setKey(null);
+			}
+			op.getObjects().getFirst().setKey(op.getNewKey().toString());
+			keyMap.put(op.getNewKey(), op.getEntity());
+			if (op.getPreviousOwner() != null)
+				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
+			else
+				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst()));
+			history.push(op);
+		} else if (operation instanceof Op.UpdateEntityColor) {
+			Op.UpdateEntityColor op = (UpdateEntityColor) operation;
+			op.getObjects().getFirst().setColor(op.getNewColor());
+			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
+			history.push(operation);
 		} else if (operation instanceof Op.ToggleEntityFlag) {
 			edit((Op.ToggleEntityFlag) operation);
 			history.push(operation);
@@ -345,10 +370,33 @@ public class CoreferenceModel {
 		if (operation instanceof Op.RenameEntity) {
 			Op.RenameEntity op = (Op.RenameEntity) operation;
 			op.getEntity().setLabel(op.getOldLabel());
+		} else if (operation instanceof Op.UpdateEntityKey) {
+			Op.UpdateEntityKey op = (UpdateEntityKey) operation;
+			if (op.getPreviousOwner() != null) {
+				op.getPreviousOwner().setKey(op.getNewKey().toString());
+				keyMap.put(op.getNewKey(), op.getPreviousOwner());
+			} else {
+				keyMap.remove(op.getNewKey());
+			}
+			if (op.getOldKey() != null) {
+				op.getEntity().setKey(op.getOldKey().toString());
+				keyMap.put(op.getOldKey(), op.getEntity());
+			} else {
+				op.getEntity().setKey(null);
+			}
+			if (op.getPreviousOwner() != null)
+				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
+			else
+				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst()));
 		} else if (operation instanceof Op.ToggleEntityFlag) {
 			edit((ToggleEntityFlag) operation);
 		} else if (operation instanceof Op.ToggleMentionFlag) {
 			edit((ToggleMentionFlag) operation);
+		} else if (operation instanceof Op.UpdateEntityColor) {
+			Op.UpdateEntityColor op = (UpdateEntityColor) operation;
+			op.getObjects().getFirst().setColor(op.getOldColor());
+			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
 		} else if (operation instanceof Op.AddEntityToEntityGroup) {
 			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
@@ -569,12 +617,6 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Remove, eg, entity));
 	}
 
-	@Deprecated
-	private void setHidden(Entity entity, boolean hidden) {
-		entity.setHidden(hidden);
-		fireEvent(Event.get(Event.Type.Update, entity, entityMentionMap.get(entity).toList().toImmutable()));
-	}
-
 	private void edit(Op.ToggleEntityFlag operation) {
 		operation.getObjects().forEach(e -> {
 			if (Util.contains(e.getFlags(), operation.getFlag())) {
@@ -595,21 +637,13 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
-	@Deprecated
-	public void toggleHidden(Entity entity) {
-		setHidden(entity, !entity.getHidden());
-	}
-
-	public void updateColor(Entity entity, Color newColor) {
-		entity.setColor(newColor.getRGB());
-		fireEvent(Event.get(Event.Type.Update, entity, entityMentionMap.get(entity).toList().toImmutable()));
-	}
-
 	public void initialPainting() {
 		if (initialised)
 			return;
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
 			fireEvent(Event.get(Event.Type.Add, null, entity));
+			if (entity.getKey() != null)
+				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
 		}
 		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
@@ -622,6 +656,10 @@ public class CoreferenceModel {
 
 	public Deque<Op> getHistory() {
 		return history;
+	}
+
+	public Map<Character, Entity> getKeyMap() {
+		return keyMap;
 	}
 
 }

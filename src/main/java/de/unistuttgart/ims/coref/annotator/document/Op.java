@@ -464,6 +464,74 @@ public interface Op {
 
 	}
 
+	public class UpdateEntityColor extends UpdateOp<Entity> {
+		int oldColor;
+		int newColor;
+
+		public UpdateEntityColor(int newColor, Entity entity) {
+			super(entity);
+			this.newColor = newColor;
+			this.oldColor = entity.getColor();
+		}
+
+		public int getOldColor() {
+			return oldColor;
+		}
+
+		public void setOldColor(int oldColor) {
+			this.oldColor = oldColor;
+		}
+
+		public int getNewColor() {
+			return newColor;
+		}
+
+		public void setNewColor(int newColor) {
+			this.newColor = newColor;
+		}
+	}
+
+	public class UpdateEntityKey extends UpdateOp<Entity> {
+		Character oldKey = null;
+		Character newKey;
+		Entity previousOwner;
+
+		public UpdateEntityKey(char newKey, Entity entity) {
+			super(entity);
+			if (entity.getKey() != null)
+				oldKey = entity.getKey().charAt(0);
+			this.newKey = newKey;
+		}
+
+		public Character getOldKey() {
+			return oldKey;
+		}
+
+		public void setOldKey(Character oldKey) {
+			this.oldKey = oldKey;
+		}
+
+		public Character getNewKey() {
+			return newKey;
+		}
+
+		public void setNewKey(Character newKey) {
+			this.newKey = newKey;
+		}
+
+		public Entity getPreviousOwner() {
+			return previousOwner;
+		}
+
+		public void setPreviousOwner(Entity previousOwner) {
+			this.previousOwner = previousOwner;
+		}
+
+		public Entity getEntity() {
+			return getObjects().getFirst();
+		}
+	}
+
 	public abstract class UpdateOp<T extends FeatureStructure> implements Op {
 		ImmutableList<T> objects;
 
