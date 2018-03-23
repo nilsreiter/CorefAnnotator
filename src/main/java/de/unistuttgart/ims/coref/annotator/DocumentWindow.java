@@ -494,7 +494,7 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
-		entityMenu.add(new JMenuItem(new UndoAction(this)));
+		entityMenu.add(new JMenuItem(undoAction));
 		entityMenu.add(new JMenuItem(copyAction));
 		entityMenu.add(new JMenuItem(deleteAction));
 		entityMenu.add(new JMenuItem(commentAction));
