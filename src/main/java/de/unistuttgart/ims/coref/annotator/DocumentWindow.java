@@ -142,8 +142,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame
-		implements CaretListener, TreeModelListener, CoreferenceModelListener, HasTextView, DocumentStateListener {
+public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener,
+		HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -1587,7 +1587,7 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> {
+	public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> {
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityGeneric(DocumentWindow documentWindow) {
@@ -1597,9 +1597,10 @@ public class DocumentWindow extends JFrame
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			getTarget().getCoreferenceModel().edit(
-					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, Lists.immutable.of(tree.getSelectionPaths())
-							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
+			getTarget().getCoreferenceModel()
+					.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
+							Lists.immutable.of(getTarget().getTree().getSelectionPaths())
+									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
@@ -2084,6 +2085,7 @@ public class DocumentWindow extends JFrame
 
 	}
 
+	@Override
 	public JTree getTree() {
 		return tree;
 	}
