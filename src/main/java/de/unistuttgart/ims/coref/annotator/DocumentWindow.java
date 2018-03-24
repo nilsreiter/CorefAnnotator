@@ -113,6 +113,9 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
@@ -173,7 +176,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
 	AbstractAction fileSaveAction, showSearchPanelAction;
 	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
-	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
+	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(this);
 	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 	AbstractAction clearAction = new ClearAction();
 	AbstractAction copyAction, undoAction;
@@ -373,8 +376,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.changeKeyAction = new ChangeKeyForEntityAction();
 		this.deleteAction = new DeleteAction();
 		this.formGroupAction = new FormEntityGroup();
-		this.toggleMentionDifficult = new ToggleMentionDifficult();
-		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous();
+		this.toggleMentionDifficult = new ToggleMentionDifficult(this);
+		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
 		this.toggleEntityGeneric = new ToggleEntityGeneric(this);
 		this.sortByAlpha = new SortTreeByAlpha();
 		this.sortByMentions = new SortTreeByMentions();
@@ -1587,7 +1590,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 	}
 
-	class ToggleEntityVisible extends AnnotatorAction {
+	public class ToggleEntityVisible extends AnnotatorAction {
 		private static final long serialVersionUID = 1L;
 
 		public ToggleEntityVisible() {
@@ -1600,65 +1603,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN, Lists.immutable.of(tree.getSelectionPaths())
 							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
-	}
-
-	class ToggleMentionDifficult extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionDifficult() {
-			super(null, Strings.ACTION_FLAG_MENTION_DIFFICULT, MaterialDesign.MDI_ALERT_BOX);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
-	}
-
-	class ToggleMentionNonNominal extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionNonNominal() {
-			super(null, Strings.ACTION_FLAG_MENTION_NON_NOMINAL, MaterialDesign.MDI_FLAG);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
-	}
-
-	class ToggleMentionAmbiguous extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionAmbiguous() {
-			super(MaterialDesign.MDI_SHARE_VARIANT);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_MENTION_AMBIGUOUS));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
 	}
 
 	@Deprecated
