@@ -18,7 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -64,7 +63,7 @@ import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
-public class CompareMentionsWindow extends JFrame implements HasTextView, CoreferenceModelListener {
+public class CompareMentionsWindow extends AbstractWindow implements HasTextView, CoreferenceModelListener {
 
 	class CopyMentionAction extends AbstractAction {
 
@@ -183,6 +182,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 	JCas[] jcas = new JCas[2];
 	File[] files = new File[2];
 	int loadedJCas = 0;
+	int loadedCModels = 0;
 	Annotator mainApplication;
 	JPanel mentionsInfoPane;
 
@@ -363,6 +363,8 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 	}
 
 	protected void initialiseWindow() {
+
+		super.initialize();
 		Caret caret = new Caret();
 
 		// JTabbedPane tabbedPane = new JTabbedPane();
@@ -404,12 +406,22 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		pack();
 	}
 
+	private void finishLoading() {
+		if (loadedCModels >= 2) {
+			super.stopIndeterminateProgress();
+		}
+	}
+
 	public void setCoreferenceModelLeft(DocumentModel cm) {
 		models[0] = cm.getCoreferenceModel();
+		loadedCModels++;
+		finishLoading();
 	}
 
 	public void setCoreferenceModelRight(DocumentModel cm) {
 		models[1] = cm.getCoreferenceModel();
+		loadedCModels++;
+		finishLoading();
 	}
 
 	public void setJCasLeft(JCas jcas, String annotatorId) {
@@ -420,10 +432,6 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 			initialiseText(jcas);
 		drawAllAnnotations();
 		mentionsInfoPane.add(getAnnotatorPanel(0), 0);
-		// CasCopier.copyCas(jcas.getCas(), targetJCas.getCas(), true, true);
-		// targetModel = new CoreferenceModel(targetJCas,
-		// mainApplication.getPreferences());
-		// targetModel.addCoreferenceModelListener(this);
 		new DocumentModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
 		revalidate();
 	}

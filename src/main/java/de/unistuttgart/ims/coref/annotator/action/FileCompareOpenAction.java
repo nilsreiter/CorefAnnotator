@@ -61,23 +61,34 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SelectTwoFiles stf = (SelectTwoFiles) SwingUtilities.getWindowAncestor((Component) e.getSource());
-			CompareMentionsWindow cmw;
-			try {
-				cmw = new CompareMentionsWindow(mainApplication);
-				cmw.setFileLeft(stf.getFiles()[0]);
-				cmw.setFileRight(stf.getFiles()[1]);
-				new JCasLoader(jcas -> {
-					cmw.setJCasLeft(jcas, stf.getNames()[0]);
-				}, stf.getFiles()[0]).execute();
-				new JCasLoader(jcas -> {
-					cmw.setJCasRight(jcas, stf.getNames()[1]);
-				}, stf.getFiles()[1]).execute();
-				cmw.setVisible(true);
-				cmw.pack();
-				dialog.setVisible(false);
-			} catch (UIMAException e1) {
-				Annotator.logger.catching(e1);
-			}
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					CompareMentionsWindow cmw;
+
+					try {
+						cmw = new CompareMentionsWindow(mainApplication);
+						cmw.setIndeterminateProgress();
+						cmw.setVisible(true);
+						cmw.setFileLeft(stf.getFiles()[0]);
+						cmw.setFileRight(stf.getFiles()[1]);
+						new JCasLoader(jcas -> {
+							cmw.setJCasLeft(jcas, stf.getNames()[0]);
+						}, stf.getFiles()[0]).execute();
+						new JCasLoader(jcas -> {
+							cmw.setJCasRight(jcas, stf.getNames()[1]);
+						}, stf.getFiles()[1]).execute();
+						cmw.setVisible(true);
+						cmw.pack();
+						dialog.setVisible(false);
+					} catch (UIMAException e1) {
+						Annotator.logger.catching(e1);
+					}
+				}
+
+			});
+
 		}
 
 	}
