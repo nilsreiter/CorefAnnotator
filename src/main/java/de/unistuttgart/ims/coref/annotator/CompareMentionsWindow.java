@@ -19,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -187,10 +188,13 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 
 	CoreferenceModel targetModel;
 
+	JMenuBar menuBar = new JMenuBar();
+
 	boolean textIsSet = false;
 
 	public CompareMentionsWindow(Annotator mainApplication) throws UIMAException {
 		this.mainApplication = mainApplication;
+		this.initialiseMenu();
 		this.initialiseWindow();
 		this.targetJCas = JCasFactory.createJCas();
 	}
@@ -306,6 +310,18 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		copyAction = new CopyAction(this, mainApplication);
 	};
 
+	protected void initialiseMenu() {
+
+		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
+		helpMenu.add(mainApplication.helpAction);
+
+		menuBar.add(helpMenu);
+
+		setJMenuBar(menuBar);
+
+		Annotator.logger.info("Initialised menus");
+	}
+
 	protected synchronized void initialiseText(JCas jcas2) {
 		if (textIsSet)
 			return;
@@ -393,6 +409,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		revalidate();
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
