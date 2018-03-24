@@ -165,24 +165,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	int mouseClickedPosition = -1;
 
 	// actions
-	AbstractAction commentAction = new CommentAction(null);
-	AbstractAction newEntityAction;
-	AbstractAction renameAction;
-	AbstractAction changeKeyAction;
-	AbstractAction changeColorAction;
-	DeleteAction deleteAction;
-	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
-	ToggleMentionDifficult toggleMentionDifficult;
-	ToggleMentionAmbiguous toggleMentionAmbiguous;
-	AbstractAction toggleEntityGeneric, toggleEntityDisplayed = new ToggleEntityVisible(this);
-	AbstractAction sortByAlpha;
-	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder(this);
-	AbstractAction fileSaveAction, showSearchPanelAction;
-	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
-	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(this);
-	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
-	AbstractAction clearAction = new ClearAction();
-	AbstractAction copyAction, undoAction;
+	ActionContainer actions = new ActionContainer();
 
 	// controller
 	DocumentModel documentModel;
@@ -242,22 +225,22 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
-		treePopupMenu.add(this.deleteAction);
+		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionNonNominal));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
-		treePopupMenu.add(this.newEntityAction);
-		treePopupMenu.add(this.renameAction);
-		treePopupMenu.add(this.changeColorAction);
-		treePopupMenu.add(this.changeKeyAction);
-		treePopupMenu.add(this.mergeSelectedEntitiesAction);
-		treePopupMenu.add(this.formGroupAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
+		treePopupMenu.add(this.actions.newEntityAction);
+		treePopupMenu.add(this.actions.renameAction);
+		treePopupMenu.add(this.actions.changeColorAction);
+		treePopupMenu.add(this.actions.changeKeyAction);
+		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
+		treePopupMenu.add(this.actions.formGroupAction);
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -288,14 +271,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
 		controls.setRollover(true);
-		controls.add(newEntityAction);
-		controls.add(renameAction);
-		controls.add(changeKeyAction);
-		controls.add(changeColorAction);
-		controls.add((deleteAction));
-		controls.add((formGroupAction));
-		controls.add(mergeSelectedEntitiesAction);
-		controls.add(showSearchPanelAction);
+		controls.add(actions.newEntityAction);
+		controls.add(actions.renameAction);
+		controls.add(actions.changeKeyAction);
+		controls.add(actions.changeColorAction);
+		controls.add((actions.deleteAction));
+		controls.add(actions.formGroupAction);
+		controls.add(actions.mergeSelectedEntitiesAction);
+		controls.add(actions.showSearchPanelAction);
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -353,7 +336,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		textPane.addCaretListener(this);
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				copyAction);
+				actions.copyAction);
 
 		highlightManager = new HighlightManager(textPane);
 
@@ -373,35 +356,35 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	}
 
 	protected void initialiseActions() {
-		this.renameAction = new RenameEntityAction();
-		this.newEntityAction = new NewEntityAction(this);
-		this.changeColorAction = new ChangeColorForEntity(this);
-		this.changeKeyAction = new ChangeKeyForEntityAction();
-		this.deleteAction = new DeleteAction();
-		this.formGroupAction = new FormEntityGroup();
-		this.toggleMentionDifficult = new ToggleMentionDifficult(this);
-		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
-		this.toggleEntityGeneric = new ToggleEntityGeneric(this);
-		this.sortByAlpha = new SortTreeByAlpha();
-		this.sortByMentions = new SortTreeByMentions();
-		this.fileSaveAction = new FileSaveAction(this);
-		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.copyAction = new CopyAction(this, mainApplication);
-		this.undoAction = new UndoAction(this);
+		this.actions.renameAction = new RenameEntityAction();
+		this.actions.newEntityAction = new NewEntityAction(this);
+		this.actions.changeColorAction = new ChangeColorForEntity(this);
+		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
+		this.actions.deleteAction = new DeleteAction();
+		this.actions.formGroupAction = new FormEntityGroup();
+		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
+		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
+		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
+		this.actions.sortByAlpha = new SortTreeByAlpha();
+		this.actions.sortByMentions = new SortTreeByMentions();
+		this.actions.fileSaveAction = new FileSaveAction(this);
+		this.actions.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
+		this.actions.copyAction = new CopyAction(this, mainApplication);
+		this.actions.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
-		newEntityAction.setEnabled(false);
-		renameAction.setEnabled(false);
-		changeKeyAction.setEnabled(false);
-		changeColorAction.setEnabled(false);
-		deleteAction.setEnabled(false);
-		formGroupAction.setEnabled(false);
-		mergeSelectedEntitiesAction.setEnabled(false);
-		toggleMentionDifficult.setEnabled(false);
-		toggleMentionAmbiguous.setEnabled(false);
-		toggleEntityGeneric.setEnabled(false);
-		toggleEntityDisplayed.setEnabled(false);
-		undoAction.setEnabled(false);
+		actions.newEntityAction.setEnabled(false);
+		actions.renameAction.setEnabled(false);
+		actions.changeKeyAction.setEnabled(false);
+		actions.changeColorAction.setEnabled(false);
+		actions.deleteAction.setEnabled(false);
+		actions.formGroupAction.setEnabled(false);
+		actions.mergeSelectedEntitiesAction.setEnabled(false);
+		actions.toggleMentionDifficult.setEnabled(false);
+		actions.toggleMentionAmbiguous.setEnabled(false);
+		actions.toggleEntityGeneric.setEnabled(false);
+		actions.toggleEntityDisplayed.setEnabled(false);
+		actions.undoAction.setEnabled(false);
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -469,9 +452,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
-		toolsMenu.add(showSearchPanelAction);
-		toolsMenu.add(setDocumentLanguageAction);
-		toolsMenu.add(clearAction);
+		toolsMenu.add(actions.showSearchPanelAction);
+		toolsMenu.add(actions.setDocumentLanguageAction);
+		toolsMenu.add(actions.clearAction);
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
@@ -500,10 +483,10 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		fileMenu.add(new FileOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
-		fileMenu.add(fileSaveAction);
+		fileMenu.add(actions.fileSaveAction);
 		fileMenu.add(new FileSaveAsAction(this));
 		fileMenu.add(fileExportMenu);
-		fileMenu.add(closeAction);
+		fileMenu.add(actions.closeAction);
 		fileMenu.add(mainApplication.quitAction);
 
 		return fileMenu;
@@ -511,28 +494,28 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
-		entityMenu.add(new JMenuItem(undoAction));
-		entityMenu.add(new JMenuItem(copyAction));
-		entityMenu.add(new JMenuItem(deleteAction));
-		entityMenu.add(new JMenuItem(commentAction));
+		entityMenu.add(new JMenuItem(actions.undoAction));
+		entityMenu.add(new JMenuItem(actions.copyAction));
+		entityMenu.add(new JMenuItem(actions.deleteAction));
+		entityMenu.add(new JMenuItem(actions.commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionNonNominal));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
-		entityMenu.add(new JMenuItem(newEntityAction));
-		entityMenu.add(new JMenuItem(renameAction));
-		entityMenu.add(new JMenuItem(changeColorAction));
-		entityMenu.add(new JMenuItem(changeKeyAction));
-		entityMenu.add(new JMenuItem(formGroupAction));
-		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
-		entityMenu.add(new JCheckBoxMenuItem(toggleEntityDisplayed));
+		entityMenu.add(new JMenuItem(actions.newEntityAction));
+		entityMenu.add(new JMenuItem(actions.renameAction));
+		entityMenu.add(new JMenuItem(actions.changeColorAction));
+		entityMenu.add(new JMenuItem(actions.changeKeyAction));
+		entityMenu.add(new JMenuItem(actions.formGroupAction));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.sortByMentions);
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
 		radio2.setSelected(true);
 		ButtonGroup grp = new ButtonGroup();
 		grp.add(radio2);
@@ -540,7 +523,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		sortMenu.add(radio1);
 		sortMenu.add(radio2);
-		sortMenu.add(new JCheckBoxMenuItem(this.sortDescending));
+		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
 
 		entityMenu.add(sortMenu);
 		return entityMenu;
@@ -568,7 +551,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				actions.closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 			}
 		});
 
@@ -591,7 +574,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
 		else
-			this.fileSaveAction.setEnabled(false);
+			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
 		try {
@@ -694,7 +677,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Alphabet);
 			documentModel.getTreeModel().getEntitySortOrder().descending = false;
 			documentModel.getTreeModel().resort();
-			sortDescending.putValue(Action.SELECTED_KEY, false);
+			actions.sortDescending.putValue(Action.SELECTED_KEY, false);
 		}
 
 	}
@@ -714,7 +697,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Mentions);
 			documentModel.getTreeModel().getEntitySortOrder().descending = true;
 			documentModel.getTreeModel().resort();
-			sortDescending.putValue(Action.SELECTED_KEY, true);
+			actions.sortDescending.putValue(Action.SELECTED_KEY, true);
 		}
 
 	}
@@ -887,7 +870,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		newEntityAction.setEnabled(
+		actions.newEntityAction.setEnabled(
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
@@ -1624,7 +1607,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
 				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
-				candMenu.add(newEntityAction);
+				candMenu.add(actions.newEntityAction);
 				candMenu.addSeparator();
 				candidates.forEach(entity -> {
 					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
@@ -1700,31 +1683,31 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			collectData(e);
-			renameAction.setEnabled(isSingle() && isEntity());
-			changeKeyAction.setEnabled(isSingle() && isEntity());
-			changeColorAction.setEnabled(isSingle() && isEntity());
-			toggleEntityGeneric.setEnabled(isEntity());
-			toggleEntityGeneric.putValue(Action.SELECTED_KEY,
+			actions.renameAction.setEnabled(isSingle() && isEntity());
+			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
+			actions.changeColorAction.setEnabled(isSingle() && isEntity());
+			actions.toggleEntityGeneric.setEnabled(isEntity());
+			actions.toggleEntityGeneric.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
-			deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
+			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
 					|| (isEntity() && isLeaf()));
-			formGroupAction.setEnabled(isDouble() && isEntity());
-			mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
+			actions.formGroupAction.setEnabled(isDouble() && isEntity());
+			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
-			toggleMentionDifficult.setEnabled(isMention());
-			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionDifficult.setEnabled(isMention());
+			actions.toggleMentionDifficult.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isDifficult(getMention(0)));
 
-			toggleMentionAmbiguous.setEnabled(isMention());
-			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionAmbiguous.setEnabled(isMention());
+			actions.toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
 
-			toggleMentionNonNominal.setEnabled(isMention());
-			toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionNonNominal.setEnabled(isMention());
+			actions.toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
 
-			toggleEntityDisplayed.setEnabled(isEntity());
-			toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
+			actions.toggleEntityDisplayed.setEnabled(isEntity());
+			actions.toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
@@ -1937,8 +1920,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		undoAction.setEnabled(state.getHistorySize() > 0);
-		fileSaveAction.setEnabled(state.getHistorySize() > 0);
+		actions.undoAction.setEnabled(state.getHistorySize() > 0);
+		actions.fileSaveAction.setEnabled(state.getHistorySize() > 0);
 		unsavedChanges = (state.getHistorySize() > 0);
 		setWindowTitle();
 	}
@@ -1955,4 +1938,33 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		return commentsWindow;
 	}
 
+	class ActionContainer {
+
+		AbstractAction clearAction = new ClearAction();
+		AbstractAction closeAction = new CloseAction();
+		AbstractAction changeColorAction;
+		AbstractAction changeKeyAction;
+		AbstractAction commentAction = new CommentAction(null);
+		AbstractAction copyAction;
+		DeleteAction deleteAction;
+		AbstractAction fileSaveAction;
+		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		AbstractAction toggleEntityGeneric;
+		ToggleMentionAmbiguous toggleMentionAmbiguous;
+		ToggleMentionDifficult toggleMentionDifficult;
+		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
+		AbstractAction toggleShowTextInTreeLabels;
+		AbstractAction toggleTrimWhitespace;
+		AbstractAction undoAction;
+		AbstractAction setDocumentLanguageAction = new SetLanguageAction();
+		AbstractAction showSearchPanelAction;
+		AbstractAction sortByAlpha;
+		AbstractAction sortByMentions;
+		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
+		AbstractAction formGroupAction;
+		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
+		AbstractAction newEntityAction;
+		AbstractAction renameAction;
+
+	}
 }
