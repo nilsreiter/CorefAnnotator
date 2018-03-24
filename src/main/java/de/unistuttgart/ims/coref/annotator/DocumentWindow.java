@@ -152,6 +152,7 @@ public class DocumentWindow extends JFrame
 	// storing and caching
 	boolean unsavedChanges = false;
 	Feature titleFeature;
+	int mouseClickedPosition = -1;
 
 	// actions
 	AbstractAction commentAction = new CommentAction(null);
@@ -204,7 +205,9 @@ public class DocumentWindow extends JFrame
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 
 	// Settings
+	@Deprecated
 	boolean trimWhitespace = true;
+	@Deprecated
 	float lineSpacing = 2f;
 	StylePlugin currentStyle;
 
@@ -1394,6 +1397,8 @@ public class DocumentWindow extends JFrame
 				e.consume();
 				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
+			} else if (e.getKeyChar() == ' ') {
+				textPopupMenu.setVisible(true);
 			}
 		}
 
@@ -1783,66 +1788,103 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
-				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
-				int offset = textPane.viewToModel(e.getPoint());
-				MutableList<Annotation> localAnnotations = Lists.mutable
-						.withAll(documentModel.getCoreferenceModel().getMentions(offset));
+				Annotator.logger.trace("Right-clicked in text at " + e.getPoint());
+				mouseClickedPosition = textPane.viewToModel(e.getPoint());
 
-				MutableList<Annotation> mentions = localAnnotations
-						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
-
-				JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
-				for (Annotation anno : mentions) {
-					if (anno instanceof Mention)
-						subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
-					else if (anno instanceof DetachedMentionPart)
-						subMenu.add(
-								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
-				}
-				if (subMenu.getMenuComponentCount() > 0)
-					textPopupMenu.add(subMenu);
-
-				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
-				subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
-				subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
-
-				for (Annotation anno : comments) {
-					if (anno instanceof CommentAnchor)
-						subMenu.add(getCommentItem((CommentAnchor) anno));
-				}
-				if (subMenu.getMenuComponentCount() > 0)
-					textPopupMenu.add(subMenu);
-
-				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-
-					Set<Entity> candidates = Sets.mutable.empty();
-					for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
-							mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
-							mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
-						candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
-					}
-					JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
-					candMenu.add(newEntityAction);
-					candMenu.addSeparator();
-					candidates.forEach(entity -> {
-						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
-						mi.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								getCoreferenceModel().edit(new Op.AddMentionsToEntity(entity, getSelection()));
-							}
-						});
-						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
-						candMenu.add(mi);
-					});
-
-					textPopupMenu.add(candMenu);
-
-				}
-
-				if (textPopupMenu.getComponentCount() > 0)
+				if (textPane.getSelectionStart() != textPane.getSelectionEnd())
 					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
+
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+	}
+
+	class PopupListener implements PopupMenuListener {
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			int offset = mouseClickedPosition;
+
+			MutableList<Annotation> localAnnotations = Lists.mutable
+					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
+
+			MutableList<Annotation> mentions = localAnnotations
+					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+
+			JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+			for (Annotation anno : mentions) {
+				if (anno instanceof Mention)
+					subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+				else if (anno instanceof DetachedMentionPart)
+					subMenu.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+			}
+			if (subMenu.getMenuComponentCount() > 0)
+				textPopupMenu.add(subMenu);
+
+			MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+			subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
+			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
+
+			for (Annotation anno : comments) {
+				if (anno instanceof CommentAnchor)
+					subMenu.add(getCommentItem((CommentAnchor) anno));
+			}
+			if (subMenu.getMenuComponentCount() > 0)
+				textPopupMenu.add(subMenu);
+
+			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+
+				Set<Entity> candidates = Sets.mutable.empty();
+				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
+						mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
+						mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
+					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
+				}
+				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				candMenu.add(newEntityAction);
+				candMenu.addSeparator();
+				candidates.forEach(entity -> {
+					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							getCoreferenceModel().edit(new Op.AddMentionsToEntity(entity, getSelection()));
+						}
+					});
+					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+					candMenu.add(mi);
+				});
+
+				textPopupMenu.add(candMenu);
+
+			}
+
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			((JPopupMenu) e.getSource()).removeAll();
+
+		}
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent e) {
 
 		}
 
@@ -1880,43 +1922,6 @@ public class DocumentWindow extends JFrame
 
 			return mentionMenu;
 		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-	}
-
-	class PopupListener implements PopupMenuListener {
-		@Override
-		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-
-		}
-
-		@Override
-		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-			((JPopupMenu) e.getSource()).removeAll();
-
-		}
-
-		@Override
-		public void popupMenuCanceled(PopupMenuEvent e) {
-
-		}
-
 	}
 
 	class MyTreeSelectionListener extends CATreeSelectionListener {
