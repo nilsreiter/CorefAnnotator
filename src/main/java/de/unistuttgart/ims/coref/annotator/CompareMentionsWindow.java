@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
@@ -16,6 +17,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -47,6 +49,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -172,10 +175,13 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 	private static final long serialVersionUID = 1L;
 	String[] annotatorIds = new String[2];
 	Color[] colors = new Color[] { Color.blue, Color.red };
+	Action[] open = new Action[2];
 
 	AbstractAction copyAction;
+
 	HighlightManager highlightManager;
 	JCas[] jcas = new JCas[2];
+	File[] files = new File[2];
 	int loadedJCas = 0;
 	Annotator mainApplication;
 	JPanel mentionsInfoPane;
@@ -278,7 +284,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		stats.analyze(jcas[index]);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(4, 2));
+		panel.setLayout(new GridLayout(5, 2));
 		Border border = BorderFactory.createTitledBorder(annotatorIds[index]);
 		panel.setBorder(border);
 		panel.setPreferredSize(new Dimension(200, 75));
@@ -309,6 +315,9 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
 				SwingConstants.RIGHT));
+
+		panel.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_OPEN), SwingConstants.RIGHT));
+		panel.add(new JButton(open[index]));
 
 		return panel;
 	}
@@ -498,5 +507,15 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 	@Override
 	public JCas getJCas() {
 		return targetJCas;
+	}
+
+	public void setFileLeft(File file) {
+		this.files[0] = file;
+		this.open[0] = new SelectedFileOpenAction(Annotator.app, file);
+	}
+
+	public void setFileRight(File file) {
+		this.files[1] = file;
+		this.open[1] = new SelectedFileOpenAction(Annotator.app, file);
 	}
 }

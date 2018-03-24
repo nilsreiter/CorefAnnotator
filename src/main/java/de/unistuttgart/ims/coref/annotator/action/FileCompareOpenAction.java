@@ -2,14 +2,11 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -67,41 +64,19 @@ public class FileCompareOpenAction extends AnnotatorAction {
 			CompareMentionsWindow cmw;
 			try {
 				cmw = new CompareMentionsWindow(mainApplication);
-				new JCasLoader(jcas -> cmw.setJCasLeft(jcas, stf.getNames()[0]), stf.getFiles()[0]).execute();
-				new JCasLoader(jcas -> cmw.setJCasRight(jcas, stf.getNames()[1]), stf.getFiles()[1]).execute();
+				cmw.setFileLeft(stf.getFiles()[0]);
+				cmw.setFileRight(stf.getFiles()[1]);
+				new JCasLoader(jcas -> {
+					cmw.setJCasLeft(jcas, stf.getNames()[0]);
+				}, stf.getFiles()[0]).execute();
+				new JCasLoader(jcas -> {
+					cmw.setJCasRight(jcas, stf.getNames()[1]);
+				}, stf.getFiles()[1]).execute();
 				cmw.setVisible(true);
 				cmw.pack();
 				dialog.setVisible(false);
 			} catch (UIMAException e1) {
 				Annotator.logger.catching(e1);
-			}
-		}
-
-	}
-
-	class SelectFileAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-		JPanel panel;
-		int index;
-
-		public SelectFileAction(JPanel panel, int index) {
-			this.panel = panel;
-			this.index = index;
-			putValue(Action.NAME, "Select");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser chooser = new JFileChooser();
-
-			chooser.setCurrentDirectory(new File("/Users/reiterns/Documents/CRETA/Code/coreference/annotations"));
-			int r = chooser.showOpenDialog(null);
-			if (r == JFileChooser.APPROVE_OPTION) {
-				String filename = chooser.getSelectedFile().getName();
-				// ((JButton) panel.getComponent(1)).setText(filename);
-				((JTextField) panel.getComponent(0)).setText(filename);
-				labels[index].setText(chooser.getSelectedFile().getAbsolutePath());
 			}
 		}
 
