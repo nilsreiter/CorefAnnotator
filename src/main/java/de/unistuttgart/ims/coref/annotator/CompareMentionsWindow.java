@@ -256,10 +256,15 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.setBorder(border);
 		panel.setPreferredSize(new Dimension(300, 50));
 
-		panel.add(new JLabel(Annotator.getString(Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT));
+		JLabel desc;
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL_TOOLTIP));
+		panel.add(desc);
 		panel.add(new JLabel(stats.total(), SwingConstants.RIGHT));
 
-		panel.add(new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT));
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_TOOLTIP));
+		panel.add(desc);
 		panel.add(
 				new JLabel(String.format("%1$,3d (%2$3.1f%%)", stats.agreed, 100 * stats.agreed / (double) stats.total),
 						SwingConstants.RIGHT));
@@ -277,22 +282,30 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		Border border = BorderFactory.createTitledBorder(annotatorIds[index]);
 		panel.setBorder(border);
 		panel.setPreferredSize(new Dimension(300, 75));
+		JLabel desc;
 
 		// color
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT));
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_COLOR_TOOLTIP));
+		panel.add(desc);
 		panel.add(new JLabel(new ColorIcon(10, 10, colors[index])));
 
 		// number of mentions
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT));
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS_TOOLTIP));
+		panel.add(desc);
 		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT));
 
 		// number of entities
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT));
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_ENTITIES_TOOLTIP));
+		panel.add(desc);
 		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT));
 
 		// annotation position
-
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT));
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_POSITION_TOOLTIP));
+		panel.add(desc);
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
 				SwingConstants.RIGHT));

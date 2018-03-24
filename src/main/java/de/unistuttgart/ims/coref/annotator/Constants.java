@@ -182,11 +182,17 @@ public class Constants {
 		public static final String STAT_AGR_TITLE = "stat.agr.title";
 		public static final String STAT_KEY_AGR_PERC = "stat.key.agr_perc";
 		public static final String STAT_KEY_AGREED = "stat.key.agreed";
+		public static final String STAT_KEY_AGREED_TOOLTIP = "stat.key.agreed.tooltip";
 		public static final String STAT_KEY_COLOR = "stat.key.color";
+		public static final String STAT_KEY_COLOR_TOOLTIP = "stat.key.color.tooltip";
 		public static final String STAT_KEY_ENTITIES = "stat.key.entities";
+		public static final String STAT_KEY_ENTITIES_TOOLTIP = "stat.key.entities.tooltip";
 		public static final String STAT_KEY_MENTIONS = "stat.key.mentions";
+		public static final String STAT_KEY_MENTIONS_TOOLTIP = "stat.key.mentions.tooltip";
 		public static final String STAT_KEY_POSITION = "stat.key.position";
+		public static final String STAT_KEY_POSITION_TOOLTIP = "stat.key.position.tooltip";
 		public static final String STAT_KEY_TOTAL = "stat.key.total";
+		public static final String STAT_KEY_TOTAL_TOOLTIP = "stat.key.total.tooltip";
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
 		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
