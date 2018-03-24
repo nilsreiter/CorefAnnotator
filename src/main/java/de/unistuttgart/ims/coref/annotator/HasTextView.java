@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import org.apache.uima.jcas.JCas;
 
-public interface TextView {
+public interface HasTextView {
 	String getText();
 
 	Span getSelection();

@@ -143,7 +143,7 @@ import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class DocumentWindow extends JFrame
-		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextView, DocumentStateListener {
+		implements CaretListener, TreeModelListener, CoreferenceModelListener, HasTextView, DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
