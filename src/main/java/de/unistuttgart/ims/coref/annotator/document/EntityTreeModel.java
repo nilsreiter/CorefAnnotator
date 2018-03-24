@@ -174,7 +174,6 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
-		Annotator.logger.trace("Sorting entity tree with {}", comparator.toString());
 		if (!getRoot().isLeaf()) {
 			getRoot().getChildren().sort(comparator);
 			nodeStructureChanged(getRoot());
