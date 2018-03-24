@@ -639,7 +639,7 @@ public class DocumentWindow extends JFrame
 		}.execute();
 	}
 
-	public JCas getJcas() {
+	public JCas getJCas() {
 		return jcas;
 	}
 
@@ -1864,7 +1864,7 @@ public class DocumentWindow extends JFrame
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
 						mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
-					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
+					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
 				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
 				candMenu.add(newEntityAction);
