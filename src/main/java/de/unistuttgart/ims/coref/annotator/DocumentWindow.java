@@ -103,7 +103,7 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
-import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
@@ -476,7 +476,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		}
 
 		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
-		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(new FileSelectOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
