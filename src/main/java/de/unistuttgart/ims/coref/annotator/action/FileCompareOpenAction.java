@@ -18,6 +18,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
@@ -31,7 +32,8 @@ public class FileCompareOpenAction extends AnnotatorAction {
 
 	public FileCompareOpenAction(Annotator mApp) {
 		super(mApp, MaterialDesign.MDI_COMPARE);
-		putValue(Action.NAME, Annotator.getString("action.compare"));
+		putValue(Action.NAME, Annotator.getString(Constants.Strings.ACTION_COMPARE));
+		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMPARE_TOOLTIP));
 		init();
 	}
 

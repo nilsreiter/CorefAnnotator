@@ -84,6 +84,8 @@ public class Constants {
 		public static final String ACTION_COMMENT_REVEAL_LOCATION_TOOLTIP = "action.comment.reveal_location.tooltip";
 		public static final String ACTION_COMMENT_SAVE = "action.comment.save";
 		public static final String ACTION_COMMENT_SAVE_TOOLTIP = "action.comment.save.tooltip";
+		public static final String ACTION_COMPARE = "action.compare";
+		public static final String ACTION_COMPARE_TOOLTIP = "action.compare.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
