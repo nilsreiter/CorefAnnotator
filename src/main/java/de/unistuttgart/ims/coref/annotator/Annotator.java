@@ -68,7 +68,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	static ResourceBundle rbundle;
 
-	Set<DocumentWindow> openFiles = Sets.mutable.empty();
+	Set<AnnotationView> openFiles = Sets.mutable.empty();
 
 	public MutableList<File> recentFiles;
 
@@ -240,13 +240,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
+	public synchronized AnnotationView open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				DocumentWindow v = new DocumentWindow(Annotator.this);
+				AnnotationView v = new AnnotationView(Annotator.this);
 				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
@@ -259,7 +259,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		return null;
 	}
 
-	public void close(DocumentWindow viewer) {
+	public void close(AnnotationView viewer) {
 		openFiles.remove(viewer);
 		viewer.dispose();
 		if (openFiles.isEmpty())
@@ -277,7 +277,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	@Override
 	public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
-		for (DocumentWindow v : openFiles)
+		for (AnnotationView v : openFiles)
 			this.close(v);
 		storeRecentFiles();
 		try {

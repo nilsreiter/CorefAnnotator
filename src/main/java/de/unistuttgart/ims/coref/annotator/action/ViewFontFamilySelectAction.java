@@ -7,7 +7,7 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
 public class ViewFontFamilySelectAction extends DocumentWindowAction {
 
@@ -15,8 +15,8 @@ public class ViewFontFamilySelectAction extends DocumentWindowAction {
 
 	String fontFamily;
 
-	public ViewFontFamilySelectAction(DocumentWindow documentWindow, String family) {
-		super(documentWindow, MaterialDesign.MDI_FORMAT_TEXT);
+	public ViewFontFamilySelectAction(AnnotationView annotationView, String family) {
+		super(annotationView, MaterialDesign.MDI_FORMAT_TEXT);
 		putValue(Action.NAME, family);
 		this.fontFamily = family;
 	}
@@ -24,7 +24,7 @@ public class ViewFontFamilySelectAction extends DocumentWindowAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		putValue(Action.SELECTED_KEY, true);
-		documentWindow.updateStyle(StyleConstants.FontFamily, fontFamily);
+		annotationView.updateStyle(StyleConstants.FontFamily, fontFamily);
 	}
 
 }

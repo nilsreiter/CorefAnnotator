@@ -11,14 +11,14 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
 public class ShowSearchPanelAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	Annotator mainApplication;
 
-	public ShowSearchPanelAction(Annotator mainApplication, DocumentWindow dw) {
+	public ShowSearchPanelAction(Annotator mainApplication, AnnotationView dw) {
 		super(dw, Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString("action.search.tooltip"));
 		putValue(Action.ACCELERATOR_KEY,
@@ -28,6 +28,6 @@ public class ShowSearchPanelAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.showSearch();
+		annotationView.showSearch();
 	}
 }

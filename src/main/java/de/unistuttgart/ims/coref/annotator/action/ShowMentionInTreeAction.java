@@ -7,7 +7,7 @@ import javax.swing.tree.TreePath;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class ShowMentionInTreeAction extends DocumentWindowAction {
@@ -16,17 +16,17 @@ public class ShowMentionInTreeAction extends DocumentWindowAction {
 
 	Mention m;
 
-	public ShowMentionInTreeAction(DocumentWindow documentWindow, Mention m) {
-		super(documentWindow, Strings.ACTION_SHOW_MENTION_IN_TREE, MaterialDesign.MDI_FILE_TREE);
+	public ShowMentionInTreeAction(AnnotationView annotationView, Mention m) {
+		super(annotationView, Strings.ACTION_SHOW_MENTION_IN_TREE, MaterialDesign.MDI_FILE_TREE);
 		this.m = m;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
+		Object[] path = annotationView.getDocumentModel().getTreeModel().getPathToRoot(m);
 		TreePath tp = new TreePath(path);
-		this.documentWindow.getTree().setSelectionPath(tp);
-		this.documentWindow.getTree().scrollPathToVisible(tp);
+		this.annotationView.getTree().setSelectionPath(tp);
+		this.annotationView.getTree().scrollPathToVisible(tp);
 
 	}
 

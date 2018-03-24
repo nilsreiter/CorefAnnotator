@@ -5,13 +5,13 @@ import java.awt.event.ActionEvent;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
-public class ViewShowCommentsAction extends TargetedIkonAction<DocumentWindow> {
+public class ViewShowCommentsAction extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ViewShowCommentsAction(DocumentWindow dw) {
+	public ViewShowCommentsAction(AnnotationView dw) {
 		super(dw, Constants.Strings.ACTION_SHOW_COMMENTS, MaterialDesign.MDI_MESSAGE);
 	}
 

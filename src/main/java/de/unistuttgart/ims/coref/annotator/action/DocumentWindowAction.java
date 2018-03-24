@@ -2,27 +2,27 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import org.kordamp.ikonli.Ikon;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
 public abstract class DocumentWindowAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
-	protected DocumentWindow documentWindow;
+	protected AnnotationView annotationView;
 
-	public DocumentWindowAction(DocumentWindow dw, String stringKey, Ikon... ikon) {
+	public DocumentWindowAction(AnnotationView dw, String stringKey, Ikon... ikon) {
 		super(dw.getMainApplication(), stringKey, ikon);
-		this.documentWindow = dw;
+		this.annotationView = dw;
 	}
 
-	public DocumentWindowAction(DocumentWindow dw, String stringKey, boolean isKey, Ikon... ikon) {
+	public DocumentWindowAction(AnnotationView dw, String stringKey, boolean isKey, Ikon... ikon) {
 		super(dw.getMainApplication(), stringKey, isKey, ikon);
-		this.documentWindow = dw;
+		this.annotationView = dw;
 	}
 
-	public DocumentWindowAction(DocumentWindow dw, Ikon ikon) {
+	public DocumentWindowAction(AnnotationView dw, Ikon ikon) {
 		super(dw.getMainApplication(), ikon);
-		this.documentWindow = dw;
+		this.annotationView = dw;
 	}
 
 }

@@ -10,15 +10,15 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class ToggleMentionDifficult extends TargetedIkonAction<DocumentWindow> {
+public class ToggleMentionDifficult extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ToggleMentionDifficult(DocumentWindow dw) {
+	public ToggleMentionDifficult(AnnotationView dw) {
 		super(dw, Strings.ACTION_FLAG_MENTION_DIFFICULT, MaterialDesign.MDI_ALERT_BOX);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP));
 

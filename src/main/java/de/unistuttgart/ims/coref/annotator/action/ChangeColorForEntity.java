@@ -10,15 +10,15 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
+public class ChangeColorForEntity extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ChangeColorForEntity(DocumentWindow dw) {
+	public ChangeColorForEntity(AnnotationView dw) {
 		super(dw, Strings.ACTION_SET_COLOR, MaterialDesign.MDI_FORMAT_COLOR_FILL);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
 	}

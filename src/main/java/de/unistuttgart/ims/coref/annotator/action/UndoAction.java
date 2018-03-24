@@ -10,13 +10,13 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
 public class UndoAction extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public UndoAction(DocumentWindow dw) {
+	public UndoAction(AnnotationView dw) {
 		super(dw, Constants.Strings.ACTION_UNDO, MaterialDesign.MDI_UNDO);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -25,7 +25,7 @@ public class UndoAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.getDocumentModel().getCoreferenceModel().undo();
+		annotationView.getDocumentModel().getCoreferenceModel().undo();
 		// TODO: working mechanism to disable the button
 		// setEnabled(documentWindow.getCoreferenceModel().getHistory().size() >
 		// 0);

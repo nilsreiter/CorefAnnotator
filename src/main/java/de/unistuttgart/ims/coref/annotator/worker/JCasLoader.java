@@ -22,7 +22,7 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
@@ -30,7 +30,7 @@ import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
 	@Deprecated
-	DocumentWindow documentWindow;
+	AnnotationView annotationView;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
@@ -39,9 +39,9 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	Consumer<JCas> consumer = null;
 
 	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
+	public JCasLoader(AnnotationView annotationView, InputStream inputStream,
 			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
+		this.annotationView = annotationView;
 		this.inputStream = inputStream;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
@@ -49,9 +49,9 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	}
 
 	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
+	public JCasLoader(AnnotationView annotationView, File file, TypeSystemDescription typeSystemDescription,
 			IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
+		this.annotationView = annotationView;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
 		this.file = file;

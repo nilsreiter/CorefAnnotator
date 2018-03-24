@@ -58,7 +58,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			@SuppressWarnings("unchecked")
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
-			return new PotentialAnnotationTransfer(documentWindow.textPane,
+			return new PotentialAnnotationTransfer(annotationView.textPane,
 					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
 		}
 
@@ -82,11 +82,11 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to entity");
-			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
+			CATreeNode node = (CATreeNode) annotationView.tree.getSelectionPath().getLastPathComponent();
 
 			Op.AddMentionsToEntity op = new Op.AddMentionsToEntity(node.getEntity(),
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			documentWindow.getCoreferenceModel().edit(op);
+			annotationView.getCoreferenceModel().edit(op);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to new entity");
 			Op.AddMentionsToNewEntity op = new Op.AddMentionsToNewEntity(
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			documentWindow.getCoreferenceModel().edit(op);
+			annotationView.getCoreferenceModel().edit(op);
 		}
 	}
 
@@ -130,7 +130,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
 
-	DocumentWindow documentWindow;
+	AnnotationView annotationView;
 	String text;
 	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();;
 	JList<SearchResult> list;
@@ -144,20 +144,20 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
 
-	public SearchDialog(DocumentWindow xdw, Preferences configuration) {
-		documentWindow = xdw;
+	public SearchDialog(AnnotationView xdw, Preferences configuration) {
+		annotationView = xdw;
 		text = xdw.textPane.getText();
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
 		annotateSelectedFindings.setEnabled(false);
-		tsl = new TSL(documentWindow.tree);
-		documentWindow.tree.addTreeSelectionListener(tsl);
+		tsl = new TSL(annotationView.tree);
+		annotationView.tree.addTreeSelectionListener(tsl);
 
 		this.initialiseWindow();
 	}
 
 	protected void initialiseWindow() {
 
-		hilit = documentWindow.textPane.getHighlighter();
+		hilit = annotationView.textPane.getHighlighter();
 		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
 
 		textField = new JTextField(20);
@@ -183,7 +183,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		list.setDragEnabled(true);
 
 		JScrollPane listScroller = new JScrollPane(list);
-		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
+		setLocation(annotationView.getLocation().x + annotationView.getWidth(), annotationView.getLocation().y);
 
 		JPanel statusbar = new JPanel();
 		statusbar.add(searchResultsLabel);
@@ -194,7 +194,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
-		setLocationRelativeTo(documentWindow);
+		setLocationRelativeTo(annotationView);
 		addWindowListener(this);
 		pack();
 	}
@@ -409,7 +409,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			if (!e.getValueIsAdjusting()) {
 				if (list.getSelectedIndices().length == 1) {
 					SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
-					documentWindow.textPane.setCaretPosition(result.getEnd());
+					annotationView.textPane.setCaretPosition(result.getEnd());
 				}
 				listCondition = (list.getSelectedValuesList().size() > 0);
 				annotateSelectedFindings.setEnabled(treeCondition && listCondition);

@@ -88,14 +88,14 @@ public class CommentPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		public RevealCommentLocationAction(DocumentWindow dw) {
+		public RevealCommentLocationAction(AnnotationView dw) {
 			super(dw, Constants.Strings.ACTION_COMMENT_REVEAL_LOCATION, MaterialDesign.MDI_CROSSHAIRS_GPS);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (comment instanceof AnnotationComment) {
-				documentWindow.annotationSelected(((AnnotationComment) comment).getAnnotation());
+				annotationView.annotationSelected(((AnnotationComment) comment).getAnnotation());
 			}
 		}
 

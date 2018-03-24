@@ -142,7 +142,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractWindow implements CaretListener, TreeModelListener,
+public class AnnotationView extends AbstractWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
@@ -191,7 +191,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	// sub windows
 	SearchDialog searchPanel;
 
-	public DocumentWindow(Annotator annotator) {
+	public AnnotationView(Annotator annotator) {
 		super();
 		this.mainApplication = annotator;
 		this.initialiseActions();
@@ -587,7 +587,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+			String lang = (String) JOptionPane.showInputDialog(AnnotationView.this,
 					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
 					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
@@ -1025,7 +1025,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			String s = "";
 			if (etn.getEntity().getKey() != null)
 				s = etn.getEntity().getKey();
-			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
+			String newKey = (String) JOptionPane.showInputDialog(AnnotationView.this,
 					Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, s);
 			if (newKey != null)
@@ -1033,7 +1033,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					Character newChar = newKey.charAt(0);
 					documentModel.getCoreferenceModel().edit(new Op.UpdateEntityKey(newChar, etn.getEntity()));
 				} else {
-					JOptionPane.showMessageDialog(DocumentWindow.this,
+					JOptionPane.showMessageDialog(AnnotationView.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
 							JOptionPane.INFORMATION_MESSAGE);
@@ -1316,7 +1316,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (unsavedChanges) {
-				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
+				int r = JOptionPane.showConfirmDialog(AnnotationView.this,
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
 				if (r == JOptionPane.OK_OPTION)
@@ -1559,7 +1559,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			JMenu mentionMenu = new JMenu(b.toString());
 			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
-			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
+			Action a = new ShowMentionInTreeAction(AnnotationView.this, m);
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteMentionAction(m));
@@ -1842,11 +1842,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		AbstractAction fileSaveAction;
-		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(AnnotationView.this);
 		AbstractAction toggleEntityGeneric;
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
 		ToggleMentionDifficult toggleMentionDifficult;
-		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
+		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(AnnotationView.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		AbstractAction undoAction;
@@ -1854,7 +1854,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction showSearchPanelAction;
 		AbstractAction sortByAlpha;
 		AbstractAction sortByMentions;
-		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
+		AbstractAction sortDescending = new ToggleEntitySortOrder(AnnotationView.this);
 		AbstractAction formGroupAction;
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;

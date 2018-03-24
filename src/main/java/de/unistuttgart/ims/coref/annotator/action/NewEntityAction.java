@@ -10,15 +10,15 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
 
-public class NewEntityAction extends TargetedIkonAction<DocumentWindow> {
+public class NewEntityAction extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public NewEntityAction(DocumentWindow dw) {
+	public NewEntityAction(AnnotationView dw) {
 		super(dw, Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,

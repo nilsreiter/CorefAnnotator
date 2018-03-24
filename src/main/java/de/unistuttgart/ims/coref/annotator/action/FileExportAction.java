@@ -10,22 +10,22 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
-public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
+public class FileExportAction extends TargetedIkonAction<AnnotationView> {
 	/**
 	 * 
 	 */
-	private final DocumentWindow documentWindow;
+	private final AnnotationView annotationView;
 
 	private static final long serialVersionUID = 1L;
 
 	IOPlugin plugin;
 
-	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, IOPlugin plugin) {
+	public FileExportAction(AnnotationView annotationView, AnnotationView dw, IOPlugin plugin) {
 		super(dw, MaterialDesign.MDI_EXPORT);
-		this.documentWindow = documentWindow;
+		this.annotationView = annotationView;
 		putValue(Action.NAME, plugin.getName());
 		this.plugin = plugin;
 
@@ -37,7 +37,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 		saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 		saveDialog.setFileFilter(plugin.getFileFilter());
 		saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
-		int r = saveDialog.showSaveDialog(this.documentWindow);
+		int r = saveDialog.showSaveDialog(this.annotationView);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			File f = saveDialog.getSelectedFile();

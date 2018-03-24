@@ -7,13 +7,13 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> {
+public class ToggleEntityVisible extends TargetedIkonAction<AnnotationView> {
 	private static final long serialVersionUID = 1L;
 
-	public ToggleEntityVisible(DocumentWindow dw) {
+	public ToggleEntityVisible(AnnotationView dw) {
 		super(dw, Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY, MaterialDesign.MDI_ACCOUNT_OUTLINE);
 	}
 

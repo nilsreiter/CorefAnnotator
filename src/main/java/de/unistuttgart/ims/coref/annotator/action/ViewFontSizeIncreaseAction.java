@@ -11,12 +11,12 @@ import javax.swing.text.StyleConstants;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
 public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
-	public ViewFontSizeIncreaseAction(DocumentWindow dw) {
+	public ViewFontSizeIncreaseAction(AnnotationView dw) {
 		super(dw, Strings.ACTION_VIEW_INCREASE_FONT_SIZE, MaterialDesign.MDI_FORMAT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -24,7 +24,7 @@ public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.updateStyle(StyleConstants.FontSize,
-				StyleConstants.getFontSize(documentWindow.getCurrentStyle().getBaseStyle()) + 1);
+		annotationView.updateStyle(StyleConstants.FontSize,
+				StyleConstants.getFontSize(annotationView.getCurrentStyle().getBaseStyle()) + 1);
 	}
 }

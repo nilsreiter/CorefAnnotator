@@ -13,13 +13,13 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
-public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
+public class FileSaveAsAction extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public FileSaveAsAction(DocumentWindow documentWindow) {
+	public FileSaveAsAction(AnnotationView annotationView) {
 		super(null, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
 		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));

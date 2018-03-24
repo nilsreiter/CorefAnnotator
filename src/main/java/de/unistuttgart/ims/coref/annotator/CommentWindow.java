@@ -18,7 +18,7 @@ public class CommentWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	DocumentWindow mainWindow;
+	AnnotationView mainWindow;
 	CoreferenceModel coreferenceModel;
 
 	CommentsModel commentsListModel;
@@ -26,7 +26,7 @@ public class CommentWindow extends JDialog {
 	// Components
 	PanelList<Comment, CommentPanel> commentList;
 
-	public CommentWindow(DocumentWindow mainWindow, CommentsModel commentsModel) {
+	public CommentWindow(AnnotationView mainWindow, CommentsModel commentsModel) {
 		this.mainWindow = mainWindow;
 		this.commentsListModel = commentsModel;
 		SwingUtilities.invokeLater(new Runnable() {

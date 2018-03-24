@@ -10,15 +10,15 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class ToggleMentionAmbiguous extends TargetedIkonAction<DocumentWindow> {
+public class ToggleMentionAmbiguous extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ToggleMentionAmbiguous(DocumentWindow dw) {
+	public ToggleMentionAmbiguous(AnnotationView dw) {
 		super(dw, MaterialDesign.MDI_SHARE_VARIANT);
 		putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_MENTION_AMBIGUOUS));
 	}

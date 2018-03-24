@@ -10,13 +10,13 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AnnotationView;
 
-public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
+public class FileSaveAction extends TargetedIkonAction<AnnotationView> {
 
 	private static final long serialVersionUID = 1L;
 
-	public FileSaveAction(DocumentWindow dw) {
+	public FileSaveAction(AnnotationView dw) {
 		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
 		putValue(Action.NAME, Annotator.getString("action.save"));
 		putValue(Action.ACCELERATOR_KEY,
