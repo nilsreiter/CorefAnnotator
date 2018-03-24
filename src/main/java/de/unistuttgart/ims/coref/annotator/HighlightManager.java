@@ -14,6 +14,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 class HighlightManager {
@@ -81,6 +82,14 @@ class HighlightManager {
 	public void underline(Annotation a) {
 		if (a instanceof Mention)
 			underline((Mention) a);
+		else if (a instanceof DetachedMentionPart)
+			underline((DetachedMentionPart) a);
+	}
+
+	public void underline(DetachedMentionPart dmp) {
+		hilit.setDrawsLayeredHighlights(true);
+		draw(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true, null);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m) {

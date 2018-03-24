@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,6 +32,7 @@ import javax.swing.border.Border;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.UIMAException;
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -42,6 +44,7 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
@@ -49,6 +52,9 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends JFrame implements TextWindow, CoreferenceModelListener {
@@ -66,7 +72,7 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			targetModel.add(span.begin, span.end);
+			targetModel.edit(new Op.AddMentionsToNewEntity(span));
 		}
 
 	}
@@ -189,25 +195,6 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		this.targetJCas = JCasFactory.createJCas();
 	}
 
-	@Override
-	public void annotationEvent(Event event, Annotation annotation) {
-		switch (event) {
-		case Add:
-			highlightManager.underline(annotation, Color.green);
-			break;
-		case Update:
-			highlightManager.underline(annotation, Color.green);
-			break;
-		case Remove:
-			highlightManager.undraw(annotation);
-		}
-	}
-
-	@Override
-	public void annotationMovedEvent(Annotation annotation, Object from, Object to) {
-
-	}
-
 	protected void drawAll(JCas jcas, Color color) {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			highlightManager.underline(m, color);
@@ -249,11 +236,9 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		this.mentionsInfoPane.add(getAgreementPanel(), 2);
 	}
 
-	@Override
 	public void entityEvent(Event event, Entity entity) {
 	}
 
-	@Override
 	public void entityGroupEvent(Event event, EntityGroup entity) {
 	}
 
@@ -406,5 +391,44 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 		mentionsInfoPane.add(getAnnotatorPanel(1), 1);
 		new DocumentModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
 		revalidate();
+	}
+
+	@Override
+	public void entityEvent(FeatureStructureEvent event) {
+		Event.Type eventType = event.getType();
+		Iterator<FeatureStructure> iter = event.iterator(1);
+		switch (eventType) {
+		case Add:
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+					highlightManager.underline((Annotation) fs);
+				} else if (fs instanceof CommentAnchor) {
+					highlightManager.highlight((Annotation) fs);
+				}
+			}
+			break;
+		case Remove:
+			while (iter.hasNext()) {
+				FeatureStructure fs = iter.next();
+				if (fs instanceof Mention) {
+					if (((Mention) fs).getDiscontinuous() != null)
+						highlightManager.undraw(((Mention) fs).getDiscontinuous());
+					highlightManager.undraw((Annotation) fs);
+				} else if (fs instanceof Annotation)
+					highlightManager.undraw((Annotation) fs);
+
+			}
+			break;
+		case Update:
+			for (FeatureStructure fs : event) {
+				if (fs instanceof Mention) {
+					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+						highlightManager.undraw((Annotation) fs);
+					else
+						highlightManager.underline((Annotation) fs);
+				}
+			}
+		}
 	}
 }

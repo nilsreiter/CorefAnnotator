@@ -5,7 +5,7 @@
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} %method - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} %class{2}.%method - %msg%n" />
 		</Console>
 		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} - %msg%n" />
