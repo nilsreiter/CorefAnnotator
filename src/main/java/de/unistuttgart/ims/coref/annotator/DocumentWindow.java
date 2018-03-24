@@ -1537,8 +1537,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Annotator.logger.trace("Right-clicked in text at " + e.getPoint());
 				mouseClickedPosition = textPane.viewToModel(e.getPoint());
 
-				if (textPane.getSelectionStart() != textPane.getSelectionEnd())
-					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				// if (textPane.getSelectionStart() != textPane.getSelectionEnd())
+				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
 
 		}
