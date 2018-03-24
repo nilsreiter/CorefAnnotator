@@ -112,6 +112,7 @@ import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
@@ -374,7 +375,7 @@ public class DocumentWindow extends JFrame
 		this.formGroupAction = new FormEntityGroup();
 		this.toggleMentionDifficult = new ToggleMentionDifficult();
 		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous();
-		this.toggleEntityGeneric = new ToggleEntityGeneric();
+		this.toggleEntityGeneric = new ToggleEntityGeneric(this);
 		this.sortByAlpha = new SortTreeByAlpha();
 		this.sortByMentions = new SortTreeByMentions();
 		this.fileSaveAction = new FileSaveAction(this);
@@ -1586,17 +1587,17 @@ public class DocumentWindow extends JFrame
 		}
 	}
 
-	class ToggleEntityGeneric extends AnnotatorAction {
+	class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> {
 		private static final long serialVersionUID = 1L;
 
-		public ToggleEntityGeneric() {
-			super(null, Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
+		public ToggleEntityGeneric(DocumentWindow documentWindow) {
+			super(documentWindow, Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC_TOOLTIP));
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().edit(
+			getTarget().getCoreferenceModel().edit(
 					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, Lists.immutable.of(tree.getSelectionPaths())
 							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
