@@ -38,6 +38,7 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -45,6 +46,8 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
+import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
@@ -56,6 +59,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends JFrame implements HasTextView, CoreferenceModelListener {
@@ -315,6 +319,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
 		helpMenu.add(mainApplication.helpAction);
 
+		menuBar.add(initialiseMenuFile());
 		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
@@ -447,6 +452,30 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 				}
 			}
 		}
+	}
+
+	protected JMenu initialiseMenuFile() {
+		JMenu fileImportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_IMPORT_FROM));
+
+		PluginManager pm = mainApplication.getPluginManager();
+		for (Class<? extends IOPlugin> pluginClass : pm.getIOPlugins()) {
+			try {
+				IOPlugin plugin = pm.getIOPlugin(pluginClass);
+				if (plugin.getImporter() != null)
+					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
+			} catch (ResourceInitializationException e) {
+				Annotator.logger.catching(e);
+			}
+
+		}
+
+		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
+		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(mainApplication.getRecentFilesMenu());
+		fileMenu.add(fileImportMenu);
+		fileMenu.add(mainApplication.quitAction);
+
+		return fileMenu;
 	}
 
 	@Override

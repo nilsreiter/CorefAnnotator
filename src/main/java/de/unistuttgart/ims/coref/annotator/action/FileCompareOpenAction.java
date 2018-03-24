@@ -1,26 +1,24 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.apache.uima.UIMAException;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
+import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class FileCompareOpenAction extends AnnotatorAction {
@@ -50,38 +48,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 	}
 
 	protected JDialog initialiseDialog() {
-		JDialog dialog = new JDialog();
-		JSplitPane splitPane = new JSplitPane();
-
-		JPanel panel = new JPanel();
-		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		panel.setLayout(bl);
-		panel.setBorder(BorderFactory.createTitledBorder("left"));
-		names[0] = new JTextField();
-		panel.add(names[0]);
-		panel.add(new JButton(new SelectFileAction(panel, 0)));
-		labels[0] = new JLabel();
-		labels[0].setVisible(false);
-		panel.add(labels[0]);
-		splitPane.setLeftComponent(panel);
-
-		panel = new JPanel();
-		bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		panel.setLayout(bl);
-		panel.setBorder(BorderFactory.createTitledBorder("right"));
-		names[1] = new JTextField();
-		panel.add(names[1]);
-		panel.add(new JButton(new SelectFileAction(panel, 1)));
-		labels[1] = new JLabel();
-		labels[1].setVisible(false);
-		panel.add(labels[1]);
-		panel.getComponent(2).setVisible(false);
-		splitPane.setRightComponent(panel);
-
-		dialog.add(splitPane, BorderLayout.CENTER);
-		dialog.add(new JButton(new RunComparisonAction()), BorderLayout.SOUTH);
-		dialog.pack();
-		return dialog;
+		return new SelectTwoFiles(new RunComparisonAction());
 	}
 
 	class RunComparisonAction extends AbstractAction {
@@ -94,17 +61,12 @@ public class FileCompareOpenAction extends AnnotatorAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			SelectTwoFiles stf = (SelectTwoFiles) SwingUtilities.getWindowAncestor((Component) e.getSource());
 			CompareMentionsWindow cmw;
 			try {
 				cmw = new CompareMentionsWindow(mainApplication);
-
-				new JCasLoader(jcas -> cmw.setJCasLeft(jcas, names[0].getText()), new File(labels[0].getText()))
-						.execute();
-
-				new JCasLoader(jcas -> cmw.setJCasRight(jcas, names[1].getText()), new File(labels[1].getText()))
-						.execute();
-
+				new JCasLoader(jcas -> cmw.setJCasLeft(jcas, stf.getNames()[0]), stf.getFiles()[0]).execute();
+				new JCasLoader(jcas -> cmw.setJCasRight(jcas, stf.getNames()[1]), stf.getFiles()[1]).execute();
 				cmw.setVisible(true);
 				cmw.pack();
 				dialog.setVisible(false);
