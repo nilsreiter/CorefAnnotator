@@ -12,6 +12,7 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
+import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -50,18 +51,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return new FileFilter() {
-
-			@Override
-			public boolean accept(File f) {
-				return f.getName().endsWith(".txt");
-			}
-
-			@Override
-			public String getDescription() {
-				return "Plain text files";
-			}
-		};
+		return FileFilters.txt;
 	}
 
 	@Override
