@@ -198,10 +198,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 
 	// Settings
-	@Deprecated
-	boolean trimWhitespace = true;
-	@Deprecated
-	float lineSpacing = 2f;
 	StylePlugin currentStyle;
 
 	// sub windows
