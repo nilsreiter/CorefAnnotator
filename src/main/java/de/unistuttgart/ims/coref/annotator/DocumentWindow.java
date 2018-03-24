@@ -36,24 +36,19 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
@@ -97,15 +92,14 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
-import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
@@ -148,8 +142,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener,
-		HasTextView, DocumentStateListener, HasTreeView {
+public class DocumentWindow extends AbstractWindow implements CaretListener, TreeModelListener,
+		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -176,20 +170,14 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
-	JPanel statusBar;
-	JProgressBar progressBar;
 	JSplitPane splitPane;
-	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 
 	// Sub windows
 	CommentWindow commentsWindow;
 
-	Thread messageVoider;
-
 	// Menu components
-	JMenuBar menuBar = new JMenuBar();
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
@@ -218,6 +206,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	 */
 
 	protected void initialiseWindow() {
+		super.initialize();
+
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
@@ -263,57 +253,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
-		// tool bar
-		JToolBar controls = new JToolBar();
-		controls.setFocusable(false);
-		controls.setRollover(true);
-		controls.add(actions.newEntityAction);
-		controls.add(actions.renameAction);
-		controls.add(actions.changeKeyAction);
-		controls.add(actions.changeColorAction);
-		controls.add((actions.deleteAction));
-		controls.add(actions.formGroupAction);
-		controls.add(actions.mergeSelectedEntitiesAction);
-		controls.add(actions.showSearchPanelAction);
-		getContentPane().add(controls, BorderLayout.NORTH);
-
-		for (Component comp : controls.getComponents())
-			comp.setFocusable(false);
-
-		// status bar
-		SpringLayout springs = new SpringLayout();
-		statusBar = new JPanel();
-		statusBar.setPreferredSize(new Dimension(800, 20));
-		statusBar.setLayout(springs);
-
-		progressBar = new JProgressBar();
-		progressBar.setMaximum(100);
-		progressBar.setMinimum(0);
-		progressBar.setPreferredSize(new Dimension(300, 20));
-
-		statusBar.add(progressBar);
-
-		styleLabel = new JLabel();
-		styleLabel.setText("Style: " + mainApplication.getPluginManager().getDefaultStylePlugin().getName());
-		styleLabel.setToolTipText(mainApplication.getPluginManager().getDefaultStylePlugin().getDescription());
-		styleLabel.setPreferredSize(new Dimension(150, 20));
-		statusBar.add(styleLabel);
-
-		messageLabel = new JLabel();
-		messageLabel.setSize(new Dimension(1, 20));
-		statusBar.add(messageLabel);
-
-		JLabel versionLabel = new JLabel(
-				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
-		versionLabel.setPreferredSize(new Dimension(220, 20));
-		statusBar.add(versionLabel);
-
-		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
-		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.EAST, messageLabel);
-		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);
-		springs.putConstraint(SpringLayout.EAST, styleLabel, 10, SpringLayout.WEST, versionLabel);
-		getContentPane().add(statusBar, BorderLayout.SOUTH);
-		statusBar.revalidate();
+		getMiscLabel().setText("Style: " + mainApplication.getPluginManager().getDefaultStylePlugin().getName());
+		getMiscLabel().setToolTipText(mainApplication.getPluginManager().getDefaultStylePlugin().getDescription());
+		getMiscLabel().setPreferredSize(new Dimension(150, 20));
 
 		// initialise text view
 		Caret caret = new Caret();
@@ -602,8 +544,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				return;
 			}
 		}
-		progressBar.setVisible(true);
-		progressBar.setIndeterminate(true);
+		getProgressBar().setVisible(true);
+		getProgressBar().setIndeterminate(true);
 
 		new SwingWorker<Object, Object>() {
 
@@ -696,50 +638,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			actions.sortDescending.putValue(Action.SELECTED_KEY, true);
 		}
 
-	}
-
-	public void setIndeterminateProgress() {
-		progressBar.setVisible(true);
-		progressBar.setIndeterminate(true);
-	}
-
-	public void stopIndeterminateProgress() {
-		progressBar.setIndeterminate(false);
-		progressBar.setVisible(false);
-	}
-
-	protected void setMessage(String message) {
-		setMessage(message, false);
-	}
-
-	protected synchronized void setMessage(String message, boolean disappearing) {
-		messageLabel.setText(message);
-		messageLabel.repaint();
-		statusBar.revalidate();
-
-		if (messageVoider != null && messageVoider.isAlive())
-			messageVoider.interrupt();
-
-		if (disappearing) {
-			messageVoider = new Thread() {
-
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(1000);
-						setMessage("");
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-
-			};
-			SwingUtilities.invokeLater(messageVoider);
-		}
-	}
-
-	public void setProgress(int i) {
-		progressBar.setValue(i);
 	}
 
 	protected void setWindowTitle() {
@@ -885,11 +783,11 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 			@Override
 			public void run() {
-				progressBar.setValue(0);
-				progressBar.setVisible(true);
+				getProgressBar().setValue(0);
+				getProgressBar().setVisible(true);
 				Annotator.logger.debug("Activating style {}", sv.getClass().getName());
 
-				progressBar.setValue(20);
+				getProgressBar().setValue(20);
 
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
 						styleContext, baseStyle);
@@ -897,16 +795,16 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
-						progressBar.setValue(progressBar.getValue() + 10);
+						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
 				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
-				styleLabel.setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
-				styleLabel.setToolTipText(sv.getDescription());
-				styleLabel.repaint();
-				progressBar.setValue(100);
-				progressBar.setVisible(false);
+				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
+				getMiscLabel().setToolTipText(sv.getDescription());
+				getMiscLabel().repaint();
+				getProgressBar().setValue(100);
+				getProgressBar().setVisible(false);
 			}
 
 		});
