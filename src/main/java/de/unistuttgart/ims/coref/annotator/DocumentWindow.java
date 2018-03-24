@@ -112,7 +112,7 @@ import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
-import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
+import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
@@ -1584,23 +1584,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 			documentModel.getTreeModel()
 					.getEntitySortOrder().descending = !documentModel.getTreeModel().getEntitySortOrder().descending;
 			documentModel.getTreeModel().resort();
-		}
-	}
-
-	public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> {
-		private static final long serialVersionUID = 1L;
-
-		public ToggleEntityGeneric(DocumentWindow documentWindow) {
-			super(documentWindow, Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC_TOOLTIP));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			getTarget().getCoreferenceModel()
-					.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
-							Lists.immutable.of(getTarget().getTree().getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 		}
 	}
 
