@@ -81,7 +81,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<configuration>
 					<transformers>
 						<transformer
@@ -129,6 +129,13 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
@@ -143,6 +150,23 @@
 			<build>
 				<plugins>
 					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.8</version>
+						<executions>
+							<execution>
+								<id>duplicate build directory</id>
+								<!-- here the phase you need -->
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<copy file="${project.build.directory}" todir="${project.build.directory}/shallow" />
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 						<groupId>sh.tak.appbundler</groupId>
 						<artifactId>appbundle-maven-plugin</artifactId>
 						<version>1.2.0</version>
@@ -150,9 +174,11 @@
 							<mainClass>de.unistuttgart.ims.coref.annotator.Annotator</mainClass>
 							<dictionaryFile>MyInfo.plist</dictionaryFile>
 							<bundleName>${project.name}</bundleName>
-							<buildDirectory>${project.build.directory}</buildDirectory>
+							<buildDirectory>${project.build.directory}/shallow</buildDirectory>
 							<generateDiskImageFile>true</generateDiskImageFile>
 							<diskImageFile>${project.name}-${project.version}</diskImageFile>
+							<diskImageInternetEnable>true</diskImageInternetEnable>
+							<includeApplicationsSymlink>true</includeApplicationsSymlink>
 						</configuration>
 						<executions>
 							<execution>
