@@ -5,11 +5,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -22,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +70,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -90,6 +94,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -126,7 +131,10 @@ import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
+import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
@@ -146,6 +154,7 @@ public class DocumentWindow extends JFrame
 	// storing and caching
 	boolean unsavedChanges = false;
 	Feature titleFeature;
+	int mouseClickedPosition = -1;
 
 	// actions
 	AbstractAction commentAction = new CommentAction(null);
@@ -198,7 +207,9 @@ public class DocumentWindow extends JFrame
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 
 	// Settings
+	@Deprecated
 	boolean trimWhitespace = true;
+	@Deprecated
 	float lineSpacing = 2f;
 	StylePlugin currentStyle;
 
@@ -1388,6 +1399,16 @@ public class DocumentWindow extends JFrame
 				e.consume();
 				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
+			} else if (e.getKeyChar() == ' ') {
+				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+					Rectangle p;
+					try {
+						p = textPane.modelToView(textPane.getSelectionStart());
+						textPopupMenu.show(e.getComponent(), p.x, p.y);
+					} catch (BadLocationException e1) {
+						Annotator.logger.catching(e1);
+					}
+				}
 			}
 		}
 
@@ -1777,40 +1798,103 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
-				Annotator.logger.debug("Right-clicked in text at " + e.getPoint());
-				int offset = textPane.viewToModel(e.getPoint());
-				MutableList<Annotation> localAnnotations = Lists.mutable
-						.withAll(documentModel.getCoreferenceModel().getMentions(offset));
-				if (localAnnotations.isEmpty())
-					return;
+				Annotator.logger.trace("Right-clicked in text at " + e.getPoint());
+				mouseClickedPosition = textPane.viewToModel(e.getPoint());
 
-				MutableList<Annotation> mentions = localAnnotations
-						.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+				if (textPane.getSelectionStart() != textPane.getSelectionEnd())
+					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
 
-				JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
-				for (Annotation anno : mentions) {
-					if (anno instanceof Mention)
-						subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
-					else if (anno instanceof DetachedMentionPart)
-						subMenu.add(
-								getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+	}
+
+	class PopupListener implements PopupMenuListener {
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			int offset = mouseClickedPosition;
+
+			MutableList<Annotation> localAnnotations = Lists.mutable
+					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
+
+			MutableList<Annotation> mentions = localAnnotations
+					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
+
+			JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+			for (Annotation anno : mentions) {
+				if (anno instanceof Mention)
+					subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+				else if (anno instanceof DetachedMentionPart)
+					subMenu.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+			}
+			if (subMenu.getMenuComponentCount() > 0)
+				textPopupMenu.add(subMenu);
+
+			MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
+			subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
+			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
+
+			for (Annotation anno : comments) {
+				if (anno instanceof CommentAnchor)
+					subMenu.add(getCommentItem((CommentAnchor) anno));
+			}
+			if (subMenu.getMenuComponentCount() > 0)
+				textPopupMenu.add(subMenu);
+
+			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+
+				Set<Entity> candidates = Sets.mutable.empty();
+				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
+						mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
+						mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
+					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
 				}
-				if (subMenu.getMenuComponentCount() > 0)
-					textPopupMenu.add(subMenu);
+				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				candMenu.add(newEntityAction);
+				candMenu.addSeparator();
+				candidates.forEach(entity -> {
+					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							getCoreferenceModel().edit(new Op.AddMentionsToEntity(entity, getSelection()));
+						}
+					});
+					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+					candMenu.add(mi);
+				});
 
-				MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
-				subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
-				subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
-
-				for (Annotation anno : comments) {
-					if (anno instanceof CommentAnchor)
-						subMenu.add(getCommentItem((CommentAnchor) anno));
-				}
-				if (subMenu.getMenuComponentCount() > 0)
-					textPopupMenu.add(subMenu);
-				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				textPopupMenu.add(candMenu);
 
 			}
+
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			((JPopupMenu) e.getSource()).removeAll();
+
+		}
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent e) {
 
 		}
 
@@ -1845,45 +1929,9 @@ public class DocumentWindow extends JFrame
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteMentionAction(m));
+
 			return mentionMenu;
 		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-	}
-
-	class PopupListener implements PopupMenuListener {
-		@Override
-		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-
-		}
-
-		@Override
-		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-			((JPopupMenu) e.getSource()).removeAll();
-
-		}
-
-		@Override
-		public void popupMenuCanceled(PopupMenuEvent e) {
-
-		}
-
 	}
 
 	class MyTreeSelectionListener extends CATreeSelectionListener {

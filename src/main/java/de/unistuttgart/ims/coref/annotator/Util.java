@@ -23,6 +23,12 @@ public class Util {
 		return toString((TreeNode) tm.getRoot(), 0);
 	}
 
+	public static String toString(Object o) {
+		if (o == null)
+			return "null";
+		return o.toString();
+	}
+
 	public static String toString(javax.swing.tree.TreeNode tn, int level) {
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < level; i++)

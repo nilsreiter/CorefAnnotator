@@ -59,6 +59,10 @@ public class FeatureStructureEvent implements Event {
 	}
 
 	public Iterator<FeatureStructure> iterator(int start) {
-		return arguments.subList(1, arguments.size()).iterator();
+		return iterable(start).iterator();
+	}
+
+	public Iterable<FeatureStructure> iterable(int start) {
+		return arguments.subList(1, arguments.size());
 	}
 }
