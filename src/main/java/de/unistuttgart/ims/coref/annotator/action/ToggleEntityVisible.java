@@ -8,7 +8,6 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> {
