@@ -155,6 +155,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	JCas jcas;
 	File file;
+	@Deprecated
 	Annotator mainApplication;
 
 	String segmentAnnotation = null;
@@ -294,8 +295,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		statusBar.add(progressBar);
 
 		styleLabel = new JLabel();
-		styleLabel.setText("Style: " + mainApplication.getPluginManager().getDefaultStylePlugin().getName());
-		styleLabel.setToolTipText(mainApplication.getPluginManager().getDefaultStylePlugin().getDescription());
+		styleLabel.setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
+		styleLabel.setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
 		styleLabel.setPreferredSize(new Dimension(150, 20));
 		statusBar.add(styleLabel);
 
@@ -364,8 +365,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
 		this.actions.fileSaveAction = new FileSaveAction(this);
-		this.actions.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.actions.copyAction = new CopyAction(this, mainApplication);
+		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
+		this.actions.copyAction = new CopyAction(this, Annotator.app);
 		this.actions.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
@@ -404,7 +405,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 		viewMenu.addSeparator();
 
-		PluginManager pm = mainApplication.getPluginManager();
+		PluginManager pm = Annotator.app.getPluginManager();
 
 		JMenu viewStyleMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_STYLE));
 		grp = new ButtonGroup();
@@ -528,7 +529,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	protected void initialiseMenu() {
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
-		helpMenu.add(mainApplication.helpAction);
+		helpMenu.add(Annotator.app.helpAction);
 
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(initialiseMenuEntity());
