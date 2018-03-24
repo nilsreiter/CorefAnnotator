@@ -254,14 +254,15 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.setLayout(new GridLayout(3, 2));
 		Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(300, 100));
+		panel.setPreferredSize(new Dimension(300, 50));
 
 		panel.add(new JLabel(Annotator.getString(Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT));
-		panel.add(new JLabel(stats.total()));
+		panel.add(new JLabel(stats.total(), SwingConstants.RIGHT));
 
 		panel.add(new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT));
-		panel.add(new JLabel(
-				String.format("%1$,3d (%2$3.1f%%)", stats.agreed, 100 * stats.agreed / (double) stats.total)));
+		panel.add(
+				new JLabel(String.format("%1$,3d (%2$3.1f%%)", stats.agreed, 100 * stats.agreed / (double) stats.total),
+						SwingConstants.RIGHT));
 
 		return panel;
 	}
@@ -275,7 +276,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.setLayout(new GridLayout(4, 2));
 		Border border = BorderFactory.createTitledBorder(annotatorIds[index]);
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(300, 100));
+		panel.setPreferredSize(new Dimension(300, 75));
 
 		// color
 		panel.add(new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT));
@@ -363,6 +364,10 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		mentionsInfoPane.add(new JLabel());
 		mentionsInfoPane.add(new JLabel());
 		mentionsInfoPane.add(new JLabel());
+
+		mentionsInfoPane.add(Box.createVerticalGlue());
+		mentionsInfoPane.add(Box.createVerticalGlue());
+		mentionsInfoPane.add(Box.createVerticalGlue());
 		mentionsInfoPane.add(Box.createVerticalGlue());
 
 		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(mentionsTextPane,
