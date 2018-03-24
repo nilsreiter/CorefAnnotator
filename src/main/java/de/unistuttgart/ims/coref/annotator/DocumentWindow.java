@@ -37,7 +37,6 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -103,6 +102,7 @@ import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
+import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -481,7 +481,7 @@ public class DocumentWindow extends JFrame
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
 				if (plugin.getExporter() != null)
-					fileExportMenu.add(new FileExportAction(plugin));
+					fileExportMenu.add(new FileExportAction(this, this, plugin));
 			} catch (ResourceInitializationException e) {
 				Annotator.logger.catching(e);
 			}
@@ -1565,35 +1565,6 @@ public class DocumentWindow extends JFrame
 					.getFeatureStructure();
 			documentModel.getCoreferenceModel().edit(new Op.GroupEntities(e1, e2));
 
-		}
-
-	}
-
-	class FileExportAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		IOPlugin plugin;
-
-		public FileExportAction(IOPlugin plugin) {
-			putValue(Action.NAME, plugin.getName());
-			this.plugin = plugin;
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
-			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(plugin.getFileFilter());
-			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
-			int r = saveDialog.showSaveDialog(DocumentWindow.this);
-			switch (r) {
-			case JFileChooser.APPROVE_OPTION:
-				File f = saveDialog.getSelectedFile();
-				saveToFile(f, plugin, true);
-				break;
-			default:
-			}
 		}
 
 	}
