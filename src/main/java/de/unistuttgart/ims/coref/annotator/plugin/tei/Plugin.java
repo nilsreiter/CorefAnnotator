@@ -24,7 +24,7 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getDescription() {
 		try {
-			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
+			return IOUtils.toString(getClass().getResourceAsStream("/plugin.tei/description.txt"), "UTF-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
