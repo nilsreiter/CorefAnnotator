@@ -254,7 +254,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.setLayout(new GridLayout(3, 2));
 		Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(300, 50));
+		panel.setPreferredSize(new Dimension(200, 50));
 
 		JLabel desc;
 		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
@@ -281,14 +281,14 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		panel.setLayout(new GridLayout(4, 2));
 		Border border = BorderFactory.createTitledBorder(annotatorIds[index]);
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(300, 75));
+		panel.setPreferredSize(new Dimension(200, 75));
 		JLabel desc;
 
 		// color
 		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_COLOR_TOOLTIP));
 		panel.add(desc);
-		panel.add(new JLabel(new ColorIcon(10, 10, colors[index])));
+		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT));
 
 		// number of mentions
 		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
@@ -372,8 +372,8 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 
 		mentionsInfoPane = new JPanel();
 		mentionsInfoPane.setLayout(new BoxLayout(mentionsInfoPane, BoxLayout.Y_AXIS));
-		mentionsInfoPane.setPreferredSize(new Dimension(300, 750));
-		mentionsInfoPane.setMaximumSize(new Dimension(300, 750));
+		mentionsInfoPane.setPreferredSize(new Dimension(210, 750));
+		mentionsInfoPane.setMaximumSize(new Dimension(250, 750));
 		mentionsInfoPane.add(new JLabel());
 		mentionsInfoPane.add(new JLabel());
 		mentionsInfoPane.add(new JLabel());
