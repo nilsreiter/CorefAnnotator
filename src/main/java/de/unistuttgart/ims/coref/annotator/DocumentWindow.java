@@ -36,7 +36,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -44,7 +43,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -53,7 +51,6 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
@@ -97,7 +94,6 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
@@ -108,7 +104,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -118,7 +113,6 @@ import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
-import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
@@ -148,8 +142,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener,
-		HasTextView, DocumentStateListener, HasTreeView {
+public class DocumentWindow extends AbstractWindow implements CaretListener, TreeModelListener,
+		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -177,10 +171,7 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
-	JPanel statusBar;
-	JProgressBar progressBar;
 	JSplitPane splitPane;
-	JLabel styleLabel, messageLabel;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 
@@ -219,6 +210,8 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 	 */
 
 	protected void initialiseWindow() {
+		super.initializeWindow();
+
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
@@ -281,40 +274,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		for (Component comp : controls.getComponents())
 			comp.setFocusable(false);
 
-		// status bar
-		SpringLayout springs = new SpringLayout();
-		statusBar = new JPanel();
-		statusBar.setPreferredSize(new Dimension(800, 20));
-		statusBar.setLayout(springs);
-
-		progressBar = new JProgressBar();
-		progressBar.setMaximum(100);
-		progressBar.setMinimum(0);
-		progressBar.setPreferredSize(new Dimension(300, 20));
-
-		statusBar.add(progressBar);
-
-		styleLabel = new JLabel();
-		styleLabel.setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
-		styleLabel.setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
-		styleLabel.setPreferredSize(new Dimension(150, 20));
-		statusBar.add(styleLabel);
-
-		messageLabel = new JLabel();
-		messageLabel.setSize(new Dimension(1, 20));
-		statusBar.add(messageLabel);
-
-		JLabel versionLabel = new JLabel(
-				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
-		versionLabel.setPreferredSize(new Dimension(220, 20));
-		statusBar.add(versionLabel);
-
-		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
-		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.EAST, messageLabel);
-		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);
-		springs.putConstraint(SpringLayout.EAST, styleLabel, 10, SpringLayout.WEST, versionLabel);
-		getContentPane().add(statusBar, BorderLayout.SOUTH);
-		statusBar.revalidate();
+		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
+		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
+		getMiscLabel().setPreferredSize(new Dimension(150, 20));
 
 		// initialise text view
 		Caret caret = new Caret();
@@ -427,23 +389,6 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 		viewMenu.add(viewStyleMenu);
 		viewMenu.add(new ViewShowCommentsAction(this));
 		return viewMenu;
-
-	}
-
-	protected JMenu initialiseMenuSettings() {
-		JMenu menu = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_TRIM_WHITESPACE)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_SHOW_TEXT_LABELS)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_FULL_TOKENS)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_KEEP_TREE_SORTED)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
-		menu.add(new SetAnnotatorNameAction(mainApplication));
-		return menu;
 
 	}
 
@@ -699,20 +644,24 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 
 	}
 
+	@Override
 	public void setIndeterminateProgress() {
 		progressBar.setVisible(true);
 		progressBar.setIndeterminate(true);
 	}
 
+	@Override
 	public void stopIndeterminateProgress() {
 		progressBar.setIndeterminate(false);
 		progressBar.setVisible(false);
 	}
 
+	@Override
 	protected void setMessage(String message) {
 		setMessage(message, false);
 	}
 
+	@Override
 	protected synchronized void setMessage(String message, boolean disappearing) {
 		messageLabel.setText(message);
 		messageLabel.repaint();
@@ -903,9 +852,9 @@ public class DocumentWindow extends JFrame implements CaretListener, TreeModelLi
 				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
-				styleLabel.setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
-				styleLabel.setToolTipText(sv.getDescription());
-				styleLabel.repaint();
+				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
+				getMiscLabel().setToolTipText(sv.getDescription());
+				getMiscLabel().repaint();
 				progressBar.setValue(100);
 				progressBar.setVisible(false);
 			}

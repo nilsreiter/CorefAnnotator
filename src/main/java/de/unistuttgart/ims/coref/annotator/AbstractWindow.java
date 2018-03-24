@@ -3,14 +3,19 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
+import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
+import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
 public abstract class AbstractWindow extends JFrame {
 
@@ -21,7 +26,9 @@ public abstract class AbstractWindow extends JFrame {
 	JLabel miscLabel = new JLabel();
 	Thread messageVoider;
 
-	protected void initialize() {
+	static JMenu menu_settings = null;
+
+	protected void initializeWindow() {
 		SpringLayout springs = new SpringLayout();
 		statusBar = new JPanel();
 		statusBar.setPreferredSize(new Dimension(800, 20));
@@ -102,5 +109,24 @@ public abstract class AbstractWindow extends JFrame {
 
 	public JLabel getMiscLabel() {
 		return miscLabel;
+	}
+
+	public JMenu initialiseMenuSettings() {
+		if (menu_settings != null)
+			return menu_settings;
+		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TEXT_LABELS)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_KEEP_TREE_SORTED)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
+		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
+		return menu_settings;
+
 	}
 }
