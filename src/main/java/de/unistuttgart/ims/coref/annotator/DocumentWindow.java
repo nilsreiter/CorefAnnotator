@@ -1822,6 +1822,8 @@ public class DocumentWindow extends JFrame
 						candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
 					}
 					JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+					candMenu.add(newEntityAction);
+					candMenu.addSeparator();
 					candidates.forEach(entity -> {
 						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
 						mi.addActionListener(new ActionListener() {
