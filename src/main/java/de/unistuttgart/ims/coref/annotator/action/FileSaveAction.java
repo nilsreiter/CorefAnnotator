@@ -12,23 +12,20 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
-public class FileSaveAction extends IkonAction {
+public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
-	DocumentWindow documentWindow;
-
 	public FileSaveAction(DocumentWindow dw) {
-		super(MaterialDesign.MDI_CONTENT_SAVE);
+		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
 		putValue(Action.NAME, Annotator.getString("action.save"));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		documentWindow = dw;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.saveCurrentFile();
+		target.saveCurrentFile();
 	}
 
 }

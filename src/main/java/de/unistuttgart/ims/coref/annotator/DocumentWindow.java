@@ -35,9 +35,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -101,21 +99,32 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
+import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
-import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
+import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
+import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
+import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -130,7 +139,6 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
-import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -140,8 +148,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends JFrame
-		implements CaretListener, TreeModelListener, CoreferenceModelListener, TextWindow, DocumentStateListener {
+public class DocumentWindow extends JFrame implements CaretListener, TreeModelListener, CoreferenceModelListener,
+		HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -157,24 +165,7 @@ public class DocumentWindow extends JFrame
 	int mouseClickedPosition = -1;
 
 	// actions
-	AbstractAction commentAction = new CommentAction(null);
-	AbstractAction newEntityAction;
-	AbstractAction renameAction;
-	AbstractAction changeKeyAction;
-	AbstractAction changeColorAction;
-	DeleteAction deleteAction;
-	AbstractAction formGroupAction, mergeSelectedEntitiesAction = new MergeSelectedEntities();
-	ToggleMentionDifficult toggleMentionDifficult;
-	ToggleMentionAmbiguous toggleMentionAmbiguous;
-	AbstractAction toggleEntityGeneric, toggleEntityDisplayed = new ToggleEntityVisible();
-	AbstractAction sortByAlpha;
-	AbstractAction sortByMentions, sortDescending = new ToggleEntitySortOrder();
-	AbstractAction fileSaveAction, showSearchPanelAction;
-	AbstractAction toggleTrimWhitespace, toggleShowTextInTreeLabels, closeAction = new CloseAction();
-	AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal();
-	AbstractAction setDocumentLanguageAction = new SetLanguageAction();
-	AbstractAction clearAction = new ClearAction();
-	AbstractAction copyAction, undoAction;
+	ActionContainer actions = new ActionContainer();
 
 	// controller
 	DocumentModel documentModel;
@@ -207,10 +198,6 @@ public class DocumentWindow extends JFrame
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 
 	// Settings
-	@Deprecated
-	boolean trimWhitespace = true;
-	@Deprecated
-	float lineSpacing = 2f;
 	StylePlugin currentStyle;
 
 	// sub windows
@@ -234,22 +221,22 @@ public class DocumentWindow extends JFrame
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
-		treePopupMenu.add(this.deleteAction);
+		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionAmbiguous));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionDifficult));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleMentionNonNominal));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
-		treePopupMenu.add(this.newEntityAction);
-		treePopupMenu.add(this.renameAction);
-		treePopupMenu.add(this.changeColorAction);
-		treePopupMenu.add(this.changeKeyAction);
-		treePopupMenu.add(this.mergeSelectedEntitiesAction);
-		treePopupMenu.add(this.formGroupAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityGeneric));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.toggleEntityDisplayed));
+		treePopupMenu.add(this.actions.newEntityAction);
+		treePopupMenu.add(this.actions.renameAction);
+		treePopupMenu.add(this.actions.changeColorAction);
+		treePopupMenu.add(this.actions.changeKeyAction);
+		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
+		treePopupMenu.add(this.actions.formGroupAction);
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
+		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -280,14 +267,14 @@ public class DocumentWindow extends JFrame
 		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
 		controls.setRollover(true);
-		controls.add(newEntityAction);
-		controls.add(renameAction);
-		controls.add(changeKeyAction);
-		controls.add(changeColorAction);
-		controls.add((deleteAction));
-		controls.add((formGroupAction));
-		controls.add(mergeSelectedEntitiesAction);
-		controls.add(showSearchPanelAction);
+		controls.add(actions.newEntityAction);
+		controls.add(actions.renameAction);
+		controls.add(actions.changeKeyAction);
+		controls.add(actions.changeColorAction);
+		controls.add((actions.deleteAction));
+		controls.add(actions.formGroupAction);
+		controls.add(actions.mergeSelectedEntitiesAction);
+		controls.add(actions.showSearchPanelAction);
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -345,7 +332,7 @@ public class DocumentWindow extends JFrame
 		textPane.addCaretListener(this);
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				copyAction);
+				actions.copyAction);
 
 		highlightManager = new HighlightManager(textPane);
 
@@ -365,35 +352,35 @@ public class DocumentWindow extends JFrame
 	}
 
 	protected void initialiseActions() {
-		this.renameAction = new RenameEntityAction();
-		this.newEntityAction = new NewEntityAction();
-		this.changeColorAction = new ChangeColorForEntity();
-		this.changeKeyAction = new ChangeKeyForEntityAction();
-		this.deleteAction = new DeleteAction();
-		this.formGroupAction = new FormEntityGroup();
-		this.toggleMentionDifficult = new ToggleMentionDifficult();
-		this.toggleMentionAmbiguous = new ToggleMentionAmbiguous();
-		this.toggleEntityGeneric = new ToggleEntityGeneric();
-		this.sortByAlpha = new SortTreeByAlpha();
-		this.sortByMentions = new SortTreeByMentions();
-		this.fileSaveAction = new FileSaveAction(this);
-		this.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.copyAction = new CopyAction(this, mainApplication);
-		this.undoAction = new UndoAction(this);
+		this.actions.renameAction = new RenameEntityAction();
+		this.actions.newEntityAction = new NewEntityAction(this);
+		this.actions.changeColorAction = new ChangeColorForEntity(this);
+		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
+		this.actions.deleteAction = new DeleteAction();
+		this.actions.formGroupAction = new FormEntityGroup();
+		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
+		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
+		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
+		this.actions.sortByAlpha = new SortTreeByAlpha();
+		this.actions.sortByMentions = new SortTreeByMentions();
+		this.actions.fileSaveAction = new FileSaveAction(this);
+		this.actions.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
+		this.actions.copyAction = new CopyAction(this, mainApplication);
+		this.actions.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
-		newEntityAction.setEnabled(false);
-		renameAction.setEnabled(false);
-		changeKeyAction.setEnabled(false);
-		changeColorAction.setEnabled(false);
-		deleteAction.setEnabled(false);
-		formGroupAction.setEnabled(false);
-		mergeSelectedEntitiesAction.setEnabled(false);
-		toggleMentionDifficult.setEnabled(false);
-		toggleMentionAmbiguous.setEnabled(false);
-		toggleEntityGeneric.setEnabled(false);
-		toggleEntityDisplayed.setEnabled(false);
-		undoAction.setEnabled(false);
+		actions.newEntityAction.setEnabled(false);
+		actions.renameAction.setEnabled(false);
+		actions.changeKeyAction.setEnabled(false);
+		actions.changeColorAction.setEnabled(false);
+		actions.deleteAction.setEnabled(false);
+		actions.formGroupAction.setEnabled(false);
+		actions.mergeSelectedEntitiesAction.setEnabled(false);
+		actions.toggleMentionDifficult.setEnabled(false);
+		actions.toggleMentionAmbiguous.setEnabled(false);
+		actions.toggleEntityGeneric.setEnabled(false);
+		actions.toggleEntityDisplayed.setEnabled(false);
+		actions.undoAction.setEnabled(false);
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -422,21 +409,22 @@ public class DocumentWindow extends JFrame
 		JMenu viewStyleMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_STYLE));
 		grp = new ButtonGroup();
 		StylePlugin pl = pm.getDefaultStylePlugin();
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(pm.getDefaultStylePlugin()));
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
+				new ViewStyleSelectAction(this, pm.getDefaultStylePlugin()));
 		radio1.setSelected(true);
 		viewStyleMenu.add(radio1);
 		styleMenuItem.put(pl, radio1);
 		grp.add(radio1);
 		for (Class<? extends StylePlugin> plugin : pm.getStylePlugins()) {
 			pl = pm.getStylePlugin(plugin);
-			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(pl));
+			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(this, pl));
 			viewStyleMenu.add(radio1);
 			styleMenuItem.put(pl, radio1);
 			grp.add(radio1);
 
 		}
 		viewMenu.add(viewStyleMenu);
-		viewMenu.add(new ViewShowCommentsAction());
+		viewMenu.add(new ViewShowCommentsAction(this));
 		return viewMenu;
 
 	}
@@ -460,9 +448,9 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuTools() {
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
-		toolsMenu.add(showSearchPanelAction);
-		toolsMenu.add(setDocumentLanguageAction);
-		toolsMenu.add(clearAction);
+		toolsMenu.add(actions.showSearchPanelAction);
+		toolsMenu.add(actions.setDocumentLanguageAction);
+		toolsMenu.add(actions.clearAction);
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
@@ -480,7 +468,7 @@ public class DocumentWindow extends JFrame
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
 				if (plugin.getExporter() != null)
-					fileExportMenu.add(new FileExportAction(plugin));
+					fileExportMenu.add(new FileExportAction(this, this, plugin));
 			} catch (ResourceInitializationException e) {
 				Annotator.logger.catching(e);
 			}
@@ -491,10 +479,10 @@ public class DocumentWindow extends JFrame
 		fileMenu.add(new FileOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
-		fileMenu.add(fileSaveAction);
-		fileMenu.add(new FileSaveAsAction());
+		fileMenu.add(actions.fileSaveAction);
+		fileMenu.add(new FileSaveAsAction(this));
 		fileMenu.add(fileExportMenu);
-		fileMenu.add(closeAction);
+		fileMenu.add(actions.closeAction);
 		fileMenu.add(mainApplication.quitAction);
 
 		return fileMenu;
@@ -502,28 +490,28 @@ public class DocumentWindow extends JFrame
 
 	protected JMenu initialiseMenuEntity() {
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
-		entityMenu.add(new JMenuItem(undoAction));
-		entityMenu.add(new JMenuItem(copyAction));
-		entityMenu.add(new JMenuItem(deleteAction));
-		entityMenu.add(new JMenuItem(commentAction));
+		entityMenu.add(new JMenuItem(actions.undoAction));
+		entityMenu.add(new JMenuItem(actions.copyAction));
+		entityMenu.add(new JMenuItem(actions.deleteAction));
+		entityMenu.add(new JMenuItem(actions.commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionAmbiguous));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionDifficult));
-		entityMenu.add(new JCheckBoxMenuItem(toggleMentionNonNominal));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
-		entityMenu.add(new JMenuItem(newEntityAction));
-		entityMenu.add(new JMenuItem(renameAction));
-		entityMenu.add(new JMenuItem(changeColorAction));
-		entityMenu.add(new JMenuItem(changeKeyAction));
-		entityMenu.add(new JMenuItem(formGroupAction));
-		entityMenu.add(new JCheckBoxMenuItem(toggleEntityGeneric));
-		entityMenu.add(new JCheckBoxMenuItem(toggleEntityDisplayed));
+		entityMenu.add(new JMenuItem(actions.newEntityAction));
+		entityMenu.add(new JMenuItem(actions.renameAction));
+		entityMenu.add(new JMenuItem(actions.changeColorAction));
+		entityMenu.add(new JMenuItem(actions.changeKeyAction));
+		entityMenu.add(new JMenuItem(actions.formGroupAction));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
+		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.sortByAlpha);
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.sortByMentions);
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
+		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
 		radio2.setSelected(true);
 		ButtonGroup grp = new ButtonGroup();
 		grp.add(radio2);
@@ -531,7 +519,7 @@ public class DocumentWindow extends JFrame
 
 		sortMenu.add(radio1);
 		sortMenu.add(radio2);
-		sortMenu.add(new JCheckBoxMenuItem(this.sortDescending));
+		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
 
 		entityMenu.add(sortMenu);
 		return entityMenu;
@@ -559,7 +547,7 @@ public class DocumentWindow extends JFrame
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				actions.closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 			}
 		});
 
@@ -582,7 +570,7 @@ public class DocumentWindow extends JFrame
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
 		else
-			this.fileSaveAction.setEnabled(false);
+			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
 		try {
@@ -639,47 +627,13 @@ public class DocumentWindow extends JFrame
 		}.execute();
 	}
 
-	public JCas getJcas() {
+	@Override
+	public JCas getJCas() {
 		return jcas;
 	}
 
 	public Annotator getMainApplication() {
 		return mainApplication;
-	}
-
-	class ViewStyleSelectAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		StylePlugin styleVariant;
-
-		public ViewStyleSelectAction(StylePlugin style) {
-			putValue(Action.NAME, style.getName());
-			styleVariant = style;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			switchStyle(styleVariant);
-
-		}
-
-	}
-
-	class ViewShowCommentsAction extends DocumentWindowAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ViewShowCommentsAction() {
-			super(DocumentWindow.this, Constants.Strings.ACTION_SHOW_COMMENTS, MaterialDesign.MDI_MESSAGE);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			commentsWindow.setVisible(true);
-
-		}
-
 	}
 
 	class SetLanguageAction extends AnnotatorAction {
@@ -719,7 +673,7 @@ public class DocumentWindow extends JFrame
 			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Alphabet);
 			documentModel.getTreeModel().getEntitySortOrder().descending = false;
 			documentModel.getTreeModel().resort();
-			sortDescending.putValue(Action.SELECTED_KEY, false);
+			actions.sortDescending.putValue(Action.SELECTED_KEY, false);
 		}
 
 	}
@@ -739,7 +693,7 @@ public class DocumentWindow extends JFrame
 			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Mentions);
 			documentModel.getTreeModel().getEntitySortOrder().descending = true;
 			documentModel.getTreeModel().resort();
-			sortDescending.putValue(Action.SELECTED_KEY, true);
+			actions.sortDescending.putValue(Action.SELECTED_KEY, true);
 		}
 
 	}
@@ -912,7 +866,7 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		newEntityAction.setEnabled(
+		actions.newEntityAction.setEnabled(
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
@@ -1156,31 +1110,6 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class ChangeColorForEntity extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ChangeColorForEntity() {
-			super(null, Strings.ACTION_SET_COLOR, MaterialDesign.MDI_FORMAT_COLOR_FILL);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			Color color = new Color(etn.getEntity().getColor());
-
-			Color newColor = JColorChooser.showDialog(DocumentWindow.this,
-					Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
-			if (color != newColor) {
-				documentModel.getCoreferenceModel().edit(new Op.UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
-			}
-
-		}
-
-	}
-
 	class ChangeKeyForEntityAction extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1211,26 +1140,6 @@ public class DocumentWindow extends JFrame
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
 							JOptionPane.INFORMATION_MESSAGE);
 				}
-		}
-
-	}
-
-	class NewEntityAction extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public NewEntityAction() {
-			super(null, Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			AddMentionsToNewEntity op = new AddMentionsToNewEntity(getSelection());
-			documentModel.getCoreferenceModel().edit(op);
 		}
 
 	}
@@ -1567,179 +1476,6 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class FileExportAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		IOPlugin plugin;
-
-		public FileExportAction(IOPlugin plugin) {
-			putValue(Action.NAME, plugin.getName());
-			this.plugin = plugin;
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser saveDialog = new JFileChooser(file.getParentFile());
-			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(plugin.getFileFilter());
-			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
-			int r = saveDialog.showSaveDialog(DocumentWindow.this);
-			switch (r) {
-			case JFileChooser.APPROVE_OPTION:
-				File f = saveDialog.getSelectedFile();
-				saveToFile(f, plugin, true);
-				break;
-			default:
-			}
-		}
-
-	}
-
-	class FileSaveAsAction extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public FileSaveAsAction() {
-			super(null, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser saveDialog;
-			if (file == null)
-				saveDialog = new JFileChooser();
-			else
-				saveDialog = new JFileChooser(file.getParentFile());
-			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(mainApplication.getPluginManager().getDefaultIOPlugin().getFileFilter());
-			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
-			int r = saveDialog.showSaveDialog(DocumentWindow.this);
-			switch (r) {
-			case JFileChooser.APPROVE_OPTION:
-				File f = saveDialog.getSelectedFile();
-				if (!f.getName().endsWith(".xmi")) {
-					f = new File(f.getAbsolutePath() + ".xmi");
-				}
-				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin(), true);
-				mainApplication.recentFiles.add(0, f);
-				mainApplication.refreshRecents();
-				break;
-			default:
-			}
-
-		}
-	}
-
-	class ToggleEntitySortOrder extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleEntitySortOrder() {
-			super(null, Strings.ACTION_SORT_REVERT, MaterialDesign.MDI_SORT_VARIANT);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getTreeModel()
-					.getEntitySortOrder().descending = !documentModel.getTreeModel().getEntitySortOrder().descending;
-			documentModel.getTreeModel().resort();
-		}
-	}
-
-	class ToggleEntityGeneric extends AnnotatorAction {
-		private static final long serialVersionUID = 1L;
-
-		public ToggleEntityGeneric() {
-			super(null, Strings.ACTION_FLAG_ENTITY_GENERIC, MaterialDesign.MDI_CLOUD);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_ENTITY_GENERIC_TOOLTIP));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().edit(
-					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC, Lists.immutable.of(tree.getSelectionPaths())
-							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-	}
-
-	class ToggleEntityVisible extends AnnotatorAction {
-		private static final long serialVersionUID = 1L;
-
-		public ToggleEntityVisible() {
-			super(null, Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY, MaterialDesign.MDI_ACCOUNT_OUTLINE);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().edit(
-					new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN, Lists.immutable.of(tree.getSelectionPaths())
-							.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-	}
-
-	class ToggleMentionDifficult extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionDifficult() {
-			super(null, Strings.ACTION_FLAG_MENTION_DIFFICULT, MaterialDesign.MDI_ALERT_BOX);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_DIFFICULT_TOOLTIP));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
-	}
-
-	class ToggleMentionNonNominal extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionNonNominal() {
-			super(null, Strings.ACTION_FLAG_MENTION_NON_NOMINAL, MaterialDesign.MDI_FLAG);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_NON_NOMINAL,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
-	}
-
-	class ToggleMentionAmbiguous extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleMentionAmbiguous() {
-			super(MaterialDesign.MDI_SHARE_VARIANT);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_MENTION_AMBIGUOUS));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel()
-					.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
-							Lists.immutable.of(tree.getSelectionPaths())
-									.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
-		}
-
-	}
-
 	@Deprecated
 	class ToggleShowTextInTreeLabels extends AnnotatorAction {
 
@@ -1801,8 +1537,8 @@ public class DocumentWindow extends JFrame
 				Annotator.logger.trace("Right-clicked in text at " + e.getPoint());
 				mouseClickedPosition = textPane.viewToModel(e.getPoint());
 
-				if (textPane.getSelectionStart() != textPane.getSelectionEnd())
-					textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				// if (textPane.getSelectionStart() != textPane.getSelectionEnd())
+				textPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
 
 		}
@@ -1864,10 +1600,10 @@ public class DocumentWindow extends JFrame
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
 						mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
-					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJcas()).take(5));
+					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
 				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
-				candMenu.add(newEntityAction);
+				candMenu.add(actions.newEntityAction);
 				candMenu.addSeparator();
 				candidates.forEach(entity -> {
 					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
@@ -1943,31 +1679,31 @@ public class DocumentWindow extends JFrame
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			collectData(e);
-			renameAction.setEnabled(isSingle() && isEntity());
-			changeKeyAction.setEnabled(isSingle() && isEntity());
-			changeColorAction.setEnabled(isSingle() && isEntity());
-			toggleEntityGeneric.setEnabled(isEntity());
-			toggleEntityGeneric.putValue(Action.SELECTED_KEY,
+			actions.renameAction.setEnabled(isSingle() && isEntity());
+			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
+			actions.changeColorAction.setEnabled(isSingle() && isEntity());
+			actions.toggleEntityGeneric.setEnabled(isEntity());
+			actions.toggleEntityGeneric.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
-			deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
+			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
 					|| (isEntity() && isLeaf()));
-			formGroupAction.setEnabled(isDouble() && isEntity());
-			mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
+			actions.formGroupAction.setEnabled(isDouble() && isEntity());
+			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
-			toggleMentionDifficult.setEnabled(isMention());
-			toggleMentionDifficult.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionDifficult.setEnabled(isMention());
+			actions.toggleMentionDifficult.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isDifficult(getMention(0)));
 
-			toggleMentionAmbiguous.setEnabled(isMention());
-			toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionAmbiguous.setEnabled(isMention());
+			actions.toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
 
-			toggleMentionNonNominal.setEnabled(isMention());
-			toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
+			actions.toggleMentionNonNominal.setEnabled(isMention());
+			actions.toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
 					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
 
-			toggleEntityDisplayed.setEnabled(isEntity());
-			toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
+			actions.toggleEntityDisplayed.setEnabled(isEntity());
+			actions.toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
@@ -2147,6 +1883,7 @@ public class DocumentWindow extends JFrame
 
 	}
 
+	@Override
 	public JTree getTree() {
 		return tree;
 	}
@@ -2179,10 +1916,51 @@ public class DocumentWindow extends JFrame
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		undoAction.setEnabled(state.getHistorySize() > 0);
-		fileSaveAction.setEnabled(state.getHistorySize() > 0);
+		actions.undoAction.setEnabled(state.getHistorySize() > 0);
+		actions.fileSaveAction.setEnabled(state.getHistorySize() > 0);
 		unsavedChanges = (state.getHistorySize() > 0);
 		setWindowTitle();
 	}
 
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public CommentWindow getCommentsWindow() {
+		return commentsWindow;
+	}
+
+	class ActionContainer {
+
+		AbstractAction clearAction = new ClearAction();
+		AbstractAction closeAction = new CloseAction();
+		AbstractAction changeColorAction;
+		AbstractAction changeKeyAction;
+		AbstractAction commentAction = new CommentAction(null);
+		AbstractAction copyAction;
+		DeleteAction deleteAction;
+		AbstractAction fileSaveAction;
+		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		AbstractAction toggleEntityGeneric;
+		ToggleMentionAmbiguous toggleMentionAmbiguous;
+		ToggleMentionDifficult toggleMentionDifficult;
+		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
+		AbstractAction toggleShowTextInTreeLabels;
+		AbstractAction toggleTrimWhitespace;
+		AbstractAction undoAction;
+		AbstractAction setDocumentLanguageAction = new SetLanguageAction();
+		AbstractAction showSearchPanelAction;
+		AbstractAction sortByAlpha;
+		AbstractAction sortByMentions;
+		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
+		AbstractAction formGroupAction;
+		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
+		AbstractAction newEntityAction;
+		AbstractAction renameAction;
+
+	}
 }
