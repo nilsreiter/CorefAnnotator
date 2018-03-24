@@ -18,6 +18,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -53,14 +54,15 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		CATreeNode arg0 = get(event.getArgument(0));
 		switch (eventType) {
 		case Add:
-			for (int i = 1; i < event.getArity(); i++) {
-				CATreeNode tn = createNode(event.getArgument(i));
-				insertNodeInto(tn, arg0, getInsertPosition(arg0, event.getArgument(i)));
-				if (event.getArgument(i) instanceof EntityGroup) {
-					EntityGroup eg = (EntityGroup) event.getArgument(i);
-					for (int j = 0; j < eg.getMembers().size(); j++)
-						insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
-
+			for (FeatureStructure fs : event.iterable(1)) {
+				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
+					CATreeNode tn = createNode(fs);
+					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
+					if (fs instanceof EntityGroup) {
+						EntityGroup eg = (EntityGroup) fs;
+						for (int j = 0; j < eg.getMembers().size(); j++)
+							insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
+					}
 				}
 			}
 			optResort();
