@@ -20,7 +20,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -197,8 +196,6 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	CoreferenceModel targetModel;
 
-	JMenuBar menuBar = new JMenuBar();
-
 	boolean textIsSet = false;
 
 	public CompareMentionsWindow(Annotator mainApplication) throws UIMAException {
@@ -343,8 +340,6 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(helpMenu);
-
-		setJMenuBar(menuBar);
 
 		Annotator.logger.info("Initialised menus");
 	}
