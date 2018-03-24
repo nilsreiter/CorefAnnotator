@@ -106,6 +106,7 @@ import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -492,7 +493,7 @@ public class DocumentWindow extends JFrame
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(fileSaveAction);
-		fileMenu.add(new FileSaveAsAction());
+		fileMenu.add(new FileSaveAsAction(this));
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(closeAction);
 		fileMenu.add(mainApplication.quitAction);
@@ -639,6 +640,7 @@ public class DocumentWindow extends JFrame
 		}.execute();
 	}
 
+	@Override
 	public JCas getJCas() {
 		return jcas;
 	}
@@ -1596,43 +1598,6 @@ public class DocumentWindow extends JFrame
 
 	}
 
-	class FileSaveAsAction extends AnnotatorAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public FileSaveAsAction() {
-			super(null, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser saveDialog;
-			if (file == null)
-				saveDialog = new JFileChooser();
-			else
-				saveDialog = new JFileChooser(file.getParentFile());
-			saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-			saveDialog.setFileFilter(mainApplication.getPluginManager().getDefaultIOPlugin().getFileFilter());
-			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
-			int r = saveDialog.showSaveDialog(DocumentWindow.this);
-			switch (r) {
-			case JFileChooser.APPROVE_OPTION:
-				File f = saveDialog.getSelectedFile();
-				if (!f.getName().endsWith(".xmi")) {
-					f = new File(f.getAbsolutePath() + ".xmi");
-				}
-				saveToFile(f, mainApplication.getPluginManager().getDefaultIOPlugin(), true);
-				mainApplication.recentFiles.add(0, f);
-				mainApplication.refreshRecents();
-				break;
-			default:
-			}
-
-		}
-	}
-
 	class ToggleEntitySortOrder extends AnnotatorAction {
 
 		private static final long serialVersionUID = 1L;
@@ -2183,6 +2148,14 @@ public class DocumentWindow extends JFrame
 		fileSaveAction.setEnabled(state.getHistorySize() > 0);
 		unsavedChanges = (state.getHistorySize() > 0);
 		setWindowTitle();
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 }
