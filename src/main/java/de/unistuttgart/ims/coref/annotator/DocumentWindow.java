@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -69,6 +70,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -1398,7 +1400,15 @@ public class DocumentWindow extends JFrame
 				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			} else if (e.getKeyChar() == ' ') {
-				textPopupMenu.setVisible(true);
+				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+					Rectangle p;
+					try {
+						p = textPane.modelToView(textPane.getSelectionStart());
+						textPopupMenu.show(e.getComponent(), p.x, p.y);
+					} catch (BadLocationException e1) {
+						Annotator.logger.catching(e1);
+					}
+				}
 			}
 		}
 
