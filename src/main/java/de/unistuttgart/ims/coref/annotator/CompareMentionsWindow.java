@@ -58,7 +58,7 @@ import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
-public class CompareMentionsWindow extends JFrame implements TextWindow, CoreferenceModelListener {
+public class CompareMentionsWindow extends JFrame implements HasTextView, CoreferenceModelListener {
 
 	class CopyMentionAction extends AbstractAction {
 
@@ -447,5 +447,10 @@ public class CompareMentionsWindow extends JFrame implements TextWindow, Corefer
 				}
 			}
 		}
+	}
+
+	@Override
+	public JCas getJCas() {
+		return targetJCas;
 	}
 }

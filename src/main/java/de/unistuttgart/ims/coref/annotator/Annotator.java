@@ -71,7 +71,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	Set<DocumentWindow> openFiles = Sets.mutable.empty();
 
-	MutableList<File> recentFiles;
+	public MutableList<File> recentFiles;
 
 	TypeSystemDescription typeSystemDescription;
 
