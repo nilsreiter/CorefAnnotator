@@ -24,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -343,7 +342,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 	protected void initialiseWindow() {
 		Caret caret = new Caret();
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		// JTabbedPane tabbedPane = new JTabbedPane();
 		mentionsTextPane = new JTextPane();
 		mentionsTextPane.setPreferredSize(new Dimension(500, 800));
 		mentionsTextPane.setDragEnabled(true);
@@ -352,7 +351,7 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 		mentionsTextPane.getCaret().setVisible(true);
 		mentionsTextPane.addFocusListener(caret);
 		mentionsTextPane.setCaretPosition(0);
-		mentionsTextPane.addMouseListener(new TextMouseListener());
+		// mentionsTextPane.addMouseListener(new TextMouseListener());
 		mentionsTextPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
@@ -370,9 +369,9 @@ public class CompareMentionsWindow extends JFrame implements HasTextView, Corefe
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), mentionsInfoPane);
 		mentionsPane.setDividerLocation(500);
 
-		tabbedPane.add("Mentions", mentionsPane);
-		add(tabbedPane, BorderLayout.CENTER);
-
+		// tabbedPane.add("Mentions", mentionsPane);
+		// add(tabbedPane, BorderLayout.CENTER);
+		add(mentionsPane, BorderLayout.CENTER);
 		highlightManager = new HighlightManager(mentionsTextPane);
 		setPreferredSize(new Dimension(800, 800));
 		pack();
