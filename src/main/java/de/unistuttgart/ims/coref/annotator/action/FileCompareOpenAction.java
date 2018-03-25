@@ -21,29 +21,17 @@ public class FileCompareOpenAction extends AnnotatorAction {
 
 	private static final long serialVersionUID = 1L;
 
-	JDialog dialog;
-
 	public FileCompareOpenAction(Annotator mApp) {
 		super(mApp, MaterialDesign.MDI_COMPARE);
 		putValue(Action.NAME, Annotator.getString(Constants.Strings.ACTION_COMPARE));
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMPARE_TOOLTIP));
-		init();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		JDialog dialog = new SelectTwoFiles(new RunComparisonAction());
 		dialog.setVisible(true);
 		dialog.pack();
-	}
-
-	protected void init() {
-		if (dialog == null) {
-			dialog = initialiseDialog();
-		}
-	}
-
-	protected JDialog initialiseDialog() {
-		return new SelectTwoFiles(new RunComparisonAction());
 	}
 
 	class RunComparisonAction extends AbstractAction {
@@ -79,7 +67,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 						}
 						cmw.setVisible(true);
 						cmw.pack();
-						dialog.setVisible(false);
+						SwingUtilities.getWindowAncestor((Component) e.getSource()).setVisible(false);
 					} catch (UIMAException e1) {
 						Annotator.logger.catching(e1);
 					}
