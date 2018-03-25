@@ -275,7 +275,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 			}
 		}
 
-		this.mentionsInfoPane.add(getAgreementPanel(), size);
+		this.mentionsInfoPane.add(getAgreementPanel(), -1);
 	}
 
 	public void entityEvent(Event event, Entity entity) {
@@ -319,8 +319,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	protected JPanel getAnnotatorPanel(int index) {
 
-		AnnotatorStatistics stats = new AnnotatorStatistics();
-		stats.analyze(jcas.get(index));
+		AnnotatorStatistics stats = annotatorStats.get(index);
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(5, 2));
@@ -463,8 +462,8 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
-		drawAllAnnotations();
 		mentionsInfoPane.add(getAnnotatorPanel(index), index);
+		drawAllAnnotations();
 		new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas).execute();
 		revalidate();
 	}
