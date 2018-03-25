@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,8 +41,10 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
@@ -132,8 +135,8 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 				JPopupMenu pMenu = new JPopupMenu();
 				int offset = mentionsTextPane.viewToModel(e.getPoint());
 
-				for (int i = 0; i < models.length; i++) {
-					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models[i].getMentions(offset));
+				for (int i = 0; i < models.size(); i++) {
+					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models.get(i).getMentions(offset));
 					MutableList<Annotation> mentions = localAnnotations
 							.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 					for (Annotation m : mentions) {
@@ -172,22 +175,23 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	}
 
 	private static final long serialVersionUID = 1L;
-	String[] annotatorIds = new String[2];
-	Color[] colors = new Color[] { Color.blue, Color.red };
-	Action[] open = new Action[2];
+	MutableList<String> annotatorIds;
+	Color[] colors = new Color[] { Color.blue, Color.red, Color.green };
+	MutableList<Action> open;
 
 	AbstractAction copyAction;
 
 	HighlightManager highlightManager;
-	JCas[] jcas = new JCas[2];
-	File[] files = new File[2];
+	MutableList<JCas> jcas;
+	MutableList<File> files;
 	int loadedJCas = 0;
 	int loadedCModels = 0;
 	Annotator mainApplication;
 	JPanel mentionsInfoPane;
 
 	JTextPane mentionsTextPane;
-	CoreferenceModel[] models = new CoreferenceModel[2];
+	MutableList<CoreferenceModel> models;
+	MutableList<AnnotatorStatistics> annotatorStats;
 
 	Statistics stats = new Statistics();
 
@@ -198,9 +202,17 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	CoreferenceModel targetModel;
 
 	boolean textIsSet = false;
+	int size = 0;
 
-	public CompareMentionsWindow(Annotator mainApplication) throws UIMAException {
+	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
+		this.jcas = Lists.mutable.withNValues(size, () -> null);
+		this.files = Lists.mutable.withNValues(size, () -> null);
+		this.annotatorIds = Lists.mutable.withNValues(size, () -> null);
+		this.open = Lists.mutable.withNValues(size, () -> null);
+		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
+		this.models = Lists.mutable.withNValues(size, () -> null);
+		this.size = size;
 		this.initialiseMenu();
 		this.initialiseWindow();
 		this.targetJCas = JCasFactory.createJCas();
@@ -215,54 +227,55 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	}
 
 	protected void drawAllAnnotations() {
-		if (loadedJCas < 2)
+		if (loadedJCas < size)
 			return;
-		Span annotated1 = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE),
-				annotated2 = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
-		MutableMap<Span, Mention> map1 = Maps.mutable.empty();
-		for (Mention m : JCasUtil.select(jcas[0], Mention.class)) {
-			map1.put(new Span(m), m);
-			if (m.getEnd() > annotated1.end)
-				annotated1.end = m.getEnd();
-			if (m.getBegin() < annotated1.begin)
-				annotated1.begin = m.getBegin();
-		}
-		MutableMap<Span, Mention> map2 = Maps.mutable.empty();
-		for (Mention m : JCasUtil.select(jcas[1], Mention.class)) {
-			map2.put(new Span(m), m);
-			if (m.getEnd() > annotated2.end)
-				annotated2.end = m.getEnd();
-			if (m.getBegin() < annotated2.begin)
-				annotated2.begin = m.getBegin();
-		}
-		Span annotatedInParallel = new Span(Math.max(annotated1.begin, annotated2.begin),
-				Math.min(annotated1.end, annotated2.end));
+		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
+		MutableMap<Span, Mention> map = Maps.mutable.empty();
+		Span overlapping = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
+		for (JCas jcas : jcas) {
+			MutableSet<Span> map1 = Sets.mutable.empty();
 
-		for (Span s : map1.keySet()) {
-			if (map2.containsKey(s)) {
-				highlightManager.underline(map1.get(s), Color.gray.brighter());
-				stats.agreed++;
-				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
-					stats.totalInOverlappingPart++;
-				stats.total++;
-			} else {
-				highlightManager.underline(map1.get(s), colors[0]);
-				stats.total++;
-				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
-					stats.totalInOverlappingPart++;
+			Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
+			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+				map1.add(new Span(m));
+				map.put(new Span(m), m);
+
+				if (m.getEnd() > annotatedRange.end)
+					annotatedRange.end = m.getEnd();
+				if (m.getBegin() < annotatedRange.begin)
+					annotatedRange.begin = m.getBegin();
+			}
+			mapList.add(map1);
+			if (overlapping.begin < annotatedRange.begin)
+				overlapping.begin = annotatedRange.begin;
+			if (overlapping.end > annotatedRange.end)
+				overlapping.end = annotatedRange.end;
+		}
+
+		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
+		for (int i = 1; i < mapList.size(); i++) {
+			intersection = intersection.intersect(mapList.get(i));
+		}
+
+		for (Span s : intersection) {
+			highlightManager.underline(map.get(s), Color.gray.brighter());
+		}
+		stats.agreed = intersection.size();
+		stats.total = stats.agreed;
+		stats.totalInOverlappingPart = stats.agreed;
+		for (int i = 0; i < mapList.size(); i++) {
+			Set<Span> spans = mapList.get(i);
+			for (Span s : spans) {
+				if (!intersection.contains(s)) {
+					highlightManager.underline(map.get(s), colors[i]);
+					stats.total++;
+					if (overlapping.contains(s))
+						stats.totalInOverlappingPart++;
+				}
 			}
 		}
 
-		for (Span s : map2.keySet()) {
-			if (!map1.containsKey(s)) {
-				highlightManager.underline(map2.get(s), colors[1]);
-				stats.total++;
-				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
-					stats.totalInOverlappingPart++;
-			}
-		}
-
-		this.mentionsInfoPane.add(getAgreementPanel(), 2);
+		this.mentionsInfoPane.add(getAgreementPanel(), size);
 	}
 
 	public void entityEvent(Event event, Entity entity) {
@@ -307,11 +320,11 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	protected JPanel getAnnotatorPanel(int index) {
 
 		AnnotatorStatistics stats = new AnnotatorStatistics();
-		stats.analyze(jcas[index]);
+		stats.analyze(jcas.get(index));
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(5, 2));
-		Border border = BorderFactory.createTitledBorder(annotatorIds[index]);
+		Border border = BorderFactory.createTitledBorder(annotatorIds.get(index));
 		panel.setBorder(border);
 		panel.setPreferredSize(new Dimension(200, 75));
 		JLabel desc;
@@ -343,7 +356,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 				SwingConstants.RIGHT));
 
 		panel.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_OPEN), SwingConstants.RIGHT));
-		panel.add(new JButton(open[index]));
+		panel.add(new JButton(open.get(index)));
 
 		return panel;
 	}
@@ -431,44 +444,28 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	}
 
 	private void finishLoading() {
-		if (loadedCModels >= 2) {
+		if (loadedCModels >= files.size()) {
 			super.stopIndeterminateProgress();
 		}
 	}
 
-	public void setCoreferenceModelLeft(DocumentModel cm) {
-		models[0] = cm.getCoreferenceModel();
+	public void setCoreferenceModel(DocumentModel cm, int index) {
+		models.set(index, cm.getCoreferenceModel());
 		loadedCModels++;
 		finishLoading();
 	}
 
-	public void setCoreferenceModelRight(DocumentModel cm) {
-		models[1] = cm.getCoreferenceModel();
-		loadedCModels++;
-		finishLoading();
-	}
-
-	public void setJCasLeft(JCas jcas, String annotatorId) {
-		this.jcas[0] = jcas;
-		this.annotatorIds[0] = annotatorId;
+	public void setJCas(JCas jcas, String annotatorId, int index) {
+		this.jcas.set(index, jcas);
+		this.annotatorIds.set(index, annotatorId);
+		this.annotatorStats.set(index, new AnnotatorStatistics());
+		this.annotatorStats.get(index).analyze(jcas);
 		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
 		drawAllAnnotations();
-		mentionsInfoPane.add(getAnnotatorPanel(0), 0);
-		new DocumentModelLoader(cm -> setCoreferenceModelRight(cm), jcas).execute();
-		revalidate();
-	}
-
-	public void setJCasRight(JCas jcas, String annotatorId) {
-		this.jcas[1] = jcas;
-		this.annotatorIds[1] = annotatorId;
-		loadedJCas++;
-		if (!textIsSet)
-			initialiseText(jcas);
-		drawAllAnnotations();
-		mentionsInfoPane.add(getAnnotatorPanel(1), 1);
-		new DocumentModelLoader(cm -> setCoreferenceModelLeft(cm), jcas).execute();
+		mentionsInfoPane.add(getAnnotatorPanel(index), index);
+		new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas).execute();
 		revalidate();
 	}
 
@@ -541,13 +538,14 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		return targetJCas;
 	}
 
-	public void setFileLeft(File file) {
-		this.files[0] = file;
-		this.open[0] = new SelectedFileOpenAction(Annotator.app, file);
+	public void setFile(File file, int index) {
+		this.files.set(index, file);
+		this.open.set(index, new SelectedFileOpenAction(Annotator.app, file));
 	}
 
-	public void setFileRight(File file) {
-		this.files[1] = file;
-		this.open[1] = new SelectedFileOpenAction(Annotator.app, file);
+	public void setFiles(Iterable<File> files) {
+		this.files = Lists.mutable.withAll(files);
+		this.open = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
 	}
+
 }

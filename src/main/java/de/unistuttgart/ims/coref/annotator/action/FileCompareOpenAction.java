@@ -57,6 +57,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SelectTwoFiles stf = (SelectTwoFiles) SwingUtilities.getWindowAncestor((Component) e.getSource());
+
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
@@ -64,17 +65,18 @@ public class FileCompareOpenAction extends AnnotatorAction {
 					CompareMentionsWindow cmw;
 
 					try {
-						cmw = new CompareMentionsWindow(mainApplication);
+						cmw = new CompareMentionsWindow(mainApplication, stf.getFiles().size());
 						cmw.setIndeterminateProgress();
 						cmw.setVisible(true);
-						cmw.setFileLeft(stf.getFilesArray()[0]);
-						cmw.setFileRight(stf.getFilesArray()[1]);
-						new JCasLoader(jcas -> {
-							cmw.setJCasLeft(jcas, stf.getNames()[0]);
-						}, stf.getFilesArray()[0]).execute();
-						new JCasLoader(jcas -> {
-							cmw.setJCasRight(jcas, stf.getNames()[1]);
-						}, stf.getFilesArray()[1]).execute();
+						cmw.setFiles(stf.getFiles());
+
+						for (int i = 0; i < stf.getFiles().size(); i++) {
+							final int j = i;
+							new JCasLoader(jcas -> {
+								cmw.setJCas(jcas, stf.getNames().get(j), j);
+							}, stf.getFiles().get(i)).execute();
+
+						}
 						cmw.setVisible(true);
 						cmw.pack();
 						dialog.setVisible(false);

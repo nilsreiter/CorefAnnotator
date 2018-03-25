@@ -30,11 +30,11 @@ public class SelectTwoFiles extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	MutableList<File> files = Lists.mutable.of(null, null);
-	MutableList<String> names = Lists.mutable.of(null, null);
+	MutableList<File> files = Lists.mutable.empty();
+	MutableList<String> names = Lists.mutable.empty();
 	Action finalAction;
 
-	private JPanel getSelectPanel() {
+	private JPanel getSelectPanel(int index) {
 		JPanel panel = new JPanel();
 		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
 		panel.setLayout(bl);
@@ -43,7 +43,7 @@ public class SelectTwoFiles extends JDialog {
 		textField.setMaximumSize(new Dimension(200, 20));
 		textField.setColumns(40);
 		panel.add(textField);
-		panel.add(new JButton(new SelectFileAction(panel, 0)));
+		panel.add(new JButton(new SelectFileAction(panel, index)));
 		panel.add(Box.createVerticalGlue());
 		panel.setPreferredSize(new Dimension(200, 100));
 		return panel;
@@ -54,8 +54,8 @@ public class SelectTwoFiles extends JDialog {
 		this.finalAction = action;
 		// JSplitPane splitPane = new JSplitPane();
 		JPanel splitPane = new JPanel();
-		splitPane.add(getSelectPanel());
-		splitPane.add(getSelectPanel());
+		splitPane.add(getSelectPanel(0));
+		splitPane.add(getSelectPanel(1));
 
 		JPanel moreLessPanel = new JPanel();
 		BoxLayout bl = new BoxLayout(moreLessPanel, BoxLayout.Y_AXIS);
@@ -70,7 +70,7 @@ public class SelectTwoFiles extends JDialog {
 		moreFilesButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				splitPane.add(getSelectPanel(), splitPane.getComponentCount());
+				splitPane.add(getSelectPanel(splitPane.getComponentCount() - 2), splitPane.getComponentCount());
 				splitPane.add(moreLessPanel);
 				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
 				revalidate();
@@ -83,6 +83,8 @@ public class SelectTwoFiles extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				splitPane.remove(splitPane.getComponentCount() - 2);
 				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
+				files.remove(files.size() - 1);
+				names.remove(names.size() - 1);
 				revalidate();
 				pack();
 			}
@@ -131,8 +133,8 @@ public class SelectTwoFiles extends JDialog {
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();
 				((JTextField) panel.getComponent(0)).setText(filename);
-				files.add(index, chooser.getSelectedFile());
-				names.add(index, files.get(index).getName());
+				files.add(chooser.getSelectedFile());
+				names.add(files.get(index).getName());
 			}
 		}
 
@@ -146,7 +148,7 @@ public class SelectTwoFiles extends JDialog {
 		return files;
 	}
 
-	public String[] getNames() {
-		return names.toArray(new String[names.size()]);
+	public MutableList<String> getNames() {
+		return names;
 	}
 }
