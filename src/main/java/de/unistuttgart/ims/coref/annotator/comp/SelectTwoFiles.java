@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.comp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,11 +10,11 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -30,28 +31,15 @@ public class SelectTwoFiles extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	MutableList<File> files = Lists.mutable.empty();
-	MutableList<String> names = Lists.mutable.empty();
+	MutableList<File> files = Lists.mutable.of(null, null);
+	MutableList<JTextField> textfields = Lists.mutable.of(null, null);
 	Action finalAction;
-
-	private JPanel getSelectPanel(int index) {
-		JPanel panel = new JPanel();
-		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		panel.setLayout(bl);
-		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		JTextField textField = new JTextField();
-		textField.setMaximumSize(new Dimension(200, 20));
-		textField.setColumns(40);
-		panel.add(textField);
-		panel.add(new JButton(new SelectFileAction(panel, index)));
-		panel.add(Box.createVerticalGlue());
-		panel.setPreferredSize(new Dimension(200, 100));
-		return panel;
-	}
+	int numberOfFiles = 2;
 
 	public SelectTwoFiles(Action action) {
 		super();
 		this.finalAction = action;
+		this.finalAction.setEnabled(false);
 		// JSplitPane splitPane = new JSplitPane();
 		JPanel splitPane = new JPanel();
 		splitPane.add(getSelectPanel(0));
@@ -61,18 +49,21 @@ public class SelectTwoFiles extends JDialog {
 		BoxLayout bl = new BoxLayout(moreLessPanel, BoxLayout.Y_AXIS);
 		moreLessPanel.setLayout(bl);
 
-		JButton lessFilesButton = new JButton(Annotator.getString("less"));
+		JButton lessFilesButton = new JButton(Annotator.getString("dialog.less"));
 		lessFilesButton.setIcon(FontIcon.of(MaterialDesign.MDI_MINUS_BOX));
 		lessFilesButton.setEnabled(false);
 
-		JButton moreFilesButton = new JButton(Annotator.getString("more"));
+		JButton moreFilesButton = new JButton(Annotator.getString("dialog.more"));
 		moreFilesButton.setIcon(FontIcon.of(MaterialDesign.MDI_PLUS_BOX));
 		moreFilesButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				splitPane.add(getSelectPanel(splitPane.getComponentCount() - 2), splitPane.getComponentCount());
+				textfields.add(null);
+				files.add(null);
+				splitPane.add(getSelectPanel(numberOfFiles), splitPane.getComponentCount());
+				numberOfFiles++;
 				splitPane.add(moreLessPanel);
-				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
+				lessFilesButton.setEnabled(numberOfFiles > 2);
 				revalidate();
 				pack();
 			}
@@ -81,12 +72,13 @@ public class SelectTwoFiles extends JDialog {
 		lessFilesButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				numberOfFiles--;
 				splitPane.remove(splitPane.getComponentCount() - 2);
 				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
-				files.remove(files.size() - 1);
-				names.remove(names.size() - 1);
 				revalidate();
 				pack();
+				files.remove(numberOfFiles);
+				textfields.remove(numberOfFiles);
 			}
 		});
 		moreLessPanel.add(moreFilesButton);
@@ -112,6 +104,22 @@ public class SelectTwoFiles extends JDialog {
 		pack();
 	}
 
+	private JPanel getSelectPanel(int index) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(3, 2));
+		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		JTextField textField = new JTextField();
+		textField.setMaximumSize(new Dimension(200, 20));
+		textField.setColumns(40);
+		textfields.set(index, textField);
+		panel.add(new JLabel(Annotator.getString(Constants.Strings.DIALOG_ANNOTATOR_LABEL)));
+		panel.add(textField);
+		panel.add(new JLabel(Annotator.getString(Constants.Strings.DIALOG_SELECT_FILE)));
+		panel.add(new JButton(new SelectFileAction(panel, index)));
+		panel.setPreferredSize(new Dimension(200, 80));
+		return panel;
+	}
+
 	class SelectFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -132,11 +140,13 @@ public class SelectTwoFiles extends JDialog {
 			int r = chooser.showOpenDialog(null);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();
-				((JTextField) panel.getComponent(0)).setText(filename);
+				((JTextField) panel.getComponent(1)).setText(filename);
+				((JButton) panel.getComponent(3)).setText(filename);
 				File f = chooser.getSelectedFile();
-				files.add(f);
-				names.add(f.getName());
+				files.set(index, f);
+				textfields.get(index).setText(f.getName());
 				Annotator.app.setCurrentDirectory(chooser.getSelectedFile().getParentFile());
+				finalAction.setEnabled(files.count(file -> file != null) >= 2);
 			}
 		}
 
@@ -151,6 +161,6 @@ public class SelectTwoFiles extends JDialog {
 	}
 
 	public MutableList<String> getNames() {
-		return names;
+		return textfields.collect(tf -> tf.getText());
 	}
 }
