@@ -47,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -102,7 +103,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -112,7 +112,6 @@ import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
-import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
@@ -149,6 +148,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	JCas jcas;
 	File file;
+	@Deprecated
 	Annotator mainApplication;
 
 	String segmentAnnotation = null;
@@ -206,7 +206,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	 */
 
 	protected void initialiseWindow() {
-		super.initialize();
+		super.initializeWindow();
 
 		// popup
 		treePopupMenu = new JPopupMenu();
@@ -253,8 +253,25 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
-		getMiscLabel().setText("Style: " + mainApplication.getPluginManager().getDefaultStylePlugin().getName());
-		getMiscLabel().setToolTipText(mainApplication.getPluginManager().getDefaultStylePlugin().getDescription());
+		// tool bar
+		JToolBar controls = new JToolBar();
+		controls.setFocusable(false);
+		controls.setRollover(true);
+		controls.add(actions.newEntityAction);
+		controls.add(actions.renameAction);
+		controls.add(actions.changeKeyAction);
+		controls.add(actions.changeColorAction);
+		controls.add((actions.deleteAction));
+		controls.add(actions.formGroupAction);
+		controls.add(actions.mergeSelectedEntitiesAction);
+		controls.add(actions.showSearchPanelAction);
+		getContentPane().add(controls, BorderLayout.NORTH);
+
+		for (Component comp : controls.getComponents())
+			comp.setFocusable(false);
+
+		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
+		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
 		getMiscLabel().setPreferredSize(new Dimension(150, 20));
 
 		// initialise text view
@@ -306,8 +323,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
 		this.actions.fileSaveAction = new FileSaveAction(this);
-		this.actions.showSearchPanelAction = new ShowSearchPanelAction(mainApplication, this);
-		this.actions.copyAction = new CopyAction(this, mainApplication);
+		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
+		this.actions.copyAction = new CopyAction(this, Annotator.app);
 		this.actions.undoAction = new UndoAction(this);
 
 		// disable some at the beginning
@@ -346,7 +363,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		viewMenu.addSeparator();
 
-		PluginManager pm = mainApplication.getPluginManager();
+		PluginManager pm = Annotator.app.getPluginManager();
 
 		JMenu viewStyleMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_STYLE));
 		grp = new ButtonGroup();
@@ -368,23 +385,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		viewMenu.add(viewStyleMenu);
 		viewMenu.add(new ViewShowCommentsAction(this));
 		return viewMenu;
-
-	}
-
-	protected JMenu initialiseMenuSettings() {
-		JMenu menu = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_TRIM_WHITESPACE)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_SHOW_TEXT_LABELS)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_FULL_TOKENS)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_KEEP_TREE_SORTED)));
-		menu.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(mainApplication, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
-		menu.add(new SetAnnotatorNameAction(mainApplication));
-		return menu;
 
 	}
 
@@ -470,7 +470,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	protected void initialiseMenu() {
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
-		helpMenu.add(mainApplication.helpAction);
+		helpMenu.add(Annotator.app.helpAction);
 
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(initialiseMenuEntity());
@@ -803,8 +803,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
 				getMiscLabel().setToolTipText(sv.getDescription());
 				getMiscLabel().repaint();
-				getProgressBar().setValue(100);
-				getProgressBar().setVisible(false);
+				progressBar.setValue(100);
+				progressBar.setVisible(false);
 			}
 
 		});

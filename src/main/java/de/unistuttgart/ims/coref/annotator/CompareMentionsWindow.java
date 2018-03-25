@@ -405,7 +405,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	protected void initialiseWindow() {
 
-		super.initialize();
+		super.initializeWindow();
 		Caret caret = new Caret();
 
 		// JTabbedPane tabbedPane = new JTabbedPane();
