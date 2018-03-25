@@ -176,7 +176,6 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	private static final long serialVersionUID = 1L;
 	MutableList<String> annotatorIds;
-	Color[] colors = new Color[] { Color.blue, Color.red, Color.green };
 	MutableList<Action> open;
 
 	AbstractAction copyAction;
@@ -203,6 +202,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	boolean textIsSet = false;
 	int size = 0;
+	Color[] colors;
 
 	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
@@ -212,6 +212,11 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		this.open = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
 		this.models = Lists.mutable.withNValues(size, () -> null);
+		this.colors = new Color[size];
+		ColorProvider cp = new ColorProvider();
+		for (int i = 0; i < colors.length; i++) {
+			this.colors[i] = cp.getNextColor();
+		}
 		this.size = size;
 		this.initialiseMenu();
 		this.initialiseWindow();
