@@ -20,7 +20,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 	private static final long serialVersionUID = 1L;
 
 	public FileSaveAsAction(DocumentWindow documentWindow) {
-		super(null, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
+		super(documentWindow, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
 		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 	}
