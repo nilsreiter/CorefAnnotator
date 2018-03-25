@@ -15,8 +15,13 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
@@ -25,40 +30,66 @@ public class SelectTwoFiles extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	JTextField[] names = new JTextField[2];
-	File[] files = new File[2];
+	MutableList<File> files = Lists.mutable.of(null, null);
+	MutableList<String> names = Lists.mutable.of(null, null);
 	Action finalAction;
+
+	private JPanel getSelectPanel() {
+		JPanel panel = new JPanel();
+		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
+		panel.setLayout(bl);
+		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		JTextField textField = new JTextField();
+		textField.setMaximumSize(new Dimension(200, 20));
+		textField.setColumns(40);
+		panel.add(textField);
+		panel.add(new JButton(new SelectFileAction(panel, 0)));
+		panel.add(Box.createVerticalGlue());
+		panel.setPreferredSize(new Dimension(200, 100));
+		return panel;
+	}
 
 	public SelectTwoFiles(Action action) {
 		super();
 		this.finalAction = action;
-		JSplitPane splitPane = new JSplitPane();
+		// JSplitPane splitPane = new JSplitPane();
+		JPanel splitPane = new JPanel();
+		splitPane.add(getSelectPanel());
+		splitPane.add(getSelectPanel());
 
-		JPanel panel = new JPanel();
-		BoxLayout bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		panel.setLayout(bl);
-		panel.setBorder(BorderFactory.createTitledBorder("left"));
-		names[0] = new JTextField();
-		names[0].setMaximumSize(new Dimension(200, 20));
-		names[0].setColumns(40);
-		panel.add(names[0]);
-		panel.add(new JButton(new SelectFileAction(panel, 0)));
-		panel.add(Box.createVerticalGlue());
-		panel.setPreferredSize(new Dimension(200, 100));
-		splitPane.setLeftComponent(panel);
+		JPanel moreLessPanel = new JPanel();
+		BoxLayout bl = new BoxLayout(moreLessPanel, BoxLayout.Y_AXIS);
+		moreLessPanel.setLayout(bl);
 
-		panel = new JPanel();
-		bl = new BoxLayout(panel, BoxLayout.Y_AXIS);
-		panel.setLayout(bl);
-		panel.setBorder(BorderFactory.createTitledBorder("right"));
-		names[1] = new JTextField();
-		names[1].setMaximumSize(new Dimension(200, 20));
-		names[1].setColumns(40);
-		panel.add(names[1]);
-		panel.add(new JButton(new SelectFileAction(panel, 1)));
-		panel.add(Box.createVerticalGlue());
-		panel.setPreferredSize(new Dimension(200, 80));
-		splitPane.setRightComponent(panel);
+		JButton lessFilesButton = new JButton(Annotator.getString("less"));
+		lessFilesButton.setIcon(FontIcon.of(MaterialDesign.MDI_MINUS_BOX));
+		lessFilesButton.setEnabled(false);
+
+		JButton moreFilesButton = new JButton(Annotator.getString("more"));
+		moreFilesButton.setIcon(FontIcon.of(MaterialDesign.MDI_PLUS_BOX));
+		moreFilesButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				splitPane.add(getSelectPanel(), splitPane.getComponentCount());
+				splitPane.add(moreLessPanel);
+				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
+				revalidate();
+				pack();
+			}
+		});
+
+		lessFilesButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				splitPane.remove(splitPane.getComponentCount() - 2);
+				lessFilesButton.setEnabled(splitPane.getComponentCount() > 3);
+				revalidate();
+				pack();
+			}
+		});
+		moreLessPanel.add(moreFilesButton);
+		moreLessPanel.add(lessFilesButton);
+		splitPane.add(moreLessPanel);
 
 		add(splitPane, BorderLayout.CENTER);
 
@@ -100,17 +131,22 @@ public class SelectTwoFiles extends JDialog {
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();
 				((JTextField) panel.getComponent(0)).setText(filename);
-				files[index] = chooser.getSelectedFile();
+				files.add(index, chooser.getSelectedFile());
+				names.add(index, files.get(index).getName());
 			}
 		}
 
 	}
 
-	public File[] getFiles() {
+	public File[] getFilesArray() {
+		return files.toArray(new File[files.size()]);
+	}
+
+	public MutableList<File> getFiles() {
 		return files;
 	}
 
 	public String[] getNames() {
-		return new String[] { names[0].getText(), names[1].getText() };
+		return names.toArray(new String[names.size()]);
 	}
 }

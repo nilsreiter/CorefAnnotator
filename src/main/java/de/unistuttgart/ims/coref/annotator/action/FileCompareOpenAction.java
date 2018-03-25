@@ -71,14 +71,14 @@ public class FileCompareOpenAction extends AnnotatorAction {
 						cmw = new CompareMentionsWindow(mainApplication);
 						cmw.setIndeterminateProgress();
 						cmw.setVisible(true);
-						cmw.setFileLeft(stf.getFiles()[0]);
-						cmw.setFileRight(stf.getFiles()[1]);
+						cmw.setFileLeft(stf.getFilesArray()[0]);
+						cmw.setFileRight(stf.getFilesArray()[1]);
 						new JCasLoader(jcas -> {
 							cmw.setJCasLeft(jcas, stf.getNames()[0]);
-						}, stf.getFiles()[0]).execute();
+						}, stf.getFilesArray()[0]).execute();
 						new JCasLoader(jcas -> {
 							cmw.setJCasRight(jcas, stf.getNames()[1]);
-						}, stf.getFiles()[1]).execute();
+						}, stf.getFilesArray()[1]).execute();
 						cmw.setVisible(true);
 						cmw.pack();
 						dialog.setVisible(false);
