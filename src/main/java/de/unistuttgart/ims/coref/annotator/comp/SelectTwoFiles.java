@@ -133,8 +133,9 @@ public class SelectTwoFiles extends JDialog {
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();
 				((JTextField) panel.getComponent(0)).setText(filename);
-				files.add(chooser.getSelectedFile());
-				names.add(files.get(index).getName());
+				File f = chooser.getSelectedFile();
+				files.add(f);
+				names.add(f.getName());
 				Annotator.app.setCurrentDirectory(chooser.getSelectedFile().getParentFile());
 			}
 		}
