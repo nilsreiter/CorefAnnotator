@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import org.apache.uima.UIMAException;
@@ -24,8 +22,6 @@ public class FileCompareOpenAction extends AnnotatorAction {
 	private static final long serialVersionUID = 1L;
 
 	JDialog dialog;
-	JTextField[] names = new JTextField[2];
-	JLabel[] labels = new JLabel[2];
 
 	public FileCompareOpenAction(Annotator mApp) {
 		super(mApp, MaterialDesign.MDI_COMPARE);
