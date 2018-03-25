@@ -85,6 +85,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	class Statistics {
 		int agreed = 0;
 		int total = 0;
+		int totalInOverlappingPart = 0;
 
 		public String total() {
 			return String.valueOf(total);
@@ -216,23 +217,39 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	protected void drawAllAnnotations() {
 		if (loadedJCas < 2)
 			return;
+		Span annotated1 = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE),
+				annotated2 = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
 		MutableMap<Span, Mention> map1 = Maps.mutable.empty();
 		for (Mention m : JCasUtil.select(jcas[0], Mention.class)) {
 			map1.put(new Span(m), m);
+			if (m.getEnd() > annotated1.end)
+				annotated1.end = m.getEnd();
+			if (m.getBegin() < annotated1.begin)
+				annotated1.begin = m.getBegin();
 		}
 		MutableMap<Span, Mention> map2 = Maps.mutable.empty();
 		for (Mention m : JCasUtil.select(jcas[1], Mention.class)) {
 			map2.put(new Span(m), m);
+			if (m.getEnd() > annotated2.end)
+				annotated2.end = m.getEnd();
+			if (m.getBegin() < annotated2.begin)
+				annotated2.begin = m.getBegin();
 		}
+		Span annotatedInParallel = new Span(Math.max(annotated1.begin, annotated2.begin),
+				Math.min(annotated1.end, annotated2.end));
 
 		for (Span s : map1.keySet()) {
 			if (map2.containsKey(s)) {
 				highlightManager.underline(map1.get(s), Color.gray.brighter());
 				stats.agreed++;
+				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
+					stats.totalInOverlappingPart++;
 				stats.total++;
 			} else {
 				highlightManager.underline(map1.get(s), colors[0]);
 				stats.total++;
+				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
+					stats.totalInOverlappingPart++;
 			}
 		}
 
@@ -240,6 +257,8 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 			if (!map1.containsKey(s)) {
 				highlightManager.underline(map2.get(s), colors[1]);
 				stats.total++;
+				if (s.begin >= annotatedInParallel.begin && s.end <= annotatedInParallel.end)
+					stats.totalInOverlappingPart++;
 			}
 		}
 
@@ -254,10 +273,10 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	protected JPanel getAgreementPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(3, 2));
+		panel.setLayout(new GridLayout(5, 2));
 		Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(200, 50));
+		panel.setPreferredSize(new Dimension(200, 70));
 
 		JLabel desc;
 		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
@@ -268,9 +287,19 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_TOOLTIP));
 		panel.add(desc);
-		panel.add(
-				new JLabel(String.format("%1$,3d (%2$3.1f%%)", stats.agreed, 100 * stats.agreed / (double) stats.total),
-						SwingConstants.RIGHT));
+		panel.add(new JLabel(String.format("%1$,3d", stats.agreed), SwingConstants.RIGHT));
+
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
+		panel.add(desc);
+		panel.add(new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
+				SwingConstants.RIGHT));
+
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
+		panel.add(desc);
+		panel.add(new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
+				SwingConstants.RIGHT));
 
 		return panel;
 	}

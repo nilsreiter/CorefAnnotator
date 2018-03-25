@@ -185,6 +185,10 @@ public class Constants {
 		public static final String STAT_AGR_TITLE = "stat.agr.title";
 		public static final String STAT_KEY_AGR_PERC = "stat.key.agr_perc";
 		public static final String STAT_KEY_AGREED = "stat.key.agreed";
+		public static final String STAT_KEY_AGREED_OVERALL = "stat.key.agreed.overall";
+		public static final String STAT_KEY_AGREED_OVERALL_TOOLTIP = "stat.key.agreed.overall.tooltip";
+		public static final String STAT_KEY_AGREED_PARALLEL = "stat.key.agreed.parallel";
+		public static final String STAT_KEY_AGREED_PARALLEL_TOOLTIP = "stat.key.agreed.parallel.tooltip";
 		public static final String STAT_KEY_AGREED_TOOLTIP = "stat.key.agreed.tooltip";
 		public static final String STAT_KEY_COLOR = "stat.key.color";
 		public static final String STAT_KEY_COLOR_TOOLTIP = "stat.key.color.tooltip";
