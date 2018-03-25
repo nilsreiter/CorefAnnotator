@@ -126,6 +126,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					preferences.put(Constants.CFG_ANNOTATOR_ID, System.getProperty("user.name"));
 				else
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
+			if (!preferences.nodeExists(Constants.CFG_CURRENT_DIRECTORY)) {
+				preferences.put(Constants.CFG_CURRENT_DIRECTORY,
+						new File(System.getProperty("user.home")).getAbsolutePath());
+			}
+
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
@@ -311,10 +316,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		openDialog.setFileFilter(flavor.getFileFilter());
+		openDialog.setCurrentDirectory(getCurrentDirectory());
 		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
+				setCurrentDirectory(f.getParentFile());
 				open(f, flavor, "de");
 			}
 			break;
@@ -398,6 +405,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		if (logWindow == null)
 			logWindow = new LogWindow();
 		return logWindow;
+	}
+
+	public File getCurrentDirectory() {
+		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, null));
+	}
+
+	public void setCurrentDirectory(File f) {
+		preferences.put(Constants.CFG_CURRENT_DIRECTORY, f.getAbsolutePath());
 	}
 
 }

@@ -211,21 +211,23 @@ public class Constants {
 	}
 
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
+	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
+
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
-
 	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
 
+	public static final String CFG_WINDOWTITLE = "Windowtitle";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
-	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 
+	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
+
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
@@ -251,6 +253,5 @@ public class Constants {
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
-
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 }

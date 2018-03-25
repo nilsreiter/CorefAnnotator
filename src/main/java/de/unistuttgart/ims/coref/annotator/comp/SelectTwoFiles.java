@@ -128,13 +128,14 @@ public class SelectTwoFiles extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser chooser = new JFileChooser();
 
-			chooser.setCurrentDirectory(new File("/Users/reiterns/Documents/CRETA/Code/coreference/annotations"));
+			chooser.setCurrentDirectory(Annotator.app.getCurrentDirectory());
 			int r = chooser.showOpenDialog(null);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String filename = chooser.getSelectedFile().getName();
 				((JTextField) panel.getComponent(0)).setText(filename);
 				files.add(chooser.getSelectedFile());
 				names.add(files.get(index).getName());
+				Annotator.app.setCurrentDirectory(chooser.getSelectedFile().getParentFile());
 			}
 		}
 

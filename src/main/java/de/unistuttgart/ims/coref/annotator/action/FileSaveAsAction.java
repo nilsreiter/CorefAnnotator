@@ -35,6 +35,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 		saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 		saveDialog.setFileFilter(Annotator.app.getPluginManager().getDefaultIOPlugin().getFileFilter());
 		saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
+		saveDialog.setCurrentDirectory(Annotator.app.getCurrentDirectory());
 		int r = saveDialog.showSaveDialog(getTarget());
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
@@ -42,6 +43,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			if (!f.getName().endsWith(".xmi")) {
 				f = new File(f.getAbsolutePath() + ".xmi");
 			}
+			Annotator.app.setCurrentDirectory(f.getParentFile());
 			getTarget().saveToFile(f, Annotator.app.getPluginManager().getDefaultIOPlugin(), true);
 			Annotator.app.recentFiles.add(0, f);
 			Annotator.app.refreshRecents();

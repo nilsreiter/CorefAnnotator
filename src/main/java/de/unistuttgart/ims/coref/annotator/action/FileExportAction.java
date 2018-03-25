@@ -37,10 +37,12 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 		saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 		saveDialog.setFileFilter(plugin.getFileFilter());
 		saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
+		saveDialog.setCurrentDirectory(Annotator.app.getCurrentDirectory());
 		int r = saveDialog.showSaveDialog(this.documentWindow);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			File f = saveDialog.getSelectedFile();
+			Annotator.app.setCurrentDirectory(f.getParentFile());
 			getTarget().saveToFile(f, plugin, true);
 			break;
 		default:
