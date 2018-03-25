@@ -38,7 +38,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -99,9 +98,9 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
-import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -178,10 +177,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	// Sub windows
 	CommentWindow commentsWindow;
 
-	Thread messageVoider;
-
 	// Menu components
-	JMenuBar menuBar = new JMenuBar();
 	JMenu documentMenu;
 	JMenu recentMenu;
 	JMenu windowsMenu;
@@ -422,7 +418,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}
 
 		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
-		fileMenu.add(new FileOpenAction(mainApplication));
+		fileMenu.add(new FileSelectOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
@@ -548,8 +544,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				return;
 			}
 		}
-		progressBar.setVisible(true);
-		progressBar.setIndeterminate(true);
+		getProgressBar().setVisible(true);
+		getProgressBar().setIndeterminate(true);
 
 		new SwingWorker<Object, Object>() {
 
@@ -642,54 +638,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			actions.sortDescending.putValue(Action.SELECTED_KEY, true);
 		}
 
-	}
-
-	@Override
-	public void setIndeterminateProgress() {
-		progressBar.setVisible(true);
-		progressBar.setIndeterminate(true);
-	}
-
-	@Override
-	public void stopIndeterminateProgress() {
-		progressBar.setIndeterminate(false);
-		progressBar.setVisible(false);
-	}
-
-	@Override
-	protected void setMessage(String message) {
-		setMessage(message, false);
-	}
-
-	@Override
-	protected synchronized void setMessage(String message, boolean disappearing) {
-		messageLabel.setText(message);
-		messageLabel.repaint();
-		statusBar.revalidate();
-
-		if (messageVoider != null && messageVoider.isAlive())
-			messageVoider.interrupt();
-
-		if (disappearing) {
-			messageVoider = new Thread() {
-
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(1000);
-						setMessage("");
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-
-			};
-			SwingUtilities.invokeLater(messageVoider);
-		}
-	}
-
-	public void setProgress(int i) {
-		progressBar.setValue(i);
 	}
 
 	protected void setWindowTitle() {
@@ -835,11 +783,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			@Override
 			public void run() {
-				progressBar.setValue(0);
-				progressBar.setVisible(true);
+				getProgressBar().setValue(0);
+				getProgressBar().setVisible(true);
 				Annotator.logger.debug("Activating style {}", sv.getClass().getName());
 
-				progressBar.setValue(20);
+				getProgressBar().setValue(20);
 
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
 						styleContext, baseStyle);
@@ -847,7 +795,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
-						progressBar.setValue(progressBar.getValue() + 10);
+						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
 				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;

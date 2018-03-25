@@ -7,6 +7,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
@@ -25,6 +26,7 @@ public abstract class AbstractWindow extends JFrame {
 	JLabel messageLabel = new JLabel();
 	JLabel miscLabel = new JLabel();
 	Thread messageVoider;
+	JMenuBar menuBar = new JMenuBar();
 
 	static JMenu menu_settings = null;
 

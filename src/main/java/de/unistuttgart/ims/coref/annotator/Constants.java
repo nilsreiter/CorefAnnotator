@@ -84,6 +84,8 @@ public class Constants {
 		public static final String ACTION_COMMENT_REVEAL_LOCATION_TOOLTIP = "action.comment.reveal_location.tooltip";
 		public static final String ACTION_COMMENT_SAVE = "action.comment.save";
 		public static final String ACTION_COMMENT_SAVE_TOOLTIP = "action.comment.save.tooltip";
+		public static final String ACTION_COMPARE = "action.compare";
+		public static final String ACTION_COMPARE_TOOLTIP = "action.compare.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
@@ -102,6 +104,7 @@ public class Constants {
 		public static final String ACTION_MERGE_TOOLTIP = "action.merge.tooltip";
 		public static final String ACTION_NEW = "action.new";
 		public static final String ACTION_NEW_TOOLTIP = "action.new.tooltip";
+		public static final String ACTION_OPEN = "action.open";
 		public static final String ACTION_RENAME = "action.rename";
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
@@ -134,6 +137,9 @@ public class Constants {
 		public static final String ACTION_UNDO = "action.undo";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+		public static final String DIALOG_ANNOTATOR_LABEL = "dialog.annotator_label";
+		public static final String DIALOG_ANNOTATOR_LABEL_TOOLTIP = "dialog.annotator_label.tooltip";
+		public static final String DIALOG_CANCEL = "dialog.cancel";
 		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE = "dialog.change_key.invalid_string.message";
@@ -145,6 +151,7 @@ public class Constants {
 		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
 		public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
+		public static final String DIALOG_SELECT_FILE = "dialog.select_file";
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
@@ -158,6 +165,7 @@ public class Constants {
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
 		public static final String MENU_ENTITIES = "menu.entities";
+		public static final String MENU_ENTITIES_CANDIDATES = "menu.entities.candidates";
 		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
@@ -177,6 +185,24 @@ public class Constants {
 		public static final String MESSAGE_SAVING = "message.saving";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
+		public static final String STAT_AGR_TITLE = "stat.agr.title";
+		public static final String STAT_KEY_AGR_PERC = "stat.key.agr_perc";
+		public static final String STAT_KEY_AGREED = "stat.key.agreed";
+		public static final String STAT_KEY_AGREED_OVERALL = "stat.key.agreed.overall";
+		public static final String STAT_KEY_AGREED_OVERALL_TOOLTIP = "stat.key.agreed.overall.tooltip";
+		public static final String STAT_KEY_AGREED_PARALLEL = "stat.key.agreed.parallel";
+		public static final String STAT_KEY_AGREED_PARALLEL_TOOLTIP = "stat.key.agreed.parallel.tooltip";
+		public static final String STAT_KEY_AGREED_TOOLTIP = "stat.key.agreed.tooltip";
+		public static final String STAT_KEY_COLOR = "stat.key.color";
+		public static final String STAT_KEY_COLOR_TOOLTIP = "stat.key.color.tooltip";
+		public static final String STAT_KEY_ENTITIES = "stat.key.entities";
+		public static final String STAT_KEY_ENTITIES_TOOLTIP = "stat.key.entities.tooltip";
+		public static final String STAT_KEY_MENTIONS = "stat.key.mentions";
+		public static final String STAT_KEY_MENTIONS_TOOLTIP = "stat.key.mentions.tooltip";
+		public static final String STAT_KEY_POSITION = "stat.key.position";
+		public static final String STAT_KEY_POSITION_TOOLTIP = "stat.key.position.tooltip";
+		public static final String STAT_KEY_TOTAL = "stat.key.total";
+		public static final String STAT_KEY_TOTAL_TOOLTIP = "stat.key.total.tooltip";
 		public static final String STATUS_NOW_AVAILABLE = "status.now.available";
 		public static final String STATUS_SEARCH_RESULTS = "status.search.results";
 		public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
@@ -184,26 +210,27 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String MENU_ENTITIES_CANDIDATES = "menu.entities.candidates";
 
 	}
 
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
+	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
+
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
-
 	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
 
+	public static final String CFG_WINDOWTITLE = "Windowtitle";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
-	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 
+	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
+
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
@@ -229,6 +256,5 @@ public class Constants {
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
-
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 }

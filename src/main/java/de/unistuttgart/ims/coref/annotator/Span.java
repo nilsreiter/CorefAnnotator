@@ -39,4 +39,8 @@ public class Span {
 		return "(" + begin + "," + end + ")";
 	}
 
+	public boolean contains(Span other) {
+		return (other.begin >= begin && other.end <= end);
+	}
+
 }

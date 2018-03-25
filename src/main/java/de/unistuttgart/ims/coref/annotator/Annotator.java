@@ -54,8 +54,9 @@ import com.apple.eawt.QuitResponse;
 
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
+import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
-import de.unistuttgart.ims.coref.annotator.action.FileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -86,6 +87,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	UpdateCheck updateCheck = new UpdateCheck();
 
 	AbstractAction openAction, quitAction = new ExitAction(), helpAction = new HelpAction();
+	AbstractAction openCompareAction;
 
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
@@ -124,6 +126,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					preferences.put(Constants.CFG_ANNOTATOR_ID, System.getProperty("user.name"));
 				else
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
+			if (!preferences.nodeExists(Constants.CFG_CURRENT_DIRECTORY)) {
+				preferences.put(Constants.CFG_CURRENT_DIRECTORY,
+						new File(System.getProperty("user.home")).getAbsolutePath());
+			}
+
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
@@ -143,7 +150,8 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	protected void initialiseActions() {
-		openAction = new FileOpenAction(this);
+		openAction = new FileSelectOpenAction(this);
+		openCompareAction = new FileCompareOpenAction(this);
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -169,6 +177,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
+		panel.add(new JButton(openCompareAction));
 		mainPanel.add(panel);
 
 		mainPanel.add(Box.createVerticalStrut(10));
@@ -307,10 +316,12 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
 		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
 		openDialog.setFileFilter(flavor.getFileFilter());
+		openDialog.setCurrentDirectory(getCurrentDirectory());
 		int r = openDialog.showOpenDialog(parent);
 		switch (r) {
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
+				setCurrentDirectory(f.getParentFile());
 				open(f, flavor, "de");
 			}
 			break;
@@ -394,6 +405,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		if (logWindow == null)
 			logWindow = new LogWindow();
 		return logWindow;
+	}
+
+	public File getCurrentDirectory() {
+		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, null));
+	}
+
+	public void setCurrentDirectory(File f) {
+		preferences.put(Constants.CFG_CURRENT_DIRECTORY, f.getAbsolutePath());
 	}
 
 }

@@ -8,6 +8,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -199,6 +200,10 @@ public class Util {
 				return Constants.SUPPORTED_LANGUAGES[i];
 
 		return null;
+	}
+
+	public static <T extends TOP> int count(JCas jcas, Class<T> cl) {
+		return JCasUtil.select(jcas, cl).size();
 	}
 
 	@SuppressWarnings("unchecked")
