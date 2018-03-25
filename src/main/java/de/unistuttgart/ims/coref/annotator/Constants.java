@@ -137,6 +137,8 @@ public class Constants {
 		public static final String ACTION_UNDO = "action.undo";
 		public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 		public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+		public static final String DIALOG_ANNOTATOR_LABEL = "dialog.annotator_label";
+		public static final String DIALOG_ANNOTATOR_LABEL_TOOLTIP = "dialog.annotator_label.tooltip";
 		public static final String DIALOG_CANCEL = "dialog.cancel";
 		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
@@ -149,6 +151,7 @@ public class Constants {
 		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
 		public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
+		public static final String DIALOG_SELECT_FILE = "dialog.select_file";
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
