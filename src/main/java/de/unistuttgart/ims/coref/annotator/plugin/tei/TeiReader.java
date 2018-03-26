@@ -17,7 +17,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.uimautil.GenericXmlReader;
+import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 
 public class TeiReader extends ResourceCollectionReaderBase {
 
