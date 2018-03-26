@@ -161,7 +161,7 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<copy file="${project.build.directory}" todir="${project.build.directory}/shallow" />
+									<copy file="${project.build.directory}" todir="${project.build.directory}/${project.name}" />
 								</configuration>
 							</execution>
 						</executions>
@@ -174,7 +174,7 @@
 							<mainClass>de.unistuttgart.ims.coref.annotator.Annotator</mainClass>
 							<dictionaryFile>MyInfo.plist</dictionaryFile>
 							<bundleName>${project.name}</bundleName>
-							<buildDirectory>${project.build.directory}/shallow</buildDirectory>
+							<buildDirectory>${project.build.directory}/${project.name}</buildDirectory>
 							<generateDiskImageFile>true</generateDiskImageFile>
 							<diskImageFile>${project.name}-${project.version}</diskImageFile>
 							<diskImageInternetEnable>true</diskImageInternetEnable>
