@@ -14,6 +14,10 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Generation of candidates. Clicking on a selected text shows the 
   context menu, which now contains a list of candidate entities (as well
   as the option to create a new entity) #58
+- Compare view. A new view allows comparing the works of two annotators. 
+  This view only compares the spans of the mentions -- there is 
+  currently no way of comparing the actual entity assignments. #69. 
+
 
 ## 1.2.1
 
