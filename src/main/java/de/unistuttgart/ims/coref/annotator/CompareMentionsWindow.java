@@ -361,7 +361,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
 				SwingConstants.RIGHT));
 
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_OPEN), SwingConstants.RIGHT));
+		panel.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
 		panel.add(new JButton(open.get(index)));
 
 		return panel;
