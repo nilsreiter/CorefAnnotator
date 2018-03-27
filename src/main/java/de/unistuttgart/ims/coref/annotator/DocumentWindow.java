@@ -1124,9 +1124,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				return handleEntity(panel, mainLabel, treeNode.getEntity());
 			else if (treeNode.isMention()) {
 				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
-			} else if (documentModel.getCoreferenceModel() != null && treeNode == tree.getModel().getRoot())
+			} else if (documentModel != null && documentModel.getCoreferenceModel() != null
+					&& treeNode == tree.getModel().getRoot())
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
-			else if (documentModel.getCoreferenceModel() != null
+			else if (documentModel != null && documentModel.getCoreferenceModel() != null
 					&& treeNode.getFeatureStructure() instanceof DetachedMentionPart)
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
