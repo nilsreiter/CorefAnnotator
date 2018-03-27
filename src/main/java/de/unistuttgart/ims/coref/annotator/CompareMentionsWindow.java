@@ -47,6 +47,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
@@ -534,6 +535,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		fileMenu.add(new FileSelectOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
+		fileMenu.add(new CloseAction());
 		fileMenu.add(mainApplication.quitAction);
 
 		return fileMenu;
