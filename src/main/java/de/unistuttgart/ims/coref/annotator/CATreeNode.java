@@ -26,8 +26,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	String label;
 
-	boolean visible = true;
-	Character keyCode = null;
 	int rank = 50;
 
 	public CATreeNode(FeatureStructure featureStructure, String label) {
@@ -113,24 +111,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 			}
 
 		};
-	}
-
-	public boolean isVisible() {
-		return visible;
-	}
-
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
-	@Deprecated
-	public Character getKeyCode() {
-		return keyCode;
-	}
-
-	@Deprecated
-	public void setKeyCode(char keyCode) {
-		this.keyCode = keyCode;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import javax.swing.SwingWorker;
 
@@ -13,6 +14,7 @@ import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.JCasIterator;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
@@ -28,13 +30,16 @@ import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
+	@Deprecated
 	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
 	String language = null;
+	Consumer<JCas> consumer = null;
 
+	@Deprecated
 	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
 			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
@@ -44,6 +49,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
+	@Deprecated
 	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
 			IOPlugin flavor, String language) {
 		this.documentWindow = documentWindow;
@@ -53,6 +59,28 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
+	public JCasLoader(Consumer<JCas> consumer, File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor,
+			String language) {
+		this.consumer = consumer;
+		this.typeSystemDescription = typeSystemDescription;
+		this.flavor = flavor;
+		this.file = file;
+		this.language = language;
+	}
+
+	public JCasLoader(Consumer<JCas> consumer, File file) {
+		this.consumer = consumer;
+		try {
+			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
+		} catch (ResourceInitializationException e) {
+			e.printStackTrace();
+		}
+		this.flavor = Annotator.app.getPluginManager().getDefaultIOPlugin();
+		this.file = file;
+		this.language = "de";
+	}
+
+	@Deprecated
 	private JCas readStream() {
 		JCas jcas = null;
 
@@ -66,19 +94,14 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		try {
 			Annotator.logger.info("Deserialising input stream.");
 			XmiCasDeserializer.deserialize(inputStream, jcas.getCas(), true);
-			this.documentWindow.setProgress(25);
-			Annotator.logger.debug("Setting loading progress to {}", 50);
 
 		} catch (SAXException | IOException e1) {
 			Annotator.logger.catching(e1);
-			System.exit(1);
 		}
 		try {
 			Annotator.logger.info("Applying importer from {}", flavor.getClass().getName());
 			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
 					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
-			documentWindow.setProgress(50);
-			Annotator.logger.debug("Setting loading progress to {}", 80);
 
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
 			Annotator.logger.catching(e1);
@@ -116,7 +139,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.documentWindow.setJCas(get());
+			this.consumer.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}

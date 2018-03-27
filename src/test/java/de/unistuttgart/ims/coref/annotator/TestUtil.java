@@ -69,4 +69,9 @@ public class TestUtil {
 		assertEquals(13, a.getEnd());
 
 	}
+
+	@Test
+	public void misc() {
+		System.out.println(String.format("%1$,3d (%2$3.1f%%)", 2342, 0.35 * 100));
+	}
 }

@@ -8,7 +8,10 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -19,6 +22,12 @@ public class Util {
 
 	public static String toString(TreeModel tm) {
 		return toString((TreeNode) tm.getRoot(), 0);
+	}
+
+	public static String toString(Object o) {
+		if (o == null)
+			return "null";
+		return o.toString();
 	}
 
 	public static String toString(javax.swing.tree.TreeNode tn, int level) {
@@ -93,6 +102,14 @@ public class Util {
 		nArr.addToIndexes();
 		return nArr;
 
+	}
+
+	public static boolean isX(FeatureStructure fs, String flag) {
+		if (fs instanceof Entity)
+			return Util.contains(((Entity) fs).getFlags(), flag);
+		if (fs instanceof Mention)
+			return Util.contains(((Mention) fs).getFlags(), flag);
+		return false;
 	}
 
 	public static boolean isGeneric(Entity e) {
@@ -183,6 +200,17 @@ public class Util {
 				return Constants.SUPPORTED_LANGUAGES[i];
 
 		return null;
+	}
+
+	public static <T extends TOP> int count(JCas jcas, Class<T> cl) {
+		return JCasUtil.select(jcas, cl).size();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends FeatureStructure> MutableList<T> toList(FSArray arr) {
+		MutableList<T> list = Lists.mutable.empty();
+		arr.forEach(fs -> list.add((T) fs));
+		return list;
 	}
 
 }

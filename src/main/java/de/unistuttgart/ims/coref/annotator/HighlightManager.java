@@ -14,6 +14,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 class HighlightManager {
@@ -30,6 +31,7 @@ class HighlightManager {
 		textComponent.setHighlighter(hilit);
 	}
 
+	@Deprecated
 	public void clearAndDrawAllAnnotations(JCas jcas) {
 		hilit.removeAllHighlights();
 		highlightMap.clear();
@@ -41,14 +43,6 @@ class HighlightManager {
 
 		}
 		textComponent.repaint();
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Annotation)} instead
-	 */
-	@Deprecated
-	public void draw(Annotation a) {
-		underline(a);
 	}
 
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
@@ -76,22 +70,6 @@ class HighlightManager {
 		}
 	}
 
-	/**
-	 * @deprecated Use {@link #underline(Mention)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m) {
-		underline(m);
-	}
-
-	/**
-	 * @deprecated Use {@link #underline(Mention,boolean)} instead
-	 */
-	@Deprecated
-	public void draw(Mention m, boolean repaint) {
-		underline(m, repaint);
-	}
-
 	public Highlighter getHighlighter() {
 		return hilit;
 	}
@@ -104,6 +82,14 @@ class HighlightManager {
 	public void underline(Annotation a) {
 		if (a instanceof Mention)
 			underline((Mention) a);
+		else if (a instanceof DetachedMentionPart)
+			underline((DetachedMentionPart) a);
+	}
+
+	public void underline(DetachedMentionPart dmp) {
+		hilit.setDrawsLayeredHighlights(true);
+		draw(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true, null);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m) {
@@ -111,6 +97,24 @@ class HighlightManager {
 		draw(m, new Color(m.getEntity().getColor()), false, true, null);
 		if (m.getDiscontinuous() != null)
 			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
+		hilit.setDrawsLayeredHighlights(false);
+	}
+
+	public void underline(Annotation m, Color color) {
+		if (m instanceof Mention)
+			underline((Mention) m, color);
+		else {
+			hilit.setDrawsLayeredHighlights(true);
+			draw(m, color, false, true, null);
+			hilit.setDrawsLayeredHighlights(false);
+		}
+	}
+
+	public void underline(Mention m, Color color) {
+		hilit.setDrawsLayeredHighlights(true);
+		draw(m, color, false, true, null);
+		if (m.getDiscontinuous() != null)
+			draw(m.getDiscontinuous(), color, true, true, null);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 

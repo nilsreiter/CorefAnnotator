@@ -11,23 +11,24 @@ import javax.swing.SwingUtilities;
 import de.unistuttgart.ims.coref.annotator.api.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelFactory;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
+import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
 public class CommentWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
 	DocumentWindow mainWindow;
-	CoreferenceModel documentModel;
+	CoreferenceModel coreferenceModel;
 
-	CoreferenceModel.CommentsModel commentsListModel;
+	CommentsModel commentsListModel;
 
 	// Components
 	PanelList<Comment, CommentPanel> commentList;
 
-	public CommentWindow(DocumentWindow mainWindow, CoreferenceModel documentModel) {
+	public CommentWindow(DocumentWindow mainWindow, CommentsModel commentsModel) {
 		this.mainWindow = mainWindow;
-		this.documentModel = documentModel;
-		this.commentsListModel = documentModel.getCommentsModel();
+		this.commentsListModel = commentsModel;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

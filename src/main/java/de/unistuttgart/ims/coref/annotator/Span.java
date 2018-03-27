@@ -2,7 +2,6 @@ package de.unistuttgart.ims.coref.annotator;
 
 import org.apache.uima.jcas.tcas.Annotation;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 public class Span {
@@ -37,10 +36,11 @@ public class Span {
 
 	@Override
 	public String toString() {
-		MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this);
-		helper.add("begin", this.begin);
-		helper.add("end", this.end);
-		return helper.toString();
+		return "(" + begin + "," + end + ")";
+	}
+
+	public boolean contains(Span other) {
+		return (other.begin >= begin && other.end <= end);
 	}
 
 }
