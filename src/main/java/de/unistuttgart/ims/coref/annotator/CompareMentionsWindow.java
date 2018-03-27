@@ -387,6 +387,8 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(helpMenu);
 
+		setJMenuBar(menuBar);
+
 		Annotator.logger.info("Initialised menus");
 	}
 
