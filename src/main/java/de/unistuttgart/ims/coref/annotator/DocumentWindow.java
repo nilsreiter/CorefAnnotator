@@ -505,7 +505,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			searchPanel.dispose();
 			searchPanel = null;
 		}
-		mainApplication.close(this);
+		Annotator.app.close(this);
 	}
 
 	public void loadFile(File file, IOPlugin flavor, String language) {
