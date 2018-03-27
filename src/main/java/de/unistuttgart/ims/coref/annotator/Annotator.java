@@ -126,10 +126,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					preferences.put(Constants.CFG_ANNOTATOR_ID, System.getProperty("user.name"));
 				else
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
-			if (!preferences.nodeExists(Constants.CFG_CURRENT_DIRECTORY)) {
-				preferences.put(Constants.CFG_CURRENT_DIRECTORY,
-						new File(System.getProperty("user.home")).getAbsolutePath());
-			}
 
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
@@ -408,11 +404,16 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public File getCurrentDirectory() {
-		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, null));
+		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, System.getProperty("user.home")));
 	}
 
 	public void setCurrentDirectory(File f) {
 		preferences.put(Constants.CFG_CURRENT_DIRECTORY, f.getAbsolutePath());
+		try {
+			preferences.sync();
+		} catch (BackingStoreException e1) {
+			logger.catching(e1);
+		}
 	}
 
 }
