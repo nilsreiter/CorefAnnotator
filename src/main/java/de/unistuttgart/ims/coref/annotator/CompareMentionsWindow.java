@@ -204,6 +204,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	boolean textIsSet = false;
 	int size = 0;
 	Color[] colors;
+	JMenu fileMenu;
 
 	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
@@ -531,7 +532,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 		}
 
-		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
+		fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
 		fileMenu.add(new FileSelectOpenAction(mainApplication));
 		fileMenu.add(mainApplication.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
@@ -549,11 +550,15 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	public void setFile(File file, int index) {
 		this.files.set(index, file);
 		this.open.set(index, new SelectedFileOpenAction(Annotator.app, file));
+
 	}
 
 	public void setFiles(Iterable<File> files) {
 		this.files = Lists.mutable.withAll(files);
 		this.open = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
+		JMenu currentFilesMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_OPEN));
+		this.open.forEach(a -> currentFilesMenu.add(a));
+		fileMenu.add(currentFilesMenu, 1);
 	}
 
 }
