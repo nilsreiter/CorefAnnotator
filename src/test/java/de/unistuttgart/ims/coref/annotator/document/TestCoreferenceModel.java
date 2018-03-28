@@ -394,4 +394,30 @@ public class TestCoreferenceModel {
 
 		assertEquals(0, model.getHistory().size());
 	}
+
+	@Test
+	public void testRemoveDuplicates() {
+		model.edit(new Op.AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4)));
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
+		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
+
+		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
+
+		model.edit(new Op.RemoveDuplicateMentionsInEntities(e));
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
+
+		model.undo();
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
+		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
+	}
 }

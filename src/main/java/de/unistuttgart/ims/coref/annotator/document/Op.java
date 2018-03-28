@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.multimap.set.ImmutableSetMultimap;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Span;
@@ -321,6 +322,33 @@ public interface Op {
 
 		public void setEntityGroup(EntityGroup entityGroup) {
 			this.entityGroup = entityGroup;
+		}
+
+	}
+
+	public class RemoveDuplicateMentionsInEntities implements Op {
+		final ImmutableList<Entity> entities;
+
+		ImmutableSet<Mention> removedMentions;
+
+		public RemoveDuplicateMentionsInEntities(Iterable<Entity> entities) {
+			this.entities = Lists.immutable.withAll(entities);
+		}
+
+		public RemoveDuplicateMentionsInEntities(Entity... entities) {
+			this.entities = Lists.immutable.of(entities);
+		}
+
+		public ImmutableSet<Mention> getRemovedMentions() {
+			return removedMentions;
+		}
+
+		public void setRemovedMentions(ImmutableSet<Mention> removedMentions) {
+			this.removedMentions = removedMentions;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
 		}
 
 	}
