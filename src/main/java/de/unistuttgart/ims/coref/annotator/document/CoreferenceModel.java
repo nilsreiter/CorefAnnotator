@@ -15,11 +15,14 @@ import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
+import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
@@ -42,6 +45,7 @@ import de.unistuttgart.ims.coref.annotator.document.Op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.Op.MoveMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.Op.RemoveDuplicateMentionsInEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.Op.RemoveMention;
@@ -230,6 +234,9 @@ public class CoreferenceModel {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			history.push(op);
+		} else if (operation instanceof Op.RemoveDuplicateMentionsInEntities) {
+			Op.RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
+			edit(op);
 		} else if (operation instanceof Op.UpdateEntityKey) {
 			Op.UpdateEntityKey op = (UpdateEntityKey) operation;
 			if (keyMap.containsKey(op.getNewKey())) {
@@ -425,6 +432,15 @@ public class CoreferenceModel {
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
 			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
 			fireEvent(op.toReversedEvent());
+		} else if (operation instanceof Op.RemoveDuplicateMentionsInEntities) {
+			Op.RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
+
+			op.getRemovedMentions().forEach(m -> {
+				m.addToIndexes();
+				entityMentionMap.put(m.getEntity(), m);
+				registerAnnotation(m);
+				fireEvent(Event.get(Type.Add, m.getEntity(), m));
+			});
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (RemovePart) operation;
 			op.getPart().setMention(op.getMention());
@@ -468,6 +484,50 @@ public class CoreferenceModel {
 			remove(op.getEntityGroup());
 			fireEvent(Event.get(Event.Type.Remove, null, op.getEntityGroup()));
 		}
+	}
+
+	private void edit(Op.RemoveDuplicateMentionsInEntities op) {
+		MutableSet<Mention> allRemoved = Sets.mutable.empty();
+
+		op.getEntities().forEach(e -> {
+			MutableListMultimap<Span, Mention> map = Multimaps.mutable.list.empty();
+			MutableList<Mention> toRemove = Lists.mutable.empty();
+			for (Mention m : entityMentionMap.get(e)) {
+				Span s = new Span(m);
+				if (map.containsKey(s)) {
+					for (Mention m2 : map.get(s)) {
+						if (m2.getDiscontinuous() == null && m.getDiscontinuous() == null) {
+							toRemove.add(m);
+						} else if (m2.getDiscontinuous() != null && m.getDiscontinuous() != null) {
+							Span s1 = new Span(m.getDiscontinuous());
+							Span s2 = new Span(m2.getDiscontinuous());
+							if (s1.equals(s2)) {
+								toRemove.add(m);
+							} else {
+								map.put(s, m);
+							}
+						} else {
+							map.put(s, m);
+						}
+					}
+				} else {
+					map.put(s, m);
+				}
+			}
+
+			toRemove.forEach(m -> {
+				remove(m, false);
+				if (m.getDiscontinuous() != null) {
+					DetachedMentionPart dmp = m.getDiscontinuous();
+					remove(dmp);
+					fireEvent(Event.get(Type.Remove, m, dmp));
+				}
+			});
+			fireEvent(Event.get(Event.Type.Remove, e, toRemove.toImmutable()));
+			allRemoved.addAll(toRemove);
+		});
+		op.setRemovedMentions(allRemoved.toImmutable());
+		history.push(op);
 	}
 
 	private void edit(Op.RemoveMention op) {
