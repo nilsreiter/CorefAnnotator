@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
@@ -20,6 +21,11 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 
 public class TeiReader extends ResourceCollectionReaderBase {
+
+	public static final String PARAM_DOCUMENT_ID = "Document Id";
+
+	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
+	String documentId = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -84,6 +90,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		} catch (IOException e1) {
 			Annotator.logger.catching(e1);
 		}
+
+		DocumentMetaData.get(jcas).setDocumentId(documentId);
 
 	}
 
