@@ -279,6 +279,10 @@ public interface Op {
 			this.entities = Lists.immutable.of(entities);
 		}
 
+		public RemoveEntities(Iterable<Entity> entities) {
+			this.entities = Lists.immutable.withAll(entities);
+		}
+
 		public ImmutableList<Entity> getEntities() {
 			return entities;
 		}
@@ -328,6 +332,12 @@ public interface Op {
 
 		public RemoveMention(Mention... mention) {
 			this.mentions = Lists.immutable.of(mention);
+			this.spans = mentions.collect(m -> new Span(m));
+			this.entity = mentions.getFirst().getEntity();
+		}
+
+		public RemoveMention(Iterable<Mention> mention) {
+			this.mentions = Lists.immutable.withAll(mention);
 			this.spans = mentions.collect(m -> new Span(m));
 			this.entity = mentions.getFirst().getEntity();
 		}
