@@ -1149,9 +1149,30 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			MutableList<TreePath> selection = Lists.mutable.of(tree.getSelectionPaths());
+			CATreeNode node = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
+			FeatureStructure fs = ((CATreeNode) tree.getSelectionPath().getLastPathComponent()).getFeatureStructure();
+			Op op = null;
+			if (fs instanceof Entity) {
+				FeatureStructure parentFs = node.getParent().getFeatureStructure();
+				if (parentFs instanceof EntityGroup) {
+					op = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
+				} else if (node.isLeaf()) {
+					op = new Op.RemoveEntities(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
+							.collect(tn -> (Entity) tn.getFeatureStructure()));
+				}
+			} else if (fs instanceof Mention) {
+				op = new Op.RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
+						.collect(tn -> (Mention) tn.getFeatureStructure()));
+			} else if (fs instanceof DetachedMentionPart) {
+				op = new Op.RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
+			}
 
-			for (TreePath tp : tree.getSelectionPaths())
-				deleteSingle((CATreeNode) tp.getLastPathComponent());
+			if (op != null)
+				getCoreferenceModel().edit(op);
+			else
+				for (TreePath tp : tree.getSelectionPaths())
+					deleteSingle((CATreeNode) tp.getLastPathComponent());
 		}
 
 		private void deleteSingle(CATreeNode tn) {
