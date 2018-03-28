@@ -241,6 +241,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	public void search(String s) {
 		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
+		annotateSelectedFindings.setEnabled(false);
+		annotateSelectedFindingsAsNew.setEnabled(false);
 		searchResultsLabel.setText("");
 		lm.clear();
 		Semaphore sema = new Semaphore(1);
