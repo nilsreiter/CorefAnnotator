@@ -45,7 +45,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.setTextRootSelector(null);
 		gxr.setPreserveWhitespace(true);
 
-		gxr.addGlobalRule("bibl[type=digitalSource] > idno[type=URL]", (d, e) -> d.setDocumentId(e.text()));
+		// set the document title
+		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
 
 		gxr.addGlobalRule("[xml:id]", Entity.class, (cf, e) -> {
 			cf.setLabel(e.attr("xml:id"));
