@@ -1,149 +1,160 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<typeSystemDescription
+	xmlns="http://uima.apache.org/resourceSpecifier">
 	<name>Coref Annotator</name>
-	<description/>
+	<description />
 	<version>1.0</version>
 	<vendor>Nils Reiter</vendor>
 	<types>
 		<typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.Mention</name>
-      <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
-      <features>
-        <featureDescription>
-          <name>Entity</name>
-          <description/>
-          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Entity</rangeTypeName>
-        </featureDescription>
-      <featureDescription>
-          <name>Discontinuous</name>
-          <description/>
-          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart</rangeTypeName>
-        </featureDescription>
-      <featureDescription>
-          <name>Flags</name>
-          <description/>
-          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
-          <multipleReferencesAllowed>false</multipleReferencesAllowed>
-        </featureDescription>
-      </features>
-    </typeDescription>
-    <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.Entity</name>
-      <description/>
-      <supertypeName>uima.cas.TOP</supertypeName>
-    <features>
-        <featureDescription>
-          <name>Label</name>
-          <description/>
-          <rangeTypeName>uima.cas.String</rangeTypeName>
-        </featureDescription>
-        <featureDescription>
-          <name>Color</name>
-          <description/>
-          <rangeTypeName>uima.cas.Integer</rangeTypeName>
-        </featureDescription>
-      <featureDescription>
-          <name>Key</name>
-          <description/>
-          <rangeTypeName>uima.cas.String</rangeTypeName>
-        </featureDescription>
-      <featureDescription>
-          <name>Flags</name>
-          <description/>
-          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
-          <multipleReferencesAllowed>true</multipleReferencesAllowed>
-        </featureDescription>
-      <featureDescription>
-          <name>Hidden</name>
-          <description/>
-          <rangeTypeName>uima.cas.Boolean</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.EntityGroup</name>
-      <description/>
-      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Entity</supertypeName>
-      <features>
-        <featureDescription>
-          <name>Members</name>
-          <description/>
-          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-          <elementType>de.unistuttgart.ims.coref.annotator.api.Entity</elementType>
-          <multipleReferencesAllowed>false</multipleReferencesAllowed>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart</name>
-      <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
-    <features>
-        <featureDescription>
-          <name>Mention</name>
-          <description/>
-          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.Meta</name>
-      <description/>
-      <supertypeName>uima.cas.TOP</supertypeName>
-      <features>
-        <featureDescription>
-          <name>StylePlugin</name>
-          <description/>
-          <rangeTypeName>uima.cas.String</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.Comment</name>
-      <description/>
-      <supertypeName>uima.cas.TOP</supertypeName>
-      <features>
-        <featureDescription>
-          <name>Author</name>
-          <description/>
-          <rangeTypeName>uima.cas.String</rangeTypeName>
-        </featureDescription>
-        <featureDescription>
-          <name>Value</name>
-          <description/>
-          <rangeTypeName>uima.cas.String</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.MentionComment</name>
-      <description/>
-      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment</supertypeName>
-      <features>
-        <featureDescription>
-          <name>Mention</name>
-          <description/>
-          <rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-    <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.AnnotationComment</name>
-      <description/>
-      <supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment</supertypeName>
-      <features>
-        <featureDescription>
-          <name>Annotation</name>
-          <description/>
-          <rangeTypeName>uima.tcas.Annotation</rangeTypeName>
-        </featureDescription>
-      </features>
-    </typeDescription>
-  <typeDescription>
-      <name>de.unistuttgart.ims.coref.annotator.api.CommentAnchor</name>
-      <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
-      </typeDescription>
-  </types>
+			<name>de.unistuttgart.ims.coref.annotator.api.Mention</name>
+			<description />
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Entity</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Entity
+					</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Discontinuous</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart
+					</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Flags</name>
+					<description />
+					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
+					<multipleReferencesAllowed>false</multipleReferencesAllowed>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.Entity</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Label</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Color</name>
+					<description />
+					<rangeTypeName>uima.cas.Integer</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Key</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Flags</name>
+					<description />
+					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
+					<multipleReferencesAllowed>true</multipleReferencesAllowed>
+				</featureDescription>
+				<featureDescription>
+					<name>Hidden</name>
+					<description />
+					<rangeTypeName>uima.cas.Boolean</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.EntityGroup</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Entity
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Members</name>
+					<description />
+					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
+					<elementType>de.unistuttgart.ims.coref.annotator.api.Entity
+					</elementType>
+					<multipleReferencesAllowed>false</multipleReferencesAllowed>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart
+			</name>
+			<description />
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Mention</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.Meta</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>StylePlugin</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.Comment</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Author</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Value</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.MentionComment</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Mention</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.AnnotationComment
+			</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Annotation</name>
+					<description />
+					<rangeTypeName>uima.tcas.Annotation</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.CommentAnchor</name>
+			<description />
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+		</typeDescription>
+	</types>
 </typeSystemDescription>
