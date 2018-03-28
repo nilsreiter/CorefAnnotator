@@ -25,6 +25,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
 public class TestCoreferenceModel {
@@ -275,6 +276,57 @@ public class TestCoreferenceModel {
 		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(2, model.entityMentionMap.get(entities.get(1)).size());
 		assertEquals(2, model.entityMentionMap.get(entities.get(0)).size());
+
+	}
+
+	@Test
+	public void testRemovEntityFromGroup() {
+		Op.AddMentionsToNewEntity op;
+		Entity e1, e2;
+		op = new Op.AddMentionsToNewEntity(new Span(1, 2));
+		model.edit(op);
+		e1 = op.getEntity();
+		op = new Op.AddMentionsToNewEntity(new Span(3, 4));
+		model.edit(op);
+		e2 = op.getEntity();
+
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+		assertFalse(JCasUtil.exists(jcas, EntityGroup.class));
+
+		model.edit(new Op.GroupEntities(e1, e2));
+
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(3, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(JCasUtil.exists(jcas, EntityGroup.class));
+
+		EntityGroup eg = JCasUtil.select(jcas, EntityGroup.class).iterator().next();
+		assertEquals(2, eg.getMembers().size());
+
+		model.edit(new Op.RemoveEntitiesFromEntityGroup(eg, e1));
+
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(3, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(JCasUtil.exists(jcas, EntityGroup.class));
+
+		eg = JCasUtil.select(jcas, EntityGroup.class).iterator().next();
+		assertEquals(1, eg.getMembers().size());
+
+		model.undo();
+
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertEquals(3, JCasUtil.select(jcas, Entity.class).size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+		assertTrue(JCasUtil.exists(jcas, EntityGroup.class));
+		eg = JCasUtil.select(jcas, EntityGroup.class).iterator().next();
+		assertEquals(2, eg.getMembers().size());
 
 	}
 
