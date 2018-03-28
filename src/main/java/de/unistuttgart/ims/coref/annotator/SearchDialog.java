@@ -11,7 +11,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -238,22 +237,17 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	public void search(String s) {
+	public synchronized void search(String s) {
 		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
+		annotateSelectedFindings.setEnabled(false);
+		annotateSelectedFindingsAsNew.setEnabled(false);
 		searchResultsLabel.setText("");
 		lm.clear();
-		Semaphore sema = new Semaphore(1);
-		try {
-			sema.acquire();
-			for (Object o : highlights) {
-				hilit.removeHighlight(o);
-			}
-			highlights.clear();
-			sema.release();
-		} catch (InterruptedException e1) {
-			Annotator.logger.catching(e1);
+		for (Object o : highlights) {
+			hilit.removeHighlight(o);
 		}
+		highlights.clear();
 		if (s.length() > 0) {
 
 			Pattern p = Pattern.compile(s);

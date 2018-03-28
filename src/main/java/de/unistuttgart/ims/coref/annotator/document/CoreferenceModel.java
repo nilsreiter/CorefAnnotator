@@ -449,6 +449,9 @@ public class CoreferenceModel {
 			for (; i < newArr.size(); i++) {
 				newArr.set(i, op.getEntities().get(i - oldArr.size()));
 			}
+			op.getEntityGroup().setMembers(newArr);
+			newArr.addToIndexes();
+			oldArr.removeFromIndexes();
 		} else if (operation instanceof Op.MergeEntities) {
 			Op.MergeEntities op = (MergeEntities) operation;
 			for (Entity oldEntity : op.getEntities()) {

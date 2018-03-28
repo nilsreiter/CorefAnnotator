@@ -36,7 +36,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
-		gxr.setTextRootSelector("TEI");
+		gxr.setTextRootSelector(null);
 		gxr.setPreserveWhitespace(true);
 
 		gxr.addGlobalRule("bibl[type=digitalSource] > idno[type=URL]", (d, e) -> d.setDocumentId(e.text()));
