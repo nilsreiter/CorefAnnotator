@@ -52,6 +52,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
+			cf.setXmlId(e.attr("xml:id"));
+			// TODO: Need to add a mention as well
 		});
 
 		// segmentation
@@ -91,6 +93,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		} catch (IOException e1) {
 			Annotator.logger.catching(e1);
 		}
+
+		// TODO: Remove <rs> elements
 
 		DocumentMetaData.get(jcas).setDocumentId(documentId);
 

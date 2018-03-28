@@ -45,7 +45,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return null;
+		return AnalysisEngineFactory.createEngineDescription(MapCorefToXmlElements.class);
 	}
 
 	@Override
@@ -56,7 +56,8 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(TeiWriter.class);
+		return AnalysisEngineFactory.createEngineDescription(TeiWriter.class, TeiWriter.PARAM_OUTPUT_FILE,
+				f.getAbsolutePath());
 	}
 
 	@Override
