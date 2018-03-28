@@ -33,7 +33,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JFileChooser saveDialog = new JFileChooser(getTarget().getFile().getParentFile());
+		JFileChooser saveDialog = new JFileChooser(Annotator.app.getCurrentDirectory());
 		saveDialog.setDialogType(JFileChooser.SAVE_DIALOG);
 		saveDialog.setFileFilter(plugin.getFileFilter());
 		saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
