@@ -27,7 +27,7 @@ public class MergeFilesPlugin extends AbstractXmiPlugin implements IOPlugin {
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
-		for (File f : files.subList(1, files.size() - 1)) {
+		for (File f : files.subList(1, files.size())) {
 			b.add(AnalysisEngineFactory.createEngineDescription(MergeAnnotations.class, MergeAnnotations.PARAM_INPUT,
 					f.getAbsolutePath()));
 		}
