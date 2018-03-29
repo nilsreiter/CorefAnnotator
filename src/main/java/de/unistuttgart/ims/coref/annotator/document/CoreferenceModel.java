@@ -519,17 +519,23 @@ public class CoreferenceModel {
 		if (biggest != null)
 			for (Entity n : nodes) {
 				if (n != tgt) {
-					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
 					fireEvent(Event.get(Event.Type.Move, n, tgt, entityMentionMap.get(n).toList().toImmutable()));
+					fireEvent(Event.get(Event.Type.Remove, n));
+					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
 
 					entityMentionMap.removeAll(n);
-					fireEvent(Event.get(Event.Type.Remove, n));
 					n.removeFromIndexes();
 				}
 			}
 		return biggest;
 	}
 
+	/**
+	 * does not fire events
+	 * 
+	 * @param newEntity
+	 * @param mentions
+	 */
 	private void moveTo(Entity newEntity, Mention... mentions) {
 		Entity oldEntity = null;
 		for (Mention m : mentions) {
@@ -715,6 +721,8 @@ public class CoreferenceModel {
 					for (Mention m : op.getPreviousState().get(oldEntity)) {
 						moveTo(oldEntity, m);
 					}
+					fireEvent(Event.get(Type.Move, null, oldEntity,
+							op.getPreviousState().get(oldEntity).toList().toImmutable()));
 				}
 			}
 		} else if (operation instanceof Op.GroupEntities) {

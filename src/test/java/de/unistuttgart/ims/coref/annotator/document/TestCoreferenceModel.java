@@ -264,6 +264,8 @@ public class TestCoreferenceModel {
 		for (Mention m : JCasUtil.select(jcas, Mention.class))
 			assertEquals(e, m.getEntity());
 
+		listener.reset();
+
 		model.undo();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
@@ -274,6 +276,9 @@ public class TestCoreferenceModel {
 		MutableSetMultimap<Entity, Mention> map = Sets.mutable.withAll(JCasUtil.select(jcas, Mention.class))
 				.groupBy(m -> m.getEntity());
 		assertEquals(2, map.keySet().size());
+
+		assertEquals(Lists.immutable.of(Type.Add, Type.Move), listener.events.collect(ev -> ev.eventType));
+
 	}
 
 	@Test

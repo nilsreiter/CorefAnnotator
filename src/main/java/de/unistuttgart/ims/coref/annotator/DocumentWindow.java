@@ -690,6 +690,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			}
 			break;
+		case Move:
+			for (FeatureStructure fs : event)
+				if (fs instanceof Mention) {
+					highlightManager.undraw((Annotation) fs);
+					highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
+				}
+			break;
 		case Update:
 			for (FeatureStructure fs : event) {
 				if (fs instanceof Mention) {
