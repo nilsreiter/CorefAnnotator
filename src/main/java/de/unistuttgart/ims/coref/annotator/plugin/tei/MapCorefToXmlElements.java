@@ -64,7 +64,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 			String baseId;
 			if (entity.getLabel() != null) {
-				baseId = entity.getLabel().toLowerCase().replace("[^a-z]", "-");
+				baseId = entity.getLabel().toLowerCase().replaceAll("[^a-z]", "-");
 			} else {
 				baseId = "e";
 			}
