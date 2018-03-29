@@ -355,15 +355,19 @@ public class CoreferenceModel {
 			history.push(op);
 		} else if (operation instanceof Op.MergeEntities) {
 			Op.MergeEntities op = (MergeEntities) operation;
-			MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
-			op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
-			op.setPreviousState(currentState.toImmutable());
-			op.setEntity(merge(op.getEntities()));
+			edit(op);
 			history.push(op);
 		} else {
 			throw new UnsupportedOperationException();
 		}
 		documentModel.fireDocumentChangedEvent();
+	}
+
+	private void edit(Op.MergeEntities op) {
+		MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
+		op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
+		op.setPreviousState(currentState.toImmutable());
+		op.setEntity(merge(op.getEntities()));
 	}
 
 	private void edit(Op.RemoveDuplicateMentionsInEntities op) {
@@ -516,8 +520,11 @@ public class CoreferenceModel {
 			for (Entity n : nodes) {
 				if (n != tgt) {
 					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
-					remove(n);
+					fireEvent(Event.get(Event.Type.Move, n, tgt, entityMentionMap.get(n).toList().toImmutable()));
+
+					entityMentionMap.removeAll(n);
 					fireEvent(Event.get(Event.Type.Remove, n));
+					n.removeFromIndexes();
 				}
 			}
 		return biggest;
