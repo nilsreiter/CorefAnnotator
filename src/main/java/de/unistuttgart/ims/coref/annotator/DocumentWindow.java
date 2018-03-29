@@ -103,6 +103,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -225,6 +226,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.changeKeyAction);
 		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
 		treePopupMenu.add(this.actions.formGroupAction);
+		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 
@@ -1633,6 +1635,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			actions.toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
 					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
 
+			actions.removeDuplicatesAction.setEnabled(isEntity());
+
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
 			else
@@ -1888,6 +1892,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;
 		AbstractAction renameAction;
+		AbstractAction removeDuplicatesAction = new RemoveDuplicatesAction();
 
 	}
 }
