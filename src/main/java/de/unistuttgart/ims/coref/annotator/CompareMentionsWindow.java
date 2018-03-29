@@ -30,6 +30,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.UIMAException;
@@ -67,6 +69,17 @@ import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends AbstractWindow implements HasTextView, CoreferenceModelListener {
+
+	public class TextCaretListener implements CaretListener {
+
+		@Override
+		public void caretUpdate(CaretEvent e) {
+			if (mentionsTextPane.getSelectionStart() != mentionsTextPane.getSelectionEnd()) {
+				Span span = new Span(mentionsTextPane.getSelectionStart(), mentionsTextPane.getSelectionEnd());
+				selectedAgreementLabel.setText(String.format("%1$3.1f%%", getAgreementInSpan(span)));
+			}
+		}
+	}
 
 	class CopyMentionAction extends AbstractAction {
 
@@ -192,6 +205,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	JTextPane mentionsTextPane;
 	MutableList<CoreferenceModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
+	JLabel selectedAgreementLabel;
 
 	Statistics stats = new Statistics();
 
@@ -291,6 +305,36 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	public void entityGroupEvent(Event event, EntityGroup entity) {
 	}
 
+	protected double getAgreementInSpan(Span s) {
+		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
+
+		int total = 0;
+		for (JCas jcas : jcas) {
+			MutableSet<Span> map1 = Sets.mutable.empty();
+
+			Annotation sel = new Annotation(jcas);
+			sel.setBegin(s.begin);
+			sel.setEnd(s.end);
+
+			for (Mention m : JCasUtil.selectCovered(Mention.class, sel)) {
+				map1.add(new Span(m));
+				total++;
+			}
+			mapList.add(map1);
+		}
+
+		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
+		for (int i = 1; i < mapList.size(); i++) {
+			intersection = intersection.intersect(mapList.get(i));
+		}
+		int agreed = intersection.size();
+
+		total = total - ((jcas.size() - 1) * intersection.size());
+
+		return 100 * agreed / (double) total;
+
+	}
+
 	protected JPanel getAgreementPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(5, 2));
@@ -320,6 +364,13 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		panel.add(desc);
 		panel.add(new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
 				SwingConstants.RIGHT));
+
+		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
+		panel.add(desc);
+		this.selectedAgreementLabel = new JLabel("");
+		this.selectedAgreementLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		panel.add(selectedAgreementLabel);
 
 		return panel;
 	}
@@ -425,6 +476,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		mentionsTextPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
+		mentionsTextPane.addCaretListener(new TextCaretListener());
 
 		mentionsInfoPane = new JPanel();
 		mentionsInfoPane.setLayout(new BoxLayout(mentionsInfoPane, BoxLayout.Y_AXIS));
