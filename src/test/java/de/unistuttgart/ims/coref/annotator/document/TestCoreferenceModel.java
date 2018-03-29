@@ -27,12 +27,14 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
 public class TestCoreferenceModel {
 
 	CoreferenceModel model;
 	JCas jcas;
 	static Preferences preferences;
+	DummyListener listener;
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -44,6 +46,8 @@ public class TestCoreferenceModel {
 	public void setUp() throws UIMAException {
 		jcas = JCasFactory.createText("the dog barks.");
 		model = new CoreferenceModel(new DocumentModel(jcas), preferences);
+		listener = new DummyListener();
+		model.addCoreferenceModelListener(listener);
 	}
 
 	@Test
@@ -62,6 +66,9 @@ public class TestCoreferenceModel {
 		assertNotNull(m.getEntity().getColor());
 		assertNotNull(m.getEntity().getFlags());
 
+		assertEquals(2, listener.events.size());
+		assertEquals(Lists.immutable.of(Type.Add, Type.Add), listener.events.collect(ev -> ev.eventType));
+
 		model.undo();
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
@@ -69,6 +76,10 @@ public class TestCoreferenceModel {
 		assertTrue(model.getMentions(1).isEmpty());
 		assertTrue(model.getMentions(2).isEmpty());
 		assertTrue(model.getMentions(3).isEmpty());
+
+		assertEquals(Lists.immutable.of(Type.Add, Type.Add, Type.Remove, Type.Remove),
+				listener.events.collect(ev -> ev.eventType));
+
 	}
 
 	@Test
@@ -91,6 +102,9 @@ public class TestCoreferenceModel {
 		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
 		assertEquals(e, m.getEntity());
 
+		assertEquals(1, listener.events.size());
+		assertEquals(Lists.immutable.of(Event.Type.Add), listener.events.collect(ev -> ev.eventType));
+
 		model.undo();
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
@@ -99,6 +113,11 @@ public class TestCoreferenceModel {
 		assertTrue(model.getMentions(1).isEmpty());
 		assertTrue(model.getMentions(2).isEmpty());
 		assertTrue(model.getMentions(3).isEmpty());
+
+		assertEquals(2, listener.events.size());
+		assertEquals(Lists.immutable.of(Event.Type.Add, Event.Type.Remove),
+				listener.events.collect(ev -> ev.eventType));
+
 	}
 
 	@Test
@@ -119,6 +138,8 @@ public class TestCoreferenceModel {
 		assertTrue(model.getMentions(5).isEmpty());
 		assertTrue(model.getMentions(6).isEmpty());
 
+		assertEquals(Lists.immutable.of(Type.Add), listener.events.collect(ev -> ev.eventType));
+
 		model.undo();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
@@ -133,6 +154,8 @@ public class TestCoreferenceModel {
 		assertTrue(model.getMentions(4).isEmpty());
 		assertTrue(model.getMentions(5).isEmpty());
 		assertTrue(model.getMentions(6).isEmpty());
+
+		assertEquals(Lists.immutable.of(Type.Add, Type.Remove), listener.events.collect(ev -> ev.eventType));
 
 	}
 
@@ -188,6 +211,8 @@ public class TestCoreferenceModel {
 
 		model.edit(new Op.RemoveMention(m));
 
+		assertEquals(Lists.immutable.of(Type.Remove, Type.Remove), listener.events.collect(ev -> ev.eventType));
+
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
 		assertFalse(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
@@ -219,12 +244,17 @@ public class TestCoreferenceModel {
 	public void testEditMergeEntities() {
 		model.edit(new Op.AddMentionsToNewEntity(new Span(0, 1), new Span(2, 3)));
 		model.edit(new Op.AddMentionsToNewEntity(new Span(4, 5), new Span(6, 7)));
+
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
 		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
 
+		listener.reset();
+
 		model.edit(new Op.MergeEntities(JCasUtil.select(jcas, Entity.class).toArray(new Entity[2])));
+
+		assertEquals(Lists.immutable.of(Type.Move, Type.Remove), listener.events.collect(ev -> ev.eventType));
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
