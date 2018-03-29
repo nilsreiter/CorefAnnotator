@@ -328,6 +328,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
 		this.actions.copyAction = new CopyAction(this, Annotator.app);
 		this.actions.undoAction = new UndoAction(this);
+		this.actions.removeDuplicatesAction = new RemoveDuplicatesAction(this);
 
 		// disable some at the beginning
 		actions.newEntityAction.setEnabled(false);
@@ -1892,7 +1893,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;
 		AbstractAction renameAction;
-		AbstractAction removeDuplicatesAction = new RemoveDuplicatesAction();
+		AbstractAction removeDuplicatesAction;
 
 	}
 }
