@@ -9,7 +9,9 @@ import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
@@ -19,9 +21,12 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 	Pattern pattern = Pattern.compile("xml:id=\"([^\"]+)\"");
 
+	MutableSet<String> ids = null;
+
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		ids = Sets.mutable.empty();
+		ids.add("e");
 		MutableMap<String, XMLElement> idMap = Maps.mutable.empty();
 
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
@@ -35,7 +40,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		// TODO: Handle who= elements
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			Entity e = m.getEntity();
-			String xid = e.getXmlId();
+			String xid = toXmlId(e);
 			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
 					XMLElement.class);
 			newElement.setTag("rs");
@@ -46,6 +51,39 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 				idMap.put(xid, newElement);
 			}
 		}
+	}
+
+	String toXmlId(Entity entity) {
+		String id = null;
+
+		if (entity.getXmlId() != null) {
+			id = entity.getXmlId();
+			ids.add(id);
+		} else {
+
+			String baseId;
+			if (entity.getLabel() != null) {
+				baseId = entity.getLabel().toLowerCase().replace("[^a-z]", "-");
+			} else {
+				baseId = "e";
+			}
+			if (ids.contains(baseId)) {
+				int counter = 0;
+				do {
+					counter++;
+					id = baseId + String.valueOf(counter);
+				} while (ids.contains(id));
+				ids.add(id);
+				entity.setXmlId(id);
+				return id;
+			} else {
+				ids.add(baseId);
+				entity.setXmlId(baseId);
+				return baseId;
+			}
+		}
+		return null;
+
 	}
 
 }
