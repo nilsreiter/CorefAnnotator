@@ -59,6 +59,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		if (entity.getXmlId() != null) {
 			id = entity.getXmlId();
 			ids.add(id);
+			return id;
 		} else {
 
 			String baseId;
@@ -68,7 +69,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 				baseId = "e";
 			}
 			if (ids.contains(baseId)) {
-				int counter = 0;
+				int counter = (baseId == "e" ? 0 : 1);
 				do {
 					counter++;
 					id = baseId + String.valueOf(counter);
@@ -82,8 +83,6 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 				return baseId;
 			}
 		}
-		return null;
-
 	}
 
 }
