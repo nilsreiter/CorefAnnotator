@@ -396,6 +396,17 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
+		toolsMenu.add(new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				KickStartWizard wiz = new KickStartWizard(DocumentWindow.this);
+
+			}
+
+		});
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
