@@ -192,6 +192,8 @@ public class Constants {
 		public static final String STAT_KEY_AGREED_OVERALL_TOOLTIP = "stat.key.agreed.overall.tooltip";
 		public static final String STAT_KEY_AGREED_PARALLEL = "stat.key.agreed.parallel";
 		public static final String STAT_KEY_AGREED_PARALLEL_TOOLTIP = "stat.key.agreed.parallel.tooltip";
+		public static final String STAT_KEY_AGREED_SELECTED = "stat.key.agreed.selected";
+		public static final String STAT_KEY_AGREED_SELECTED_TOOLTIP = "stat.key.agreed.selected.tooltip";
 		public static final String STAT_KEY_AGREED_TOOLTIP = "stat.key.agreed.tooltip";
 		public static final String STAT_KEY_COLOR = "stat.key.color";
 		public static final String STAT_KEY_COLOR_TOOLTIP = "stat.key.color.tooltip";
