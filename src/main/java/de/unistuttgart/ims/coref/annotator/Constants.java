@@ -172,6 +172,7 @@ public class Constants {
 		public static final String MENU_HELP = "menu.help";
 		public static final String MENU_SETTINGS = "menu.settings";
 		public static final String MENU_TOOLS = "menu.tools";
+		public static final String MENU_TOOLS_PROC = "menu.tools.proc";
 		public static final String MENU_VIEW = "menu.view";
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
 		public static final String MENU_VIEW_STYLE = "menu.view.style";

@@ -103,6 +103,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
@@ -138,6 +139,8 @@ import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -392,7 +395,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected JMenu initialiseMenuTools() {
+
+		JMenu procMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS_PROC));
+		for (Class<? extends ProcessingPlugin> pp : Annotator.app.getPluginManager().getProcessingPlugins()) {
+			procMenu.add(new ProcessAction(this, Annotator.app.getPluginManager().getPlugin(pp)));
+		}
+
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
+		toolsMenu.add(procMenu);
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
@@ -732,7 +742,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		if (meta.getStylePlugin() != null) {
 			Object o;
 			try {
-				Class<?> cl = Class.forName(meta.getStylePlugin());
+				Class<? extends Plugin> cl = (Class<? extends Plugin>) Class.forName(meta.getStylePlugin());
 				o = mainApplication.getPluginManager().getPlugin(cl);
 				if (o instanceof StylePlugin)
 					sPlugin = (StylePlugin) o;
