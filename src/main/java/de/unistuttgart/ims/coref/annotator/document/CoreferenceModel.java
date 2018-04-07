@@ -228,7 +228,7 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public void edit(Op operation) {
+	public synchronized void edit(Op operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
