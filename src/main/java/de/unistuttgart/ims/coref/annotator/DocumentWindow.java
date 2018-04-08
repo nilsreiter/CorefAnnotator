@@ -583,8 +583,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			protected void done() {
 				progressBar.setVisible(false);
 				setMessage("");
-				file = f;
 				if (plugin == mainApplication.getPluginManager().getDefaultIOPlugin()) {
+					file = f;
 					unsavedChanges = false;
 					setWindowTitle();
 				}
@@ -663,7 +663,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	protected void setWindowTitle() {
+	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 		String documentTitle = null;
 		try {
@@ -1914,5 +1914,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction renameAction;
 		AbstractAction removeDuplicatesAction;
 
+	}
+
+	public boolean hasUnsavedChanges() {
+		return unsavedChanges;
+	}
+
+	public void setUnsavedChanges(boolean unsavedChanges) {
+		this.unsavedChanges = unsavedChanges;
 	}
 }

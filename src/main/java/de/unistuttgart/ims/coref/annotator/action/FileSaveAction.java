@@ -13,6 +13,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
+import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implements DocumentStateListener {
 
@@ -27,7 +28,14 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		target.saveCurrentFile();
+		target.setIndeterminateProgress();
+		SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
+				(file, jcas) -> {
+					target.setUnsavedChanges(false);
+					target.setWindowTitle();
+					target.stopIndeterminateProgress();
+				});
+		worker.execute();
 	}
 
 	@Override
