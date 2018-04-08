@@ -3,6 +3,18 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.3.2
+
+- Fixed a bug that caused saved files to be written in another file name after export #90
+
+## 1.3.1
+
+- Fixed a bug that caused multiple removal actions to be individual undos #78
+- Fixed that the TEI import did not include the header #80
+- Fixed a bug that prevented the removal of an entity from an entity group to be undoable #82
+- Fixed: Add buttons in search panels are now inactive when now findings are selected #83
+- Attempt at fixing a crash bug in the search panel #70
+
 ## 1.3
 
 - Add TEI import plugin. In TEI files, everything that as a `ref` 
