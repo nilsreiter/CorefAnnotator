@@ -262,4 +262,6 @@ public class Constants {
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
+
+	public static final String X_UNSPECIFIED = "x-unspecified";
 }

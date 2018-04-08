@@ -320,7 +320,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
 				setCurrentDirectory(f.getParentFile());
-				open(f, flavor, "de");
+				open(f, flavor, Constants.X_UNSPECIFIED);
 			}
 			break;
 		default:
