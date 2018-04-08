@@ -11,8 +11,10 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.document.DocumentState;
+import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 
-public class UndoAction extends DocumentWindowAction {
+public class UndoAction extends DocumentWindowAction implements DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,9 +28,11 @@ public class UndoAction extends DocumentWindowAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		documentWindow.getDocumentModel().getCoreferenceModel().undo();
-		// TODO: working mechanism to disable the button
-		// setEnabled(documentWindow.getCoreferenceModel().getHistory().size() >
-		// 0);
+	}
+
+	@Override
+	public void documentStateEvent(DocumentState state) {
+		setEnabled(state.getHistorySize() > 0);
 	}
 
 }

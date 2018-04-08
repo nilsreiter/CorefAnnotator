@@ -350,6 +350,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
 
+		//
+		documentStateListeners.add(actions.undoAction);
+		documentStateListeners.add(actions.fileSaveAction);
+
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -1865,8 +1869,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		actions.undoAction.setEnabled(state.getHistorySize() > 0);
-		actions.fileSaveAction.setEnabled(state.getHistorySize() > 0);
 		unsavedChanges = (state.getHistorySize() > 0);
 		setWindowTitle();
 	}
@@ -1892,7 +1894,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction commentAction = new CommentAction(null);
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
-		AbstractAction fileSaveAction;
+		FileSaveAction fileSaveAction;
 		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
 		AbstractAction toggleEntityGeneric;
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
@@ -1900,7 +1902,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
-		AbstractAction undoAction;
+		UndoAction undoAction;
 		AbstractAction setDocumentLanguageAction = new SetLanguageAction();
 		AbstractAction showSearchPanelAction;
 		AbstractAction sortByAlpha;

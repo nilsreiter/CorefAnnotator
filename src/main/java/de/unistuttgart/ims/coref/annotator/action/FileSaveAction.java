@@ -11,8 +11,10 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.document.DocumentState;
+import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 
-public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
+public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implements DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +28,11 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		target.saveCurrentFile();
+	}
+
+	@Override
+	public void documentStateEvent(DocumentState state) {
+		setEnabled(state.getHistorySize() > 0);
 	}
 
 }
