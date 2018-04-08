@@ -126,6 +126,7 @@ public class Constants {
 		public static final String ACTION_SORT_MENTIONS = "action.sort_mentions";
 		public static final String ACTION_SORT_MENTIONS_TOOLTIP = "action.sort_mentions.tooltip";
 		public static final String ACTION_SORT_REVERT = "action.sort_revert";
+		public static final String ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE = "action.toggle.ask_before_file_overwrite";
 		public static final String ACTION_TOGGLE_DELETE_EMPTY_ENTITIES = "action.toggle.delete_empty_entities";
 		public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
 		public static final String ACTION_TOGGLE_FULL_TOKENS = "action.toggle.full_tokens";
@@ -219,6 +220,7 @@ public class Constants {
 	}
 
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
+	public static final String CFG_ASK_BEFORE_FILE_OVERWRITE = "CFG_ASK_FILE_OVERWRITE";
 	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
 
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
@@ -239,6 +241,11 @@ public class Constants {
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
+
+	public static final Setting<Boolean> SETTING_ASK_BEFORE_FILE_OVERWRITE = new Setting<Boolean>(
+			CFG_ASK_BEFORE_FILE_OVERWRITE, Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE,
+			Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE, Defaults.CFG_ASK_BEFORE_FILE_OVERWRITE,
+			MaterialDesign.MDI_SETTINGS);
 
 	public static final Setting<Boolean> SETTING_DELETE_EMPTY_ENTITIES = new Setting<Boolean>(CFG_DELETE_EMPTY_ENTITIES,
 			Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, true,
