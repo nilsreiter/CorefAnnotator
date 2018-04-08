@@ -14,6 +14,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 
@@ -43,10 +44,18 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			if (!f.getName().endsWith(".xmi")) {
 				f = new File(f.getAbsolutePath() + ".xmi");
 			}
-			Annotator.app.setCurrentDirectory(f.getParentFile());
-			getTarget().saveToFile(f, Annotator.app.getPluginManager().getDefaultIOPlugin(), true);
-			Annotator.app.recentFiles.add(0, f);
-			Annotator.app.refreshRecents();
+
+			SaveJCasWorker worker = new SaveJCasWorker(f, target.getJCas(), (file, jcas) -> {
+				Annotator.app.recentFiles.add(0, file);
+				Annotator.app.refreshRecents();
+				Annotator.app.setCurrentDirectory(file.getParentFile());
+				target.setUnsavedChanges(false);
+				target.setFile(file);
+				target.setWindowTitle();
+				target.stopIndeterminateProgress();
+
+			});
+			worker.execute();
 			break;
 		default:
 		}

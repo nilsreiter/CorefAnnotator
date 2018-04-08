@@ -11,6 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
 
@@ -25,7 +26,14 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		target.saveCurrentFile();
+		target.setIndeterminateProgress();
+		SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
+				(file, jcas) -> {
+					target.setUnsavedChanges(false);
+					target.setWindowTitle();
+					target.stopIndeterminateProgress();
+				});
+		worker.execute();
 	}
 
 }
