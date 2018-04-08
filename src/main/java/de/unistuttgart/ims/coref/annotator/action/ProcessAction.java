@@ -2,8 +2,7 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.SwingWorker;
-
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -17,10 +16,12 @@ import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.document.DocumentState;
+import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 
-public class ProcessAction extends DocumentWindowAction {
+public class ProcessAction extends DocumentWindowAction implements DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -68,13 +69,9 @@ public class ProcessAction extends DocumentWindowAction {
 		new Thread(r).start();
 	}
 
-	class Perform extends SwingWorker<JCas, Object> {
-
-		@Override
-		protected JCas doInBackground() throws Exception {
-			return null;
-		}
-
+	@Override
+	public void documentStateEvent(DocumentState state) {
+		setEnabled(ArrayUtils.contains(plugin.getSupportedLanguages(), state.getLanguage()));
 	}
 
 }
