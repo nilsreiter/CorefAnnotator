@@ -604,11 +604,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
 					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
-					Util.getLanguageName(jcas.getDocumentLanguage()));
+					Util.getLanguageName(documentModel.getLanguage()));
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
-				jcas.setDocumentLanguage(Util.getLanguage(lang));
-
+				documentModel.setLanguage(Util.getLanguage(lang));
 			}
 		}
 

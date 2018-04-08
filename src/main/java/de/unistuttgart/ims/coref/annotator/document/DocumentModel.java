@@ -60,4 +60,17 @@ public class DocumentModel {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
+	public void setLanguage(String l) {
+		jcas.setDocumentLanguage(l);
+		fireDocumentChangedEvent();
+	}
+
+	public String getLanguage() {
+		return jcas.getDocumentLanguage();
+	}
+
+	public void signal() {
+		fireDocumentChangedEvent();
+	}
+
 }
