@@ -87,6 +87,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -150,6 +151,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	private static final long serialVersionUID = 1L;
 
+	@Deprecated
 	JCas jcas;
 	File file;
 	@Deprecated
@@ -177,6 +179,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 
 	// Sub windows
 	CommentWindow commentsWindow;
@@ -346,6 +349,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		actions.toggleEntityGeneric.setEnabled(false);
 		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
+
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -398,7 +402,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		JMenu procMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS_PROC));
 		for (Class<? extends ProcessingPlugin> pp : Annotator.app.getPluginManager().getProcessingPlugins()) {
-			procMenu.add(new ProcessAction(this, Annotator.app.getPluginManager().getPlugin(pp)));
+			ProcessAction pa = new ProcessAction(this, Annotator.app.getPluginManager().getPlugin(pp));
+			procMenu.add(pa);
+			documentStateListeners.add(pa);
+
 		}
 
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
@@ -730,6 +737,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		documentModel = model;
 
 		// UI
+		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
 		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
@@ -759,7 +767,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		setMessage("");
 
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
-
+		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
