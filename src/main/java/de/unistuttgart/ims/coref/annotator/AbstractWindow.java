@@ -79,7 +79,7 @@ public abstract class AbstractWindow extends JFrame {
 		progressBar.setVisible(false);
 	}
 
-	protected void setMessage(String message) {
+	public void setMessage(String message) {
 		setMessage(message, false);
 	}
 
