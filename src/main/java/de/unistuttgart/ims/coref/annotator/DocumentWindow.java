@@ -551,11 +551,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
+	@Deprecated
 	public synchronized void saveCurrentFile() {
 		if (file != null)
 			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin(), false);
 	}
 
+	@Deprecated
 	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
 		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
 		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
