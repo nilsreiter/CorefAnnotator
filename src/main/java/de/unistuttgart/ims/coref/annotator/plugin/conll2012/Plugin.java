@@ -60,7 +60,7 @@ public class Plugin implements IOPlugin {
 				f.getName().replaceAll(getSuffix(), "")));
 		b.add(AnalysisEngineFactory.createEngineDescription(Conll2012Writer.class,
 				Conll2012Writer.PARAM_TARGET_LOCATION, f.getParentFile().getAbsolutePath(),
-				Conll2012Writer.PARAM_USE_DOCUMENT_ID, true));
+				Conll2012Writer.PARAM_USE_DOCUMENT_ID, true, Conll2012Writer.PARAM_OVERWRITE, true));
 		b.add(AnalysisEngineFactory.createEngineDescription(ClearAnnotation.class, ClearAnnotation.PARAM_TYPE,
 				CoreferenceLink.class));
 		return b.createAggregateDescription();
