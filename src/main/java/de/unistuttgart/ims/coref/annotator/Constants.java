@@ -91,6 +91,8 @@ public class Constants {
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
+		public static final String ACTION_FILE_MERGE = "action.merge_files";
+		public static final String ACTION_FILE_MERGE_TOOLTIP = "action.merge_files.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
 		public static final String ACTION_FLAG_ENTITY_GENERIC_TOOLTIP = "action.flag_entity_generic.tooltip";
 		public static final String ACTION_FLAG_MENTION_AMBIGUOUS = "action.flag_mention_ambiguous";
@@ -172,6 +174,7 @@ public class Constants {
 		public static final String MENU_HELP = "menu.help";
 		public static final String MENU_SETTINGS = "menu.settings";
 		public static final String MENU_TOOLS = "menu.tools";
+		public static final String MENU_TOOLS_PROC = "menu.tools.proc";
 		public static final String MENU_VIEW = "menu.view";
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
 		public static final String MENU_VIEW_STYLE = "menu.view.style";
@@ -212,8 +215,6 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String ACTION_FILE_MERGE = "action.merge_files";
-		public static final String ACTION_FILE_MERGE_TOOLTIP = "action.merge_files.tooltip";
 
 	}
 
@@ -261,4 +262,6 @@ public class Constants {
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
+
+	public static final String X_UNSPECIFIED = "x-unspecified";
 }

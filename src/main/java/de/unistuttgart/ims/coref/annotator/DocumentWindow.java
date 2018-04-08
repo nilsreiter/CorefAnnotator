@@ -87,6 +87,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -103,6 +104,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
@@ -138,6 +140,8 @@ import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -147,6 +151,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	private static final long serialVersionUID = 1L;
 
+	@Deprecated
 	JCas jcas;
 	File file;
 	@Deprecated
@@ -174,6 +179,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 
 	// Sub windows
 	CommentWindow commentsWindow;
@@ -343,6 +349,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		actions.toggleEntityGeneric.setEnabled(false);
 		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
+
 		Annotator.logger.trace("Actions initialised.");
 
 	}
@@ -392,7 +399,17 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected JMenu initialiseMenuTools() {
+
+		JMenu procMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS_PROC));
+		for (Class<? extends ProcessingPlugin> pp : Annotator.app.getPluginManager().getProcessingPlugins()) {
+			ProcessAction pa = new ProcessAction(this, Annotator.app.getPluginManager().getPlugin(pp));
+			procMenu.add(pa);
+			documentStateListeners.add(pa);
+
+		}
+
 		JMenu toolsMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
+		toolsMenu.add(procMenu);
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
@@ -594,11 +611,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
 					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
 					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
-					Util.getLanguageName(jcas.getDocumentLanguage()));
+					Util.getLanguageName(documentModel.getLanguage()));
 			if (lang != null) {
 				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
-				jcas.setDocumentLanguage(Util.getLanguage(lang));
-
+				documentModel.setLanguage(Util.getLanguage(lang));
 			}
 		}
 
@@ -721,6 +737,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		documentModel = model;
 
 		// UI
+		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
 		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 		splitPane.setVisible(true);
@@ -732,7 +749,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		if (meta.getStylePlugin() != null) {
 			Object o;
 			try {
-				Class<?> cl = Class.forName(meta.getStylePlugin());
+				Class<? extends Plugin> cl = (Class<? extends Plugin>) Class.forName(meta.getStylePlugin());
 				o = mainApplication.getPluginManager().getPlugin(cl);
 				if (o instanceof StylePlugin)
 					sPlugin = (StylePlugin) o;
@@ -750,7 +767,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		setMessage("");
 
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
-
+		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 	}
 
