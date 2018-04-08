@@ -19,6 +19,7 @@ public class Exporter extends JCasAnnotator_ImplBase {
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
+
 		Type chainType = jcas.getTypeSystem().getType(Constants.TYPE_CHAIN);
 		Type linkType = jcas.getTypeSystem().getType(Constants.TYPE_LINK);
 
