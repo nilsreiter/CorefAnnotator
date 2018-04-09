@@ -26,6 +26,8 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, IOPlugin plugin) {
 		super(dw, MaterialDesign.MDI_EXPORT);
 		putValue(Action.NAME, plugin.getName());
+		if (plugin.getDescription() != null)
+			putValue(Action.SHORT_DESCRIPTION, plugin.getDescription());
 		this.plugin = plugin;
 
 	}
