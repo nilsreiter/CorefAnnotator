@@ -106,6 +106,7 @@ import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
+import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -417,6 +418,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
+		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(mainApplication));
