@@ -1,1 +1,1 @@
-This plugin imports from arbitrary XML/TEI files. The entire textual content (below the element <text>) is treated as the document text. All elements with the attribute 'ref' are treated as a mention.
+This plugin imports from arbitrary XML/TEI files. The entire textual content (below the element <text>) is treated as the document text. All elements with the attribute 'ref' are treated as a mention. Exporting into TEI/XML only works when the document has been imported from TEI/XML before.
