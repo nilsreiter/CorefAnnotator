@@ -107,6 +107,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -602,28 +603,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	public Annotator getMainApplication() {
 		return mainApplication;
-	}
-
-	class SetLanguageAction extends AnnotatorAction {
-		private static final long serialVersionUID = 1L;
-
-		public SetLanguageAction() {
-			super(null, Constants.Strings.ACTION_SET_DOCUMENT_LANGUAGE, MaterialDesign.MDI_SWITCH);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String lang = (String) JOptionPane.showInputDialog(DocumentWindow.this,
-					Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE),
-					Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT), JOptionPane.QUESTION_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
-					Util.getLanguageName(documentModel.getLanguage()));
-			if (lang != null) {
-				Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
-				documentModel.setLanguage(Util.getLanguage(lang));
-			}
-		}
-
 	}
 
 	class SortTreeByAlpha extends IkonAction {
@@ -1908,7 +1887,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
-		AbstractAction setDocumentLanguageAction = new SetLanguageAction();
+		AbstractAction setDocumentLanguageAction = new SetLanguageAction(DocumentWindow.this);
 		AbstractAction showSearchPanelAction;
 		AbstractAction sortByAlpha;
 		AbstractAction sortByMentions;
