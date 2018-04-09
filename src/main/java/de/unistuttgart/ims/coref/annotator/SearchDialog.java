@@ -131,7 +131,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	DocumentWindow documentWindow;
 	String text;
-	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();;
+	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();
 	JList<SearchResult> list;
 	JTextField textField;
 	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
