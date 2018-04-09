@@ -711,6 +711,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 						highlightManager.underline((Annotation) fs);
 				}
 			}
+			break;
+		default:
+			break;
 		}
 
 	}
