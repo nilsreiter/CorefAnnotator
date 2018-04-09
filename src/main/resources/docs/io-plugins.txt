@@ -1,0 +1,12 @@
+<html>
+<head>
+<title>Input/Output</title>
+</head>
+<body style="font-family:sans-serif;font-size:12pt;">
+
+<h1>Input/Output</h1>
+<p>Import from and export to other formats is organized in plugins. 
+Most plugins are implemented as UIMA components, which makes it 
+relatively straightforward to add new formats (or use the DKpro 
+formatters). This list shows the currently available plugins with their 
+description.</p>
