@@ -50,6 +50,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		comment.addToIndexes();
 
 		register(comment);
+		documentModel.setUnsavedChanges(true);
 		documentModel.fireDocumentChangedEvent();
 		return comment;
 	}
@@ -100,11 +101,13 @@ public class CommentsModel extends AbstractListModel<Comment> {
 			documentModel.getCoreferenceModel()
 					.fireEvent(Event.get(Event.Type.Remove, null, ((AnnotationComment) c).getAnnotation()));
 		}
+		documentModel.setUnsavedChanges(true);
 		fireIntervalRemoved(this, index, index);
 	}
 
 	public void update(Comment c) {
 		int index = comments.indexOf(c);
+		documentModel.setUnsavedChanges(true);
 		fireContentsChanged(this, index, index);
 	}
 }
