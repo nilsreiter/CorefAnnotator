@@ -597,6 +597,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	@Override
+	@Deprecated
 	public JCas getJCas() {
 		return jcas;
 	}
