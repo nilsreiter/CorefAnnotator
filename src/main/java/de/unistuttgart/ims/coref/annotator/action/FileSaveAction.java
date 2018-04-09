@@ -39,7 +39,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		setEnabled(state.isSavable());
+		setEnabled(state.isSavable() && target.getFile() != null);
 	}
 
 }

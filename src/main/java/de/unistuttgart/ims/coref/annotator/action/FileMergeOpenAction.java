@@ -12,6 +12,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.plugins.MergeFilesPlugin;
 
@@ -51,7 +52,8 @@ public class FileMergeOpenAction extends AnnotatorAction {
 
 				@Override
 				public void run() {
-					Annotator.app.open(stf.getFiles().getFirst(), pl, "");
+					DocumentWindow dw = Annotator.app.open(stf.getFiles().getFirst(), pl, "");
+					dw.setFile(null);
 				}
 
 			});
