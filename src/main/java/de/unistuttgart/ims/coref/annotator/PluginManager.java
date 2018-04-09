@@ -23,7 +23,7 @@ public class PluginManager {
 	ImmutableSet<Class<? extends StylePlugin>> stylePlugins;
 	ImmutableSet<Class<? extends EntityRankingPlugin>> rankingPlugins;
 	ImmutableSet<Class<? extends ProcessingPlugin>> processingPlugins;
-	Map<Class<?>, Plugin> instances = new HashMap<Class<?>, Plugin>();
+	Map<Class<? extends Plugin>, Plugin> instances = new HashMap<Class<? extends Plugin>, Plugin>();
 
 	public void init() {
 		Annotator.logger.trace("Initialising plugin manager");
@@ -66,6 +66,7 @@ public class PluginManager {
 		return getStylePlugin(DefaultStylePlugin.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T extends Plugin> T getPlugin(Class<T> cl) {
 		if (!instances.containsKey(cl)) {
 			T p;

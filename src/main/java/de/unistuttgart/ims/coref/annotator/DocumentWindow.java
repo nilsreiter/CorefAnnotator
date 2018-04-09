@@ -753,11 +753,15 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		StylePlugin sPlugin = null;
 
 		if (meta.getStylePlugin() != null) {
-			Object o;
+			Object o = null;
 			try {
-				Class<? extends Plugin> cl = (Class<? extends Plugin>) Class.forName(meta.getStylePlugin());
-				o = mainApplication.getPluginManager().getPlugin(cl);
-				if (o instanceof StylePlugin)
+				Class<?> pureClass = Class.forName(meta.getStylePlugin());
+				if (pureClass.isAssignableFrom(Plugin.class)) {
+					@SuppressWarnings("unchecked")
+					Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) pureClass;
+					o = Annotator.app.getPluginManager().getPlugin(pluginClass);
+				}
+				if (o != null && o instanceof StylePlugin)
 					sPlugin = (StylePlugin) o;
 			} catch (ClassNotFoundException e) {
 				Annotator.logger.catching(e);
