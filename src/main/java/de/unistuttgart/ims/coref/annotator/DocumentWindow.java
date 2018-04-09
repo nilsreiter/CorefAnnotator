@@ -421,7 +421,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
-		toolsMenu.add(new ShowLogWindowAction(mainApplication));
+		toolsMenu.add(new ShowLogWindowAction(Annotator.app));
 		return toolsMenu;
 	}
 
@@ -429,12 +429,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		JMenu fileImportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_IMPORT_FROM));
 		JMenu fileExportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_EXPORT_AS));
 
-		PluginManager pm = mainApplication.getPluginManager();
+		PluginManager pm = Annotator.app.getPluginManager();
 		for (Class<? extends IOPlugin> pluginClass : pm.getIOPlugins()) {
 			try {
 				IOPlugin plugin = pm.getIOPlugin(pluginClass);
 				if (plugin.getImporter() != null)
-					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
+					fileImportMenu.add(new FileImportAction(Annotator.app, plugin));
 				if (plugin.getExporter() != null)
 					fileExportMenu.add(new FileExportAction(this, this, plugin));
 			} catch (ResourceInitializationException e) {
@@ -444,14 +444,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}
 
 		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
-		fileMenu.add(new FileSelectOpenAction(mainApplication));
-		fileMenu.add(mainApplication.getRecentFilesMenu());
+		fileMenu.add(new FileSelectOpenAction(Annotator.app));
+		fileMenu.add(Annotator.app.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
 		fileMenu.add(new FileSaveAsAction(this));
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(actions.closeAction);
-		fileMenu.add(mainApplication.quitAction);
+		fileMenu.add(Annotator.app.quitAction);
 
 		return fileMenu;
 	}
@@ -556,7 +556,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	@Deprecated
 	public synchronized void saveCurrentFile() {
 		if (file != null)
-			saveToFile(file, mainApplication.getPluginManager().getDefaultIOPlugin(), false);
+			saveToFile(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), false);
 	}
 
 	@Deprecated
@@ -587,7 +587,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			protected void done() {
 				progressBar.setVisible(false);
 				setMessage("");
-				if (plugin == mainApplication.getPluginManager().getDefaultIOPlugin()) {
+				if (plugin == Annotator.app.getPluginManager().getDefaultIOPlugin()) {
 					file = f;
 					setWindowTitle();
 				}
@@ -602,8 +602,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		return jcas;
 	}
 
+	@Deprecated
 	public Annotator getMainApplication() {
-		return mainApplication;
+		return Annotator.app;
 	}
 
 	class SortTreeByAlpha extends IkonAction {
@@ -662,12 +663,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	public void showSearch() {
 		if (searchPanel == null) {
-			searchPanel = new SearchDialog(this, mainApplication.getPreferences());
+			searchPanel = new SearchDialog(this, Annotator.app.getPreferences());
 		}
 		searchPanel.setVisible(true);
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
@@ -751,7 +751,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			}
 		}
 		if (sPlugin == null)
-			sPlugin = mainApplication.getPluginManager().getDefaultStylePlugin();
+			sPlugin = Annotator.app.getPluginManager().getDefaultStylePlugin();
 
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
@@ -773,7 +773,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
-				mainApplication.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
+				Annotator.app.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
 
 		// highlightManager.clearAndDrawAllAnnotations(jcas);
 
@@ -1033,7 +1033,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
-			super(mainApplication, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
+			super(Annotator.app, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 
 		}
@@ -1065,7 +1065,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
-		boolean showText = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+		boolean showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
 
 		CATreeNode treeNode;
 
@@ -1374,7 +1374,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		private static final long serialVersionUID = 1L;
 
 		public MergeSelectedEntities() {
-			super(mainApplication, Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
+			super(Annotator.app, Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_TOOLTIP));
 		}
 
@@ -1396,7 +1396,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		private static final long serialVersionUID = 1L;
 
 		public FormEntityGroup() {
-			super(mainApplication, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
+			super(Annotator.app, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1425,13 +1425,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			super(null, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
 			putValue(Action.SELECTED_KEY,
-					mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
+					Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			boolean old = mainApplication.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
-			mainApplication.getPreferences().putBoolean(Constants.CFG_SHOW_TEXT_LABELS, !old);
+			boolean old = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			Annotator.app.getPreferences().putBoolean(Constants.CFG_SHOW_TEXT_LABELS, !old);
 			putValue(Action.SELECTED_KEY, !old);
 			tree.repaint();
 		}
@@ -1538,8 +1538,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 				Set<Entity> candidates = Sets.mutable.empty();
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
-						mainApplication.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
-						mainApplication.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
+						Annotator.app.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
+						Annotator.app.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
 				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
