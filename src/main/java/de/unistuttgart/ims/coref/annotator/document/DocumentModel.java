@@ -8,6 +8,13 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 
+/**
+ * This class represents an opened document. Individual aspects are stored in
+ * sub models (e.g., for comments or the coreference part). All interaction with
+ * the document should take place through this class (and not accessing the JCas
+ * directly).
+ *
+ */
 public class DocumentModel {
 
 	JCas jcas;
@@ -26,6 +33,11 @@ public class DocumentModel {
 		this.jcas = jcas;
 	}
 
+	/**
+	 * Don't use! This method will become protected at some point.
+	 * 
+	 * @return
+	 */
 	public JCas getJcas() {
 		return jcas;
 	}
@@ -79,6 +91,11 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	/**
+	 * This method removes annotations from the CAS that are not used by the
+	 * annotation tool. Currently, this is mostly DKpro-related annotations. TODO:
+	 * Make this configurable and more robust
+	 */
 	public void removeForeignAnnotations() {
 		TOP fs;
 
