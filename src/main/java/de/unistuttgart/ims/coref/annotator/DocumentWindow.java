@@ -161,7 +161,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	String segmentAnnotation = null;
 
 	// storing and caching
-	boolean unsavedChanges = false;
 	Feature titleFeature;
 	int mouseClickedPosition = -1;
 
@@ -589,7 +588,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				setMessage("");
 				if (plugin == mainApplication.getPluginManager().getDefaultIOPlugin()) {
 					file = f;
-					unsavedChanges = false;
 					setWindowTitle();
 				}
 			}
@@ -1873,7 +1871,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		unsavedChanges = (state.getHistorySize() > 0);
 		setWindowTitle();
 	}
 
@@ -1920,11 +1917,4 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	public boolean hasUnsavedChanges() {
-		return unsavedChanges;
-	}
-
-	public void setUnsavedChanges(boolean unsavedChanges) {
-		this.unsavedChanges = unsavedChanges;
-	}
 }
