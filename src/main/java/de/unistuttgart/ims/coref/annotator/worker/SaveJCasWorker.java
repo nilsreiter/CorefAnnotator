@@ -10,6 +10,9 @@ import javax.swing.SwingWorker;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.jcas.JCas;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+
 public class SaveJCasWorker extends SwingWorker<Object, Object> {
 
 	File file;
@@ -35,5 +38,16 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 	@Override
 	protected void done() {
 		consumer.accept(file, jcas);
+	}
+
+	public static BiConsumer<File, JCas> getConsumer(DocumentWindow target) {
+		return (file, jcas) -> {
+			Annotator.app.recentFiles.add(0, file);
+			Annotator.app.refreshRecents();
+			Annotator.app.setCurrentDirectory(file.getParentFile());
+			target.setFile(file);
+			target.setWindowTitle();
+			target.stopIndeterminateProgress();
+		};
 	}
 }
