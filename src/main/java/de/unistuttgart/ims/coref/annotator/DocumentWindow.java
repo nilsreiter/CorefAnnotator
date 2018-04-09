@@ -755,6 +755,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		// final
 		setMessage("");
+		setWindowTitle();
 
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
@@ -773,7 +774,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		// highlightManager.clearAndDrawAllAnnotations(jcas);
 
-		setWindowTitle();
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);
 		im.execute();
