@@ -31,7 +31,6 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		target.setIndeterminateProgress();
 		SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
 				(file, jcas) -> {
-					target.setUnsavedChanges(false);
 					target.setWindowTitle();
 					target.stopIndeterminateProgress();
 				});
@@ -40,7 +39,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
-		setEnabled(state.getHistorySize() > 0);
+		setEnabled(state.isSavable());
 	}
 
 }

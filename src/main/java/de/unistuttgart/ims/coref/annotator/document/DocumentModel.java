@@ -20,6 +20,8 @@ public class DocumentModel {
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
+	boolean unsavedChanges = false;
+
 	public DocumentModel(JCas jcas) {
 		this.jcas = jcas;
 	}
@@ -90,6 +92,15 @@ public class DocumentModel {
 		fs = new de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence(jcas);
 		jcas.removeAllIncludingSubtypes(fs.getTypeIndexID());
 
+		fireDocumentChangedEvent();
+	}
+
+	public boolean hasUnsavedChanges() {
+		return this.unsavedChanges;
+	}
+
+	public boolean isSavable() {
+		return hasUnsavedChanges() || coreferenceModel.getHistory().size() > 0;
 	}
 
 }

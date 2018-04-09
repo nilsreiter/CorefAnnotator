@@ -523,7 +523,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected void closeWindow(boolean quit) {
-		if (unsavedChanges) {
+		if (documentModel.isSavable()) {
 			Annotator.logger.warn("Closing window with unsaved changes");
 		}
 		if (searchPanel != null) {
@@ -679,7 +679,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		if (documentTitle == null)
 			documentTitle = "Untitled document";
 		setTitle(documentTitle + " (" + fileName + ")"
-				+ (unsavedChanges ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
+				+ (documentModel.isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
 	}
 
 	public void showSearch() {
@@ -1372,7 +1372,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (unsavedChanges) {
+			if (documentModel.isSavable()) {
 				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
