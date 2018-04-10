@@ -175,6 +175,10 @@ public interface Op {
 			this.entities = Lists.immutable.of(entities);
 		}
 
+		public MergeEntities(Iterable<Entity> entities) {
+			this.entities = Lists.immutable.withAll(entities);
+		}
+
 		public ImmutableSetMultimap<Entity, Mention> getPreviousState() {
 			return previousState;
 		}

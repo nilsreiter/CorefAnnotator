@@ -87,6 +87,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -1380,13 +1381,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode[] nodes = new CATreeNode[tree.getSelectionPaths().length];
-			Entity[] entities = new Entity[tree.getSelectionPaths().length];
-			for (int i = 0; i < tree.getSelectionPaths().length; i++) {
-				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
-				entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
-			}
-			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(entities));
+			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(getSelectedEntities()));
 
 		}
 
@@ -1904,4 +1899,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
+	public ImmutableSet<Entity> getSelectedEntities() {
+		Entity[] entities = new Entity[tree.getSelectionPaths().length];
+		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
+		}
+		return Sets.immutable.of(entities);
+	}
 }
