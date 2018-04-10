@@ -98,6 +98,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -237,6 +238,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
+		treePopupMenu.addSeparator();
+		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -337,6 +340,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.copyAction = new CopyAction(this, Annotator.app);
 		this.actions.undoAction = new UndoAction(this);
 		this.actions.removeDuplicatesAction = new RemoveDuplicatesAction(this);
+		this.actions.entityStatisticsAction = new EntityStatisticsAction(this);
 
 		// disable some at the beginning
 		actions.newEntityAction.setEnabled(false);
@@ -1896,6 +1900,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction newEntityAction;
 		AbstractAction renameAction;
 		AbstractAction removeDuplicatesAction;
+		EntityStatisticsAction entityStatisticsAction;
 
 	}
 
