@@ -61,7 +61,11 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 					if (fs instanceof EntityGroup) {
 						EntityGroup eg = (EntityGroup) fs;
 						for (int j = 0; j < eg.getMembers().size(); j++)
-							insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
+							try {
+								insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
+							} catch (NullPointerException e) {
+								Annotator.logger.catching(e);
+							}
 					}
 				}
 			}
