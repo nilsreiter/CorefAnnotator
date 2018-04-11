@@ -148,7 +148,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	protected void initialiseActions() {
 		openAction = new FileSelectOpenAction(this);
-		openCompareAction = new FileCompareOpenAction(this);
+		openCompareAction = new FileCompareOpenAction();
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -175,7 +175,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		panel.add(new JButton(openCompareAction));
-		panel.add(new JButton(new FileMergeOpenAction(this)));
+		panel.add(new JButton(new FileMergeOpenAction()));
 		mainPanel.add(panel);
 
 		mainPanel.add(Box.createVerticalStrut(10));

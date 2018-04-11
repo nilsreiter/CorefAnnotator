@@ -9,12 +9,12 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 
-public class SelectedFileOpenAction extends AnnotatorAction {
+public class SelectedFileOpenAction extends IkonAction {
 	private static final long serialVersionUID = 1L;
 	File file;
 
 	public SelectedFileOpenAction(Annotator mApplication, File file) {
-		super(mApplication, MaterialDesign.MDI_OPEN_IN_APP);
+		super(MaterialDesign.MDI_OPEN_IN_APP);
 		putValue(Action.NAME, file.getName());
 		putValue(Action.SHORT_DESCRIPTION, file.getPath());
 		this.file = file;
@@ -22,7 +22,7 @@ public class SelectedFileOpenAction extends AnnotatorAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		mainApplication.open(file, mainApplication.getPluginManager().getDefaultIOPlugin(), null);
+		Annotator.app.open(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), null);
 	}
 
 }

@@ -9,9 +9,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 
 public class SetLanguageAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
@@ -22,13 +22,13 @@ public class SetLanguageAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String lang = (String) JOptionPane.showInputDialog(this.documentWindow,
+		String lang = (String) JOptionPane.showInputDialog(getTarget(),
 				Annotator.getString(Strings.DIALOG_LANGUAGE_TITLE), Annotator.getString(Strings.DIALOG_LANGUAGE_PROMPT),
 				JOptionPane.QUESTION_MESSAGE, FontIcon.of(MaterialDesign.MDI_SWITCH), Util.getSupportedLanguageNames(),
-				Util.getLanguageName(documentWindow.getDocumentModel().getLanguage()));
+				Util.getLanguageName(getTarget().getDocumentModel().getLanguage()));
 		if (lang != null) {
 			Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
-			documentWindow.getDocumentModel().setLanguage(Util.getLanguage(lang));
+			getTarget().getDocumentModel().setLanguage(Util.getLanguage(lang));
 		}
 	}
 

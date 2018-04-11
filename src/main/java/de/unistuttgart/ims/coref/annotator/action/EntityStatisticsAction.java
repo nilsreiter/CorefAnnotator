@@ -37,24 +37,24 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 		chooser.setFileFilter(FileFilters.csv);
 		chooser.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
 
-		String name = documentWindow.getSelectedEntities().iterator().next().getLabel();
+		String name = getDocumentWindow().getSelectedEntities().iterator().next().getLabel();
 		if (name != null)
 			chooser.setSelectedFile(new File(name + ".csv"));
 
-		int r = chooser.showSaveDialog(documentWindow);
+		int r = chooser.showSaveDialog(getDocumentWindow());
 		if (r == JFileChooser.APPROVE_OPTION) {
 			new SwingWorker<Object, Object>() {
 
 				@Override
 				protected Object doInBackground() throws Exception {
-					documentWindow.setMessage("Exporting ...");
-					documentWindow.setIndeterminateProgress();
+					getDocumentWindow().setMessage("Exporting ...");
+					getDocumentWindow().setIndeterminateProgress();
 					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
 						p.printRecord("begin", "end", "surface", "entityNum", "entityLabel", "entityGroup",
 								"entityGeneric", "ambiguous", "difficult");
 						int entityNum = 0;
-						for (Entity entity : documentWindow.getSelectedEntities()) {
-							for (Mention mention : documentWindow.getDocumentModel().getCoreferenceModel()
+						for (Entity entity : getDocumentWindow().getSelectedEntities()) {
+							for (Mention mention : getDocumentWindow().getDocumentModel().getCoreferenceModel()
 									.get(entity)) {
 								String surface = mention.getCoveredText();
 								if (mention.getDiscontinuous() != null)
@@ -73,8 +73,8 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 				@Override
 				protected void done() {
-					documentWindow.setMessage("");
-					documentWindow.stopIndeterminateProgress();
+					getDocumentWindow().setMessage("");
+					getDocumentWindow().stopIndeterminateProgress();
 				}
 			}.execute();
 

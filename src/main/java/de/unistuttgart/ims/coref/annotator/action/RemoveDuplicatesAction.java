@@ -26,9 +26,9 @@ public class RemoveDuplicatesAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		MutableList<TreePath> paths = Lists.mutable.with(documentWindow.getTree().getSelectionPaths());
+		MutableList<TreePath> paths = Lists.mutable.with(getTarget().getTree().getSelectionPaths());
 
-		documentWindow.getDocumentModel().getCoreferenceModel().edit(new Op.RemoveDuplicateMentionsInEntities(paths
+		getTarget().getDocumentModel().getCoreferenceModel().edit(new Op.RemoveDuplicateMentionsInEntities(paths
 				.collect(p -> (CATreeNode) p.getLastPathComponent()).collect(n -> (Entity) n.getFeatureStructure())));
 	}
 

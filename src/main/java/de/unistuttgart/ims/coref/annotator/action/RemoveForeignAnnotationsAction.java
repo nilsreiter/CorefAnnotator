@@ -21,18 +21,18 @@ public class RemoveForeignAnnotationsAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.setIndeterminateProgress();
+		getTarget().setIndeterminateProgress();
 		new SwingWorker<Object, Object>() {
 
 			@Override
 			protected Object doInBackground() throws Exception {
-				documentWindow.getDocumentModel().removeForeignAnnotations();
+				getTarget().getDocumentModel().removeForeignAnnotations();
 				return null;
 			}
 
 			@Override
 			protected void done() {
-				documentWindow.stopIndeterminateProgress();
+				getTarget().stopIndeterminateProgress();
 			}
 		}.execute();
 	}

@@ -16,13 +16,12 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.plugins.MergeFilesPlugin;
 
-public class FileMergeOpenAction extends AnnotatorAction {
+public class FileMergeOpenAction extends IkonAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public FileMergeOpenAction(Annotator mApp) {
-		super(mApp, MaterialDesign.MDI_SOURCE_MERGE);
-		putValue(Action.NAME, Annotator.getString(Constants.Strings.ACTION_FILE_MERGE));
+	public FileMergeOpenAction() {
+		super(Constants.Strings.ACTION_FILE_MERGE, MaterialDesign.MDI_SOURCE_MERGE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_FILE_MERGE_TOOLTIP));
 	}
 

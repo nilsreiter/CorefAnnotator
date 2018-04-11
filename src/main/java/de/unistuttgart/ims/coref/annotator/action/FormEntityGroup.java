@@ -28,8 +28,8 @@ public class FormEntityGroup extends DocumentWindowAction implements CAAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.getDocumentModel().getCoreferenceModel()
-				.edit(new Op.GroupEntities(documentWindow.getSelectedEntities()));
+		getTarget().getDocumentModel().getCoreferenceModel()
+				.edit(new Op.GroupEntities(getTarget().getSelectedEntities()));
 	}
 
 	@Override

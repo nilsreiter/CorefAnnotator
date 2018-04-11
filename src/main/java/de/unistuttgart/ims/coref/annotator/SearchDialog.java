@@ -43,7 +43,7 @@ import javax.swing.text.Highlighter;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
+import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
@@ -67,12 +67,12 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class AnnotateSelectedFindings extends AnnotatorAction {
+	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(null, Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
+			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			this.addIkon(MaterialDesign.MDI_ACCOUNT);
@@ -89,11 +89,11 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class AnnotateSelectedFindingsAsNewEntity extends AnnotatorAction {
+	class AnnotateSelectedFindingsAsNewEntity extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindingsAsNewEntity() {
-			super(null, Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
+			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
 		}
@@ -107,12 +107,12 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	class RunSearch extends AnnotatorAction {
+	class RunSearch extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public RunSearch() {
-			super(null, Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
+			super(Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 			setEnabled(false);
 		}
 

@@ -429,7 +429,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	}
 
 	protected void initialiseActions() {
-		copyAction = new CopyAction(this, mainApplication);
+		copyAction = new CopyAction(this);
 	};
 
 	protected void initialiseMenu() {

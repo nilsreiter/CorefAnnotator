@@ -17,13 +17,12 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class FileCompareOpenAction extends AnnotatorAction {
+public class FileCompareOpenAction extends IkonAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public FileCompareOpenAction(Annotator mApp) {
-		super(mApp, MaterialDesign.MDI_COMPARE);
-		putValue(Action.NAME, Annotator.getString(Constants.Strings.ACTION_COMPARE));
+	public FileCompareOpenAction() {
+		super(Constants.Strings.ACTION_COMPARE, MaterialDesign.MDI_COMPARE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMPARE_TOOLTIP));
 	}
 
@@ -53,7 +52,7 @@ public class FileCompareOpenAction extends AnnotatorAction {
 					CompareMentionsWindow cmw;
 
 					try {
-						cmw = new CompareMentionsWindow(mainApplication, stf.getFiles().size());
+						cmw = new CompareMentionsWindow(Annotator.app, stf.getFiles().size());
 						cmw.setIndeterminateProgress();
 						cmw.setVisible(true);
 						cmw.setFiles(stf.getFiles());

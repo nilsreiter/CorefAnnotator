@@ -23,10 +23,10 @@ public class ShowMentionInTreeAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
+		Object[] path = getTarget().getDocumentModel().getTreeModel().getPathToRoot(m);
 		TreePath tp = new TreePath(path);
-		this.documentWindow.getTree().setSelectionPath(tp);
-		this.documentWindow.getTree().scrollPathToVisible(tp);
+		this.getTarget().getTree().setSelectionPath(tp);
+		this.getTarget().getTree().scrollPathToVisible(tp);
 
 	}
 

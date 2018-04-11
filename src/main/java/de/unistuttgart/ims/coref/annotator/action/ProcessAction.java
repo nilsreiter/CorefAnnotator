@@ -40,8 +40,8 @@ public class ProcessAction extends DocumentWindowAction implements DocumentState
 			@Override
 			public void run() {
 				try {
-					documentWindow.setIndeterminateProgress();
-					JCas jcas = documentWindow.getJCas();
+					getTarget().setIndeterminateProgress();
+					JCas jcas = getTarget().getJCas();
 
 					SimplePipeline.runPipeline(jcas, plugin.getEngineDescription());
 
@@ -52,14 +52,14 @@ public class ProcessAction extends DocumentWindowAction implements DocumentState
 
 					for (String surface : map.keySet()) {
 						Op op = new Op.AddMentionsToNewEntity(map.get(surface));
-						documentWindow.getDocumentModel().getCoreferenceModel().edit(op);
+						getTarget().getDocumentModel().getCoreferenceModel().edit(op);
 					}
 
-					documentWindow.stopIndeterminateProgress();
+					getTarget().stopIndeterminateProgress();
 				} catch (AnalysisEngineProcessException | ResourceInitializationException e) {
 					Annotator.logger.catching(e);
 				} finally {
-					documentWindow.stopIndeterminateProgress();
+					getTarget().stopIndeterminateProgress();
 				}
 
 			}

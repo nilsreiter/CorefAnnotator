@@ -10,30 +10,27 @@ import javax.swing.KeyStroke;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.HasTextView;
+import de.unistuttgart.ims.coref.annotator.Span;
 
-public class CopyAction extends AnnotatorAction {
+public class CopyAction extends TargetedIkonAction<HasTextView> {
 
 	private static final long serialVersionUID = 1L;
 
-	HasTextView hasTextView;
-
-	public CopyAction(HasTextView dw, Annotator app) {
-		super(app, Constants.Strings.ACTION_COPY, MaterialDesign.MDI_CONTENT_COPY);
+	public CopyAction(HasTextView dw) {
+		super(dw, Constants.Strings.ACTION_COPY, MaterialDesign.MDI_CONTENT_COPY);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Span span = hasTextView.getSelection();
-		hasTextView.getText().substring(span.begin, span.end);
+		Span span = getTarget().getSelection();
+		getTarget().getText().substring(span.begin, span.end);
 
 		Toolkit.getDefaultToolkit().getSystemClipboard()
-				.setContents(new StringSelection(hasTextView.getText().substring(span.begin, span.end)), null);
+				.setContents(new StringSelection(getTarget().getText().substring(span.begin, span.end)), null);
 	}
 
 }

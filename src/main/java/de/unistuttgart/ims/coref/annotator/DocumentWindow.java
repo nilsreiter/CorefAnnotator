@@ -95,7 +95,6 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
@@ -336,7 +335,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.sortByMentions = new SortTreeByMentions();
 		this.actions.fileSaveAction = new FileSaveAction(this);
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
-		this.actions.copyAction = new CopyAction(this, Annotator.app);
+		this.actions.copyAction = new CopyAction(this);
 		this.actions.undoAction = new UndoAction(this);
 		this.actions.removeDuplicatesAction = new RemoveDuplicatesAction(this);
 		this.actions.entityStatisticsAction = new EntityStatisticsAction(this);
@@ -1034,12 +1033,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class ChangeKeyForEntityAction extends AnnotatorAction {
+	class ChangeKeyForEntityAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ChangeKeyForEntityAction() {
-			super(Annotator.app, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
+			super(Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 
 		}
@@ -1162,11 +1161,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class DeleteAction extends AnnotatorAction {
+	class DeleteAction extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
 		public DeleteAction() {
-			super(null, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1226,14 +1225,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class DeleteMentionAction extends AnnotatorAction {
+	class DeleteMentionAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		Mention m;
 
 		public DeleteMentionAction(Mention m) {
-			super(null, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			this.m = m;
 
@@ -1331,12 +1330,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}
 	}
 
-	class ClearAction extends AnnotatorAction {
+	class ClearAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ClearAction() {
-			super(null, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
@@ -1375,12 +1374,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class MergeSelectedEntities extends AnnotatorAction {
+	class MergeSelectedEntities extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public MergeSelectedEntities() {
-			super(Annotator.app, Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
+			super(Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_TOOLTIP));
 		}
 
@@ -1393,12 +1392,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	@Deprecated
-	class ToggleShowTextInTreeLabels extends AnnotatorAction {
+	class ToggleShowTextInTreeLabels extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public ToggleShowTextInTreeLabels() {
-			super(null, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
+			super(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
 			putValue(Action.SELECTED_KEY,
 					Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
