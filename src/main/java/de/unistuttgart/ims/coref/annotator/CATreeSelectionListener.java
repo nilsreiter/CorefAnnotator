@@ -49,31 +49,31 @@ public abstract class CATreeSelectionListener implements TreeSelectionListener {
 
 	}
 
-	protected boolean isSingle() {
+	public boolean isSingle() {
 		return num == 1;
 	}
 
-	protected boolean isDouble() {
+	public boolean isDouble() {
 		return num == 2;
 	}
 
-	protected boolean isEntity() {
+	public boolean isEntity() {
 		return fs.allSatisfy(f -> f instanceof Entity);
 	}
 
-	protected boolean isDetachedMentionPart() {
+	public boolean isDetachedMentionPart() {
 		return fs.allSatisfy(f -> f instanceof DetachedMentionPart);
 	}
 
-	protected boolean isMention() {
+	public boolean isMention() {
 		return fs.allSatisfy(f -> f instanceof Mention);
 	}
 
-	protected boolean isEntityGroup() {
+	public boolean isEntityGroup() {
 		return fs.allSatisfy(f -> f instanceof EntityGroup);
 	}
 
-	protected boolean isLeaf() {
+	public boolean isLeaf() {
 		for (TreeNode n : nodes)
 			if (!n.isLeaf())
 				return false;
