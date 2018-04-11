@@ -19,6 +19,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   positions), the mention label and number, all mention and entity 
   properties (ambiguous, generic etc.). This can be used for quick
   and dirty statistical analysis of an entity (R-script available). #94
+- Entity groups can now be formed from more than two selected 
+  entities. Only the first two will be used to create the label. The 
+  and in the label is now translatable.
 
 ## 1.3
 
