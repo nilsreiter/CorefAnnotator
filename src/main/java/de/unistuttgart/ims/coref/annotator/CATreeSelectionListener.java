@@ -49,6 +49,10 @@ public abstract class CATreeSelectionListener implements TreeSelectionListener {
 
 	}
 
+	public int size() {
+		return num;
+	}
+
 	public boolean isSingle() {
 		return num == 1;
 	}
