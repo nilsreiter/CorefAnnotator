@@ -162,6 +162,7 @@ public class Constants {
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
+		public static final String ENTITY_GROUP_AND = "entity.group.and";
 		public static final String LANGUAGE = "language";
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";

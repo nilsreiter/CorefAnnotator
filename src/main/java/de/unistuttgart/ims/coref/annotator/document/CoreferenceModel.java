@@ -346,8 +346,10 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.GroupEntities) {
 			Op.GroupEntities op = (GroupEntities) operation;
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
-			EntityGroup eg = createEntityGroup(op.getEntities().subList(0, 2).select(e -> e.getLabel() != null)
-					.collect(e -> e.getLabel()).makeString(" and "), op.getEntities().size());
+			EntityGroup eg = createEntityGroup(
+					op.getEntities().subList(0, 2).select(e -> e.getLabel() != null).collect(e -> e.getLabel())
+							.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " "),
+					op.getEntities().size());
 			for (int i = 0; i < op.getEntities().size(); i++)
 				eg.setMembers(i, op.getEntities().get(i));
 			fireEvent(Event.get(Event.Type.Add, null, eg));
