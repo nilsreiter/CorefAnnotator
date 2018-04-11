@@ -411,11 +411,20 @@ public class TestCoreferenceModel {
 
 		EntityGroup group = JCasUtil.select(jcas, EntityGroup.class).iterator().next();
 		assertEquals(2, group.getMembers().size());
+		assertEquals(entities.get(0), group.getMembers(0));
+		assertEquals(entities.get(1), group.getMembers(1));
 
 		model.edit(new Op.RemoveMention(mentions.getFirst()));
 		model.edit(new Op.RemoveEntities(entities.getFirst()));
 
 		assertEquals(1, group.getMembers().size());
+		assertEquals(entities.get(1), group.getMembers(0));
+
+		model.undo();
+
+		assertEquals(2, group.getMembers().size());
+		assertEquals(entities.get(1), group.getMembers(0));
+		assertEquals(entities.get(0), group.getMembers(1));
 
 	}
 }
