@@ -66,6 +66,22 @@ public class Util {
 		return nArr;
 	}
 
+	public static FSArray removeFrom(JCas jcas, FSArray arr, FeatureStructure fs) {
+		int i = 0, j = 0;
+		FSArray nArr = null;
+		arr.removeFromIndexes();
+		int oldSize = arr == null ? 0 : arr.size();
+		nArr = new FSArray(jcas, oldSize - 1);
+		for (; i < oldSize; i++, j++) {
+			if (!arr.get(i).equals(fs))
+				nArr.set(j, arr.get(i));
+			else
+				j--;
+		}
+		nArr.addToIndexes();
+		return nArr;
+	}
+
 	public static StringArray addTo(JCas jcas, StringArray arr, String fs) {
 		int i = 0;
 		StringArray nArr;
