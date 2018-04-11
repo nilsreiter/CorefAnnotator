@@ -66,8 +66,8 @@ public class CommentWindow extends JDialog {
 	}
 
 	public void enterNewComment(int begin, int end) {
-		Comment c = commentsListModel.add("", mainWindow.getMainApplication().getPreferences()
-				.get(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID), begin, end);
+		Comment c = commentsListModel.add("",
+				Annotator.app.getPreferences().get(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID), begin, end);
 		commentList.getPanel(c).fireEditAction();
 	}
 
