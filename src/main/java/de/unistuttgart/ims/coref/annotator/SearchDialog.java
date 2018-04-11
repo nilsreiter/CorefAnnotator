@@ -393,7 +393,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
 				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
-						+ ((Entity) fs.get(0)).getLabel());
+						+ ((Entity) featureStructures.get(0)).getLabel());
 			else
 				selectedEntityLabel.setText("");
 		}

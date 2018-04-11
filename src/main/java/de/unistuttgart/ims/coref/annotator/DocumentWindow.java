@@ -1598,9 +1598,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			actions.renameAction.setEnabled(isSingle() && isEntity());
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
-			actions.toggleEntityGeneric.setEnabled(isEntity());
-			actions.toggleEntityGeneric.putValue(Action.SELECTED_KEY,
-					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
+
+			actions.toggleEntityGeneric.setEnabled(this);
+
 			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
 					|| (isEntity() && isLeaf()));
 
@@ -1608,21 +1608,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
-			actions.toggleMentionDifficult.setEnabled(isMention());
-			actions.toggleMentionDifficult.putValue(Action.SELECTED_KEY,
-					isSingle() && isMention() && Util.isDifficult(getMention(0)));
-
-			actions.toggleMentionAmbiguous.setEnabled(isMention());
-			actions.toggleMentionAmbiguous.putValue(Action.SELECTED_KEY,
-					isSingle() && isMention() && Util.isAmbiguous(getMention(0)));
-
-			actions.toggleMentionNonNominal.setEnabled(isMention());
-			actions.toggleMentionNonNominal.putValue(Action.SELECTED_KEY,
-					isSingle() && isMention() && Util.isNonNominal(getMention(0)));
-
-			actions.toggleEntityDisplayed.setEnabled(isEntity());
-			actions.toggleEntityDisplayed.putValue(Action.SELECTED_KEY,
-					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
+			actions.toggleMentionDifficult.setEnabled(this);
+			actions.toggleMentionAmbiguous.setEnabled(this);
+			actions.toggleMentionNonNominal.setEnabled(this);
+			actions.toggleEntityDisplayed.setEnabled(this);
 
 			actions.removeDuplicatesAction.setEnabled(isEntity());
 
@@ -1863,11 +1852,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
-		AbstractAction toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
-		AbstractAction toggleEntityGeneric;
+		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		ToggleEntityGeneric toggleEntityGeneric;
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
 		ToggleMentionDifficult toggleMentionDifficult;
-		AbstractAction toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
+		ToggleMentionNonNominal toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
