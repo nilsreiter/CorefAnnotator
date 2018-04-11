@@ -3,6 +3,23 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.4
+
+- Selecting text in the compare view now displays agreement calculated 
+  in this section on the right #79 
+- Annotated files can now be merged. This can be used if different 
+  annotators have worked on different parts of the text. The merge is 
+  done as is -- entities need to be merged by hand after the documents 
+  have been merged. #73
+- Duplicate mentions (covering the same span) can now be deleted 
+  automatically. This is done via the context menu for entities and 
+  should be useful after files have been merged. #81 
+- Mention export: Mentions of selected entities can now be exported as a 
+  CSV file. The CSV file contains the surface, the span (character 
+  positions), the mention label and number, all mention and entity 
+  properties (ambiguous, generic etc.). This can be used for quick
+  and dirty statistical analysis of an entity (R-script available). #94
+
 ## 1.3
 
 - Add TEI import plugin. In TEI files, everything that as a `ref` 
