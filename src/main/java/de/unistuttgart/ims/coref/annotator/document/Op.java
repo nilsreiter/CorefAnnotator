@@ -148,6 +148,10 @@ public interface Op {
 			this.entities = Lists.immutable.of(entities);
 		}
 
+		public GroupEntities(Iterable<Entity> entities) {
+			this.entities = Lists.immutable.withAll(entities);
+		}
+
 		public ImmutableList<Entity> getEntities() {
 			return entities;
 		}
