@@ -87,6 +87,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -97,6 +98,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AnnotatorAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -236,6 +238,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
+		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
 		textPopupMenu.addPopupMenuListener(new PopupListener());
@@ -336,6 +339,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.copyAction = new CopyAction(this, Annotator.app);
 		this.actions.undoAction = new UndoAction(this);
 		this.actions.removeDuplicatesAction = new RemoveDuplicatesAction(this);
+		this.actions.entityStatisticsAction = new EntityStatisticsAction(this);
 
 		// disable some at the beginning
 		actions.newEntityAction.setEnabled(false);
@@ -350,6 +354,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		actions.toggleEntityGeneric.setEnabled(false);
 		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
+		actions.entityStatisticsAction.setEnabled(false);
 
 		//
 		documentStateListeners.add(actions.undoAction);
@@ -476,6 +481,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
+		entityMenu.add(actions.entityStatisticsAction);
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
@@ -1380,13 +1386,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CATreeNode[] nodes = new CATreeNode[tree.getSelectionPaths().length];
-			Entity[] entities = new Entity[tree.getSelectionPaths().length];
-			for (int i = 0; i < tree.getSelectionPaths().length; i++) {
-				nodes[i] = (CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent();
-				entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
-			}
-			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(entities));
+			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(getSelectedEntities()));
 
 		}
 
@@ -1648,6 +1648,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			actions.removeDuplicatesAction.setEnabled(isEntity());
 
+			actions.entityStatisticsAction.setEnabled(isEntity());
+
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
 			else
@@ -1901,7 +1903,15 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction newEntityAction;
 		AbstractAction renameAction;
 		AbstractAction removeDuplicatesAction;
+		EntityStatisticsAction entityStatisticsAction;
 
 	}
 
+	public ImmutableSet<Entity> getSelectedEntities() {
+		Entity[] entities = new Entity[tree.getSelectionPaths().length];
+		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
+		}
+		return Sets.immutable.of(entities);
+	}
 }

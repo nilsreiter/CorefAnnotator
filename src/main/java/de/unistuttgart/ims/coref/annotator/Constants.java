@@ -91,6 +91,8 @@ public class Constants {
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
+		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
+		public static final String ACTION_ENTITY_STATISTICS_TOOLTIP = "action.entity_statistics.tooltip";
 		public static final String ACTION_FILE_MERGE = "action.merge_files";
 		public static final String ACTION_FILE_MERGE_TOOLTIP = "action.merge_files.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";

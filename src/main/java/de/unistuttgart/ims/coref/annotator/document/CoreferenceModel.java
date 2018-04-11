@@ -485,6 +485,10 @@ public class CoreferenceModel {
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
+	public ImmutableSet<Mention> getMentions(Entity entity) {
+		return entityMentionMap.get(entity).toImmutable();
+	}
+
 	public Preferences getPreferences() {
 		return preferences;
 	}
