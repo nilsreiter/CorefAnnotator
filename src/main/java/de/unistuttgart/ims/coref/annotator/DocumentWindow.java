@@ -238,7 +238,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
 		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
-		treePopupMenu.addSeparator();
 		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
@@ -355,6 +354,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		actions.toggleEntityGeneric.setEnabled(false);
 		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
+		actions.entityStatisticsAction.setEnabled(false);
 
 		//
 		documentStateListeners.add(actions.undoAction);
@@ -481,6 +481,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
+		entityMenu.add(actions.entityStatisticsAction);
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
@@ -1646,6 +1647,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					isEntity() && fs.allSatisfy(f -> ((Entity) f).getHidden()));
 
 			actions.removeDuplicatesAction.setEnabled(isEntity());
+
+			actions.entityStatisticsAction.setEnabled(isEntity());
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
