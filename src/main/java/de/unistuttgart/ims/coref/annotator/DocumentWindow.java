@@ -104,6 +104,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
@@ -328,7 +329,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
 		this.actions.deleteAction = new DeleteAction();
-		this.actions.formGroupAction = new FormEntityGroup();
 		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
 		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
 		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
@@ -1392,30 +1392,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class FormEntityGroup extends AnnotatorAction {
-		private static final long serialVersionUID = 1L;
-
-		public FormEntityGroup() {
-			super(Annotator.app, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			Entity e1 = (Entity) ((CATreeNode) tree.getSelectionPaths()[0].getLastPathComponent())
-					.getFeatureStructure();
-			Entity e2 = (Entity) ((CATreeNode) tree.getSelectionPaths()[1].getLastPathComponent())
-					.getFeatureStructure();
-			documentModel.getCoreferenceModel().edit(new Op.GroupEntities(e1, e2));
-
-		}
-
-	}
-
 	@Deprecated
 	class ToggleShowTextInTreeLabels extends AnnotatorAction {
 
@@ -1627,7 +1603,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					isEntity() && fs.allSatisfy(f -> Util.isGeneric((Entity) f)));
 			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
 					|| (isEntity() && isLeaf()));
-			actions.formGroupAction.setEnabled(isDouble() && isEntity());
+
+			actions.formGroupAction.setEnabled(this);
+
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
 
 			actions.toggleMentionDifficult.setEnabled(isMention());
@@ -1898,7 +1876,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction sortByAlpha;
 		AbstractAction sortByMentions;
 		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
-		AbstractAction formGroupAction;
+		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;
 		AbstractAction renameAction;
