@@ -272,7 +272,8 @@ public class Constants {
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
-	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en" };
+	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
+			"nl", "ru" };
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
 	public static final String X_UNSPECIFIED = "x-unspecified";
