@@ -13,6 +13,7 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -454,5 +455,37 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
+	}
+
+	@Test
+	public void testRemoveEntityThatIsInGroup() {
+		model.edit(new Op.AddMentionsToNewEntity(new Span(0, 1)));
+		model.edit(new Op.AddMentionsToNewEntity(new Span(1, 2)));
+
+		ImmutableList<Entity> entities = Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class));
+		ImmutableList<Mention> mentions = Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class));
+
+		assertEquals(entities.getFirst(), mentions.getFirst().getEntity());
+		assertEquals(entities.getLast(), mentions.getLast().getEntity());
+
+		model.edit(new Op.GroupEntities(entities.get(0), entities.get(1)));
+
+		EntityGroup group = JCasUtil.select(jcas, EntityGroup.class).iterator().next();
+		assertEquals(2, group.getMembers().size());
+		assertEquals(entities.get(0), group.getMembers(0));
+		assertEquals(entities.get(1), group.getMembers(1));
+
+		model.edit(new Op.RemoveMention(mentions.getFirst()));
+		model.edit(new Op.RemoveEntities(entities.getFirst()));
+
+		assertEquals(1, group.getMembers().size());
+		assertEquals(entities.get(1), group.getMembers(0));
+
+		model.undo();
+
+		assertEquals(2, group.getMembers().size());
+		assertEquals(entities.get(1), group.getMembers(0));
+		assertEquals(entities.get(0), group.getMembers(1));
+
 	}
 }

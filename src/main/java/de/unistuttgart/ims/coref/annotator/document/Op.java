@@ -3,8 +3,10 @@ package de.unistuttgart.ims.coref.annotator.document;
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.multimap.set.ImmutableSetMultimap;
+import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
@@ -283,6 +285,7 @@ public interface Op {
 
 	public class RemoveEntities implements Op {
 		ImmutableList<Entity> entities;
+		MutableSetMultimap<Entity, EntityGroup> entityEntityGroupMap = Multimaps.mutable.set.empty();
 
 		public RemoveEntities(Entity... entities) {
 			this.entities = Lists.immutable.of(entities);
