@@ -476,6 +476,10 @@ public class CoreferenceModel {
 		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
 	}
 
+	public ImmutableSet<Mention> getMentions(Entity entity) {
+		return entityMentionMap.get(entity).toImmutable();
+	}
+
 	/**
 	 * Retrieve all annotations that cover the current character position
 	 * 
@@ -485,10 +489,6 @@ public class CoreferenceModel {
 	 */
 	public Collection<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
-	}
-
-	public ImmutableSet<Mention> getMentions(Entity entity) {
-		return entityMentionMap.get(entity).toImmutable();
 	}
 
 	public Preferences getPreferences() {
