@@ -21,7 +21,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   and dirty statistical analysis of an entity (R-script available). #94
 - Entity groups can now be formed from more than two selected 
   entities. Only the first two will be used to create the label. The 
-  and in the label is now translatable.
+  'and' in the label is now translatable. #96
 
 ## 1.3.3
 
