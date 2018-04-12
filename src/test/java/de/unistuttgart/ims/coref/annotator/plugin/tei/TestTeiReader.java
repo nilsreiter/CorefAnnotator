@@ -22,7 +22,8 @@ public class TestTeiReader {
 	@Test
 	public void testReader() throws UIMAException, IOException {
 		CollectionReaderDescription crd = CollectionReaderFactory.createReaderDescription(TeiReader.class,
-				TeiReader.PARAM_SOURCE_LOCATION, "src/test/resources/tei/test.xml");
+				TeiReader.PARAM_SOURCE_LOCATION, getClass().getResource("/tei/test.xml").toString(),
+				TeiReader.PARAM_DOCUMENT_ID, "test");
 
 		JCasIterable iterable = SimplePipeline.iteratePipeline(crd,
 				AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class));

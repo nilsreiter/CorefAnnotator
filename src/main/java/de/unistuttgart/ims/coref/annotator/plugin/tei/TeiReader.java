@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
@@ -95,8 +96,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		}
 
 		// TODO: Remove <rs> elements
-
-		DocumentMetaData.get(jcas).setDocumentId(documentId);
+		if (JCasUtil.exists(jcas, DocumentMetaData.class))
+			DocumentMetaData.get(jcas).setDocumentId(documentId);
+		else
+			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
 	}
 
