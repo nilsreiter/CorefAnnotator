@@ -78,7 +78,9 @@ public class CoreferenceModel {
 	 */
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
-	MutableSetMultimap<Object, Mention> entityMentionMap = Multimaps.mutable.set.empty();
+	MutableSetMultimap<Entity, Mention> entityMentionMap = Multimaps.mutable.set.empty();
+
+	MutableSetMultimap<Entity, EntityGroup> entityEntityGroupMap = Multimaps.mutable.set.empty();
 
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
@@ -325,7 +327,12 @@ public class CoreferenceModel {
 			edit((RemoveMention) operation);
 		} else if (operation instanceof Op.RemoveEntities) {
 			Op.RemoveEntities op = (RemoveEntities) operation;
-			op.getEntities().forEach(e -> remove(e));
+			op.getEntities().forEach(e -> {
+				if (entityEntityGroupMap.containsKey(e))
+					op.entityEntityGroupMap.putAll(e, entityEntityGroupMap.get(e));
+				remove(e);
+			});
+
 			history.push(op);
 		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
 			Op.RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
@@ -341,8 +348,10 @@ public class CoreferenceModel {
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
 			EntityGroup eg = createEntityGroup(op.getEntities().subList(0, 2).select(e -> e.getLabel() != null)
 					.collect(e -> e.getLabel()).makeString(" and "), op.getEntities().size());
-			for (int i = 0; i < op.getEntities().size(); i++)
+			for (int i = 0; i < op.getEntities().size(); i++) {
 				eg.setMembers(i, op.getEntities().get(i));
+				entityEntityGroupMap.put(op.getEntities().get(i), eg);
+			}
 			fireEvent(Event.get(Event.Type.Add, null, eg));
 			op.setEntityGroup(eg);
 			history.push(op);
@@ -436,6 +445,10 @@ public class CoreferenceModel {
 			Op.RemoveEntities op = (RemoveEntities) operation;
 			op.getEntities().forEach(e -> {
 				e.addToIndexes();
+				if (op.entityEntityGroupMap.containsKey(e)) {
+					for (EntityGroup group : op.entityEntityGroupMap.get(e))
+						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
+				}
 			});
 			fireEvent(Event.get(Event.Type.Add, null, op.getEntities()));
 		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
@@ -466,6 +479,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.GroupEntities) {
 			Op.GroupEntities op = (GroupEntities) operation;
 			remove(op.getEntityGroup());
+			op.getEntities().forEach(e -> entityEntityGroupMap.remove(e, op.getEntityGroup()));
 			fireEvent(Event.get(Event.Type.Remove, null, op.getEntityGroup()));
 		}
 	}
@@ -588,6 +602,12 @@ public class CoreferenceModel {
 			characterPosition2AnnotationMap.remove(m);
 			m.removeFromIndexes();
 		}
+		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
+			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
+		}
+
+		entityEntityGroupMap.removeAll(entity);
+
 		fireEvent(Event.get(Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
