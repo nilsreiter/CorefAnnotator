@@ -41,13 +41,15 @@ public class TeiReader extends ResourceCollectionReaderBase {
 
 		gxr.addGlobalRule("bibl[type=digitalSource] > idno[type=URL]", (d, e) -> d.setDocumentId(e.text()));
 
-		gxr.addGlobalRule("[xml:id]", Entity.class, (cf, e) -> {
+		gxr.addGlobalRule("[xml:id]", Mention.class, (m, e) -> {
+			Entity cf = new Entity(jcas);
+			cf.addToIndexes();
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
+			m.setEntity(cf);
 		});
 
-		// segmentation
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
 			Entity entity = entityMap.get(id);
