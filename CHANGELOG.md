@@ -3,6 +3,15 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.3.3
+
+- Fixed a bug that caused loading to crash if in previous runs, entities
+  had been removed under certain conditions. Files can now be opened, but
+  group members may be missing. #93 
+- Fixed a bug that could cause subsequent loading issues. If an entity 
+  was part of a group, and then removed entirely, a null-reference would
+  appear in the group and causing loading to crash. #95
+
 ## 1.3.2
 
 - Fixed a bug that caused saved files to be written in another file name after export #90
