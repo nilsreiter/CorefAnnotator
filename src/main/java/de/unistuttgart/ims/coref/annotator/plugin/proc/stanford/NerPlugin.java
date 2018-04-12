@@ -33,7 +33,7 @@ public class NerPlugin implements ProcessingPlugin {
 
 	@Override
 	public String[] getSupportedLanguages() {
-		return new String[] { "en" };
+		return new String[] { "en", "de" };
 	}
 
 }
