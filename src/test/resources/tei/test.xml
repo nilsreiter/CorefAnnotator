@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<text><rs xml:id="dog">The dog</rs> barks. <rs ref="#dog">It</rs> is hungry.</text>

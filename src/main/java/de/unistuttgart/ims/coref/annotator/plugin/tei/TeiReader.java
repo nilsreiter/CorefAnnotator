@@ -48,15 +48,15 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		// set the document title
 		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
 
-		gxr.addGlobalRule("[xml:id]", Entity.class, (cf, e) -> {
+		gxr.addGlobalRule("[xml:id]", Mention.class, (m, e) -> {
+			Entity cf = new Entity(jcas);
+			cf.addToIndexes();
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
-			cf.setXmlId(e.attr("xml:id"));
-			// TODO: Need to add a mention as well
+			m.setEntity(cf);
 		});
 
-		// segmentation
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
 			Entity entity = entityMap.get(id);
