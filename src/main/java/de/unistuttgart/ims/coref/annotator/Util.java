@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.util.Arrays;
+
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
@@ -201,6 +203,7 @@ public class Util {
 			for (int i = 0; i < languageNames.length; i++) {
 				languageNames[i] = Annotator.getString("language." + Constants.SUPPORTED_LANGUAGES[i]);
 			}
+			Arrays.sort(languageNames);
 		}
 		return languageNames;
 	}

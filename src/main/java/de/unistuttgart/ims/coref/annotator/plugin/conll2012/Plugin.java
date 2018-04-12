@@ -12,14 +12,12 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
-import de.unistuttgart.ims.uimautil.ClearAnnotation;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 
 public class Plugin implements IOPlugin {
@@ -44,6 +42,7 @@ public class Plugin implements IOPlugin {
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
+		b.add(AnalysisEngineFactory.createEngineDescription(Cleaner.class));
 		b.add(Constants.FLOW_KEY_TOKENIZER, AnalysisEngineFactory.createEngineDescription(BreakIteratorSegmenter.class,
 				BreakIteratorSegmenter.PARAM_WRITE_SENTENCE, false));
 		b.add(Constants.FLOW_KEY_SENTENCE_SPLITTER, AnalysisEngineFactory.createEngineDescription(
@@ -61,8 +60,6 @@ public class Plugin implements IOPlugin {
 		b.add(AnalysisEngineFactory.createEngineDescription(Conll2012Writer.class,
 				Conll2012Writer.PARAM_TARGET_LOCATION, f.getParentFile().getAbsolutePath(),
 				Conll2012Writer.PARAM_USE_DOCUMENT_ID, true, Conll2012Writer.PARAM_OVERWRITE, true));
-		b.add(AnalysisEngineFactory.createEngineDescription(ClearAnnotation.class, ClearAnnotation.PARAM_TYPE,
-				CoreferenceLink.class));
 		return b.createAggregateDescription();
 	}
 

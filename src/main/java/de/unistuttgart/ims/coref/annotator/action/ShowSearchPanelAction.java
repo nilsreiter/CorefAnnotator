@@ -28,6 +28,6 @@ public class ShowSearchPanelAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.showSearch();
+		getTarget().showSearch();
 	}
 }

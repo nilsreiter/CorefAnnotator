@@ -45,18 +45,19 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return null;
+		return AnalysisEngineFactory.createEngineDescription(MapCorefToXmlElements.class);
 	}
 
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TeiReader.class, TeiReader.PARAM_SOURCE_LOCATION,
-				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, "de");
+				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, "de", TeiReader.PARAM_DOCUMENT_ID, f.getName());
 	}
 
 	@Override
 	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return null;
+		return AnalysisEngineFactory.createEngineDescription(TeiWriter.class, TeiWriter.PARAM_OUTPUT_FILE,
+				f.getAbsolutePath());
 	}
 
 	@Override

@@ -45,6 +45,22 @@ public abstract class IkonAction extends AbstractAction {
 		}
 	}
 
+	public IkonAction(String stringKey, boolean isKey, Ikon... icon) {
+		this.ikon = Lists.mutable.of(icon);
+		if (isKey)
+			putValue(Action.NAME, Annotator.getString(stringKey));
+		else
+			putValue(Action.NAME, stringKey);
+		try {
+			if (icon != null) {
+				putValue(Action.LARGE_ICON_KEY, getIcon());
+				putValue(Action.SMALL_ICON, getIcon());
+			}
+		} catch (UnsupportedOperationException e) {
+			Annotator.logger.catching(e);
+		}
+	}
+
 	@Override
 	public void setEnabled(boolean b) {
 		super.setEnabled(b);

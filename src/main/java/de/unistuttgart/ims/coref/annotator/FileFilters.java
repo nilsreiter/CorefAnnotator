@@ -45,4 +45,18 @@ public class FileFilters {
 		}
 
 	};
+
+	static public FileFilter csv = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".csv");
+		}
+
+		@Override
+		public String getDescription() {
+			return "CSV files";
+		}
+
+	};
 }

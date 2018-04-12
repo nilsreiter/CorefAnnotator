@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
@@ -20,6 +22,11 @@ import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 
 public class TeiReader extends ResourceCollectionReaderBase {
+
+	public static final String PARAM_DOCUMENT_ID = "Document Id";
+
+	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
+	String documentId = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -39,15 +46,18 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.setTextRootSelector(null);
 		gxr.setPreserveWhitespace(true);
 
-		gxr.addGlobalRule("bibl[type=digitalSource] > idno[type=URL]", (d, e) -> d.setDocumentId(e.text()));
+		// set the document title
+		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
 
-		gxr.addGlobalRule("[xml:id]", Entity.class, (cf, e) -> {
+		gxr.addGlobalRule("[xml:id]", Mention.class, (m, e) -> {
+			Entity cf = new Entity(jcas);
+			cf.addToIndexes();
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
+			m.setEntity(cf);
 		});
 
-		// segmentation
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
 			Entity entity = entityMap.get(id);
@@ -84,6 +94,12 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		} catch (IOException e1) {
 			Annotator.logger.catching(e1);
 		}
+
+		// TODO: Remove <rs> elements
+		if (JCasUtil.exists(jcas, DocumentMetaData.class))
+			DocumentMetaData.get(jcas).setDocumentId(documentId);
+		else
+			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
 	}
 

@@ -10,4 +10,5 @@ public class Constants {
 	public static final String FLOW_KEY_CONVERTER = "Converter";
 	public static final String FLOW_KEY_TOKENIZER = "Tokenizer";
 	public static final String FLOW_KEY_SENTENCE_SPLITTER = "Sentencer";
+	public static final String FLOW_KEY_CLEANER = "Cleaner";
 }

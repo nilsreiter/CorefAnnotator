@@ -9,7 +9,7 @@ import org.kordamp.ikonli.Ikon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 
-public abstract class TogglePreferenceAction extends AnnotatorAction {
+public abstract class TogglePreferenceAction extends IkonAction {
 	private static final long serialVersionUID = 1L;
 
 	String prefKey;
@@ -20,16 +20,16 @@ public abstract class TogglePreferenceAction extends AnnotatorAction {
 	}
 
 	public TogglePreferenceAction(Annotator annotator, Ikon[] ikon, String stringKey, String prefKey, boolean def) {
-		super(annotator, stringKey, ikon);
-		putValue(Action.SELECTED_KEY, mainApplication.getPreferences().getBoolean(prefKey, def));
+		super(stringKey, ikon);
+		putValue(Action.SELECTED_KEY, Annotator.app.getPreferences().getBoolean(prefKey, def));
 		this.prefKey = prefKey;
 		this.defaultValue = def;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		boolean old = mainApplication.getPreferences().getBoolean(prefKey, defaultValue);
-		mainApplication.getPreferences().putBoolean(prefKey, !old);
+		boolean old = Annotator.app.getPreferences().getBoolean(prefKey, defaultValue);
+		Annotator.app.getPreferences().putBoolean(prefKey, !old);
 		putValue(Action.SELECTED_KEY, !old);
 	}
 

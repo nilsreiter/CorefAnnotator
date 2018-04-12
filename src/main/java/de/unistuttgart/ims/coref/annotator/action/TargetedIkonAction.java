@@ -13,6 +13,11 @@ public abstract class TargetedIkonAction<T> extends IkonAction {
 		this.target = dw;
 	}
 
+	public TargetedIkonAction(T dw, String stringKey, boolean isKey, Ikon... ikon) {
+		super(stringKey, isKey, ikon);
+		this.target = dw;
+	}
+
 	public TargetedIkonAction(T dw, Ikon ikon) {
 		super(ikon);
 		this.target = dw;

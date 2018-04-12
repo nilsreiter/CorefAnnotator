@@ -24,7 +24,7 @@ public class ViewFontFamilySelectAction extends DocumentWindowAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		putValue(Action.SELECTED_KEY, true);
-		documentWindow.updateStyle(StyleConstants.FontFamily, fontFamily);
+		getTarget().updateStyle(StyleConstants.FontFamily, fontFamily);
 	}
 
 }

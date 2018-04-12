@@ -3,6 +3,31 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.4
+
+- Selecting text in the compare view now displays agreement calculated 
+  in this section on the right #79 
+- Annotated files can now be merged. This can be used if different 
+  annotators have worked on different parts of the text. The merge is 
+  done as is -- entities need to be merged by hand after the documents 
+  have been merged. #73
+- Duplicate mentions (covering the same span) can now be deleted 
+  automatically. This is done via the context menu for entities and 
+  should be useful after files have been merged. #81 
+- Mention export: Mentions of selected entities can now be exported as a 
+  CSV file. The CSV file contains the surface, the span (character 
+  positions), the mention label and number, all mention and entity 
+  properties (ambiguous, generic etc.). This can be used for quick
+  and dirty statistical analysis of an entity (R-script available). #94
+- Entity groups can now be formed from more than two selected 
+  entities. Only the first two will be used to create the label. The 
+  'and' in the label is now translatable. #96
+- Automatic support: The tools menu now contains a sub menu with 
+  automatic helpers. At the moment, StanfordNER can be run on a number
+  of languages. See help window for details. #89
+- Fixes that the first mention of a chain was missing when importing 
+  from TEI #92
+
 ## 1.3.3
 
 - Fixed a bug that caused loading to crash if in previous runs, entities

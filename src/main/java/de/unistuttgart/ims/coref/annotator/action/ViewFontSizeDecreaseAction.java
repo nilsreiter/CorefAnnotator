@@ -26,8 +26,8 @@ public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		documentWindow.updateStyle(StyleConstants.FontSize,
-				StyleConstants.getFontSize(documentWindow.getCurrentStyle().getBaseStyle()) - 1);
+		getTarget().updateStyle(StyleConstants.FontSize,
+				StyleConstants.getFontSize(getTarget().getCurrentStyle().getBaseStyle()) - 1);
 	}
 
 }

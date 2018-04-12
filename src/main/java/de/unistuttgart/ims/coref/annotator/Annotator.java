@@ -56,6 +56,7 @@ import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
+import de.unistuttgart.ims.coref.annotator.action.FileMergeOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
@@ -147,7 +148,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	protected void initialiseActions() {
 		openAction = new FileSelectOpenAction(this);
-		openCompareAction = new FileCompareOpenAction(this);
+		openCompareAction = new FileCompareOpenAction();
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -168,12 +169,13 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.default")));
-		panel.setPreferredSize(new Dimension(width, 100));
+		panel.setPreferredSize(new Dimension(width, 130));
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
 		panel.add(new JButton(helpAction));
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		panel.add(new JButton(openCompareAction));
+		panel.add(new JButton(new FileMergeOpenAction()));
 		mainPanel.add(panel);
 
 		mainPanel.add(Box.createVerticalStrut(10));
@@ -318,7 +320,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		case JFileChooser.APPROVE_OPTION:
 			for (File f : openDialog.getSelectedFiles()) {
 				setCurrentDirectory(f.getParentFile());
-				open(f, flavor, "de");
+				open(f, flavor, Constants.X_UNSPECIFIED);
 			}
 			break;
 		default:

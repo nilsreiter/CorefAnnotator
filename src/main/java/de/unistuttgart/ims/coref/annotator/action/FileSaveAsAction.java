@@ -45,16 +45,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 				f = new File(f.getAbsolutePath() + ".xmi");
 			}
 
-			SaveJCasWorker worker = new SaveJCasWorker(f, target.getJCas(), (file, jcas) -> {
-				Annotator.app.recentFiles.add(0, file);
-				Annotator.app.refreshRecents();
-				Annotator.app.setCurrentDirectory(file.getParentFile());
-				target.setUnsavedChanges(false);
-				target.setFile(file);
-				target.setWindowTitle();
-				target.stopIndeterminateProgress();
-
-			});
+			SaveJCasWorker worker = new SaveJCasWorker(f, target.getJCas(), SaveJCasWorker.getConsumer(getTarget()));
 			worker.execute();
 			break;
 		default:

@@ -25,7 +25,7 @@ public abstract class CATreeSelectionListener implements TreeSelectionListener {
 	// selected things
 	ImmutableList<TreePath> paths;
 	MutableList<CATreeNode> nodes;
-	MutableList<FeatureStructure> fs;
+	MutableList<FeatureStructure> featureStructures;
 
 	public CATreeSelectionListener(JTree tree) {
 		this.tree = tree;
@@ -36,44 +36,48 @@ public abstract class CATreeSelectionListener implements TreeSelectionListener {
 		num = tree.getSelectionCount();
 		paths = Lists.immutable.of(tree.getSelectionPaths());
 		nodes = Lists.mutable.empty();
-		fs = Lists.mutable.empty();
+		featureStructures = Lists.mutable.empty();
 
 		if (num > 0)
 			try {
 				for (int i = 0; i < paths.size(); i++) {
 					nodes.add(i, (CATreeNode) paths.get(i).getLastPathComponent());
-					fs.add(i, nodes.get(i).getFeatureStructure());
+					featureStructures.add(i, nodes.get(i).getFeatureStructure());
 				}
 			} catch (NullPointerException ex) {
 			}
 
 	}
 
-	protected boolean isSingle() {
+	public int size() {
+		return num;
+	}
+
+	public boolean isSingle() {
 		return num == 1;
 	}
 
-	protected boolean isDouble() {
+	public boolean isDouble() {
 		return num == 2;
 	}
 
-	protected boolean isEntity() {
-		return fs.allSatisfy(f -> f instanceof Entity);
+	public boolean isEntity() {
+		return featureStructures.allSatisfy(f -> f instanceof Entity);
 	}
 
-	protected boolean isDetachedMentionPart() {
-		return fs.allSatisfy(f -> f instanceof DetachedMentionPart);
+	public boolean isDetachedMentionPart() {
+		return featureStructures.allSatisfy(f -> f instanceof DetachedMentionPart);
 	}
 
-	protected boolean isMention() {
-		return fs.allSatisfy(f -> f instanceof Mention);
+	public boolean isMention() {
+		return featureStructures.allSatisfy(f -> f instanceof Mention);
 	}
 
-	protected boolean isEntityGroup() {
-		return fs.allSatisfy(f -> f instanceof EntityGroup);
+	public boolean isEntityGroup() {
+		return featureStructures.allSatisfy(f -> f instanceof EntityGroup);
 	}
 
-	protected boolean isLeaf() {
+	public boolean isLeaf() {
 		for (TreeNode n : nodes)
 			if (!n.isLeaf())
 				return false;
@@ -81,15 +85,19 @@ public abstract class CATreeSelectionListener implements TreeSelectionListener {
 	}
 
 	protected Entity getEntity(int i) {
-		return (Entity) fs.get(i);
+		return (Entity) featureStructures.get(i);
 	}
 
 	protected Annotation getAnnotation(int i) {
-		return (Annotation) fs.get(i);
+		return (Annotation) featureStructures.get(i);
 	}
 
 	protected Mention getMention(int i) {
-		return (Mention) fs.get(i);
+		return (Mention) featureStructures.get(i);
+	}
+
+	public ImmutableList<FeatureStructure> getFeatureStructures() {
+		return featureStructures.toImmutable();
 	}
 
 }

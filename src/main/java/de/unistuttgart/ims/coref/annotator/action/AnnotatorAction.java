@@ -6,11 +6,12 @@ import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 
+@Deprecated
 public abstract class AnnotatorAction extends IkonAction {
 
 	private static final long serialVersionUID = 1L;
 
-	Annotator mainApplication;
+	Annotator mainApplication = Annotator.app;
 
 	public AnnotatorAction(Annotator mApp, Ikon... ikon) {
 		super(ikon);
