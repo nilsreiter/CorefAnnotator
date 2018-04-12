@@ -22,6 +22,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Entity groups can now be formed from more than two selected 
   entities. Only the first two will be used to create the label. The 
   'and' in the label is now translatable. #96
+- Fixes that the first mention of a chain was missing when importing 
+  from TEI #92
 
 ## 1.3.3
 
