@@ -360,6 +360,11 @@
 			<artifactId>uimautil</artifactId>
 			<version>0.7.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.tinyjee.jgraphx</groupId>
+			<artifactId>jgraphx</artifactId>
+			<version>3.4.1.3</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
