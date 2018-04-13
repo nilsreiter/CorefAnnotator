@@ -109,6 +109,11 @@
 					<description />
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
+				<featureDescription>
+					<name>FileFormat</name>
+					<description/>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
