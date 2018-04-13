@@ -97,6 +97,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -328,7 +329,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.actions.newEntityAction = new NewEntityAction(this);
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
-		this.actions.deleteAction = new DeleteAction();
+		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
 		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
 		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
@@ -1132,70 +1133,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class DeleteAction extends IkonAction {
-		private static final long serialVersionUID = 1L;
-
-		public DeleteAction() {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			MutableList<TreePath> selection = Lists.mutable.of(tree.getSelectionPaths());
-			CATreeNode node = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			FeatureStructure fs = ((CATreeNode) tree.getSelectionPath().getLastPathComponent()).getFeatureStructure();
-			Op op = null;
-			if (fs instanceof Entity) {
-				FeatureStructure parentFs = node.getParent().getFeatureStructure();
-				if (parentFs instanceof EntityGroup) {
-					op = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
-				} else if (node.isLeaf()) {
-					op = new Op.RemoveEntities(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-							.collect(tn -> (Entity) tn.getFeatureStructure()));
-				}
-			} else if (fs instanceof Mention) {
-				op = new Op.RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-						.collect(tn -> (Mention) tn.getFeatureStructure()));
-			} else if (fs instanceof DetachedMentionPart) {
-				op = new Op.RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
-			}
-
-			if (op != null)
-				getCoreferenceModel().edit(op);
-			else
-				for (TreePath tp : tree.getSelectionPaths())
-					deleteSingle((CATreeNode) tp.getLastPathComponent());
-		}
-
-		private void deleteSingle(CATreeNode tn) {
-			Op operation = null;
-			if (tn.getFeatureStructure() instanceof Mention) {
-				int row = tree.getLeadSelectionRow() - 1;
-				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
-				tree.setSelectionRow(row);
-			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getFeatureStructure()));
-			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
-				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().edit(new Op.RemovePart(dmp.getMention(), dmp));
-			} else if (tn.isEntity()) {
-				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
-				if (parentFs instanceof EntityGroup) {
-					operation = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
-				} else if (tn.isLeaf()) {
-					documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getEntity()));
-				}
-			}
-			if (operation != null)
-				documentModel.getCoreferenceModel().edit(operation);
-		}
-
-	}
-
 	class DeleteMentionAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1570,10 +1507,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
 
 			actions.toggleEntityGeneric.setEnabled(this);
-
-			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
-					|| (isEntity() && isLeaf()));
-
+			actions.deleteAction.setEnabled(this);
 			actions.formGroupAction.setEnabled(this);
 
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
