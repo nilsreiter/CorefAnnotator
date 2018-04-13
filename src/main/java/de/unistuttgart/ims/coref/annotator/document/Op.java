@@ -9,10 +9,10 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 
 public interface Op {
 

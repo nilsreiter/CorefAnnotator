@@ -24,10 +24,10 @@ import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
 public class TestCoreferenceModel {

@@ -44,7 +44,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {

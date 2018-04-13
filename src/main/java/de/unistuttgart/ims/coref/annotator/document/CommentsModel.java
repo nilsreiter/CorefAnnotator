@@ -13,9 +13,9 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CommentSortOrder;
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
-import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.CommentAnchor;
 
 public class CommentsModel extends AbstractListModel<Comment> {
 

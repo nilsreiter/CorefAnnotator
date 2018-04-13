@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> implements CAAction {
