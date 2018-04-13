@@ -129,7 +129,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			Annotator.logger.catching(e);
 		}
 
 		this.initialiseActions();
