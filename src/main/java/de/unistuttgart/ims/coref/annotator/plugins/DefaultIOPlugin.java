@@ -34,7 +34,7 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
+		return AnalysisEngineFactory.createEngineDescription(MapAnnotation0To1.class);
 	}
 
 	@Override
