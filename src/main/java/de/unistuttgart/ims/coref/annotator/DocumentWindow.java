@@ -109,6 +109,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
@@ -323,7 +324,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected void initialiseActions() {
-		this.actions.renameAction = new RenameEntityAction();
+		this.actions.renameAction = new RenameEntityAction(this);
 		this.actions.newEntityAction = new NewEntityAction(this);
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
@@ -1003,36 +1004,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
-	class RenameEntityAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public RenameEntityAction() {
-			super(MaterialDesign.MDI_RENAME_BOX);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_RENAME));
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_RENAME_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			treeKeyListener.setIgnoreNext(true);
-			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			String l = etn.getEntity().getLabel();
-			String newLabel = (String) JOptionPane.showInputDialog(textPane,
-					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
-			if (newLabel != null) {
-				Op.RenameEntity op = new Op.RenameEntity(etn.getEntity(), newLabel);
-				documentModel.getCoreferenceModel().edit(op);
-
-			}
-		}
-
-	}
-
 	class ChangeKeyForEntityAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1594,7 +1565,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			collectData(e);
-			actions.renameAction.setEnabled(isSingle() && isEntity());
+			actions.renameAction.setEnabled(this);
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
 
@@ -1867,7 +1838,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;
-		AbstractAction renameAction;
+		RenameEntityAction renameAction;
 		AbstractAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
 
