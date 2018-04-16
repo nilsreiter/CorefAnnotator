@@ -200,28 +200,12 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		runSearch.setEnabled(textField.getText().length() > 0);
-		try {
-			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 2)
-				search(textField.getText());
-		} catch (PatternSyntaxException ex) {
-			searchResultsLabel.setText(ex.getLocalizedMessage());
-			// silently catching
-		}
+		changedUpdate(e);
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		runSearch.setEnabled(textField.getText().length() > 0);
-		try {
-			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 2)
-				search(textField.getText());
-		} catch (PatternSyntaxException ex) {
-			searchResultsLabel.setText(ex.getLocalizedMessage());
-			// silently catching
-		}
+		changedUpdate(e);
 	}
 
 	@Override
@@ -231,10 +215,23 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Pattern.compile(textField.getText());
 			if (textField.getText().length() > 2)
 				search(textField.getText());
+			else
+				clearSearchResults();
 		} catch (PatternSyntaxException ex) {
 			searchResultsLabel.setText(ex.getLocalizedMessage());
 			// silently catching
 		}
+	}
+
+	protected void clearSearchResults() {
+		Annotator.logger.entry();
+		searchResultsLabel.setText("");
+		lm.clear();
+		for (Object o : highlights) {
+			hilit.removeHighlight(o);
+		}
+		highlights.clear();
+
 	}
 
 	public synchronized void search(String s) {
@@ -243,12 +240,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		list.clearSelection();
 		annotateSelectedFindings.setEnabled(false);
 		annotateSelectedFindingsAsNew.setEnabled(false);
-		searchResultsLabel.setText("");
-		lm.clear();
-		for (Object o : highlights) {
-			hilit.removeHighlight(o);
-		}
-		highlights.clear();
+		clearSearchResults();
 		if (s.length() > 0) {
 
 			Pattern p = Pattern.compile(s);
