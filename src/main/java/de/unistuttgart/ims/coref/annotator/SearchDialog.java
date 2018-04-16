@@ -238,6 +238,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	}
 
 	public synchronized void search(String s) {
+		Annotator.logger.entry(s);
 		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
 		annotateSelectedFindings.setEnabled(false);
