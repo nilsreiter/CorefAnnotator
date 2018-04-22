@@ -23,7 +23,7 @@ public class ExitAction extends IkonAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Annotator.app.handleQuitRequestWith(null, null);
+		Annotator.app.handleQuitRequestWith();
 
 	}
 }
