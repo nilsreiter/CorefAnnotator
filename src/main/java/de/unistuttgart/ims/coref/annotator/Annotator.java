@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -63,10 +64,13 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class Annotator extends Application implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
@@ -100,6 +104,24 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 
 	public static void main(String[] args) {
 		Annotator.launch(args);
+	}
+
+	@Override
+	public void init() {
+		logger.trace("Application startup");
+		this.pluginManager.init();
+		this.recentFiles = loadRecentFiles();
+
+		try {
+			if (!preferences.nodeExists(Constants.CFG_ANNOTATOR_ID))
+				if (System.getProperty("user.name") != null)
+					preferences.put(Constants.CFG_ANNOTATOR_ID, System.getProperty("user.name"));
+				else
+					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
+
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Annotator() throws ResourceInitializationException {
@@ -297,20 +319,20 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 		this.opening.setVisible(true);
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
-		openDialog.setFileFilter(flavor.getFileFilter());
-		openDialog.setCurrentDirectory(getCurrentDirectory());
-		int r = openDialog.showOpenDialog(parent);
-		switch (r) {
-		case JFileChooser.APPROVE_OPTION:
+	@FXML
+	public void fileOpenDialog() {
+		fileOpenDialog(null, getPluginManager().getDefaultIOPlugin());
+	}
+
+	public void fileOpenDialog(Window parent, IOPlugin flavor) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+		List<File> files = fileChooser.showOpenMultipleDialog(parent);
+		if (files != null) {
 			for (File f : openDialog.getSelectedFiles()) {
 				setCurrentDirectory(f.getParentFile());
 				open(f, flavor, Constants.X_UNSPECIFIED);
 			}
-			break;
-		default:
-			showOpening();
 		}
 	}
 
@@ -406,7 +428,8 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Pane root = (Pane) FXMLLoader.load(getClass().getResource("/Annotator.fxml"));
+		Pane root = (Pane) FXMLLoader.load(getClass().getResource("/Annotator.fxml"),
+				ResourceBundle.getBundle("locales/strings", Locale.getDefault()));
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 		stage.show();
