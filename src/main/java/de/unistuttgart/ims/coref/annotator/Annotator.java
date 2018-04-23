@@ -29,7 +29,6 @@ import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,8 +62,13 @@ import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
-public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
+public class Annotator extends Application implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
 
 	public static final Logger logger = LogManager.getLogger(Annotator.class);
 
@@ -95,25 +99,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	public static Annotator app;
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					try {
-						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					} catch (Exception e) {
-						Annotator.logger.error("Could not set look and feel {}.", e.getMessage());
-					}
-
-					app = new Annotator();
-					app.showOpening();
-				} catch (ResourceInitializationException e) {
-					logger.catching(e);
-				}
-			}
-
-		});
+		Annotator.launch(args);
 	}
 
 	public Annotator() throws ResourceInitializationException {
@@ -416,6 +402,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		} catch (BackingStoreException e1) {
 			logger.catching(e1);
 		}
+	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+		Pane root = (Pane) FXMLLoader.load(getClass().getResource("/Annotator.fxml"));
+		Scene scene = new Scene(root);
+		stage.setScene(scene);
+		stage.show();
 	}
 
 }
