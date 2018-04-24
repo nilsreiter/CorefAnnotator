@@ -41,6 +41,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	 */
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 
+	String currentSearchString = null;
+
 	public EntityTreeModel(CoreferenceModel docMod) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.coreferenceModel = docMod;
@@ -207,6 +209,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	public void rankBySearchString(String s) {
+		currentSearchString = s;
+		if (s == null)
+			return;
 		Pattern pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 		if (s.length() >= 1) {
 			for (int i = 0; i < getRoot().getChildCount(); i++) {
@@ -217,19 +222,27 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			}
 			resort(EntitySortOrder.getVisibilitySortOrder(getEntitySortOrder().getComparator()));
 		} else {
-			for (int i = 0; i < getRoot().getChildCount(); i++) {
-				CATreeNode tn = getRoot().getChildAt(i);
-				if (tn.isEntity()) {
-					tn.setRank(50);
-
-				}
-			}
-			resort();
+			unRankBySearch();
 		}
 	}
 
+	public void unRankBySearch() {
+		currentSearchString = null;
+		for (int i = 0; i < getRoot().getChildCount(); i++) {
+			CATreeNode tn = getRoot().getChildAt(i);
+			if (tn.isEntity()) {
+				tn.setRank(50);
+
+			}
+		}
+		resort();
+	}
+
 	public void resort() {
-		resort(entitySortOrder.getComparator());
+		if (currentSearchString != null)
+			rankBySearchString(currentSearchString);
+		else
+			resort(entitySortOrder.getComparator());
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {
