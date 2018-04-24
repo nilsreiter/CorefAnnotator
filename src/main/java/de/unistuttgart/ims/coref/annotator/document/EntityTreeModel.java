@@ -48,6 +48,18 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	}
 
+	private CATreeNode createNode(FeatureStructure fs) {
+		CATreeNode node = null;
+		if (fs instanceof Entity) {
+			node = new CATreeNode(fs, ((Entity) fs).getLabel());
+		} else if (fs instanceof Annotation) {
+			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		}
+		if (node != null)
+			fsMap.put(fs, node);
+		return node;
+	}
+
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
@@ -112,6 +124,16 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		}
 	}
 
+	protected CATreeNode get(Object m) {
+		if (m == null)
+			return getRoot();
+		return fsMap.get(m);
+	}
+
+	public EntitySortOrder getEntitySortOrder() {
+		return entitySortOrder;
+	}
+
 	private int getInsertPosition(CATreeNode newParent, FeatureStructure newChildFS) {
 		int ind = 0;
 		if (newChildFS instanceof Annotation)
@@ -123,28 +145,6 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				ind++;
 			}
 		return ind;
-	}
-
-	private CATreeNode createNode(FeatureStructure fs) {
-		CATreeNode node = null;
-		if (fs instanceof Entity) {
-			node = new CATreeNode(fs, ((Entity) fs).getLabel());
-		} else if (fs instanceof Annotation) {
-			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
-		}
-		if (node != null)
-			fsMap.put(fs, node);
-		return node;
-	}
-
-	protected CATreeNode get(Object m) {
-		if (m == null)
-			return getRoot();
-		return fsMap.get(m);
-	}
-
-	public EntitySortOrder getEntitySortOrder() {
-		return entitySortOrder;
 	}
 
 	public Object[] getPathToRoot(FeatureStructure fs) {
