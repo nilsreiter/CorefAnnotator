@@ -602,11 +602,17 @@ public class CoreferenceModel {
 		characterPosition2AnnotationMap.remove(dmp);
 	}
 
+	/**
+	 * Removes entity and fires events
+	 * 
+	 * @param entity
+	 */
 	private void remove(Entity entity) {
 		fireEvent(Event.get(Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
 			m.removeFromIndexes();
+			// TODO: remove parts
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
