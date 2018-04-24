@@ -9,7 +9,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   mention is dragged in (or added a key) while the tree view is ranked 
   according to the search, the ranking remains after having added the 
   mention. If the user presses enter, the ranking (and search) is 
-  removed.
+  removed. #100
+- Added a new command to automatically remove all singletons. Empty
+  entities are also removed at the same time. #103
 
 ## 1.4.1
 
