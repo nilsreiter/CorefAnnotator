@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1228106.svg)](https://doi.org/10.5281/zenodo.1228106)
+
+
 # Coref Annotator
 
 This is yet another annotation tool, this time for coreference. It's built on top of [Apache's UIMA](https://uima.apache.org), and works with long documents and long coreference chains.
