@@ -447,6 +447,28 @@ public interface Op {
 
 	}
 
+	public class RemoveSingletons implements Op {
+		ImmutableList<Mention> mentions;
+		ImmutableList<Entity> entities;
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
+
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+	}
+
 	public class ToggleEntityFlag extends ToggleFlag<Entity> {
 
 		public ToggleEntityFlag(String flag, Iterable<Entity> objects) {
