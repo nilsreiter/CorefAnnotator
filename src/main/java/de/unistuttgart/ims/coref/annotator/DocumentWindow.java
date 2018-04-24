@@ -108,6 +108,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -478,6 +479,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.changeColorAction));
 		entityMenu.add(new JMenuItem(actions.changeKeyAction));
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
+		entityMenu.add(new JMenuItem(new RemoveSingletons(this)));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 		entityMenu.add(actions.entityStatisticsAction);
