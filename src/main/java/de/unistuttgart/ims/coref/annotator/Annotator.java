@@ -42,16 +42,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.OpenFilesEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.OpenFilesHandler;
-import com.apple.eawt.PreferencesHandler;
-import com.apple.eawt.QuitHandler;
-import com.apple.eawt.QuitResponse;
-
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
@@ -74,7 +64,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-public class Annotator extends Application implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
+public class Annotator extends Application {
 
 	public static final Logger logger = LogManager.getLogger(Annotator.class);
 
@@ -142,7 +132,7 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			Annotator.logger.catching(e);
 		}
 
 		this.initialiseActions();
@@ -173,7 +163,7 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 			@Override
 			public void windowClosing(WindowEvent e) {
 				opening.dispose();
-				handleQuitRequestWith(null, null);
+				handleQuitRequestWith();
 			}
 		});
 
@@ -286,17 +276,7 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 			this.showOpening();
 	};
 
-	@Override
-	public void openFiles(OpenFilesEvent e) {
-		for (Object file : e.getFiles()) {
-			if (file instanceof File) {
-				open((File) file, new DefaultIOPlugin(), null);
-			}
-		}
-	}
-
-	@Override
-	public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
+	public void handleQuitRequestWith() {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
 		storeRecentFiles();
@@ -306,14 +286,6 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 			logger.catching(e1);
 		}
 		System.exit(0);
-	}
-
-	@Override
-	public void handleAbout(AboutEvent e) {
-	}
-
-	@Override
-	public void handlePreferences(PreferencesEvent e) {
 	}
 
 	public void warnDialog(String message, String title) {

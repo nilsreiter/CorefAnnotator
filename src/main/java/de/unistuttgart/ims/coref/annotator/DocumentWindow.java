@@ -97,6 +97,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -109,6 +110,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
@@ -323,11 +325,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected void initialiseActions() {
-		this.actions.renameAction = new RenameEntityAction();
+		this.actions.renameAction = new RenameEntityAction(this);
 		this.actions.newEntityAction = new NewEntityAction(this);
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
-		this.actions.deleteAction = new DeleteAction();
+		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
 		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
 		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
@@ -971,10 +973,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
 					operation = new Op.AddEntityToEntityGroup((EntityGroup) targetFS,
-							moved.collect(n -> n.getFeatureStructure()));
-				} else
-					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
-							moved.collect(n -> (n.getFeatureStructure()))));
+							moved.select(n -> n.getFeatureStructure() instanceof Entity)
+									.collect(n -> n.getFeatureStructure()));
+				}
+				documentModel.getCoreferenceModel()
+						.edit(new Op.MoveMentionsToEntity((Entity) targetFS,
+								moved.select(n -> n.getFeatureStructure() instanceof Mention)
+										.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
 				operation = new Op.MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
@@ -999,36 +1004,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			if (nodes.isEmpty())
 				return null;
 			return new NodeListTransferable(nodes);
-		}
-
-	}
-
-	class RenameEntityAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public RenameEntityAction() {
-			super(MaterialDesign.MDI_RENAME_BOX);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_RENAME));
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_RENAME_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			treeKeyListener.setIgnoreNext(true);
-			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			String l = etn.getEntity().getLabel();
-			String newLabel = (String) JOptionPane.showInputDialog(textPane,
-					Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
-			if (newLabel != null) {
-				Op.RenameEntity op = new Op.RenameEntity(etn.getEntity(), newLabel);
-				documentModel.getCoreferenceModel().edit(op);
-
-			}
 		}
 
 	}
@@ -1157,70 +1132,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
 			return panel;
-		}
-
-	}
-
-	class DeleteAction extends IkonAction {
-		private static final long serialVersionUID = 1L;
-
-		public DeleteAction() {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			MutableList<TreePath> selection = Lists.mutable.of(tree.getSelectionPaths());
-			CATreeNode node = (CATreeNode) tree.getSelectionPath().getLastPathComponent();
-			FeatureStructure fs = ((CATreeNode) tree.getSelectionPath().getLastPathComponent()).getFeatureStructure();
-			Op op = null;
-			if (fs instanceof Entity) {
-				FeatureStructure parentFs = node.getParent().getFeatureStructure();
-				if (parentFs instanceof EntityGroup) {
-					op = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
-				} else if (node.isLeaf()) {
-					op = new Op.RemoveEntities(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-							.collect(tn -> (Entity) tn.getFeatureStructure()));
-				}
-			} else if (fs instanceof Mention) {
-				op = new Op.RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-						.collect(tn -> (Mention) tn.getFeatureStructure()));
-			} else if (fs instanceof DetachedMentionPart) {
-				op = new Op.RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
-			}
-
-			if (op != null)
-				getCoreferenceModel().edit(op);
-			else
-				for (TreePath tp : tree.getSelectionPaths())
-					deleteSingle((CATreeNode) tp.getLastPathComponent());
-		}
-
-		private void deleteSingle(CATreeNode tn) {
-			Op operation = null;
-			if (tn.getFeatureStructure() instanceof Mention) {
-				int row = tree.getLeadSelectionRow() - 1;
-				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(tn.getFeatureStructure()));
-				tree.setSelectionRow(row);
-			} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getFeatureStructure()));
-			} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
-				DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-				documentModel.getCoreferenceModel().edit(new Op.RemovePart(dmp.getMention(), dmp));
-			} else if (tn.isEntity()) {
-				FeatureStructure parentFs = tn.getParent().getFeatureStructure();
-				if (parentFs instanceof EntityGroup) {
-					operation = new Op.RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
-				} else if (tn.isLeaf()) {
-					documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(tn.getEntity()));
-				}
-			}
-			if (operation != null)
-				documentModel.getCoreferenceModel().edit(operation);
 		}
 
 	}
@@ -1594,15 +1505,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			collectData(e);
-			actions.renameAction.setEnabled(isSingle() && isEntity());
+			actions.renameAction.setEnabled(this);
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
 
 			actions.toggleEntityGeneric.setEnabled(this);
-
-			actions.deleteAction.setEnabled(isDetachedMentionPart() || isMention() || (isEntityGroup() && isLeaf())
-					|| (isEntity() && isLeaf()));
-
+			actions.deleteAction.setEnabled(this);
 			actions.formGroupAction.setEnabled(this);
 
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
@@ -1867,7 +1775,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
 		AbstractAction newEntityAction;
-		AbstractAction renameAction;
+		RenameEntityAction renameAction;
 		AbstractAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
 
