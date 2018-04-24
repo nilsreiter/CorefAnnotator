@@ -67,6 +67,8 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -99,6 +101,9 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 	AbstractAction openCompareAction;
 
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
+
+	@FXML
+	FlowPane importPane;
 
 	public static Annotator app;
 
@@ -432,6 +437,11 @@ public class Annotator extends Application implements AboutHandler, PreferencesH
 				ResourceBundle.getBundle("locales/strings", Locale.getDefault()));
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
+
+		Button button = new Button();
+
+		importPane.getChildren().add(button);
+
 		stage.show();
 	}
 
