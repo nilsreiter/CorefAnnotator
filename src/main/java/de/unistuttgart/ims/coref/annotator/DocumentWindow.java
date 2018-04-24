@@ -973,10 +973,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
 					operation = new Op.AddEntityToEntityGroup((EntityGroup) targetFS,
-							moved.collect(n -> n.getFeatureStructure()));
-				} else
-					documentModel.getCoreferenceModel().edit(new Op.MoveMentionsToEntity((Entity) targetFS,
-							moved.collect(n -> (n.getFeatureStructure()))));
+							moved.select(n -> n.getFeatureStructure() instanceof Entity)
+									.collect(n -> n.getFeatureStructure()));
+				}
+				documentModel.getCoreferenceModel()
+						.edit(new Op.MoveMentionsToEntity((Entity) targetFS,
+								moved.select(n -> n.getFeatureStructure() instanceof Mention)
+										.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
 				operation = new Op.MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
