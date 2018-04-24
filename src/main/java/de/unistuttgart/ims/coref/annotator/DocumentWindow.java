@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -81,7 +80,6 @@ import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -110,6 +108,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -480,6 +479,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.changeColorAction));
 		entityMenu.add(new JMenuItem(actions.changeKeyAction));
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
+		entityMenu.add(new JMenuItem(new RemoveSingletons(this)));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 		entityMenu.add(actions.entityStatisticsAction);
@@ -1561,60 +1561,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		Pattern pattern;
 
 		public void filter(String s) {
-			pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-			if (s.length() >= 1) {
-				documentModel.getTreeModel().getRoot();
-				for (int i = 0; i < documentModel.getTreeModel().getRoot().getChildCount(); i++) {
-					CATreeNode tn = documentModel.getTreeModel().getRoot().getChildAt(i);
-					if (tn.isEntity()) {
-						tn.setRank(matches(s, tn) ? 60 : 40);
-						tree.scrollRowToVisible(0);
-					}
-				}
-				// cModel.nodeStructureChanged(cModel.getRootNode());
-				documentModel.getTreeModel().resort(EntitySortOrder
-						.getVisibilitySortOrder(documentModel.getTreeModel().getEntitySortOrder().getComparator()));
-			} else {
-				for (int i = 0; i < documentModel.getTreeModel().getRoot().getChildCount(); i++) {
-					CATreeNode tn = documentModel.getTreeModel().getRoot().getChildAt(i);
-					if (tn.isEntity()) {
-						tn.setRank(50);
-
-					}
-				}
-				// cModel.nodeStructureChanged(cModel.getRootNode());
-				documentModel.getTreeModel().resort();
-			}
-		}
-
-		protected boolean matches(String s, CATreeNode e) {
-			if (!e.isEntity())
-				return false;
-			Matcher m;
-
-			if (e.getEntity().getLabel() != null) {
-				m = pattern.matcher(e.getEntity().getLabel());
-				if (m.find())
-					return true;
-			}
-			StringArray flags = e.getEntity().getFlags();
-			if (flags != null)
-				for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
-					m = pattern.matcher(e.getEntity().getFlags(i));
-					if (m.find())
-						return true;
-				}
-			for (int i = 0; i < e.getChildCount(); i++) {
-				FeatureStructure child = e.getChildAt(i).getFeatureStructure();
-				if (child instanceof Annotation) {
-					String mc = ((Annotation) child).getCoveredText();
-					m = pattern.matcher(mc);
-					if (m.find())
-						return true;
-				}
-			}
-			return false;
-
+			documentModel.getTreeModel().rankBySearchString(s);
 		}
 
 		@Override
