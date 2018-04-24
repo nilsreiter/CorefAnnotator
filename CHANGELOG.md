@@ -3,6 +3,14 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.0
+
+- Searching in the tree view now behaves slightly different: If a new 
+  mention is dragged in (or added a key) while the tree view is ranked 
+  according to the search, the ranking remains after having added the 
+  mention. If the user presses enter, the ranking (and search) is 
+  removed.
+
 ## 1.4.1
 
 - App now launches on a Mac with Java 9 and higher. #71
