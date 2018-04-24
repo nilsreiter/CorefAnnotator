@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.4.1
+
+- App now launches on a Mac with Java 9 and higher. #71
+- Mentions can now be moved into an entity group properly #108
+
+
 ## 1.4
 
 - Selecting text in the compare view now displays agreement calculated 
