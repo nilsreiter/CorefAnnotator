@@ -13,8 +13,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.comp.CompoundIcon;
+import javafx.event.EventHandler;
 
-public abstract class IkonAction extends AbstractAction {
+public abstract class IkonAction extends AbstractAction implements EventHandler<javafx.event.ActionEvent> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -89,5 +90,10 @@ public abstract class IkonAction extends AbstractAction {
 
 	public Icon getIcon() {
 		return new CompoundIcon(ikon.collect(ik -> getIcon(ik)).toArray(new Icon[ikon.size()]));
+	}
+
+	@Override
+	public void handle(javafx.event.ActionEvent event) {
+		actionPerformed(null);
 	}
 }

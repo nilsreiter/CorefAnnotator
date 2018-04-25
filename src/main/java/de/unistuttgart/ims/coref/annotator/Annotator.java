@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -54,11 +53,10 @@ import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -92,9 +90,6 @@ public class Annotator extends Application {
 
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
-	@FXML
-	FlowPane importPane;
-
 	public static Annotator app;
 
 	public static void main(String[] args) {
@@ -121,6 +116,7 @@ public class Annotator extends Application {
 
 	public Annotator() throws ResourceInitializationException {
 		logger.trace("Application startup");
+		app = this;
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -152,6 +148,22 @@ public class Annotator extends Application {
 	protected void initialiseActions() {
 		openAction = new FileSelectOpenAction(this);
 		openCompareAction = new FileCompareOpenAction();
+	}
+
+	public void fileOpenDialog() {
+		fileOpenDialog(null, Annotator.app.getPluginManager().getDefaultIOPlugin());
+	}
+
+	public void fileOpenDialog(Window parent, IOPlugin flavor) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+		List<File> files = fileChooser.showOpenMultipleDialog(parent);
+		if (files != null) {
+			for (File f : Annotator.app.openDialog.getSelectedFiles()) {
+				Annotator.app.setCurrentDirectory(f.getParentFile());
+				Annotator.app.open(f, flavor, Constants.X_UNSPECIFIED);
+			}
+		}
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -222,7 +234,7 @@ public class Annotator extends Application {
 				button.addActionListener(new ActionListener() {
 
 					@Override
-					public void actionPerformed(ActionEvent e) {
+					public void actionPerformed(java.awt.event.ActionEvent e) {
 						try {
 							Desktop.getDesktop().browse(updateCheck.getReleasePage());
 						} catch (IOException e1) {
@@ -294,23 +306,6 @@ public class Annotator extends Application {
 
 	public void showOpening() {
 		this.opening.setVisible(true);
-	}
-
-	@FXML
-	public void fileOpenDialog() {
-		fileOpenDialog(null, getPluginManager().getDefaultIOPlugin());
-	}
-
-	public void fileOpenDialog(Window parent, IOPlugin flavor) {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
-		List<File> files = fileChooser.showOpenMultipleDialog(parent);
-		if (files != null) {
-			for (File f : openDialog.getSelectedFiles()) {
-				setCurrentDirectory(f.getParentFile());
-				open(f, flavor, Constants.X_UNSPECIFIED);
-			}
-		}
 	}
 
 	public static String getString(String key) {
@@ -405,15 +400,32 @@ public class Annotator extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Pane root = (Pane) FXMLLoader.load(getClass().getResource("/Annotator.fxml"),
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Annotator.fxml"),
 				ResourceBundle.getBundle("locales/strings", Locale.getDefault()));
+
+		Pane root = (Pane) fxmlLoader.load();
+		AnnotatorController controller = fxmlLoader.getController();
+
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 
-		Button button = new Button();
+		for (Class<? extends IOPlugin> pluginClass : getPluginManager().getIOPlugins()) {
+			IOPlugin plug = getPluginManager().getIOPlugin(pluginClass);
+			Button button = new Button();
+			button.setText(plug.getName());
+			button.setTooltip(new Tooltip(plug.getDescription()));
+			button.setOnAction(new FileImportAction(plug));
+			controller.importPane.getChildren().add(button);
+		}
 
-		importPane.getChildren().add(button);
-
+		for (int i = 0; i < Math.min(20, recentFiles.size()); i++) {
+			File file = recentFiles.get(i);
+			Button button = new Button();
+			button.setText(file.getName());
+			button.setTooltip(new Tooltip(file.getAbsolutePath()));
+			button.setOnAction(new SelectedFileOpenAction(this, recentFiles.get(i)));
+			controller.recentPane.getChildren().add(button);
+		}
 		stage.show();
 	}
 
