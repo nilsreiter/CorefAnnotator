@@ -13,6 +13,14 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Added a new command to automatically remove all singletons. Empty
   entities are also removed at the same time. #103
 
+## 1.4.2
+
+- Fixed that detached mention parts were not included in the tree
+  after loading a file. #111
+- Fixed that warning dialogs were displayed even if all changes were 
+  saved. The downside is that saving now clears the history. #109
+- Delete everything now deletes everything. #97
+
 ## 1.4.1
 
 - App now launches on a Mac with Java 9 and higher. #71

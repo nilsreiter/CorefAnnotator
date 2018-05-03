@@ -1252,11 +1252,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
-			for (Mention m : JCasUtil.select(jcas, Mention.class))
+			for (Mention m : Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class)))
 				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
-			for (Entity e : JCasUtil.select(jcas, Entity.class))
+			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
 				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(e));
-
+			documentModel.getCoreferenceModel().getHistory().clear();
 		}
 
 	}
