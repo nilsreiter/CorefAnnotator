@@ -3,6 +3,30 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.0
+
+- Searching in the tree view now behaves slightly different: If a new 
+  mention is dragged in (or added a key) while the tree view is ranked 
+  according to the search, the ranking remains after having added the 
+  mention. If the user presses enter, the ranking (and search) is 
+  removed. #100
+- Added a new command to automatically remove all singletons. Empty
+  entities are also removed at the same time. #103
+
+## 1.4.2
+
+- Fixed that detached mention parts were not included in the tree
+  after loading a file. #111
+- Fixed that warning dialogs were displayed even if all changes were 
+  saved. The downside is that saving now clears the history. #109
+- Delete everything now deletes everything. #97
+
+## 1.4.1
+
+- App now launches on a Mac with Java 9 and higher. #71
+- Mentions can now be moved into an entity group properly #108
+
+
 ## 1.4
 
 - Selecting text in the compare view now displays agreement calculated 
