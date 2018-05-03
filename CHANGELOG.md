@@ -15,6 +15,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 ## 1.4.2
 
+- Fixed that detached mention parts were not included in the tree
+  after loading a file. #111
 - Fixed that warning dialogs were displayed even if all changes were 
   saved. The downside is that saving now clears the history. #109
 
