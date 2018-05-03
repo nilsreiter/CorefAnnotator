@@ -45,6 +45,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 			Annotator.app.recentFiles.add(0, file);
 			Annotator.app.refreshRecents();
 			Annotator.app.setCurrentDirectory(file.getParentFile());
+			target.getDocumentModel().getCoreferenceModel().getHistory().clear();
 			target.setFile(file);
 			target.setWindowTitle();
 			target.stopIndeterminateProgress();
