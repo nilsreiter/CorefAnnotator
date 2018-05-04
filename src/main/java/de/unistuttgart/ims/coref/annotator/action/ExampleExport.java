@@ -106,7 +106,7 @@ public class ExampleExport extends DocumentWindowAction {
 		public String getEndTag(Mention anno) {
 			if (!entityList.contains(anno.getEntity()))
 				entityList.add(anno.getEntity());
-			return "]~" + entityList.indexOf(anno.getEntity()) + "~";
+			return "]<sub>" + entityList.indexOf(anno.getEntity()) + "</sub>";
 		}
 
 		@Override
