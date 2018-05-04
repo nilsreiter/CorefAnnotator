@@ -1,28 +1,37 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.Annotation;
-import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.uima.io.xml.GenericInlineWriter;
+import de.unistuttgart.ims.uima.io.xml.InlineTagFactory;
 
 public class ExampleExport extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public ExampleExport(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_EXPORT_EXAMPLE, MaterialDesign.MDI_CODE_TAGS);
+	public static enum Format {
+		MARKDOWN, PLAINTEXT
+	};
+
+	Format format;
+
+	public ExampleExport(DocumentWindow dw, Format format) {
+		super(dw, Annotator.getString("format." + format.toString()), false);
+		this.format = format;
 	}
 
 	@Override
@@ -30,25 +39,25 @@ public class ExampleExport extends DocumentWindowAction {
 		Span selection = getTarget().getSelection();
 		JCas jcas = getTarget().getDocumentModel().getJcas();
 
-		StringBuilder b = new StringBuilder();
-
-		b.append(jcas.getDocumentText().substring(selection.begin, selection.end));
-
-		Annotation spanAnnotation = new Annotation(jcas);
-		spanAnnotation.setBegin(selection.begin);
-		spanAnnotation.setEnd(selection.end);
-		ImmutableList<Mention> mentions = Lists.immutable
-				.withAll(JCasUtil.selectCovered(Mention.class, spanAnnotation));
-
-		AnnotationComparator annoComp = new AnnotationComparator();
-		annoComp.setDescending(true);
-		annoComp.setUseEnd(true);
-		mentions = mentions.toSortedList(annoComp).toImmutable();
-		for (Mention m : mentions) {
-			b.insert(m.getEnd() - selection.begin, "]");
+		GenericInlineWriter<Mention> giw = new GenericInlineWriter<Mention>(Mention.class);
+		switch (format) {
+		case PLAINTEXT:
+			giw.setTagFactory(new PlainTextTagFactory());
+			break;
+		default:
+			giw.setTagFactory(new MarkdownTagFactory());
 		}
 
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(b.toString()), null);
+		ByteArrayOutputStream boas = new ByteArrayOutputStream();
+
+		giw.write(jcas, boas, selection.begin, selection.end);
+
+		try {
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(boas.toString("UTF-8")),
+					null);
+		} catch (HeadlessException | UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
 
 	}
 
@@ -60,5 +69,50 @@ public class ExampleExport extends DocumentWindowAction {
 		int position;
 
 		Mention source;
+	}
+
+	class PlainTextTagFactory implements InlineTagFactory<Mention> {
+		MutableList<Entity> entityList = Lists.mutable.empty();
+
+		@Override
+		public String getBeginTag(Mention anno) {
+			return "[";
+		}
+
+		@Override
+		public String getEndTag(Mention anno) {
+			if (!entityList.contains(anno.getEntity()))
+				entityList.add(anno.getEntity());
+			return "]" + entityList.indexOf(anno.getEntity());
+		}
+
+		@Override
+		public String getEmptyTag(Mention anno) {
+			return "";
+		}
+
+	}
+
+	class MarkdownTagFactory implements InlineTagFactory<Mention> {
+
+		MutableList<Entity> entityList = Lists.mutable.empty();
+
+		@Override
+		public String getBeginTag(Mention anno) {
+			return "[";
+		}
+
+		@Override
+		public String getEndTag(Mention anno) {
+			if (!entityList.contains(anno.getEntity()))
+				entityList.add(anno.getEntity());
+			return "]~" + entityList.indexOf(anno.getEntity()) + "~";
+		}
+
+		@Override
+		public String getEmptyTag(Mention anno) {
+			return "";
+		}
+
 	}
 }
