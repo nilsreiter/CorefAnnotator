@@ -12,6 +12,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   removed. #100
 - Added a new command to automatically remove all singletons. Empty
   entities are also removed at the same time. #103
+- If a text segment has been selected, clicking on the context menu 
+  shows the option "copy formatted example". This copies the selection 
+  with their markdown or plain text formatted annotations onto the 
+  clipboard. Currently, the markdown format uses <sub></sub> to 
+  subscript, but other formats can be included. #110
 
 ## 1.4.2
 
