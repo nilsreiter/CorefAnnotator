@@ -164,6 +164,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
 			entityEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+			if (m.getDiscontinuous() != null)
+				entityEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}

@@ -517,6 +517,10 @@ public class CoreferenceModel {
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
 			fireEvent(Event.get(Event.Type.Add, mention.getEntity(), mention));
+			if (mention.getDiscontinuous() != null) {
+				registerAnnotation(mention.getDiscontinuous());
+				fireEvent(Event.get(Event.Type.Add, mention, mention.getDiscontinuous()));
+			}
 		}
 		initialised = true;
 	}
