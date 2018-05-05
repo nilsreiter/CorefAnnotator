@@ -97,6 +97,7 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
+import de.unistuttgart.ims.coref.annotator.action.ExampleExport;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSaveAction;
@@ -1392,6 +1393,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 			int offset = mouseClickedPosition;
+
+			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+				JMenu exampleExportMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
+				exampleExportMenu.setIcon(FontIcon.of(MaterialDesign.MDI_CODE_TAGS));
+				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
+				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
+				textPopupMenu.add(exampleExportMenu);
+			}
 
 			MutableList<Annotation> localAnnotations = Lists.mutable
 					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
