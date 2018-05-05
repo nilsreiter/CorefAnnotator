@@ -62,7 +62,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			fs.removeFromIndexes();
 		}
 
-		Util.getMeta(jcas).setFileFormat(TypeSystemVersion.v1_0.name());
+		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.v1_0.name());
 	}
 
 	protected AnnotationComment getComment(JCas jcas,
