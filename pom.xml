@@ -6,7 +6,7 @@
 	<version>1.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>1.9.0</version.dkpro>
@@ -378,4 +378,9 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<description>Annotation tool for coreference</description>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/nilsreiter/CorefAnnotator/issues</url>
+	</issueManagement>
 </project>
