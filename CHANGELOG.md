@@ -25,6 +25,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Fixed that warning dialogs were displayed even if all changes were 
   saved. The downside is that saving now clears the history. #109
 - Delete everything now deletes everything. #97
+- Fixed that the settings menu would disappear on Windows if multiple
+  windows are opened. #113
 
 ## 1.4.1
 
