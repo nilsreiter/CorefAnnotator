@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins;
+package de.unistuttgart.ims.coref.annotator.uima;
 
 import java.io.IOException;
 
