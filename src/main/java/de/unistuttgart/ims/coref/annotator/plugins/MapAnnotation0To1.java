@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.TypeCapability;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -22,6 +23,15 @@ import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
 
+@TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
+		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
+		"de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart",
+		"de.unistuttgart.ims.coref.annotator.api.AnnotationComment" }, outputs = {
+				"de.unistuttgart.ims.coref.annotator.api.v1_0.Entity",
+				"de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup",
+				"de.unistuttgart.ims.coref.annotator.api.v1_0.Mention",
+				"de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart",
+				"de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment" })
 public class MapAnnotation0To1 extends FileFormatVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
