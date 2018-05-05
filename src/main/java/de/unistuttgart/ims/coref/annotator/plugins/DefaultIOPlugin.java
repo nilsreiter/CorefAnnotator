@@ -13,6 +13,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import de.unistuttgart.ims.coref.annotator.uima.MapAnnotation0To1;
 
 public final class DefaultIOPlugin extends AbstractXmiPlugin {
 

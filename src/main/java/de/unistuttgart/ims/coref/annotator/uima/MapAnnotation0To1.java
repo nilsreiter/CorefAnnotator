@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins;
+package de.unistuttgart.ims.coref.annotator.uima;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.TypeCapability;
@@ -21,7 +21,6 @@ import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
 
 @TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
 		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
