@@ -13,7 +13,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.uima.converter.MapAnnotation0To1;
+import de.unistuttgart.ims.coref.annotator.uima.converter.LEGACY_TO_V1_0;
 
 public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
@@ -35,7 +35,7 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(MapAnnotation0To1.class);
+		return AnalysisEngineFactory.createEngineDescription(LEGACY_TO_V1_0.class);
 	}
 
 	@Override

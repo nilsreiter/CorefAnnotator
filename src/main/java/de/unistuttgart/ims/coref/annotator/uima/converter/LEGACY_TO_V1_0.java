@@ -32,7 +32,7 @@ import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.Mention",
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart",
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment" })
-public class MapAnnotation0To1 extends FileFormatVersionConverter {
+public class LEGACY_TO_V1_0 extends FileFormatVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
 	MutableSet<TOP> toRemove = Sets.mutable.empty();
