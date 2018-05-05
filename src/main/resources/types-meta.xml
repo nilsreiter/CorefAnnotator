@@ -17,7 +17,7 @@
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
-					<name>FileFormat</name>
+					<name>TypeSystemVersion</name>
 					<description/>
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
