@@ -114,8 +114,6 @@ public abstract class AbstractWindow extends JFrame {
 	}
 
 	public JMenu initialiseMenuSettings() {
-		if (menu_settings != null)
-			return menu_settings;
 		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
