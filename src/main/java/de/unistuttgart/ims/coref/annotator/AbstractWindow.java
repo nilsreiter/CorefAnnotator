@@ -28,7 +28,7 @@ public abstract class AbstractWindow extends JFrame {
 	Thread messageVoider;
 	JMenuBar menuBar = new JMenuBar();
 
-	static JMenu menu_settings = null;
+	JMenu menu_settings = null;
 
 	protected void initializeWindow() {
 		SpringLayout springs = new SpringLayout();
