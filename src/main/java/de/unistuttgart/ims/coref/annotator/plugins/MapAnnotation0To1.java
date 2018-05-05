@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -21,8 +20,9 @@ import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
 
-public class MapAnnotation0To1 extends JCasAnnotator_ImplBase {
+public class MapAnnotation0To1 extends FileFormatVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
 	MutableSet<TOP> toRemove = Sets.mutable.empty();
@@ -126,6 +126,16 @@ public class MapAnnotation0To1 extends JCasAnnotator_ImplBase {
 			toRemove.add(oldEntity);
 		}
 		return entityMap.get(oldEntity);
+	}
+
+	@Override
+	public FileFormat getSource() {
+		return FileFormat.LEGACY;
+	}
+
+	@Override
+	public FileFormat getTarget() {
+		return FileFormat.v1_0;
 	}
 
 }
