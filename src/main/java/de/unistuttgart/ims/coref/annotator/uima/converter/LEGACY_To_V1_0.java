@@ -21,7 +21,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
+import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
 
 @TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
 		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
@@ -32,7 +32,7 @@ import de.unistuttgart.ims.coref.annotator.uima.FileFormatVersionConverter;
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.Mention",
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart",
 				"de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment" })
-public class LEGACY_To_V1_0 extends FileFormatVersionConverter {
+public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
 	MutableSet<TOP> toRemove = Sets.mutable.empty();
