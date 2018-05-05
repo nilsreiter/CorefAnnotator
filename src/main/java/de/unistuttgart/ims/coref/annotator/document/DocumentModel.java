@@ -7,7 +7,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
-import de.unistuttgart.ims.coref.annotator.FileFormat;
+import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -26,7 +26,7 @@ public class DocumentModel {
 
 	EntityTreeModel treeModel;
 
-	FileFormat fileFormat;
+	TypeSystemVersion typeSystemVersion;
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
@@ -52,8 +52,8 @@ public class DocumentModel {
 		return coreferenceModel;
 	}
 
-	public FileFormat getFileFormat() {
-		return fileFormat;
+	public TypeSystemVersion getFileFormat() {
+		return typeSystemVersion;
 	}
 
 	/**
@@ -111,8 +111,8 @@ public class DocumentModel {
 		this.coreferenceModel = coreferenceModel;
 	}
 
-	protected void setFileFormat(FileFormat fileFormat) {
-		this.fileFormat = fileFormat;
+	protected void setFileFormat(TypeSystemVersion typeSystemVersion) {
+		this.typeSystemVersion = typeSystemVersion;
 	}
 
 	public void setJcas(JCas jcas) {

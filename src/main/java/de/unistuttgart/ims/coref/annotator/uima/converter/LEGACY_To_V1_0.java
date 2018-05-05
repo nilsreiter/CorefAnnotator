@@ -13,7 +13,7 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.FileFormat;
+import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.CommentAnchor;
@@ -62,7 +62,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			fs.removeFromIndexes();
 		}
 
-		Util.getMeta(jcas).setFileFormat(FileFormat.v1_0.name());
+		Util.getMeta(jcas).setFileFormat(TypeSystemVersion.v1_0.name());
 	}
 
 	protected AnnotationComment getComment(JCas jcas,
@@ -139,13 +139,13 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	}
 
 	@Override
-	public FileFormat getSource() {
-		return FileFormat.LEGACY;
+	public TypeSystemVersion getSource() {
+		return TypeSystemVersion.LEGACY;
 	}
 
 	@Override
-	public FileFormat getTarget() {
-		return FileFormat.v1_0;
+	public TypeSystemVersion getTarget() {
+		return TypeSystemVersion.v1_0;
 	}
 
 }
