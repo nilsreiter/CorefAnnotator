@@ -7,12 +7,15 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
+import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
+import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.uima.converter.LEGACY_To_V1_0;
 
 public final class DefaultIOPlugin extends AbstractXmiPlugin {
@@ -35,7 +38,12 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(LEGACY_To_V1_0.class);
+		AggregateBuilder b = new AggregateBuilder();
+		b.add(TypeSystemVersion.v1_0.name(), AnalysisEngineFactory.createEngineDescription(LEGACY_To_V1_0.class));
+		b.setFlowControllerDescription(
+				FlowControllerFactory.createFlowControllerDescription(ConvertFlowController.class));
+
+		return b.createAggregateDescription();
 	}
 
 	@Override
