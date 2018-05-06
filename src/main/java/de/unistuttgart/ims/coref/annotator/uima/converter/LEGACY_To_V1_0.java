@@ -13,6 +13,7 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment;
@@ -39,7 +40,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		getLogger().info("Converting type system from LEGACY to 1.0");
+		Annotator.logger.info("Converting type system from LEGACY to 1.0");
 
 		// map entities and entity groups
 		for (de.unistuttgart.ims.coref.annotator.api.Entity oldEntity : JCasUtil.select(jcas,
