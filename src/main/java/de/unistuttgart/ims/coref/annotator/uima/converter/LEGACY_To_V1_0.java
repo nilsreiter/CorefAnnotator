@@ -39,6 +39,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
+		getLogger().info("Converting type system from LEGACY to 1.0");
 
 		// map entities and entity groups
 		for (de.unistuttgart.ims.coref.annotator.api.Entity oldEntity : JCasUtil.select(jcas,
