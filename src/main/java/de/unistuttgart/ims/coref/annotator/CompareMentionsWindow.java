@@ -102,20 +102,6 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 
 	}
 
-	class Statistics {
-		int agreed = 0;
-		int total = 0;
-		int totalInOverlappingPart = 0;
-
-		public String total() {
-			return String.valueOf(total);
-		}
-
-		public String agreed() {
-			return String.valueOf(agreed);
-		}
-	}
-
 	class AnnotatorStatistics {
 		int mentions = 0;
 		int entities = 0;
@@ -212,7 +198,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
 	JLabel selectedAgreementLabel;
 
-	Statistics stats = new Statistics();
+	AgreementStatistics stats = new AgreementStatistics();
 
 	StyleContext styleContext = new StyleContext();
 
