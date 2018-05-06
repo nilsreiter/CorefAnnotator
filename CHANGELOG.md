@@ -17,6 +17,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   with their markdown or plain text formatted annotations onto the 
   clipboard. Currently, the markdown format uses <sub></sub> to 
   subscript, but other formats can be included. #110
+- The user can now control whether singletons are ignored for comparing
+  two annotation files. #106
 
 ## 1.4.2
 

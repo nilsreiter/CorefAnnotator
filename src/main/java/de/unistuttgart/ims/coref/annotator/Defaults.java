@@ -11,4 +11,6 @@ public class Defaults {
 	public static final boolean CFG_TRIM_WHITESPACE = true;
 	public static final String CFG_WINDOWTITLE = "de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData:documentTitle";
 	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;
+	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
+
 }
