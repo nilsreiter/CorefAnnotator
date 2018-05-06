@@ -9,10 +9,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -62,6 +66,7 @@ import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
@@ -71,7 +76,8 @@ import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
-public class CompareMentionsWindow extends AbstractWindow implements HasTextView, CoreferenceModelListener {
+public class CompareMentionsWindow extends AbstractWindow
+		implements HasTextView, CoreferenceModelListener, PreferenceChangeListener {
 
 	public class TextCaretListener implements CaretListener {
 
@@ -79,7 +85,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		public void caretUpdate(CaretEvent e) {
 			if (mentionsTextPane.getSelectionStart() != mentionsTextPane.getSelectionEnd()) {
 				Span span = new Span(mentionsTextPane.getSelectionStart(), mentionsTextPane.getSelectionEnd());
-				selectedAgreementLabel.setText(String.format("%1$3.1f%%", getAgreementInSpan(span)));
+				stats.setAgreementInSpan(getAgreementInSpan(span));
 			}
 		}
 	}
@@ -191,12 +197,12 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	int loadedCModels = 0;
 	Annotator mainApplication;
 	JPanel mentionsInfoPane;
+	JPanel agreementPanel = null;
 
 	JTextPane mentionsTextPane;
 	MutableList<CoreferenceModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
 	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
-	JLabel selectedAgreementLabel;
 
 	AgreementStatistics stats = new AgreementStatistics();
 
@@ -226,6 +232,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 			this.colors[i] = cp.getNextColor();
 		}
 		this.size = size;
+		Annotator.app.getPreferences().addPreferenceChangeListener(this);
 		this.initialiseMenu();
 		this.initialiseWindow();
 		this.targetJCas = JCasFactory.createJCas();
@@ -279,21 +286,23 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		for (Span s : intersection) {
 			highlightManager.underline(map.get(s), Color.gray.brighter());
 		}
-		stats.agreed = intersection.size();
-		stats.total = stats.agreed;
-		stats.totalInOverlappingPart = stats.agreed;
+		int agreed = intersection.size();
+		int total = agreed;
+		int totalInOverlappingPart = agreed;
 		for (int i = 0; i < mapList.size(); i++) {
 			Set<Span> spans = mapList.get(i);
 			for (Span s : spans) {
 				if (!intersection.contains(s)) {
 					highlightManager.underline(map.get(s), colors[i]);
-					stats.total++;
+					total++;
 					if (overlapping.contains(s))
-						stats.totalInOverlappingPart++;
+						totalInOverlappingPart++;
 				}
 			}
 		}
-
+		stats.setTotal(total);
+		stats.setAgreed(agreed);
+		stats.setTotalInOverlappingPart(totalInOverlappingPart);
 		this.mentionsInfoPane.add(getAgreementPanel(), -1);
 	}
 
@@ -340,43 +349,74 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	}
 
 	protected JPanel getAgreementPanel() {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(5, 2));
-		Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
-		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(200, 70));
+		if (agreementPanel == null) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new GridLayout(5, 2));
+			Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
+			panel.setBorder(border);
+			panel.setPreferredSize(new Dimension(200, 70));
 
-		JLabel desc;
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(stats.total(), SwingConstants.RIGHT));
+			JLabel desc;
+			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL_TOOLTIP));
+			panel.add(desc);
+			JLabel valueLabel = new BoundLabel(stats, "total", o -> o.toString(), stats.total());
+			panel.add(valueLabel);
 
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(String.format("%1$,3d", stats.agreed), SwingConstants.RIGHT));
+			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_TOOLTIP));
+			panel.add(desc);
+			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()));
 
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
-				SwingConstants.RIGHT));
+			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL) + ":",
+					SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
+			panel.add(desc);
+			JLabel percTotalLabel = new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
+					SwingConstants.RIGHT);
 
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
-				SwingConstants.RIGHT));
+			panel.add(percTotalLabel);
 
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
-		panel.add(desc);
-		this.selectedAgreementLabel = new JLabel("");
-		this.selectedAgreementLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel.add(selectedAgreementLabel);
+			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL) + ":",
+					SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
+			panel.add(desc);
+			JLabel percOvrLabel = new JLabel(
+					String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
+					SwingConstants.RIGHT);
+			panel.add(percOvrLabel);
 
-		return panel;
+			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED) + ":",
+					SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
+			panel.add(desc);
+			JLabel selectedAgreementLabel = new BoundLabel(stats, "agreementInSpan",
+					o -> String.format("%1$3.1f%%", o));
+			selectedAgreementLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			panel.add(selectedAgreementLabel);
+
+			stats.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+
+					if (evt.getPropertyName().equals("total") || evt.getPropertyName().equals("agreed")) {
+						percTotalLabel.setText(
+								String.format("%1$3.1f%%", 100 * stats.getAgreed() / (double) stats.getTotal()));
+					}
+					if (evt.getPropertyName().equals("totalInOverlappingPart")
+							|| evt.getPropertyName().equals("agreed")) {
+						percOvrLabel.setText(String.format("%1$3.1f%%",
+								100 * stats.getAgreed() / (double) stats.getTotalInOverlappingPart()));
+					}
+				}
+
+			});
+
+			this.agreementPanel = panel;
+
+		}
+		return agreementPanel;
 	}
 
 	protected JPanel getAnnotatorPanel(int index) {
@@ -532,6 +572,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 			initialiseText(jcas);
 		mentionsInfoPane.add(getAnnotatorPanel(index), index);
 		drawAllAnnotations();
+		mentionsInfoPane.add(getAgreementPanel(), -1);
 		new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas).execute();
 		revalidate();
 	}
@@ -618,6 +659,14 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		JMenu currentFilesMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_OPEN));
 		this.open.forEach(a -> currentFilesMenu.add(a));
 		fileMenu.add(currentFilesMenu, 1);
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (evt.getKey() == Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING) {
+			highlightManager.hilit.removeAllHighlights();
+			drawAllAnnotations();
+		}
 	}
 
 }
