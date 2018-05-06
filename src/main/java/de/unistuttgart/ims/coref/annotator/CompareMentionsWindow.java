@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -43,9 +44,11 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
@@ -120,12 +123,13 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		int lastMention = 0;
 		int length = 0;
 
-		public void analyze(JCas jcas) {
+		public void analyze(JCas jcas, Consumer<Mention> cons) {
 			length = jcas.getDocumentText().length();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				mentions++;
 				if (m.getEnd() > lastMention)
 					lastMention = m.getEnd();
+				cons.accept(m);
 			}
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 				entities++;
@@ -205,6 +209,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 	JTextPane mentionsTextPane;
 	MutableList<CoreferenceModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
+	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
 	JLabel selectedAgreementLabel;
 
 	Statistics stats = new Statistics();
@@ -228,6 +233,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		this.open = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
 		this.models = Lists.mutable.withNValues(size, () -> null);
+		this.entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
 		this.colors = new Color[size];
 		ColorProvider cp = new ColorProvider();
 		for (int i = 0; i < colors.length; i++) {
@@ -253,11 +259,16 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
 		MutableMap<Span, Mention> map = Maps.mutable.empty();
 		Span overlapping = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
+		int index = 0;
 		for (JCas jcas : jcas) {
 			MutableSet<Span> map1 = Sets.mutable.empty();
 
 			Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING,
+						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
+						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
+					continue;
 				map1.add(new Span(m));
 				map.put(new Span(m), m);
 
@@ -271,6 +282,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 				overlapping.begin = annotatedRange.begin;
 			if (overlapping.end > annotatedRange.end)
 				overlapping.end = annotatedRange.end;
+			index++;
 		}
 
 		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
@@ -309,6 +321,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
 
 		int total = 0;
+		int index = 0;
 		for (JCas jcas : jcas) {
 			MutableSet<Span> map1 = Sets.mutable.empty();
 
@@ -317,10 +330,15 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 			sel.setEnd(s.end);
 
 			for (Mention m : JCasUtil.selectCovered(Mention.class, sel)) {
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING,
+						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
+						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
+					continue;
 				map1.add(new Span(m));
 				total++;
 			}
 			mapList.add(map1);
+			index++;
 		}
 
 		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
@@ -438,6 +456,7 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		helpMenu.add(mainApplication.helpAction);
 
 		menuBar.add(initialiseMenuFile());
+		menuBar.add(initialiseMenuSettings());
 		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
@@ -519,7 +538,9 @@ public class CompareMentionsWindow extends AbstractWindow implements HasTextView
 		this.jcas.set(index, jcas);
 		this.annotatorIds.set(index, annotatorId);
 		this.annotatorStats.set(index, new AnnotatorStatistics());
-		this.annotatorStats.get(index).analyze(jcas);
+		this.annotatorStats.get(index).analyze(jcas, m -> {
+			entityMentionMaps.get(index).put(m.getEntity(), m);
+		});
 		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
