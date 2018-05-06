@@ -22,6 +22,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   the changes are not significant, but provide the stage for later 
   changes. When an old file is opened for the first time, it gets 
   converted automatically. #101
+- The user can now control whether singletons are ignored for comparing
+  two annotation files. #106
 
 ## 1.4.2
 
