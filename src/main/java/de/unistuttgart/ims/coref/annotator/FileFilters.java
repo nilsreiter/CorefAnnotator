@@ -46,6 +46,20 @@ public class FileFilters {
 
 	};
 
+	static public FileFilter tei = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".tei") || f.getName().endsWith(".xml");
+		}
+
+		@Override
+		public String getDescription() {
+			return "TEI/XML files";
+		}
+
+	};
+
 	static public FileFilter csv = new FileFilter() {
 
 		@Override
