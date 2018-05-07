@@ -21,11 +21,10 @@ public class Issue2 extends InstanceIssue<Mention> {
 	}
 
 	@Override
-	public void solve() {
-		super.solve();
+	public boolean solve() {
 		AnnotationUtil.trimEnd(getInstance(), Checker.whitespace);
 		getDocumentModel().getCoreferenceModel().fireEvent(new FeatureStructureEvent(Event.Type.Update, getInstance()));
-
+		return true;
 	}
 
 }

@@ -25,10 +25,14 @@ public abstract class Issue implements CABean {
 		return solvable;
 	}
 
-	public void solve() {
-		pcs.firePropertyChange("solvable", true, false);
-		solvable = false;
+	public void fireSolve() {
+		if (solve()) {
+			pcs.firePropertyChange("solvable", true, false);
+			solvable = false;
+		}
 	};
+
+	public abstract boolean solve();
 
 	public String getDescription() {
 		return description;
@@ -50,11 +54,11 @@ public abstract class Issue implements CABean {
 
 	public static abstract class InstanceIssue<T extends TOP> extends Issue {
 
+		T instance;
+
 		public InstanceIssue(DocumentModel documentModel) {
 			super(documentModel);
 		}
-
-		T instance;
 
 		public T getInstance() {
 			return instance;
@@ -72,4 +76,5 @@ public abstract class Issue implements CABean {
 	public void setDocumentModel(DocumentModel documentModel) {
 		this.documentModel = documentModel;
 	}
+
 }

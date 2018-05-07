@@ -32,15 +32,20 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 
 	@Override
 	protected ListModel<Issue> doInBackground() throws Exception {
-		char[] text = jcas.getDocumentText().toCharArray();
+		String textString = jcas.getDocumentText();
+		char[] text = textString.toCharArray();
 
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			int b = m.getBegin(), e = m.getEnd();
+			String surface1 = textString.substring(b - 1, e + 1);
 			if (ArrayUtils.contains(whitespace, text[b - 1]) && ArrayUtils.contains(whitespace, text[b]))
 				listModel.addElement(new Issue1(getDocumentModel(), m));
 
 			if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
 				listModel.addElement(new Issue2(getDocumentModel(), m));
+
+			if (!surface1.matches(".*\\b\\Q" + m.getCoveredText() + "\\E.*"))
+				listModel.addElement(new Issue3(getDocumentModel(), m));
 
 		}
 		return listModel;
