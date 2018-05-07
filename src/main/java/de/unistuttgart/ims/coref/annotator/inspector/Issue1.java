@@ -17,7 +17,7 @@ public class Issue1 extends InstanceIssue<Mention> {
 
 	@Override
 	public IssueType getIssueType() {
-		return IssueType.MISPLACED_BEGIN;
+		return IssueType.MISTAKE;
 	}
 
 	@Override

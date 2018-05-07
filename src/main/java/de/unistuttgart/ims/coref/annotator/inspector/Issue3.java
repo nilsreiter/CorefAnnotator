@@ -14,7 +14,7 @@ public class Issue3 extends InstanceIssue<Mention> {
 
 	@Override
 	public IssueType getIssueType() {
-		return IssueType.DUMMY;
+		return IssueType.QUESTIONABLE;
 	}
 
 	@Override

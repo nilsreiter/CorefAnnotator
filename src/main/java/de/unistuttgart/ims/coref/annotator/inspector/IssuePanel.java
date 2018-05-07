@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,6 +16,8 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.HighlightManager;
 import de.unistuttgart.ims.coref.annotator.Span;
@@ -42,6 +45,10 @@ public class IssuePanel extends JPanel {
 		setLayout(layout);
 
 		JLabel label = new JLabel(issue.getDescription());
+		if (getIcon(issue.getIssueType()) != null)
+			label.setIcon(getIcon(issue.getIssueType()));
+		if (issue.getIssueType().getToolTip() != null)
+			label.setToolTipText(issue.getIssueType().getToolTip());
 		add(label);
 		layout.putConstraint(SpringLayout.WEST, label, 10, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.NORTH, this);
@@ -128,6 +135,15 @@ public class IssuePanel extends JPanel {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	public static Icon getIcon(IssueType number) {
+		switch (number) {
+		case MISTAKE:
+			return FontIcon.of(MaterialDesign.MDI_ALERT);
+		default:
+			return null;
 		}
 	}
 
