@@ -24,6 +24,8 @@ public class DocumentModel {
 
 	CoreferenceModel coreferenceModel;
 
+	SegmentModel segmentModel;
+
 	EntityTreeModel treeModel;
 
 	TypeSystemVersion typeSystemVersion;
@@ -134,6 +136,14 @@ public class DocumentModel {
 
 	public void signal() {
 		fireDocumentChangedEvent();
+	}
+
+	public SegmentModel getSegmentModel() {
+		return segmentModel;
+	}
+
+	public void setSegmentModel(SegmentModel segmentModel) {
+		this.segmentModel = segmentModel;
 	}
 
 }

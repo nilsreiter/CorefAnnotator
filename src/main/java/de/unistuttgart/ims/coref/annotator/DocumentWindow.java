@@ -134,6 +134,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -185,6 +186,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
+	SegmentIndicator segmentIndicator;
 
 	// Sub windows
 	CommentWindow commentsWindow;
@@ -309,8 +311,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		highlightManager = new HighlightManager(textPane);
 
+		segmentIndicator = new SegmentIndicator();
+		leftPanel.add(segmentIndicator, BorderLayout.WEST);
+
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
 		// split pane
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -731,6 +736,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
+		model.getSegmentModel().addListDataListener(segmentIndicator);
+		segmentIndicator.setVisible(true);
 		documentModel = model;
 
 		// UI
@@ -782,6 +789,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
 				Annotator.app.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
+
+		segmentIndicator.setDocumentLength(jcas.getDocumentText().length());
 
 		// highlightManager.clearAndDrawAllAnnotations(jcas);
 
