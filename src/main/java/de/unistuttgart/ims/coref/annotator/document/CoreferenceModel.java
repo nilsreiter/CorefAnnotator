@@ -485,7 +485,7 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
-	protected void fireEvent(FeatureStructureEvent event) {
+	public void fireEvent(FeatureStructureEvent event) {
 		crModelListeners.forEach(l -> l.entityEvent(event));
 	}
 

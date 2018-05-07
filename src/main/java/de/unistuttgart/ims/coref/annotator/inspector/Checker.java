@@ -12,17 +12,20 @@ import org.apache.uima.jcas.JCas;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 
 	JCas jcas;
+	DocumentModel documentModel;
 	Inspector caller;
 	DefaultListModel<Issue> listModel;
 
 	public static char[] whitespace = new char[] { ' ', '\n', '\t', '\r', '\f' };
 
-	public Checker(JCas jcas, Inspector caller, DefaultListModel<Issue> listModel) {
-		this.jcas = jcas;
+	public Checker(DocumentModel documentModel, Inspector caller, DefaultListModel<Issue> listModel) {
+		this.jcas = documentModel.getJcas();
+		this.documentModel = documentModel;
 		this.caller = caller;
 		this.listModel = listModel;
 	}
@@ -34,10 +37,10 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			int b = m.getBegin(), e = m.getEnd();
 			if (ArrayUtils.contains(whitespace, text[b - 1]) && ArrayUtils.contains(whitespace, text[b]))
-				listModel.addElement(new Issue1(m));
+				listModel.addElement(new Issue1(getDocumentModel(), m));
 
 			if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
-				listModel.addElement(new Issue2(m));
+				listModel.addElement(new Issue2(getDocumentModel(), m));
 
 		}
 		return listModel;
@@ -50,6 +53,14 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
+	public void setDocumentModel(DocumentModel documentModel) {
+		this.documentModel = documentModel;
 	}
 
 }

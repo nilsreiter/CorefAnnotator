@@ -1,14 +1,17 @@
 package de.unistuttgart.ims.coref.annotator.inspector;
 
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.inspector.Issue.InstanceIssue;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
-public class Issue2 extends Issue {
+public class Issue2 extends InstanceIssue<Mention> {
 
-	Mention m;
-
-	public Issue2(Mention mention) {
-		this.m = mention;
+	public Issue2(DocumentModel documentModel, Mention mention) {
+		super(documentModel);
+		setInstance(mention);
 		setDescription("Misplaced end boundary of mention");
 	}
 
@@ -19,7 +22,10 @@ public class Issue2 extends Issue {
 
 	@Override
 	public void solve() {
-		AnnotationUtil.trimEnd(m, Checker.whitespace);
+		super.solve();
+		AnnotationUtil.trimEnd(getInstance(), Checker.whitespace);
+		getDocumentModel().getCoreferenceModel().fireEvent(new FeatureStructureEvent(Event.Type.Update, getInstance()));
+
 	}
 
 }

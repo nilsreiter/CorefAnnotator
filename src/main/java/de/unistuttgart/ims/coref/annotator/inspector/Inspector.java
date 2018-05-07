@@ -23,7 +23,7 @@ public class Inspector extends JDialog {
 
 		DefaultListModel<Issue> listModel = new DefaultListModel<Issue>();
 		listModel.addListDataListener(issueList);
-		Checker checker = new Checker(dw.getDocumentModel().getJcas(), this, listModel);
+		Checker checker = new Checker(dw.getDocumentModel(), this, listModel);
 		checker.execute();
 
 		add(issueList, BorderLayout.CENTER);

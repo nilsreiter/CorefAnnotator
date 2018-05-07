@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.LayeredHighlighter;
 
@@ -17,7 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 
-class HighlightManager {
+public class HighlightManager {
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
@@ -70,7 +69,7 @@ class HighlightManager {
 		}
 	}
 
-	public Highlighter getHighlighter() {
+	public DefaultHighlighter getHighlighter() {
 		return hilit;
 	}
 
