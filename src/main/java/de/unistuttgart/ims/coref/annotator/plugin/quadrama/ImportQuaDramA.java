@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Segment;
 
 public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 
@@ -32,6 +33,8 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 		Type entityType = ts.getType(Constants.ENTITY_TYPE_NAME);
 		Type mentionType = ts.getType(Constants.MENTION_TYPE_NAME);
 		Type speakerType = ts.getType(Constants.TYPE_SPEAKER);
+		Type sceneType = ts.getType(Constants.SCENE_TYPE_NAME);
+		Type actType = ts.getType(Constants.ACT_TYPE_NAME);
 
 		Feature labelFeature = entityType.getFeatureByBaseName(Constants.ENTITY_LABEL_FEATURE_NAME);
 		Feature entityFeature = mentionType.getFeatureByBaseName(Constants.MENTION_ENTITY_FEATURE_NAME);
@@ -72,6 +75,14 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 					m.setEntity(entityMap.get(eFS.get(i)));
 				}
 		}
+
+		idx = jcas.getAnnotationIndex(sceneType);
+		for (Annotation qm : idx)
+			AnnotationFactory.createAnnotation(jcas, qm.getBegin(), qm.getEnd(), Segment.class);
+
+		idx = jcas.getAnnotationIndex(actType);
+		for (Annotation qm : idx)
+			AnnotationFactory.createAnnotation(jcas, qm.getBegin(), qm.getEnd(), Segment.class);
 
 		Meta m = Util.getMeta(jcas);
 		m.setStylePlugin(QDStylePlugin.class.getCanonicalName());
