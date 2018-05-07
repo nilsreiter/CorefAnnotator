@@ -10,7 +10,7 @@
 			<name>de.unistuttgart.ims.coref.annotator.api.v1_0.Segment</name>
 			<supertypeName>uima.tcas.Annotation</supertypeName>
 			<description />
-			<feature>
+			<features>
 				<featureDescription>
 					<name>Label</name>
 					<description/>
@@ -22,7 +22,7 @@
 					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
 					<multipleReferencesAllowed>false</multipleReferencesAllowed>
 				</featureDescription>
-			</feature>
+			</features>
 		</typeDescription>
 		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1_0.Mention</name>
