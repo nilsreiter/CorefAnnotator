@@ -52,6 +52,14 @@ public abstract class Issue implements CABean {
 		this.pcs.removePropertyChangeListener(listener);
 	}
 
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
+	public void setDocumentModel(DocumentModel documentModel) {
+		this.documentModel = documentModel;
+	}
+
 	public static abstract class InstanceIssue<T extends TOP> extends Issue {
 
 		T instance;
@@ -68,13 +76,4 @@ public abstract class Issue implements CABean {
 			this.instance = instance;
 		}
 	}
-
-	public DocumentModel getDocumentModel() {
-		return documentModel;
-	}
-
-	public void setDocumentModel(DocumentModel documentModel) {
-		this.documentModel = documentModel;
-	}
-
 }

@@ -13,6 +13,9 @@ import org.apache.uima.jcas.JCas;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 
@@ -39,10 +42,22 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 			int b = m.getBegin(), e = m.getEnd();
 			String surface1 = textString.substring(b - 1, e + 1);
 			if (ArrayUtils.contains(whitespace, text[b - 1]) && ArrayUtils.contains(whitespace, text[b]))
-				listModel.addElement(new Issue1(getDocumentModel(), m));
+				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
+						"Misplaced begin boundary of mention", iss -> {
+							AnnotationUtil.trimBegin(iss.getInstance(), Checker.whitespace);
+							getDocumentModel().getCoreferenceModel()
+									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
+							return true;
+						}));
 
 			if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
-				listModel.addElement(new Issue2(getDocumentModel(), m));
+				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
+						"Misplaced begin boundary of mention", iss -> {
+							AnnotationUtil.trimEnd(iss.getInstance(), Checker.whitespace);
+							getDocumentModel().getCoreferenceModel()
+									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
+							return true;
+						}));
 
 			if (!surface1.matches(".*\\b\\Q" + m.getCoveredText() + "\\E.*"))
 				listModel.addElement(new Issue3(getDocumentModel(), m));

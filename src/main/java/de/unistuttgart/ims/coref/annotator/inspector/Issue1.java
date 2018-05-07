@@ -7,6 +7,7 @@ import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.inspector.Issue.InstanceIssue;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
+@Deprecated
 public class Issue1 extends InstanceIssue<Mention> {
 
 	public Issue1(DocumentModel documentModel, Mention mention) {
