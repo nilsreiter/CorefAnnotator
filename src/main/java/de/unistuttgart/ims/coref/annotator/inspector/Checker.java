@@ -52,7 +52,7 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 
 			if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
 				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
-						"Misplaced begin boundary of mention", iss -> {
+						"Misplaced end boundary of mention", iss -> {
 							AnnotationUtil.trimEnd(iss.getInstance(), Checker.whitespace);
 							getDocumentModel().getCoreferenceModel()
 									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
