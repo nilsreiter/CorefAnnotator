@@ -3,6 +3,13 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.4.3
+
+- Fixed an issue with the TEI/XML handling. The base TEI IO plugin now
+  *only* handles elements with `@ref` attribute, and does not read or 
+  write `@xml:id` attributes. This is in line with the documentation 
+  of the `@ref` attribute, which is not restricted to XML IDs. #118
+
 ## 1.4.2
 
 - Fixed that detached mention parts were not included in the tree
