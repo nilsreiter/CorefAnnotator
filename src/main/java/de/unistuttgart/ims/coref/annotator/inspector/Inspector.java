@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.inspector;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
@@ -19,6 +20,7 @@ public class Inspector extends JDialog {
 
 	public Inspector(DocumentWindow dw) {
 		super(dw);
+		setPreferredSize(new Dimension(300, 600));
 
 		DefaultListModel<Issue> listModel = new DefaultListModel<Issue>();
 		issueList = new PanelList<Issue, JPanel>(new IssuePanelFactory());
@@ -27,7 +29,7 @@ public class Inspector extends JDialog {
 		Checker checker = new Checker(dw.getDocumentModel(), this, listModel);
 		checker.execute();
 
-		add(new JScrollPane(issueList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		getContentPane().add(new JScrollPane(issueList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
 		setModalityType(ModalityType.MODELESS);
@@ -35,8 +37,8 @@ public class Inspector extends JDialog {
 	}
 
 	public void setListModel(ListModel<Issue> listModel) {
-		listModel.addListDataListener(issueList);
-
+		setVisible(true);
+		pack();
 	}
 
 }
