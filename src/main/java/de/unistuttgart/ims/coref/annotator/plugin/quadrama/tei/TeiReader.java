@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -70,6 +71,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			entityMap.put(e.attr("xml:id"), cf);
 			m.setEntity(cf);
 		});
+
+		gxr.addRule("speaker", Speaker.class);
 
 		// entity references
 		gxr.addRule("text rs[ref]", Mention.class, (m, e) -> {
@@ -132,8 +135,11 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
-			if (element.getTag().equalsIgnoreCase("rs"))
+			if (element.getTag().equalsIgnoreCase("rs") && element.getSelector().contains("> text >"))
 				element.removeFromIndexes();
+			if (element.getTag().equalsIgnoreCase("name") && element.getSelector().contains("> text >")) {
+				element.removeFromIndexes();
+			}
 		}
 	}
 

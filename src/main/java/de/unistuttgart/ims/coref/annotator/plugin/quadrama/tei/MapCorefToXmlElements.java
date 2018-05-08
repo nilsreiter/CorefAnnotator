@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,7 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
@@ -29,16 +32,27 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		ids.add("e");
 		MutableMap<String, XMLElement> idMap = Maps.mutable.empty();
 
+		Map<Mention, Collection<XMLElement>> coveringXMLElement = JCasUtil.indexCovering(jcas, Mention.class,
+				XMLElement.class);
+		Map<Mention, Collection<Speaker>> coveringSpeaker = JCasUtil.indexCovering(jcas, Mention.class, Speaker.class);
+		XMLElement textElement = null;
+
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
 			Matcher m = pattern.matcher(xmlElement.getAttributes());
 			if (m.find()) {
 				String id = m.group(1);
 				idMap.put(id, xmlElement);
 			}
+			if (xmlElement.getTag().equalsIgnoreCase("text"))
+				textElement = xmlElement;
 		}
 
 		// TODO: Handle who= elements
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+			if (!coveringXMLElement.get(m).contains(textElement))
+				continue;
+			if (coveringSpeaker.containsKey(m))
+				continue;
 			Entity e = m.getEntity();
 			String xid = toXmlId(e);
 			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
@@ -59,7 +73,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 			String baseId;
 			if (entity.getLabel() != null) {
-				baseId = entity.getLabel().toLowerCase().replaceAll("[^a-z]", "-");
+				baseId = entity.getLabel().toLowerCase().replaceAll("[^a-z]", "_");
 			} else {
 				baseId = "e";
 			}
