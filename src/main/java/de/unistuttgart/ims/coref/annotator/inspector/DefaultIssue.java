@@ -27,8 +27,18 @@ public class DefaultIssue<T extends TOP> extends InstanceIssue<T> {
 	}
 
 	@Override
-	public boolean solve() {
+	public boolean solve(int solution) {
 		return solver.apply(this);
+	}
+
+	@Override
+	public int getNumberOfSolutions() {
+		return 1;
+	}
+
+	@Override
+	public String getSolutionDescription(int solution) {
+		return "solve";
 	}
 
 }

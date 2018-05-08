@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.inspector;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -54,30 +55,33 @@ public class IssuePanel extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.NORTH, this);
 
 		if (issue.isSolvable()) {
-			JButton solveButton = new JButton("solve");
-			solveButton.addActionListener(new ActionListener() {
+			JPanel solutionsPanel = new JPanel();
+			for (int i = 0; i < issue.getNumberOfSolutions(); i++) {
+				final int solution = i;
+				JButton solveButton = new JButton(issue.getSolutionDescription(solution));
+				solveButton.addActionListener(new ActionListener() {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					issue.fireSolve();
-					updatePanel();
-				}
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						issue.fireSolve(solution);
+						updatePanel();
+					}
 
-			});
-			issue.addPropertyChangeListener(new PropertyChangeListener() {
+				});
+				issue.addPropertyChangeListener(new PropertyChangeListener() {
 
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					if (evt.getPropertyName().equals("solvable"))
-						solveButton.setEnabled((boolean) evt.getNewValue());
-				}
+					@Override
+					public void propertyChange(PropertyChangeEvent evt) {
+						if (evt.getPropertyName().equals("solvable"))
+							solveButton.setEnabled((boolean) evt.getNewValue());
+					}
 
-			});
-			add(solveButton);
-			layout.putConstraint(SpringLayout.EAST, label, 10, SpringLayout.WEST, solveButton);
-			layout.putConstraint(SpringLayout.NORTH, solveButton, 10, SpringLayout.NORTH, this);
-			layout.putConstraint(SpringLayout.EAST, solveButton, -10, SpringLayout.EAST, this);
-
+				});
+				solutionsPanel.add(solveButton);
+			}
+			layout.putConstraint(SpringLayout.EAST, label, 10, SpringLayout.WEST, solutionsPanel);
+			layout.putConstraint(SpringLayout.NORTH, solutionsPanel, 10, SpringLayout.NORTH, this);
+			layout.putConstraint(SpringLayout.EAST, solutionsPanel, -10, SpringLayout.EAST, this);
 		}
 		if (issue instanceof InstanceIssue) {
 			TOP instance = ((InstanceIssue<?>) issue).getInstance();
@@ -111,7 +115,22 @@ public class IssuePanel extends JPanel {
 			}
 		}
 
-		setSize(300, 100);
+		issue.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("solved"))
+					label.setIcon(FontIcon.of(WeatherIcons.DAY_SUNNY));
+
+			}
+
+		});
+
+	}
+
+	@Override
+	public Dimension getSize() {
+		return new Dimension(300, 100);
 	}
 
 	public void updatePanel() {

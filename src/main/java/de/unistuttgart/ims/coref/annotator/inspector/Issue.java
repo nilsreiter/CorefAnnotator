@@ -13,6 +13,7 @@ public abstract class Issue implements CABean {
 
 	String description;
 	boolean solvable = true;
+	boolean solved = false;
 	DocumentModel documentModel;
 
 	public Issue(DocumentModel documentModel) {
@@ -25,14 +26,19 @@ public abstract class Issue implements CABean {
 		return solvable;
 	}
 
-	public void fireSolve() {
-		if (solve()) {
+	public void fireSolve(int solution) {
+		if (solve(solution)) {
 			pcs.firePropertyChange("solvable", true, false);
 			solvable = false;
+			pcs.firePropertyChange("solved", false, true);
 		}
 	};
 
-	public abstract boolean solve();
+	public abstract String getSolutionDescription(int solution);
+
+	public abstract int getNumberOfSolutions();
+
+	public abstract boolean solve(int solution);
 
 	public String getDescription() {
 		return description;
@@ -75,5 +81,13 @@ public abstract class Issue implements CABean {
 		public void setInstance(T instance) {
 			this.instance = instance;
 		}
+	}
+
+	public boolean isSolved() {
+		return solved;
+	}
+
+	public void setSolved(boolean solved) {
+		this.solved = solved;
 	}
 }

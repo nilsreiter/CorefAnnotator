@@ -18,8 +18,18 @@ public class Issue3 extends InstanceIssue<Mention> {
 	}
 
 	@Override
-	public boolean solve() {
+	public boolean solve(int solution) {
 		return false;
+	}
+
+	@Override
+	public int getNumberOfSolutions() {
+		return 1;
+	}
+
+	@Override
+	public String getSolutionDescription(int solution) {
+		return "solve";
 	}
 
 }
