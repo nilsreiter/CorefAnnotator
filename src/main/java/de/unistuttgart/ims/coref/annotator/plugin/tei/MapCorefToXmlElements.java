@@ -44,12 +44,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
 					XMLElement.class);
 			newElement.setTag("rs");
-			if (idMap.containsKey(xid)) {
-				newElement.setAttributes(" ref=\"#" + xid + "\"");
-			} else {
-				newElement.setAttributes(" xml:id=\"" + xid + "\"");
-				idMap.put(xid, newElement);
-			}
+			newElement.setAttributes(" ref=\"#" + xid + "\"");
 		}
 	}
 
