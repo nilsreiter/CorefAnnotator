@@ -58,6 +58,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
 				entity.setLabel(m.getCoveredText());
+				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
 			m.setEntity(entity);
