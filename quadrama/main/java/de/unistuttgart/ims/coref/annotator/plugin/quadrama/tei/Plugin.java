@@ -79,9 +79,4 @@ public class Plugin implements IOPlugin {
 		return null;
 	}
 
-	@Override
-	public boolean createBackup() {
-		return false;
-	}
-
 }

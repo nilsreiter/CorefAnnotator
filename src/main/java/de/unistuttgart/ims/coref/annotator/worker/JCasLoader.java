@@ -22,8 +22,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
-import com.google.common.io.Files;
-
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -119,13 +117,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
 					getLanguage()));
 		b.add(flavor.getImporter());
-
-		if (flavor.createBackup())
-			try {
-				Files.copy(file, new File(file.getAbsolutePath() + ".bak"));
-			} catch (IOException e) {
-				Annotator.logger.catching(e);
-			}
 
 		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), b.createAggregateDescription()).iterator();
 		if (iter.hasNext()) {

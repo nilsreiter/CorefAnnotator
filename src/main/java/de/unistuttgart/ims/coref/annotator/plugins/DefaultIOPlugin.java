@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -13,8 +12,6 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
-
-import com.google.common.io.Files;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
@@ -35,11 +32,6 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		try {
-			Files.copy(f, new File(f.getAbsolutePath() + ".bak"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		return CollectionReaderFactory.createReaderDescription(XmiReader.class, XmiReader.PARAM_LENIENT, true,
 				XmiReader.PARAM_ADD_DOCUMENT_METADATA, false, XmiReader.PARAM_SOURCE_LOCATION, f.getAbsolutePath());
 	}

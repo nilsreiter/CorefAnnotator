@@ -101,9 +101,4 @@ public class Plugin implements IOPlugin {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
 
-	@Override
-	public boolean createBackup() {
-		return false;
-	}
-
 }
