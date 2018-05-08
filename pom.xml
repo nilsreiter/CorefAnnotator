@@ -211,7 +211,19 @@
 								</goals>
 								<configuration>
 									<sources>
-										<source>src/quadrama/java</source>
+										<source>quadrama/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>quadrama/test/java</source>
 									</sources>
 								</configuration>
 							</execution>
@@ -219,14 +231,16 @@
 					</plugin>
 				</plugins>
 			</build>
+			<dependencies>
+				<dependency>
+					<groupId>de.unistuttgart.ims</groupId>
+					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
+					<version>1.0.0</version>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 	<dependencies>
-		<dependency>
-			<groupId>de.unistuttgart.ims</groupId>
-			<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimafit-core</artifactId>
