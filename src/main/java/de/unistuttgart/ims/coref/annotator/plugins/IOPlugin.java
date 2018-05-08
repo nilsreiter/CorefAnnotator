@@ -25,4 +25,6 @@ public interface IOPlugin extends Plugin {
 	String getSuffix();
 
 	String[] getSupportedLanguages();
+
+	boolean createBackup();
 }

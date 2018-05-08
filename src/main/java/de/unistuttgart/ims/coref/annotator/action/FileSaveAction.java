@@ -33,6 +33,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 				(file, jcas) -> {
 					target.getDocumentModel().getCoreferenceModel().getHistory().clear();
 					target.setWindowTitle();
+					target.getDocumentModel().setUnsavedChanges(false);
 					target.stopIndeterminateProgress();
 				});
 		worker.execute();
