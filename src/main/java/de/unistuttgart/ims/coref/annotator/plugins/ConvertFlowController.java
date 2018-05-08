@@ -22,15 +22,15 @@ public class ConvertFlowController extends JCasFlowController_ImplBase {
 			public Step next() throws AnalysisEngineProcessException {
 				Meta metaData = Util.getMeta(jcas);
 				if (metaData.getTypeSystemVersion() == null) {
-					return new SimpleStep(TypeSystemVersion.v1_0.name());
+					return new SimpleStep(TypeSystemVersion.v1.name());
 				} else {
 					TypeSystemVersion tsVersion = TypeSystemVersion.valueOf(metaData.getTypeSystemVersion());
 
 					// add new versions to this switch statement
 					switch (tsVersion) {
 					case LEGACY:
-						return new SimpleStep(TypeSystemVersion.v1_0.name());
-					case v1_0:
+						return new SimpleStep(TypeSystemVersion.v1.name());
+					case v1:
 					default:
 						return new FinalStep();
 					}

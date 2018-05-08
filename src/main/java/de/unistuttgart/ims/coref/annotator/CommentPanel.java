@@ -17,8 +17,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
 import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 

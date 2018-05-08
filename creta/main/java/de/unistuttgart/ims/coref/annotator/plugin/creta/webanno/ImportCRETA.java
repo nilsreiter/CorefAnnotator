@@ -14,9 +14,9 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import webanno.custom.CRETALink;
 import webanno.custom.CRETAMention;
 

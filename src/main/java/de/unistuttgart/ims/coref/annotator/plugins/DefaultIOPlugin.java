@@ -39,7 +39,7 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin {
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
-		b.add(TypeSystemVersion.v1_0.name(), AnalysisEngineFactory.createEngineDescription(LEGACY_To_V1_0.class));
+		b.add(TypeSystemVersion.v1.name(), AnalysisEngineFactory.createEngineDescription(LEGACY_To_V1_0.class));
 		b.setFlowControllerDescription(
 				FlowControllerFactory.createFlowControllerDescription(ConvertFlowController.class));
 

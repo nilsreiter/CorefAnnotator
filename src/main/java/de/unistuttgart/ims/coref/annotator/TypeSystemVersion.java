@@ -1,9 +1,9 @@
 package de.unistuttgart.ims.coref.annotator;
 
 public enum TypeSystemVersion {
-	LEGACY, v1_0;
+	LEGACY, v1;
 
 	static TypeSystemVersion getCurrent() {
-		return TypeSystemVersion.v1_0;
+		return TypeSystemVersion.v1;
 	}
 }

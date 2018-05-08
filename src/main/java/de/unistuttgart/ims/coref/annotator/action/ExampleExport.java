@@ -14,8 +14,8 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericInlineWriter;
 import de.unistuttgart.ims.uima.io.xml.InlineTagFactory;
 
