@@ -15,8 +15,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 
 public class TestTeiReader {
 	@Test
