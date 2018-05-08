@@ -93,6 +93,7 @@ public class Constants {
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
 		public static final String ACTION_ENTITY_STATISTICS_TOOLTIP = "action.entity_statistics.tooltip";
+		public static final String ACTION_EXPORT_EXAMPLE = "action.export_example";
 		public static final String ACTION_FILE_MERGE = "action.merge_files";
 		public static final String ACTION_FILE_MERGE_TOOLTIP = "action.merge_files.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
@@ -135,6 +136,8 @@ public class Constants {
 		public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
 		public static final String ACTION_TOGGLE_FULL_TOKENS = "action.toggle.full_tokens";
 		public static final String ACTION_TOGGLE_FULL_TOKENS_TOOLTIP = "action.toggle.full_tokens.tooltip";
+		public static final String ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING = "action.toggle.ignore_singletons";
+		public static final String ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP = "action.toggle.ignore_singletons.tooltip";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED = "action.toggle.keep_tree_sorted";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP = "action.toggle.keep_tree_sorted.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
@@ -189,6 +192,7 @@ public class Constants {
 		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
 		public static final String MESSAGE_ENTITY_CREATED = "message.entity_created";
 		public static final String MESSAGE_LOADING = "message.loading";
+		public static final String MESSAGE_LOADING_CONVERTED_TO_1 = "message.loading.converted_to_1";
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
@@ -231,6 +235,7 @@ public class Constants {
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
+	public static final String CFG_IGNORE_SINGLETONS_WHEN_COMPARING = "CFG_IGNORE_SINGLETONS_WHEN_COMPARING";
 	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
@@ -271,6 +276,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
+
+	public static final Setting<Boolean> SETTING_IGNORE_SINGLETONS_WHEN_COMPARING = new Setting<Boolean>(
+			CFG_IGNORE_SINGLETONS_WHEN_COMPARING, Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING,
+			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru" };

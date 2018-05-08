@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugins;
+package de.unistuttgart.ims.coref.annotator.uima;
 
 import java.io.File;
 
@@ -9,6 +9,10 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
+
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class MergeFilesPlugin extends AbstractXmiPlugin implements IOPlugin {
 

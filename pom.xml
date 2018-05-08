@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.4.3</version>
+	<version>1.5.0-beta1</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>1.9.0</version.dkpro>
@@ -32,6 +33,8 @@
 							<typeSystemIncludes>
 								<!-- one or more ant-like file patterns identifying top level descriptors -->
 								<typeSystemInclude>src/main/resources/types.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
 							</typeSystemIncludes>
 							<!-- true or false, default = false -->
 							<!-- if true, then although the complete merged type system will be 
@@ -147,6 +150,9 @@
 					<value>release</value>
 				</property>
 			</activation>
+			<properties>
+				<release>release</release>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -161,7 +167,8 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<copy file="${project.build.directory}" todir="${project.build.directory}/${project.name}" />
+									<copy file="${project.build.directory}"
+										todir="${project.build.directory}/${project.name}" />
 								</configuration>
 							</execution>
 						</executions>
@@ -192,13 +199,110 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>quadrama</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>release</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>quadrama-add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>quadrama/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>quadrama-add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>quadrama/test/java</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>de.unistuttgart.ims</groupId>
+					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
+					<version>1.0.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>creta</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>release</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>creta-add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>creta/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>creta-add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>creta/test/java</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>de.unistuttgart.ims</groupId>
+					<artifactId>creta.api</artifactId>
+					<version>1.3.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
 	</profiles>
 	<dependencies>
-		<dependency>
-			<groupId>de.unistuttgart.ims</groupId>
-			<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.uima</groupId>
 			<artifactId>uimafit-core</artifactId>
@@ -329,11 +433,7 @@
 			<artifactId>json</artifactId>
 			<version>20151123</version>
 		</dependency>
-		<dependency>
-			<groupId>de.unistuttgart.ims</groupId>
-			<artifactId>creta.api</artifactId>
-			<version>1.3.0</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -348,7 +448,7 @@
 		<dependency>
 			<groupId>de.unistuttgart.ims.uima.io</groupId>
 			<artifactId>generic-xml-reader</artifactId>
-			<version>1.1.0</version>
+			<version>1.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>de.unistuttgart.ims</groupId>
@@ -378,4 +478,9 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<description>Annotation tool for coreference</description>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/nilsreiter/CorefAnnotator/issues</url>
+	</issueManagement>
 </project>

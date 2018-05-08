@@ -9,10 +9,10 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public interface Op {
 
@@ -443,6 +443,28 @@ public interface Op {
 
 		public void setSpan(Span span) {
 			this.span = span;
+		}
+
+	}
+
+	public class RemoveSingletons implements Op {
+		ImmutableList<Mention> mentions;
+		ImmutableList<Entity> entities;
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
+
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
 		}
 
 	}

@@ -23,7 +23,8 @@ public class SetAnnotatorNameAction extends IkonAction {
 		String current = Annotator.app.getPreferences().get(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 		String s = JOptionPane
 				.showInputDialog(Annotator.getString(Constants.Strings.DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT), current);
-		Annotator.app.getPreferences().put(Constants.CFG_ANNOTATOR_ID, s);
+		if (s != null && s != current)
+			Annotator.app.getPreferences().put(Constants.CFG_ANNOTATOR_ID, s);
 	}
 
 }

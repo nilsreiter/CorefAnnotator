@@ -100,18 +100,6 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.Meta</name>
-			<description />
-			<supertypeName>uima.cas.TOP</supertypeName>
-			<features>
-				<featureDescription>
-					<name>StylePlugin</name>
-					<description />
-					<rangeTypeName>uima.cas.String</rangeTypeName>
-				</featureDescription>
-			</features>
-		</typeDescription>
-		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.Comment</name>
 			<description />
 			<supertypeName>uima.cas.TOP</supertypeName>

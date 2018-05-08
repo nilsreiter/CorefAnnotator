@@ -11,6 +11,7 @@ import javax.swing.SwingWorker;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
@@ -112,13 +113,18 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 	private JCas readFile() throws ResourceInitializationException {
 		JCasIterator iter;
+
+		CollectionReaderDescription crd = flavor.getReader(file);
+
 		AggregateBuilder b = new AggregateBuilder();
 		if (getLanguage() != null)
 			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
 					getLanguage()));
 		b.add(flavor.getImporter());
 
-		iter = SimplePipeline.iteratePipeline(flavor.getReader(file), b.createAggregateDescription()).iterator();
+	
+
+		iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
 		if (iter.hasNext()) {
 			return iter.next();
 		}
