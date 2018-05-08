@@ -1,7 +1,6 @@
-package de.unistuttgart.ims.coref.annotator.plugin.tei;
+package de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -15,7 +14,7 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -24,8 +23,8 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getDescription() {
 		try {
-			return IOUtils.toString(getClass().getResourceAsStream("/plugin.tei/description.txt"), "UTF-8");
-		} catch (IOException e) {
+			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "";
@@ -33,7 +32,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getName() {
-		return "TEI/XML";
+		return "QuaDramA/TEI";
 	}
 
 	@Override
@@ -62,7 +61,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public Class<? extends StylePlugin> getStylePlugin() {
-		return DefaultStylePlugin.class;
+		return QDStylePlugin.class;
 	}
 
 	@Override
