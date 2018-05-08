@@ -10,7 +10,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
-import org.jsoup.nodes.Element;
+import org.eclipse.collections.impl.factory.Sets;
 
 import de.tudarmstadt.ukp.dkpro.core.api.io.ResourceCollectionReaderBase;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
+import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class TeiReader extends ResourceCollectionReaderBase {
 
@@ -49,15 +50,6 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		// set the document title
 		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
 
-		gxr.addGlobalRule("[xml:id]", Mention.class, (m, e) -> {
-			Entity cf = new Entity(jcas);
-			cf.addToIndexes();
-			cf.setLabel(e.attr("xml:id"));
-			cf.setColor(colorProvider.getNextColor().getRGB());
-			entityMap.put(e.attr("xml:id"), cf);
-			m.setEntity(cf);
-		});
-
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
 			Entity entity = entityMap.get(id);
@@ -70,21 +62,6 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			}
 			m.setEntity(entity);
 		});
-		gxr.addRule("speaker", Mention.class, (m, e) -> {
-			Element parent = e.parent();
-			if (parent.hasAttr("who")) {
-				String id = parent.attr("who").substring(1);
-				Entity entity = entityMap.get(id);
-				if (entity == null) {
-					entity = new Entity(jcas);
-					entity.addToIndexes();
-					entity.setLabel(m.getCoveredText());
-					entity.setColor(colorProvider.getNextColor().getRGB());
-					entityMap.put(id, entity);
-				}
-				m.setEntity(entity);
-			}
-		});
 
 		Resource res = nextFile();
 
@@ -95,12 +72,16 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			Annotator.logger.catching(e1);
 		}
 
-		// TODO: Remove <rs> elements
 		if (JCasUtil.exists(jcas, DocumentMetaData.class))
 			DocumentMetaData.get(jcas).setDocumentId(documentId);
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
+		// TODO: Remove <rs> elements
+		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
+			if (element.getTag().equalsIgnoreCase("rs"))
+				element.removeFromIndexes();
+		}
 	}
 
 }
