@@ -12,10 +12,10 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 
 public abstract class CATreeSelectionListener implements TreeSelectionListener {
 	TreeSelectionEvent currentEvent = null;

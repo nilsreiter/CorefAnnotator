@@ -15,8 +15,8 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 

@@ -18,8 +18,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
 
 public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 
@@ -54,8 +54,8 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 			FSArray eFS = (FSArray) qm.getFeatureValue(entityFeature);
 			if (eFS != null)
 				for (int i = 0; i < eFS.size(); i++) {
-					de.unistuttgart.ims.coref.annotator.api.Mention m = AnnotationFactory.createAnnotation(jcas,
-							qm.getBegin(), qm.getEnd(), de.unistuttgart.ims.coref.annotator.api.Mention.class);
+					de.unistuttgart.ims.coref.annotator.api.v1_0.Mention m = AnnotationFactory.createAnnotation(jcas,
+							qm.getBegin(), qm.getEnd(), de.unistuttgart.ims.coref.annotator.api.v1_0.Mention.class);
 					m.setEntity(entityMap.get(eFS.get(i)));
 
 				}
@@ -67,8 +67,8 @@ public class ImportQuaDramA extends JCasAnnotator_ImplBase {
 			FSArray eFS = (FSArray) qm.getFeatureValue(entityFeature);
 			if (eFS != null)
 				for (int i = 0; i < eFS.size(); i++) {
-					de.unistuttgart.ims.coref.annotator.api.Mention m = AnnotationFactory.createAnnotation(jcas,
-							qm.getBegin(), qm.getEnd(), de.unistuttgart.ims.coref.annotator.api.Mention.class);
+					de.unistuttgart.ims.coref.annotator.api.v1_0.Mention m = AnnotationFactory.createAnnotation(jcas,
+							qm.getBegin(), qm.getEnd(), de.unistuttgart.ims.coref.annotator.api.v1_0.Mention.class);
 					m.setEntity(entityMap.get(eFS.get(i)));
 				}
 		}
