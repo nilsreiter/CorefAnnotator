@@ -771,6 +771,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
+
+		// show conversion message if necessary
+		if (meta.getLoadingMessage() != null) {
+			JOptionPane.showMessageDialog(this, meta.getLoadingMessage(), Annotator.getString("message.loading.title"),
+					JOptionPane.WARNING_MESSAGE);
+			meta.setLoadingMessage(null);
+			getDocumentModel().setUnsavedChanges(true);
+		}
 	}
 
 	public void setJCas(JCas jcas) {
