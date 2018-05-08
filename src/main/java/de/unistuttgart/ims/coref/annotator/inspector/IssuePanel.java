@@ -79,6 +79,7 @@ public class IssuePanel extends JPanel {
 				});
 				solutionsPanel.add(solveButton);
 			}
+			add(solutionsPanel);
 			layout.putConstraint(SpringLayout.EAST, label, 10, SpringLayout.WEST, solutionsPanel);
 			layout.putConstraint(SpringLayout.NORTH, solutionsPanel, 10, SpringLayout.NORTH, this);
 			layout.putConstraint(SpringLayout.EAST, solutionsPanel, -10, SpringLayout.EAST, this);

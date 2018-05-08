@@ -1,5 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
+import java.awt.Component;
+
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
@@ -19,10 +22,13 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 	int selection;
 	PanelFactory<T, U> factory;
 	MutableMap<T, U> panelMap = Maps.mutable.empty();
+	Component glue;
 
 	public PanelList(PanelFactory<T, U> pFactory) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.factory = pFactory;
+		glue = Box.createVerticalGlue();
+		add(glue);
 		// this.setPreferredSize(new Dimension(200, 300));
 	}
 
@@ -37,9 +43,11 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 	@Override
 	public void intervalAdded(ListDataEvent e) {
 		Annotator.logger.debug("intervalAdded {}", e);
+		remove(glue);
 		for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
 			add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
 		}
+		add(glue);
 		revalidate();
 		repaint();
 	}
@@ -47,10 +55,12 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 	@Override
 	public void intervalRemoved(ListDataEvent e) {
 		Annotator.logger.debug("intervalRemoved {}", e);
+		remove(glue);
 		for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
 			Annotator.logger.debug("removing {}", i);
 			this.remove(i);
 		}
+		add(glue);
 		repaint();
 		revalidate();
 	}
@@ -81,6 +91,14 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 
 	public U get(T c) {
 		return panelMap.get(c);
+	}
+
+	@Override
+	public int getHeight() {
+		int h = 0;
+		for (U panel : panelMap.values())
+			h += panel.getHeight();
+		return h;
 	}
 
 }

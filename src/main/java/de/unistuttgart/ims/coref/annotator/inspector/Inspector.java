@@ -31,6 +31,7 @@ public class Inspector extends JDialog {
 
 		getContentPane().add(new JScrollPane(issueList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+		getContentPane().setPreferredSize(new Dimension(300, 600));
 
 		setModalityType(ModalityType.MODELESS);
 
