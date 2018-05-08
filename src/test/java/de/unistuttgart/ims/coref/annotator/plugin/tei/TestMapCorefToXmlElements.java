@@ -58,7 +58,7 @@ public class TestMapCorefToXmlElements {
 		assertEquals("rs", e.getTag());
 		assertEquals(0, e.getBegin());
 		assertEquals(1, e.getEnd());
-		assertEquals(" xml:id=\"e1\"", e.getAttributes());
+		assertEquals(" ref=\"#e1\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 1);
 
@@ -69,7 +69,7 @@ public class TestMapCorefToXmlElements {
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 2);
 		assertEquals("rs", e.getTag());
-		assertEquals(" xml:id=\"e2\"", e.getAttributes());
+		assertEquals(" ref=\"#e2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 3);
 		assertEquals("rs", e.getTag());
@@ -87,7 +87,7 @@ public class TestMapCorefToXmlElements {
 		assertEquals("rs", e.getTag());
 		assertEquals(0, e.getBegin());
 		assertEquals(1, e.getEnd());
-		assertEquals(" xml:id=\"dog\"", e.getAttributes());
+		assertEquals(" ref=\"#dog\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 1);
 
@@ -98,7 +98,7 @@ public class TestMapCorefToXmlElements {
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 2);
 		assertEquals("rs", e.getTag());
-		assertEquals(" xml:id=\"dog2\"", e.getAttributes());
+		assertEquals(" ref=\"#dog2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 3);
 		assertEquals("rs", e.getTag());
@@ -117,7 +117,7 @@ public class TestMapCorefToXmlElements {
 		assertEquals("rs", e.getTag());
 		assertEquals(0, e.getBegin());
 		assertEquals(1, e.getEnd());
-		assertEquals(" xml:id=\"dog\"", e.getAttributes());
+		assertEquals(" ref=\"#dog\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 1);
 
