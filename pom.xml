@@ -209,7 +209,7 @@
 						<version>3.0.0</version>
 						<executions>
 							<execution>
-								<id>add-source</id>
+								<id>quadrama-add-source</id>
 								<phase>generate-sources</phase>
 								<goals>
 									<goal>add-source</goal>
@@ -221,7 +221,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>add-test-source</id>
+								<id>quadrama-add-test-source</id>
 								<phase>generate-test-sources</phase>
 								<goals>
 									<goal>add-test-source</goal>
@@ -259,7 +259,7 @@
 						<version>3.0.0</version>
 						<executions>
 							<execution>
-								<id>add-source</id>
+								<id>creta-add-source</id>
 								<phase>generate-sources</phase>
 								<goals>
 									<goal>add-source</goal>
@@ -271,7 +271,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>add-test-source</id>
+								<id>creta-add-test-source</id>
 								<phase>generate-test-sources</phase>
 								<goals>
 									<goal>add-test-source</goal>
