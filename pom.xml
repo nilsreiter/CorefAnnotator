@@ -259,7 +259,11 @@
 			<artifactId>guava</artifactId>
 			<version>24.0-jre</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-weathericons-pack</artifactId>
+			<version>${version.ikonli}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-materialdesign-pack</artifactId>

@@ -16,8 +16,8 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.kordamp.ikonli.weathericons.WeatherIcons;
 
 import de.unistuttgart.ims.coref.annotator.HighlightManager;
 import de.unistuttgart.ims.coref.annotator.Span;
@@ -141,7 +141,9 @@ public class IssuePanel extends JPanel {
 	public static Icon getIcon(IssueType number) {
 		switch (number) {
 		case MISTAKE:
-			return FontIcon.of(MaterialDesign.MDI_ALERT);
+			return FontIcon.of(WeatherIcons.THUNDERSTORM);
+		case QUESTIONABLE:
+			return FontIcon.of(WeatherIcons.DAY_CLOUDY);
 		default:
 			return null;
 		}
