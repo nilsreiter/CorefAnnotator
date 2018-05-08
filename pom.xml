@@ -148,6 +148,9 @@
 					<value>release</value>
 				</property>
 			</activation>
+			<properties>
+				<release>release</release>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -199,6 +202,7 @@
 			<activation>
 				<property>
 					<name>release</name>
+					<value>release</value>
 				</property>
 			</activation>
 			<build>
@@ -249,6 +253,7 @@
 			<activation>
 				<property>
 					<name>release</name>
+					<value>release</value>
 				</property>
 			</activation>
 			<build>
