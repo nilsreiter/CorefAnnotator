@@ -29,6 +29,12 @@
 					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
 					<multipleReferencesAllowed>false</multipleReferencesAllowed>
 				</featureDescription>
+				<featureDescription>
+					<name>AdditionalExtent</name>
+					<description />
+					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
+					<elementType>uima.tcas.Annotation</elementType>
+				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
