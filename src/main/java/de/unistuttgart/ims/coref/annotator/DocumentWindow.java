@@ -128,13 +128,12 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Comment;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
-import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -778,6 +777,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
+
+		// show conversion message if necessary
+		if (meta.getLoadingMessage() != null) {
+			JOptionPane.showMessageDialog(this, meta.getLoadingMessage(), Annotator.getString("message.loading.title"),
+					JOptionPane.WARNING_MESSAGE);
+			meta.setLoadingMessage(null);
+			getDocumentModel().setUnsavedChanges(true);
+		}
 	}
 
 	public void setJCas(JCas jcas) {

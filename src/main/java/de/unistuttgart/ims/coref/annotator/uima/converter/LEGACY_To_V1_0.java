@@ -14,14 +14,16 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Mention;
+import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
 
 @TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
@@ -64,7 +66,9 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			fs.removeFromIndexes();
 		}
 
-		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.v1_0.name());
+		Meta meta = Util.getMeta(jcas);
+		meta.setTypeSystemVersion(TypeSystemVersion.v1.name());
+		meta.setLoadingMessage(Annotator.getString(Constants.Strings.MESSAGE_LOADING_CONVERTED_TO_1));
 	}
 
 	protected AnnotationComment getComment(JCas jcas,
@@ -93,6 +97,14 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			mention.setEnd(oldMention.getEnd());
 			mention.addToIndexes();
 			mention.setEntity(entityMap.get(oldMention.getEntity()));
+			// this is a bit hacky, but for some reason a mention doesn't have an entity in
+			// an old file
+			if (mention.getEntity() == null) {
+				Entity newEntity = new Entity(jcas);
+				newEntity.addToIndexes();
+				newEntity.setLabel(mention.getCoveredText());
+				mention.setEntity(newEntity);
+			}
 			mention.setFlags(oldMention.getFlags());
 			if (oldMention.getDiscontinuous() != null) {
 				de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart oldDmp = oldMention.getDiscontinuous();
@@ -147,7 +159,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 
 	@Override
 	public TypeSystemVersion getTarget() {
-		return TypeSystemVersion.v1_0;
+		return TypeSystemVersion.v1;
 	}
 
 }

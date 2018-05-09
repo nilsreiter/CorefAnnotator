@@ -130,8 +130,9 @@ public class DocumentModel {
 		this.treeModel = treeModel;
 	}
 
-	protected void setUnsavedChanges(boolean unsavedChanges) {
+	public void setUnsavedChanges(boolean unsavedChanges) {
 		this.unsavedChanges = unsavedChanges;
+		fireDocumentChangedEvent();
 	}
 
 	public void signal() {
