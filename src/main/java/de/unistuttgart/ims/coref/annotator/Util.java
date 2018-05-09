@@ -232,4 +232,16 @@ public class Util {
 		return list;
 	}
 
+	public static <T extends Annotation> String getCoveredText(T a) {
+		return a.getCoveredText();
+	}
+
+	public static int getBegin(Annotation a) {
+		return a.getBegin();
+	}
+
+	public static int getEnd(Annotation a) {
+		return a.getEnd();
+	}
+
 }
