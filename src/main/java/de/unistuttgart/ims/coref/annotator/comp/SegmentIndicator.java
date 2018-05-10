@@ -7,7 +7,7 @@ import java.awt.event.AdjustmentListener;
 import javax.swing.JLabel;
 
 import de.unistuttgart.ims.coref.annotator.SegmentPanel;
-import de.unistuttgart.ims.coref.annotator.api.v1_0.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public class SegmentIndicator extends PanelList<Segment, SegmentPanel> implements AdjustmentListener {
