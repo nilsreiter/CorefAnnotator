@@ -6,22 +6,26 @@ import javax.swing.JPanel;
 
 public class SegmentPanel extends JPanel {
 
-	int height = 0;
+	double relativeLength = 0;
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
+		return (int) (relativeLength * getParent().getHeight());
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(getWidth(), getHeight());
+	}
+
+	public double getLength() {
+		return relativeLength;
+	}
+
+	public void setLength(double length) {
+		this.relativeLength = length;
 	}
 
 }

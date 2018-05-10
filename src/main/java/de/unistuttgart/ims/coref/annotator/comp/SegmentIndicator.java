@@ -1,9 +1,11 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import de.unistuttgart.ims.coref.annotator.SegmentPanel;
@@ -50,16 +52,15 @@ public class SegmentIndicator extends PanelList<Segment, SegmentPanel> implement
 
 		@Override
 		public SegmentPanel getPanel(Segment object) {
-			int length = object.getEnd() - object.getBegin();
-
-			double scaledLength = (length / getDocumentLength()) * getHeight();
+			double length = object.getEnd() - object.getBegin();
 
 			SegmentPanel panel = new SegmentPanel();
 			if (object.getLabel() != null)
 				panel.add(new JLabel("Segment: " + object.getLabel()));
 			else
 				panel.add(new JLabel("Segment"));
-			panel.setHeight((int) scaledLength);
+			panel.setLength(length / getDocumentLength());
+			panel.setBorder(BorderFactory.createLineBorder(Color.blue));
 			panel.setEnabled(true);
 			panel.setVisible(true);
 			return panel;
