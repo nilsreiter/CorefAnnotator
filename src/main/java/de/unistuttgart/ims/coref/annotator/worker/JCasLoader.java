@@ -60,8 +60,8 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
-	public JCasLoader(Consumer<JCas> consumer, File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor,
-			String language) {
+	public JCasLoader(File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language,
+			Consumer<JCas> consumer) {
 		this.consumer = consumer;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
@@ -69,7 +69,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
-	public JCasLoader(Consumer<JCas> consumer, File file) {
+	public JCasLoader(File file, Consumer<JCas> consumer) {
 		this.consumer = consumer;
 		try {
 			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
