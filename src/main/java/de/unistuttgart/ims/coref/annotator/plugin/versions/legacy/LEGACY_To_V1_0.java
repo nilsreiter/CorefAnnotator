@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.uima.converter;
+package de.unistuttgart.ims.coref.annotator.plugin.versions.legacy;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.TypeCapability;
