@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.apache.uima.UIMAException;
@@ -38,7 +39,8 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	IOPlugin flavor;
 	File file = null;
 	String language = null;
-	Consumer<JCas> consumer = null;
+	Consumer<JCas> success = null;
+	Consumer<Exception> failConsumer = null;
 
 	@Deprecated
 	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
@@ -61,8 +63,9 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	}
 
 	public JCasLoader(File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language,
-			Consumer<JCas> consumer) {
-		this.consumer = consumer;
+			Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+		this.success = consumer;
+		this.failConsumer = failConsumer;
 		this.typeSystemDescription = typeSystemDescription;
 		this.flavor = flavor;
 		this.file = file;
@@ -70,7 +73,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	}
 
 	public JCasLoader(File file, Consumer<JCas> consumer) {
-		this.consumer = consumer;
+		this.success = consumer;
 		try {
 			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 		} catch (ResourceInitializationException e) {
@@ -122,8 +125,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 					getLanguage()));
 		b.add(flavor.getImporter());
 
-	
-
 		iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
 		if (iter.hasNext()) {
 			return iter.next();
@@ -145,9 +146,16 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.consumer.accept(get());
+			this.success.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					failConsumer.accept(e);
+				}
+
+			});
 		}
 	}
 
