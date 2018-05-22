@@ -552,8 +552,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			setIndeterminateProgress();
-			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(),
-					flavor, language, jcas -> this.setJCas(jcas));
+			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language,
+					jcas -> this.setJCas(jcas), ex -> {
+						setVisible(false);
+						dispose();
+						Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+					});
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
