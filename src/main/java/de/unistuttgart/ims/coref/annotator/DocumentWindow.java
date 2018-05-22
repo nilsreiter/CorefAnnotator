@@ -552,8 +552,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			setIndeterminateProgress();
-			lai = new JCasLoader(jcas -> this.setJCas(jcas), file,
-					TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language);
+			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language,
+					jcas -> this.setJCas(jcas), ex -> {
+						setVisible(false);
+						dispose();
+						Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+					});
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -772,13 +776,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 
-		// show conversion message if necessary
-		if (meta.getLoadingMessage() != null) {
-			JOptionPane.showMessageDialog(this, meta.getLoadingMessage(), Annotator.getString("message.loading.title"),
-					JOptionPane.WARNING_MESSAGE);
-			meta.setLoadingMessage(null);
-			getDocumentModel().setUnsavedChanges(true);
-		}
 	}
 
 	public void setJCas(JCas jcas) {
