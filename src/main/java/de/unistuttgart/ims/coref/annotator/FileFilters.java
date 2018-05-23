@@ -59,4 +59,18 @@ public class FileFilters {
 		}
 
 	};
+
+	static public FileFilter xmi_zip = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".xmi.zip");
+		}
+
+		@Override
+		public String getDescription() {
+			return "Zipped UIMA XMI files";
+		}
+
+	};
 }
