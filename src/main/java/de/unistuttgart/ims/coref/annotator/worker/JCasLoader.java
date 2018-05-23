@@ -72,7 +72,8 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
-	public JCasLoader(File file, Consumer<JCas> consumer) {
+	public JCasLoader(File file, Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+		this.failConsumer = failConsumer;
 		this.success = consumer;
 		try {
 			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
