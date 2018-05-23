@@ -3,24 +3,24 @@
 	xmlns="http://uima.apache.org/resourceSpecifier">
 	<name>Coref Annotator</name>
 	<description />
-	<version>1.0</version>
+	<version>1</version>
 	<vendor>Nils Reiter</vendor>
 	<types>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.Mention</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Mention</name>
 			<description />
 			<supertypeName>uima.tcas.Annotation</supertypeName>
 			<features>
 				<featureDescription>
 					<name>Entity</name>
 					<description />
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Entity
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
 					</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
 					<name>Discontinuous</name>
 					<description />
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
 					</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
@@ -32,7 +32,7 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.Entity</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Entity</name>
 			<description />
 			<supertypeName>uima.cas.TOP</supertypeName>
 			<features>
@@ -70,23 +70,23 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.EntityGroup</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup</name>
 			<description />
-			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Entity
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
 			</supertypeName>
 			<features>
 				<featureDescription>
 					<name>Members</name>
 					<description />
 					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
-					<elementType>de.unistuttgart.ims.coref.annotator.api.Entity
+					<elementType>de.unistuttgart.ims.coref.annotator.api.v1.Entity
 					</elementType>
 					<multipleReferencesAllowed>false</multipleReferencesAllowed>
 				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
 			</name>
 			<description />
 			<supertypeName>uima.tcas.Annotation</supertypeName>
@@ -94,13 +94,13 @@
 				<featureDescription>
 					<name>Mention</name>
 					<description />
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
 					</rangeTypeName>
 				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.Comment</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Comment</name>
 			<description />
 			<supertypeName>uima.cas.TOP</supertypeName>
 			<features>
@@ -117,24 +117,24 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.MentionComment</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionComment</name>
 			<description />
-			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Comment
 			</supertypeName>
 			<features>
 				<featureDescription>
 					<name>Mention</name>
 					<description />
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.Mention
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
 					</rangeTypeName>
 				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.AnnotationComment
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment
 			</name>
 			<description />
-			<supertypeName>de.unistuttgart.ims.coref.annotator.api.Comment
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Comment
 			</supertypeName>
 			<features>
 				<featureDescription>
@@ -145,7 +145,7 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.CommentAnchor</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor</name>
 			<description />
 			<supertypeName>uima.tcas.Annotation</supertypeName>
 		</typeDescription>

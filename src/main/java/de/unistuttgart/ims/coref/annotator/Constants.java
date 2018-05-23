@@ -192,6 +192,7 @@ public class Constants {
 		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
 		public static final String MESSAGE_ENTITY_CREATED = "message.entity_created";
 		public static final String MESSAGE_LOADING = "message.loading";
+		public static final String MESSAGE_LOADING_CONVERTED_TO_1 = "message.loading.converted_to_1";
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
@@ -240,7 +241,6 @@ public class Constants {
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 

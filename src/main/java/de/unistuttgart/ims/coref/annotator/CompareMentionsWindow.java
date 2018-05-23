@@ -61,11 +61,11 @@ import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
-import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -493,7 +493,7 @@ public class CompareMentionsWindow extends AbstractWindow
 	protected synchronized void initialiseText(JCas jcas2) {
 		if (textIsSet)
 			return;
-		mentionsTextPane.setText(jcas2.getDocumentText());
+		mentionsTextPane.setText(jcas2.getDocumentText().replaceAll("\r", " "));
 		mentionsTextPane.setCaretPosition(0);
 		textIsSet = true;
 
@@ -511,7 +511,7 @@ public class CompareMentionsWindow extends AbstractWindow
 		// JTabbedPane tabbedPane = new JTabbedPane();
 		mentionsTextPane = new JTextPane();
 		mentionsTextPane.setPreferredSize(new Dimension(500, 800));
-		mentionsTextPane.setDragEnabled(true);
+		mentionsTextPane.setDragEnabled(false);
 		mentionsTextPane.setEditable(false);
 		mentionsTextPane.setCaret(caret);
 		mentionsTextPane.getCaret().setVisible(true);
