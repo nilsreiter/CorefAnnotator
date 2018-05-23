@@ -76,7 +76,6 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -549,19 +548,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
-		try {
-			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
-			setIndeterminateProgress();
-			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language,
-					jcas -> this.setJCas(jcas), ex -> {
-						setVisible(false);
-						dispose();
-						Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
-					});
-			lai.execute();
-		} catch (ResourceInitializationException e) {
-			Annotator.logger.catching(e);
-		}
+		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
+		setIndeterminateProgress();
+		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
+			setVisible(false);
+			dispose();
+			Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+		});
+		lai.execute();
 
 	}
 

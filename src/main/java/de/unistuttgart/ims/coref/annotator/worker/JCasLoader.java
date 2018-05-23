@@ -25,7 +25,6 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
@@ -33,8 +32,6 @@ import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
-	@Deprecated
-	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
@@ -43,32 +40,15 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	Consumer<JCas> success = null;
 	Consumer<Exception> failConsumer = null;
 
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
-			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.inputStream = inputStream;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.language = language;
-	}
-
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
-			IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.file = file;
-		this.language = language;
-	}
-
-	@Deprecated
-	public JCasLoader(File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language,
-			Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+	public JCasLoader(File file, IOPlugin flavor, String language, Consumer<JCas> consumer,
+			Consumer<Exception> failConsumer) {
 		this.success = consumer;
 		this.failConsumer = failConsumer;
-		this.typeSystemDescription = typeSystemDescription;
+		try {
+			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
+		} catch (ResourceInitializationException e) {
+			e.printStackTrace();
+		}
 		this.flavor = flavor;
 		this.file = file;
 		this.language = language;
