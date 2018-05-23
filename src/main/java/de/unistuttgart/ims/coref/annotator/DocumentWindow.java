@@ -127,13 +127,13 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
-import de.unistuttgart.ims.coref.annotator.api.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -552,8 +552,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		try {
 			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 			setIndeterminateProgress();
-			lai = new JCasLoader(jcas -> this.setJCas(jcas), file,
-					TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language);
+			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language,
+					jcas -> this.setJCas(jcas), ex -> {
+						setVisible(false);
+						dispose();
+						Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+					});
 			lai.execute();
 		} catch (ResourceInitializationException e) {
 			Annotator.logger.catching(e);
@@ -771,6 +775,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
+
 	}
 
 	public void setJCas(JCas jcas) {
