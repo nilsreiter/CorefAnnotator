@@ -28,6 +28,13 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   on ".xmi.gz", the file will be gzipped and therefore take much less 
   space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
   can be loaded directly as usual. #125
+- QuaDramA/CRETA-specific importers that we used to import files from 
+  WebAnno have been removed. Import (of coreference annotations) from 
+  WebAnno can still be done using the dkpro importer. #124
+- JSON export: Coreference annotations can now be exported as JSON
+  files. The file contains a list of tokens, and each token can be 
+  associated with one or more entities. This JSON format will be 
+  importable by [rCat](http://www.rcat-ims.de:5000/) in the future. #120
 
 ## 1.4.4
 
