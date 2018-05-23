@@ -304,7 +304,7 @@ public class Annotator {
 		try {
 			return getString(key, Locale.getDefault());
 		} catch (java.util.MissingResourceException e) {
-			logger.catching(e);
+			logger.warn("Key {} not defined", key);
 			return key;
 		}
 	}
