@@ -63,6 +63,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		this.language = language;
 	}
 
+	@Deprecated
 	public JCasLoader(File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language,
 			Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
 		this.success = consumer;
