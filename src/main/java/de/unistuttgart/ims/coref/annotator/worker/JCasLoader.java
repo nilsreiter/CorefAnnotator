@@ -26,6 +26,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
@@ -115,20 +116,32 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		return jcas;
 	}
 
-	private JCas readFile() throws ResourceInitializationException {
+	private JCas readFile() throws IOException, UIMAException {
 		JCasIterator iter;
 
-		CollectionReaderDescription crd = flavor.getReader(file);
+		if (flavor instanceof DirectFileIOPlugin) {
+			JCas jcas = ((DirectFileIOPlugin) flavor).getJCas(file);
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
 
-		AggregateBuilder b = new AggregateBuilder();
-		if (getLanguage() != null)
-			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
-					getLanguage()));
-		b.add(flavor.getImporter());
+			SimplePipeline.runPipeline(jcas, b.createAggregateDescription());
+			return jcas;
+		} else {
+			CollectionReaderDescription crd = flavor.getReader(file);
 
-		iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
-		if (iter.hasNext()) {
-			return iter.next();
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
+
+			iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
+			if (iter.hasNext()) {
+				return iter.next();
+			}
 		}
 		return null;
 
