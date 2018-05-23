@@ -44,7 +44,8 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			if (!f.getName().endsWith(".xmi") && !f.getName().endsWith(".xmi.gz"))
 				f = new File(f.getAbsolutePath() + ".xmi.gz");
 
-			SaveJCasWorker worker = new SaveJCasWorker(f, target.getJCas(), SaveJCasWorker.getConsumer(getTarget()));
+			SaveJCasWorker worker = new SaveJCasWorker(f, target.getDocumentModel().getJcas(),
+					SaveJCasWorker.getConsumer(getTarget()));
 			worker.execute();
 			break;
 		default:
