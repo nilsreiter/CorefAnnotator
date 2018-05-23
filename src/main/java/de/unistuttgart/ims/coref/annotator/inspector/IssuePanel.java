@@ -23,7 +23,7 @@ import org.kordamp.ikonli.weathericons.WeatherIcons;
 import de.unistuttgart.ims.coref.annotator.HighlightManager;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.UnderlinePainter;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.inspector.Issue.InstanceIssue;
 
 public class IssuePanel extends JPanel {

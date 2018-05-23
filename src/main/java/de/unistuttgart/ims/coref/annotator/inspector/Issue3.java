@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.inspector;
 
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.inspector.Issue.InstanceIssue;
 
