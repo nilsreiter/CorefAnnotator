@@ -18,6 +18,19 @@ public class FileFilters {
 		}
 	};
 
+	static public FileFilter xmi_gz = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".xmi") || f.getName().endsWith(".xmi.gz");
+		}
+
+		@Override
+		public String getDescription() {
+			return "UIMA Xmi Files (Compressed/Uncompressed)";
+		}
+	};
+
 	static public FileFilter txt = new FileFilter() {
 
 		@Override
