@@ -17,6 +17,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   with their markdown or plain text formatted annotations onto the 
   clipboard. Currently, the markdown format uses <sub></sub> to 
   subscript, but other formats can be included. #110
+- **New type system**: This version introduces a modified type system, 
+  which entails that the file format has to change. At this point, 
+  the changes are not significant, but provide the stage for later 
+  changes. When an old file is opened for the first time, it gets 
+  converted automatically. #101
 - The user can now control whether singletons are ignored for comparing
   two annotation files. #106
 
