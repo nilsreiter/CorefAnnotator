@@ -29,6 +29,13 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
   can be loaded directly as usual. #125
 
+## 1.4.4
+
+- Fixed an issue in the compare view that led to displaced underlines.
+  Root cause was the handling of windows-style newlines `\r\n` #114
+- Fixed an issue in the TEI importer that caused the document title to 
+  be wrong #119
+
 ## 1.4.3
 
 - Fixed an issue with the TEI/XML handling. The base TEI IO plugin now
