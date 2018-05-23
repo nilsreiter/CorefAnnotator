@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -14,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -41,6 +43,9 @@ public class IssuePanel extends JPanel {
 
 	public IssuePanel(Issue issue) {
 		this.issue = issue;
+
+		setBorder(BorderFactory.createLineBorder(Color.black));
+
 		SpringLayout layout = new SpringLayout();
 
 		setLayout(layout);
@@ -104,7 +109,8 @@ public class IssuePanel extends JPanel {
 					}
 
 					highlightManager.getHighlighter().addHighlight(context + abbreviation.length(),
-							context + abbreviation.length() + length, new UnderlinePainter(color, 1));
+							context + abbreviation.length() + length,
+							new DefaultHighlighter.DefaultHighlightPainter(color));
 
 					textField.setEditable(false);
 					add(textField);
@@ -131,7 +137,12 @@ public class IssuePanel extends JPanel {
 
 	@Override
 	public Dimension getSize() {
-		return new Dimension(300, 100);
+		return new Dimension(400, 100);
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		return getSize();
 	}
 
 	public void updatePanel() {
