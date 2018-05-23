@@ -24,6 +24,17 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   converted automatically. #101
 - The user can now control whether singletons are ignored for comparing
   two annotation files. #106
+- Compressed files: If the file name entered in the Save As dialog ends 
+  on ".xmi.gz", the file will be gzipped and therefore take much less 
+  space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
+  can be loaded directly as usual. #125
+
+## 1.4.4
+
+- Fixed an issue in the compare view that led to displaced underlines.
+  Root cause was the handling of windows-style newlines `\r\n` #114
+- Fixed an issue in the TEI importer that caused the document title to 
+  be wrong #119
 
 ## 1.4.3
 

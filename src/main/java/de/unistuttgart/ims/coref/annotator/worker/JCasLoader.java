@@ -25,15 +25,13 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
-	@Deprecated
-	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
@@ -42,37 +40,22 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	Consumer<JCas> success = null;
 	Consumer<Exception> failConsumer = null;
 
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
-			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.inputStream = inputStream;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.language = language;
-	}
-
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
-			IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.file = file;
-		this.language = language;
-	}
-
-	public JCasLoader(File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language,
-			Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+	public JCasLoader(File file, IOPlugin flavor, String language, Consumer<JCas> consumer,
+			Consumer<Exception> failConsumer) {
 		this.success = consumer;
 		this.failConsumer = failConsumer;
-		this.typeSystemDescription = typeSystemDescription;
+		try {
+			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
+		} catch (ResourceInitializationException e) {
+			e.printStackTrace();
+		}
 		this.flavor = flavor;
 		this.file = file;
 		this.language = language;
 	}
 
-	public JCasLoader(File file, Consumer<JCas> consumer) {
+	public JCasLoader(File file, Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+		this.failConsumer = failConsumer;
 		this.success = consumer;
 		try {
 			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
@@ -114,20 +97,32 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		return jcas;
 	}
 
-	private JCas readFile() throws ResourceInitializationException {
+	private JCas readFile() throws IOException, UIMAException {
 		JCasIterator iter;
 
-		CollectionReaderDescription crd = flavor.getReader(file);
+		if (flavor instanceof DirectFileIOPlugin) {
+			JCas jcas = ((DirectFileIOPlugin) flavor).getJCas(file);
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
 
-		AggregateBuilder b = new AggregateBuilder();
-		if (getLanguage() != null)
-			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
-					getLanguage()));
-		b.add(flavor.getImporter());
+			SimplePipeline.runPipeline(jcas, b.createAggregateDescription());
+			return jcas;
+		} else {
+			CollectionReaderDescription crd = flavor.getReader(file);
 
-		iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
-		if (iter.hasNext()) {
-			return iter.next();
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
+
+			iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
+			if (iter.hasNext()) {
+				return iter.next();
+			}
 		}
 		return null;
 

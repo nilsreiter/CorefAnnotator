@@ -74,9 +74,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -92,6 +90,7 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
@@ -166,7 +165,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	String segmentAnnotation = null;
 
 	// storing and caching
-	Feature titleFeature;
 	int mouseClickedPosition = -1;
 
 	// actions
@@ -549,19 +547,14 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
-		try {
-			setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
-			setIndeterminateProgress();
-			lai = new JCasLoader(file, TypeSystemDescriptionFactory.createTypeSystemDescription(), flavor, language,
-					jcas -> this.setJCas(jcas), ex -> {
-						setVisible(false);
-						dispose();
-						Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
-					});
-			lai.execute();
-		} catch (ResourceInitializationException e) {
-			Annotator.logger.catching(e);
-		}
+		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
+		setIndeterminateProgress();
+		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
+			setVisible(false);
+			dispose();
+			Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+		});
+		lai.execute();
 
 	}
 
@@ -660,15 +653,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
-		String documentTitle = null;
+		String documentTitle = "Untitled document";
 		try {
-			if (titleFeature != null)
-				documentTitle = jcas.getDocumentAnnotationFs().getFeatureValueAsString(titleFeature);
+			if (JCasUtil.exists(jcas, DocumentMetaData.class) && DocumentMetaData.get(jcas).getDocumentTitle() != null)
+				documentTitle = DocumentMetaData.get(jcas).getDocumentTitle();
 		} catch (Exception e) {
 			Annotator.logger.catching(e);
 		}
-		if (documentTitle == null)
-			documentTitle = "Untitled document";
 		setTitle(documentTitle + " (" + fileName + ")"
 				+ (documentModel.isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
 	}
@@ -770,7 +761,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		// final
 		setMessage("");
-		setWindowTitle();
 
 		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
@@ -784,11 +774,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
-
-		titleFeature = jcas.getTypeSystem().getFeatureByFullName(
-				Annotator.app.getPreferences().get(Constants.CFG_WINDOWTITLE, Defaults.CFG_WINDOWTITLE));
-
-		// highlightManager.clearAndDrawAllAnnotations(jcas);
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);

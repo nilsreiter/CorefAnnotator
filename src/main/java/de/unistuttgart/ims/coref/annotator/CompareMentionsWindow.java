@@ -493,7 +493,7 @@ public class CompareMentionsWindow extends AbstractWindow
 	protected synchronized void initialiseText(JCas jcas2) {
 		if (textIsSet)
 			return;
-		mentionsTextPane.setText(jcas2.getDocumentText());
+		mentionsTextPane.setText(jcas2.getDocumentText().replaceAll("\r", " "));
 		mentionsTextPane.setCaretPosition(0);
 		textIsSet = true;
 
@@ -511,7 +511,7 @@ public class CompareMentionsWindow extends AbstractWindow
 		// JTabbedPane tabbedPane = new JTabbedPane();
 		mentionsTextPane = new JTextPane();
 		mentionsTextPane.setPreferredSize(new Dimension(500, 800));
-		mentionsTextPane.setDragEnabled(true);
+		mentionsTextPane.setDragEnabled(false);
 		mentionsTextPane.setEditable(false);
 		mentionsTextPane.setCaret(caret);
 		mentionsTextPane.getCaret().setVisible(true);

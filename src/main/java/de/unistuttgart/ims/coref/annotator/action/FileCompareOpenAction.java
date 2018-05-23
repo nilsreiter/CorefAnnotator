@@ -61,6 +61,10 @@ public class FileCompareOpenAction extends IkonAction {
 							final int j = i;
 							new JCasLoader(stf.getFiles().get(i), jcas -> {
 								cmw.setJCas(jcas, stf.getNames().get(j), j);
+							}, ex -> {
+								cmw.setVisible(false);
+								cmw.dispose();
+								Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
 							}).execute();
 
 						}
