@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.inspector;
 
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -15,6 +16,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 public class Checker extends SwingWorker<ListModel<Issue>, Object> {
@@ -41,6 +43,9 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			int b = m.getBegin(), e = m.getEnd();
 			String surface1 = textString.substring(b - 1, e + 1);
+			Pattern p = Pattern.compile(".\\b\\Q" + m.getCoveredText() + "\\E.",
+					Pattern.DOTALL | Pattern.UNICODE_CHARACTER_CLASS);
+
 			if (ArrayUtils.contains(whitespace, text[b - 1]) && ArrayUtils.contains(whitespace, text[b]))
 				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
 						"Misplaced begin boundary of mention", iss -> {
@@ -50,7 +55,7 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 							return true;
 						}));
 
-			if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
+			else if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
 				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
 						"Misplaced end boundary of mention", iss -> {
 							AnnotationUtil.trimEnd(iss.getInstance(), Checker.whitespace);
@@ -58,8 +63,13 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
 							return true;
 						}));
-
-			if (!surface1.matches(".*\\b\\Q" + m.getCoveredText() + "\\E.*"))
+			else if (m.getBegin() == m.getEnd())
+				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
+						"Mention with zero length", iss -> {
+							getDocumentModel().getCoreferenceModel().edit(new Op.RemoveMention(m));
+							return true;
+						}));
+			else if (!p.matcher(surface1).matches())
 				listModel.addElement(new Issue3(getDocumentModel(), m));
 
 		}
