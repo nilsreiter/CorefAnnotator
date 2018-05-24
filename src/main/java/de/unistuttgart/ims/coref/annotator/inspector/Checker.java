@@ -7,17 +7,17 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.Event;
-import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.Op;
-import de.unistuttgart.ims.uimautil.AnnotationUtil;
+import de.unistuttgart.ims.coref.annotator.inspector.detector.BeginBoundary;
+import de.unistuttgart.ims.coref.annotator.inspector.detector.EndBoundary;
+import de.unistuttgart.ims.coref.annotator.inspector.detector.MentionOfZeroLength;
 
 public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 
@@ -25,6 +25,8 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 	DocumentModel documentModel;
 	Inspector caller;
 	DefaultListModel<Issue> listModel;
+	ImmutableList<Detector<Mention>> mentionDetectors = Lists.immutable.of(new BeginBoundary(), new EndBoundary(),
+			new MentionOfZeroLength());
 
 	public static char[] whitespace = new char[] { ' ', '\n', '\t', '\r', '\f' };
 
@@ -46,31 +48,16 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 			Pattern p = Pattern.compile(".\\b\\Q" + m.getCoveredText() + "\\E.",
 					Pattern.DOTALL | Pattern.UNICODE_CHARACTER_CLASS);
 
-			if (ArrayUtils.contains(whitespace, text[b - 1]) && ArrayUtils.contains(whitespace, text[b]))
-				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
-						"Misplaced begin boundary of mention", iss -> {
-							AnnotationUtil.trimBegin(iss.getInstance(), Checker.whitespace);
-							getDocumentModel().getCoreferenceModel()
-									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
-							return true;
-						}));
+			boolean ok = true;
+			for (Detector<Mention> det : mentionDetectors) {
+				if (ok && det.detect(m, text)) {
+					listModel.addElement(det.getIssue(getDocumentModel(), m));
+					ok = false;
+				}
+			}
 
-			else if (ArrayUtils.contains(whitespace, text[e - 1]) && ArrayUtils.contains(whitespace, text[e]))
-				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
-						"Misplaced end boundary of mention", iss -> {
-							AnnotationUtil.trimEnd(iss.getInstance(), Checker.whitespace);
-							getDocumentModel().getCoreferenceModel()
-									.fireEvent(new FeatureStructureEvent(Event.Type.Update, iss.getInstance()));
-							return true;
-						}));
-			else if (m.getBegin() == m.getEnd())
-				listModel.addElement(new DefaultIssue<Mention>(getDocumentModel(), IssueType.MISTAKE, m,
-						"Mention with zero length", iss -> {
-							getDocumentModel().getCoreferenceModel().edit(new Op.RemoveMention(m));
-							return true;
-						}));
-			else if (!p.matcher(surface1).matches())
-				listModel.addElement(new Issue3(getDocumentModel(), m));
+			// if (!p.matcher(surface1).matches())
+			// listModel.addElement(new Issue3(getDocumentModel(), m));
 
 		}
 		return listModel;
