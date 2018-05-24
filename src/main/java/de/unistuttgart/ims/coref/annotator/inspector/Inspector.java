@@ -35,6 +35,9 @@ public class Inspector extends JDialog {
 
 	public void setListModel(ListModel<Issue> listModel) {
 		issueList.setModel(listModel);
+		if (listModel.getSize() > 0)
+			issueList.intervalAdded(
+					new ListDataEvent(listModel, ListDataEvent.INTERVAL_ADDED, 0, listModel.getSize() - 1));
 		setVisible(true);
 		pack();
 	}
