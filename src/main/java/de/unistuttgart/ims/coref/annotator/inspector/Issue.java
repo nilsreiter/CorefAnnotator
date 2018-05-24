@@ -34,6 +34,8 @@ public abstract class Issue implements CABean {
 		}
 	};
 
+	public abstract String getSolutionName(int solution);
+
 	public abstract String getSolutionDescription(int solution);
 
 	public abstract int getNumberOfSolutions();

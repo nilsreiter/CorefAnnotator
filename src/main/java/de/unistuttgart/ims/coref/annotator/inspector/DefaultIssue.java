@@ -11,6 +11,7 @@ public class DefaultIssue<T extends TOP> extends InstanceIssue<T> {
 
 	IssueType issueType;
 	Function<DefaultIssue<T>, Boolean> solver;
+	String solutionDescription;
 
 	public DefaultIssue(DocumentModel documentModel, IssueType issueType, T instance, String description,
 			Function<DefaultIssue<T>, Boolean> solver) {
@@ -38,7 +39,16 @@ public class DefaultIssue<T extends TOP> extends InstanceIssue<T> {
 
 	@Override
 	public String getSolutionDescription(int solution) {
+		return solutionDescription;
+	}
+
+	@Override
+	public String getSolutionName(int solution) {
 		return "solve";
+	}
+
+	public void setSolutionDescription(String desc) {
+		solutionDescription = desc;
 	}
 
 }

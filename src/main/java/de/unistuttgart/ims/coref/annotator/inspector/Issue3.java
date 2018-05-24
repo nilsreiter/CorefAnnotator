@@ -29,6 +29,11 @@ public class Issue3 extends InstanceIssue<Mention> {
 
 	@Override
 	public String getSolutionDescription(int solution) {
+		return "this should be a longer description";
+	}
+
+	@Override
+	public String getSolutionName(int solution) {
 		return "solve";
 	}
 
