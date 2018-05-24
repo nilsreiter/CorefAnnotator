@@ -27,6 +27,7 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 	public PanelList(PanelFactory<T, U> pFactory) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.factory = pFactory;
+		this.setAlignmentX(LEFT_ALIGNMENT);
 		glue = Box.createVerticalGlue();
 		add(glue);
 		// this.setPreferredSize(new Dimension(200, 300));
@@ -39,13 +40,14 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 		return panelMap.get(obj);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void intervalAdded(ListDataEvent e) {
 		Annotator.logger.debug("intervalAdded {}", e);
 		remove(glue);
 		for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
-			add(getPanel(((ListModel<T>) e.getSource()).getElementAt(i)), i);
+			U panel = getPanel(model.getElementAt(i));
+			add(panel, i);
+			panel.setPreferredSize(panel.getPreferredSize());
 		}
 		add(glue);
 		revalidate();
@@ -93,12 +95,12 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 		return panelMap.get(c);
 	}
 
-	@Override
-	public int getHeight() {
-		int h = 0;
-		for (U panel : panelMap.values())
-			h += panel.getHeight();
-		return h;
-	}
+	// @Override
+	// public int getHeight() {
+	// int h = 0;
+	// for (U panel : panelMap.values())
+	// h += panel.getHeight();
+	// return h;
+	// }
 
 }

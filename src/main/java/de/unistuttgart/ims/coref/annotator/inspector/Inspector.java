@@ -6,7 +6,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
@@ -22,14 +24,17 @@ public class Inspector extends JDialog {
 
 		DefaultListModel<Issue> listModel = new DefaultListModel<Issue>();
 		issueList = new PanelList<Issue, JPanel>(new IssuePanelFactory());
-
-		Checker checker = new Checker(dw.getDocumentModel(), this, listModel);
-		checker.execute();
-
+		getContentPane().add(new JToolBar(), BorderLayout.NORTH);
 		getContentPane().add(new JScrollPane(issueList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
 		setModalityType(ModalityType.MODELESS);
+
+		Checker checker = new Checker(dw.getDocumentModel(), this, listModel);
+		checker.execute();
+
+		issueList.setVisible(true);
+		setVisible(true);
 
 	}
 
