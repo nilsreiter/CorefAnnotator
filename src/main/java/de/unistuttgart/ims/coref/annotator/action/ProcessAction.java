@@ -41,7 +41,7 @@ public class ProcessAction extends DocumentWindowAction implements DocumentState
 			public void run() {
 				try {
 					getTarget().setIndeterminateProgress();
-					JCas jcas = getTarget().getJCas();
+					JCas jcas = getTarget().getDocumentModel().getJcas();
 
 					SimplePipeline.runPipeline(jcas, plugin.getEngineDescription());
 

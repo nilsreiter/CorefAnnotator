@@ -13,8 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
 
 public class JSONWriter extends SingleFileWriter {
