@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.uima.converter.LEGACY_To_V1_0;
+import de.unistuttgart.ims.coref.annotator.plugin.versions.legacy.LEGACY_To_V1_0;
 
 public class TestCoreferenceModelLoader {
 	JCas jcas;

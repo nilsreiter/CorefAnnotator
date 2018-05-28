@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.uima.converter;
+package de.unistuttgart.ims.coref.annotator.plugin.versions.legacy;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.TypeCapability;
@@ -14,7 +14,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
@@ -68,7 +67,6 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 
 		Meta meta = Util.getMeta(jcas);
 		meta.setTypeSystemVersion(TypeSystemVersion.v1.name());
-		meta.setLoadingMessage(Annotator.getString(Constants.Strings.MESSAGE_LOADING_CONVERTED_TO_1));
 	}
 
 	protected AnnotationComment getComment(JCas jcas,
