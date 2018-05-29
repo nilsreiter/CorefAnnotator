@@ -133,7 +133,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator;
+import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator2;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -184,7 +184,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
-	SegmentIndicator segmentIndicator;
+	SegmentIndicator2 segmentIndicator;
 
 	// Sub windows
 	CommentWindow commentsWindow;
@@ -309,7 +309,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		highlightManager = new HighlightManager(textPane);
 
-		segmentIndicator = new SegmentIndicator();
+		segmentIndicator = new SegmentIndicator2();
 		leftPanel.add(segmentIndicator, BorderLayout.WEST);
 
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -782,8 +782,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
 
-        segmentIndicator.setDocumentLength(jcas.getDocumentText().length());
-        
+		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
+
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);
 		im.execute();
