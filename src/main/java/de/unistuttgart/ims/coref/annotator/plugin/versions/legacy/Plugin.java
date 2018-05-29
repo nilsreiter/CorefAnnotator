@@ -19,7 +19,7 @@ public class Plugin extends AbstractXmiPlugin {
 
 	@Override
 	public String getName() {
-		return "LEGACY";
+		return "Convert: LEGACY → v1";
 	}
 
 	@Override
