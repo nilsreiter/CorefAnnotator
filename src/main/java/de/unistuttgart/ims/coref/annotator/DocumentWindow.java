@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -20,11 +21,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -133,6 +137,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -552,7 +557,21 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
 			setVisible(false);
 			dispose();
-			Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
+					Annotator.getString("message.wrong_file_version.help") };
+			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
+					ex.getCause().getLocalizedMessage(), options, new BooleanSupplier[] { () -> {
+						return true;
+					}, () -> {
+						try {
+							Desktop.getDesktop().browse(
+									new URI("https://github.com/nilsreiter/CorefAnnotator/wiki/File-format-versions"));
+						} catch (IOException | URISyntaxException e) {
+							Annotator.logger.catching(e);
+						}
+						return true;
+					} });
+
 		});
 		lai.execute();
 
