@@ -46,10 +46,15 @@ public class SegmentModel implements ListModel<Segment> {
 		return topLevelSegments.get(index);
 	}
 
+	public ImmutableList<Segment> getElementsAt(int index0, int index1) {
+		return topLevelSegments.subList(index0, index1);
+	}
+
 	@Override
 	public void addListDataListener(ListDataListener l) {
 		listeners.add(l);
-		l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, getSize() - 1));
+		if (!topLevelSegments.isEmpty())
+			l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, getSize() - 1));
 	}
 
 	@Override
