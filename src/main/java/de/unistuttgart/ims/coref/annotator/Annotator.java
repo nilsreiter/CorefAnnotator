@@ -119,7 +119,7 @@ public class Annotator {
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			Annotator.logger.catching(e);
 		}
 
 		this.initialiseActions();
@@ -131,7 +131,7 @@ public class Annotator {
 	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi);
+		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}

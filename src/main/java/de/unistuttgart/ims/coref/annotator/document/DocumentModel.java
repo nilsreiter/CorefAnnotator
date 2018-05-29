@@ -7,6 +7,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
+import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -25,12 +26,34 @@ public class DocumentModel {
 
 	EntityTreeModel treeModel;
 
+	TypeSystemVersion typeSystemVersion;
+
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
 	boolean unsavedChanges = false;
 
 	public DocumentModel(JCas jcas) {
 		this.jcas = jcas;
+	}
+
+	public boolean addDocumentStateListener(DocumentStateListener e) {
+		return documentStateListeners.add(e);
+	}
+
+	protected void fireDocumentChangedEvent() {
+		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
+	}
+
+	public CommentsModel getCommentsModel() {
+		return commentsModel;
+	}
+
+	public CoreferenceModel getCoreferenceModel() {
+		return coreferenceModel;
+	}
+
+	public TypeSystemVersion getFileFormat() {
+		return typeSystemVersion;
 	}
 
 	/**
@@ -42,53 +65,20 @@ public class DocumentModel {
 		return jcas;
 	}
 
-	public void setJcas(JCas jcas) {
-		this.jcas = jcas;
-	}
-
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
-	}
-
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
-	}
-
-	public CoreferenceModel getCoreferenceModel() {
-		return coreferenceModel;
-	}
-
-	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
-		this.coreferenceModel = coreferenceModel;
+	public String getLanguage() {
+		return jcas.getDocumentLanguage();
 	}
 
 	public EntityTreeModel getTreeModel() {
 		return treeModel;
 	}
 
-	public void setTreeModel(EntityTreeModel treeModel) {
-		this.treeModel = treeModel;
+	public boolean hasUnsavedChanges() {
+		return unsavedChanges;
 	}
 
-	public boolean addDocumentStateListener(DocumentStateListener e) {
-		return documentStateListeners.add(e);
-	}
-
-	protected void fireDocumentChangedEvent() {
-		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
-	}
-
-	public void setLanguage(String l) {
-		jcas.setDocumentLanguage(l);
-		fireDocumentChangedEvent();
-	}
-
-	public String getLanguage() {
-		return jcas.getDocumentLanguage();
-	}
-
-	public void signal() {
-		fireDocumentChangedEvent();
+	public boolean isSavable() {
+		return hasUnsavedChanges() || coreferenceModel.getHistory().size() > 0;
 	}
 
 	/**
@@ -113,16 +103,38 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
-	public boolean hasUnsavedChanges() {
-		return unsavedChanges;
+	public void setCommentsModel(CommentsModel commentsModel) {
+		this.commentsModel = commentsModel;
 	}
 
-	public boolean isSavable() {
-		return hasUnsavedChanges() || coreferenceModel.getHistory().size() > 0;
+	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
+		this.coreferenceModel = coreferenceModel;
 	}
 
-	protected void setUnsavedChanges(boolean unsavedChanges) {
+	protected void setFileFormat(TypeSystemVersion typeSystemVersion) {
+		this.typeSystemVersion = typeSystemVersion;
+	}
+
+	public void setJcas(JCas jcas) {
+		this.jcas = jcas;
+	}
+
+	public void setLanguage(String l) {
+		jcas.setDocumentLanguage(l);
+		fireDocumentChangedEvent();
+	}
+
+	public void setTreeModel(EntityTreeModel treeModel) {
+		this.treeModel = treeModel;
+	}
+
+	public void setUnsavedChanges(boolean unsavedChanges) {
 		this.unsavedChanges = unsavedChanges;
+		fireDocumentChangedEvent();
+	}
+
+	public void signal() {
+		fireDocumentChangedEvent();
 	}
 
 }

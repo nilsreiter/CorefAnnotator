@@ -7,7 +7,9 @@ import java.util.prefs.Preferences;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +18,7 @@ import org.xml.sax.SAXException;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.plugin.versions.legacy.LEGACY_To_V1_0;
 
 public class TestCoreferenceModelLoader {
 	JCas jcas;
@@ -45,6 +48,7 @@ public class TestCoreferenceModelLoader {
 	public void testResource(String s) throws UIMAException, SAXException, IOException {
 		jcas = JCasFactory.createJCas();
 		XmiCasDeserializer.deserialize(getClass().getResourceAsStream(s), jcas.getCas(), true);
+		SimplePipeline.runPipeline(jcas, AnalysisEngineFactory.createEngineDescription(LEGACY_To_V1_0.class));
 		DocumentModelLoader cml = new DocumentModelLoader(cm -> {
 		}, jcas);
 		CoreferenceModel model = cml.load(Preferences.userRoot()).getCoreferenceModel();

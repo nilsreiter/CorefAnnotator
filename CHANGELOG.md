@@ -3,6 +3,39 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.0
+
+- Searching in the tree view now behaves slightly different: If a new 
+  mention is dragged in (or added a key) while the tree view is ranked 
+  according to the search, the ranking remains after having added the 
+  mention. If the user presses enter, the ranking (and search) is 
+  removed. #100
+- Added a new command to automatically remove all singletons. Empty
+  entities are also removed at the same time. #103
+- If a text segment has been selected, clicking on the context menu 
+  shows the option "copy formatted example". This copies the selection 
+  with their markdown or plain text formatted annotations onto the 
+  clipboard. Currently, the markdown format uses <sub></sub> to 
+  subscript, but other formats can be included. #110
+- **New type system**: This version introduces a modified type system, 
+  which entails that the file format has to change. At this point, 
+  the changes are not significant, but provide the stage for later 
+  changes. When an old file is opened for the first time, it gets 
+  converted automatically. #101
+- The user can now control whether singletons are ignored for comparing
+  two annotation files. #106
+- Compressed files: If the file name entered in the Save As dialog ends 
+  on ".xmi.gz", the file will be gzipped and therefore take much less 
+  space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
+  can be loaded directly as usual. #125
+- QuaDramA/CRETA-specific importers that we used to import files from 
+  WebAnno have been removed. Import (of coreference annotations) from 
+  WebAnno can still be done using the dkpro importer. #124
+- JSON export: Coreference annotations can now be exported as JSON
+  files. The file contains a list of tokens, and each token can be 
+  associated with one or more entities. This JSON format will be 
+  importable by [rCat](http://www.rcat-ims.de:5000/) in the future. #120
+
 ## 1.4.4
 
 - Fixed an issue in the compare view that led to displaced underlines.

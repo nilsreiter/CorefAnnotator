@@ -10,4 +10,6 @@ public class Defaults {
 	public static final boolean CFG_SHOW_TEXT_LABELS = true;
 	public static final boolean CFG_TRIM_WHITESPACE = true;
 	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;
+	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
+
 }

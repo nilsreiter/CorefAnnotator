@@ -8,7 +8,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
 public class DeleteCommentAction extends IkonAction {

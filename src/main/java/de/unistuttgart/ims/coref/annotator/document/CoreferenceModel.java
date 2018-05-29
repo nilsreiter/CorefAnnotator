@@ -32,11 +32,11 @@ import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.Op.AddMentionsToEntity;
@@ -350,6 +350,10 @@ public class CoreferenceModel {
 			remove(op.getPart());
 			fireEvent(Event.get(Type.Remove, op.getMention(), op.getPart()));
 			history.push(op);
+		} else if (operation instanceof Op.RemoveSingletons) {
+			edit((Op.RemoveSingletons) operation);
+			// fireEvent(null); // TODO
+			history.push(operation);
 		} else if (operation instanceof Op.GroupEntities) {
 			Op.GroupEntities op = (GroupEntities) operation;
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
@@ -436,6 +440,29 @@ public class CoreferenceModel {
 		});
 		fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
 		history.push(op);
+	}
+
+	private void edit(Op.RemoveSingletons operation) {
+		MutableSet<Entity> entities = Sets.mutable.empty();
+		MutableSet<Mention> mentions = Sets.mutable.empty();
+		for (Entity entity : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class))) {
+			ImmutableSet<Mention> ms = getMentions(entity);
+			switch (ms.size()) {
+			case 0:
+				remove(entity);
+				entities.add(entity);
+				break;
+			case 1:
+				Mention m = ms.getOnly();
+				remove(m.getEntity());
+				mentions.add(m);
+				break;
+			default:
+				break;
+			}
+		}
+		operation.setEntities(entities.toList().toImmutable());
+		operation.setMentions(mentions.toList().toImmutable());
 	}
 
 	private void edit(Op.ToggleEntityFlag operation) {
@@ -579,11 +606,17 @@ public class CoreferenceModel {
 		characterPosition2AnnotationMap.remove(dmp);
 	}
 
+	/**
+	 * Removes entity and fires events
+	 * 
+	 * @param entity
+	 */
 	private void remove(Entity entity) {
 		fireEvent(Event.get(Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
 			m.removeFromIndexes();
+			// TODO: remove parts
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
@@ -741,6 +774,8 @@ public class CoreferenceModel {
 			op.getEntityGroup().setMembers(newArr);
 			newArr.addToIndexes();
 			oldArr.removeFromIndexes();
+		} else if (operation instanceof Op.RemoveSingletons) {
+			undo((Op.RemoveSingletons) operation);
 		} else if (operation instanceof Op.MergeEntities) {
 			Op.MergeEntities op = (MergeEntities) operation;
 			for (Entity oldEntity : op.getEntities()) {
@@ -780,6 +815,19 @@ public class CoreferenceModel {
 		op.getMentions().select(m -> m.getDiscontinuous() != null)
 				.forEach(m -> fireEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous())));
 
+	}
+
+	private void undo(Op.RemoveSingletons op) {
+		op.getEntities().forEach(e -> e.addToIndexes());
+		op.getMentions().forEach(m -> {
+			entityMentionMap.put(m.getEntity(), m);
+			characterPosition2AnnotationMap.add(m);
+			m.addToIndexes();
+			m.getEntity().addToIndexes();
+			fireEvent(Event.get(Event.Type.Add, null, m.getEntity()));
+			fireEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+		});
+		fireEvent(Event.get(Event.Type.Add, null, op.getEntities()));
 	}
 
 }
