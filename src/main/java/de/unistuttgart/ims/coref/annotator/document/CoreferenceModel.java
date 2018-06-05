@@ -439,13 +439,16 @@ public class CoreferenceModel {
 	}
 
 	private void edit(Op.ToggleEntityFlag operation) {
+		MutableSet<Mention> mentions = Sets.mutable.empty();
 		operation.getObjects().forEach(e -> {
+			mentions.addAll(entityMentionMap.get(e));
 			if (Util.contains(e.getFlags(), operation.getFlag())) {
 				e.setFlags(Util.removeFrom(jcas, e.getFlags(), operation.getFlag()));
 			} else
 				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
 		});
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(Event.Type.Update, mentions));
 	}
 
 	private void edit(Op.ToggleMentionFlag operation) {
