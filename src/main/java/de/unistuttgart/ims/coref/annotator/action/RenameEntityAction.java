@@ -12,7 +12,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
+import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
@@ -44,7 +44,7 @@ public class RenameEntityAction extends DocumentWindowAction implements CAAction
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionListener l) {
+	public void setEnabled(CATreeSelectionEvent l) {
 		setEnabled(l.isSingle() && l.isEntity());
 	}
 

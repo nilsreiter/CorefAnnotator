@@ -376,7 +376,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	public void windowDeactivated(WindowEvent e) {
 	}
 
-	class TSL extends CATreeSelectionListener implements ListSelectionListener {
+	class TSL extends CATreeSelectionEvent implements ListSelectionListener {
 
 		public TSL(JTree tree) {
 			super(tree);

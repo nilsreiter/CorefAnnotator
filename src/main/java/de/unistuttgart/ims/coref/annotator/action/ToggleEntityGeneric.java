@@ -9,7 +9,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
+import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -34,7 +34,7 @@ public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> impl
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionListener l) {
+	public void setEnabled(CATreeSelectionEvent l) {
 		boolean en = l.isEntity();
 		setEnabled(en);
 		putValue(Action.SELECTED_KEY, en && l.getFeatureStructures().allSatisfy(f -> Util.isGeneric((Entity) f)));
