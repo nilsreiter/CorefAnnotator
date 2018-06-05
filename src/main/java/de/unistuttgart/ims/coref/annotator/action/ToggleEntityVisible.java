@@ -11,7 +11,7 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> implements CAAction {
@@ -33,6 +33,7 @@ public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> impl
 	public void setEnabled(CATreeSelectionListener l) {
 		boolean en = l.isEntity();
 		setEnabled(en);
-		putValue(Action.SELECTED_KEY, en && l.getFeatureStructures().allSatisfy(fs -> ((Entity) fs).getHidden()));
+		putValue(Action.SELECTED_KEY,
+				en && l.getFeatureStructures().allSatisfy(fs -> Util.isX(fs, Constants.ENTITY_FLAG_HIDDEN)));
 	}
 }
