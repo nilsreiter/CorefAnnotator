@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.1
+
+- Fixes that hiding an entity didn't de-underline its mentions #127
+
 ## 1.5.0
 
 - Searching in the tree view now behaves slightly different: If a new 
