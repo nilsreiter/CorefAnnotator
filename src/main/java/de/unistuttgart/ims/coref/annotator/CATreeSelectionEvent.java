@@ -61,6 +61,10 @@ public abstract class CATreeSelectionEvent implements TreeSelectionListener {
 		return num == 2;
 	}
 
+	public boolean isClass(Class<?> cl) {
+		return featureStructures.allSatisfy(f -> cl.isAssignableFrom(f.getClass()));
+	}
+
 	public boolean isEntity() {
 		return featureStructures.allSatisfy(f -> f instanceof Entity);
 	}

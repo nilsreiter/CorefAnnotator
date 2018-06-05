@@ -9,6 +9,7 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public class Flag {
@@ -55,7 +56,11 @@ public class Flag {
 					getFlag(Constants.MENTION_FLAG_DIFFICULT, Mention.class).setIkon(MaterialDesign.MDI_ALERT_BOX)
 							.setTranslationKey(Constants.Strings.MENTION_FLAG_DIFFICULT),
 					getFlag(Constants.MENTION_FLAG_NON_NOMINAL, Mention.class).setIkon(MaterialDesign.MDI_FLAG)
-							.setTranslationKey(Constants.Strings.MENTION_FLAG_NON_NOMINAL));
+							.setTranslationKey(Constants.Strings.MENTION_FLAG_NON_NOMINAL),
+					getFlag(Constants.ENTITY_FLAG_GENERIC, Entity.class).setIkon(MaterialDesign.MDI_CLOUD)
+							.setTranslationKey(Constants.Strings.ACTION_FLAG_ENTITY_GENERIC),
+					getFlag(Constants.ENTITY_FLAG_HIDDEN, Entity.class).setIkon(MaterialDesign.MDI_ACCOUNT_OUTLINE)
+							.setTranslationKey(Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY));
 		}
 		return defaultSet;
 	}

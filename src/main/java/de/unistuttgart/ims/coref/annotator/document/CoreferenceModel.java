@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -275,6 +276,9 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.ToggleMentionFlag) {
 			edit((Op.ToggleMentionFlag) operation);
 			history.push(operation);
+		} else if (operation instanceof Op.ToggleGenericFlag) {
+			edit((Op.ToggleGenericFlag) operation);
+			history.push(operation);
 		} else if (operation instanceof Op.AddEntityToEntityGroup) {
 			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			MutableList<Entity> oldArr = Util.toList(op.getEntityGroup().getMembers());
@@ -475,6 +479,7 @@ public class CoreferenceModel {
 		operation.setMentions(mentions.toList().toImmutable());
 	}
 
+	@Deprecated
 	private void edit(Op.ToggleEntityFlag operation) {
 		operation.getObjects().forEach(e -> {
 			if (Util.contains(e.getFlags(), operation.getFlag())) {
@@ -485,6 +490,7 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
 	}
 
+	@Deprecated
 	private void edit(Op.ToggleMentionFlag operation) {
 		operation.getObjects().forEach(m -> {
 			if (Util.contains(m.getFlags(), operation.getFlag())) {
@@ -493,6 +499,25 @@ public class CoreferenceModel {
 				m.setFlags(Util.addTo(jcas, m.getFlags(), operation.getFlag()));
 		});
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
+	}
+
+	private void edit(Op.ToggleGenericFlag operation) {
+		operation.getObjects().forEach(m -> {
+			if (Util.isX(m, operation.getFlag())) {
+				try {
+					Util.setFlags(m, Util.removeFrom(jcas, Util.getFlags(m), operation.getFlag()));
+				} catch (CASException e) {
+					Annotator.logger.catching(e);
+				}
+			} else
+				try {
+					Util.setFlags(m, Util.addTo(jcas, Util.getFlags(m), operation.getFlag()));
+				} catch (CASException e) {
+					Annotator.logger.catching(e);
+				}
+		});
+		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
+
 	}
 
 	protected void fireEvent(FeatureStructureEvent event) {

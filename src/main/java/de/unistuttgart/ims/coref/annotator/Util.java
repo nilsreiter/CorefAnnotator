@@ -5,6 +5,8 @@ import java.util.Arrays;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
+import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -230,6 +232,22 @@ public class Util {
 		MutableList<T> list = Lists.mutable.empty();
 		arr.forEach(fs -> list.add((T) fs));
 		return list;
+	}
+
+	public static StringArray getFlags(FeatureStructure fs) throws CASException {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return new StringArray(fs.getCAS().getJCas(), 0);
+		else
+			return (StringArray) fs.getFeatureValue(feature);
+	}
+
+	public static void setFlags(FeatureStructure fs, StringArray arr) throws CASException {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return;
+		else
+			fs.setFeatureValue(feature, arr);
 	}
 
 }

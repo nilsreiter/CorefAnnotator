@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
+@Deprecated
 public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> implements CAAction {
 	private static final long serialVersionUID = 1L;
 

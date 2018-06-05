@@ -469,6 +469,7 @@ public interface Op {
 
 	}
 
+	@Deprecated
 	public class ToggleEntityFlag extends ToggleFlag<Entity> {
 
 		public ToggleEntityFlag(String flag, Iterable<Entity> objects) {
@@ -477,12 +478,20 @@ public interface Op {
 
 	}
 
+	@Deprecated
 	public class ToggleMentionFlag extends ToggleFlag<Mention> {
 
 		public ToggleMentionFlag(String flag, Iterable<Mention> objects) {
 			super(flag, objects);
 		}
 
+	}
+
+	public class ToggleGenericFlag extends ToggleFlag<FeatureStructure> {
+
+		public ToggleGenericFlag(String flag, Iterable<FeatureStructure> objects) {
+			super(flag, objects);
+		}
 	}
 
 	public abstract class ToggleFlag<T extends FeatureStructure> extends UpdateOp<T> {

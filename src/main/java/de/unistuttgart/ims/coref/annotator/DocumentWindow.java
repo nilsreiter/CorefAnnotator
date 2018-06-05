@@ -121,9 +121,9 @@ import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
+import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
@@ -138,6 +138,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
@@ -202,7 +203,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
-	JMenu mentionFlags, entityFlags;
+	FlagMenu mentionFlagsInTreePopup, entityFlagsInTreePopup, mentionFlagsInMenuBar, entityFlagsInMenuBar;
 
 	// Settings
 	StylePlugin currentStyle;
@@ -227,8 +228,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
-		mentionFlags = new JMenu(Annotator.getString("menu_mention_flags"));
-		entityFlags = new JMenu(Annotator.getString("menu_entity_flags"));
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_mention_flags"), this);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_entity_flags"), this);
 
 		// popup
 		treePopupMenu = new JPopupMenu();
@@ -236,7 +237,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		treePopupMenu.add(mentionFlags);
+		treePopupMenu.add(mentionFlagsInTreePopup);
 
 		// treePopupMenu.add(new
 		// JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
@@ -253,7 +254,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
 		treePopupMenu.add(this.actions.formGroupAction);
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
-		treePopupMenu.add(entityFlags);
+		treePopupMenu.add(entityFlagsInTreePopup);
 
 		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
 		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
@@ -278,13 +279,16 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.addTreeSelectionListener(treeSelectionListener);
 
 		for (Flag f : Flag.getDefaultSet()) {
-			ToggleMentionFlagAction a = new ToggleMentionFlagAction(DocumentWindow.this, f);
+			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, f);
 			treeSelectionListener.addListener(a);
 			if (f.getTargetClass().equals(Mention.class)) {
-				mentionFlags.add(new JCheckBoxMenuItem(a));
+				mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+				mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
 			} else {
-				entityFlags.add(new JCheckBoxMenuItem(a));
+				entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+				entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
 			}
+
 		}
 
 		treeSearchField = new JTextField();
@@ -492,6 +496,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	protected JMenu initialiseMenuEntity() {
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this);
+
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
 		entityMenu.add(new JMenuItem(actions.copyAction));
@@ -499,9 +506,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		entityMenu.add(mentionFlagsInMenuBar);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(actions.newEntityAction));
@@ -510,8 +518,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.changeKeyAction));
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
 		entityMenu.add(new JMenuItem(new RemoveSingletons(this)));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
+		entityMenu.add(entityFlagsInMenuBar);
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 		entityMenu.add(actions.entityStatisticsAction);
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
@@ -757,6 +766,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 						highlightManager.undraw((Annotation) fs);
 					else
 						highlightManager.underline((Annotation) fs);
+				} else if (fs instanceof Entity) {
+					// TODO: hide mentions of the entity #127
 				}
 			}
 			break;
@@ -771,6 +782,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
+		model.getCoreferenceModel().addPropertyChangeListener(entityFlagsInMenuBar);
+		model.getCoreferenceModel().addPropertyChangeListener(entityFlagsInTreePopup);
+		model.getCoreferenceModel().addPropertyChangeListener(mentionFlagsInMenuBar);
+		model.getCoreferenceModel().addPropertyChangeListener(mentionFlagsInTreePopup);
 		documentModel = model;
 
 		// UI
@@ -1540,7 +1555,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}
 	}
 
-	class MyTreeSelectionListener extends CATreeSelectionEvent {
+	public class MyTreeSelectionListener extends CATreeSelectionEvent {
 
 		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 
@@ -1793,5 +1808,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 		}
 		return Sets.immutable.of(entities);
+	}
+
+	public MyTreeSelectionListener getTreeSelectionListener() {
+		return treeSelectionListener;
 	}
 }
