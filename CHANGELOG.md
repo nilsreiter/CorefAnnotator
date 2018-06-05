@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.4.5
+
+- Fixes that hiding an entity didn't de-underline its mentions. #127 
+
 ## 1.4.4
 
 - Fixed an issue in the compare view that led to displaced underlines.
