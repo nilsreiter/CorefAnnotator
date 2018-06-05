@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -65,6 +67,8 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  */
 public class CoreferenceModel {
 
+	public static final String PROPERTY_EVENT_FLAG_ADDED = "FLAG_ADDED";
+
 	/**
 	 * A mapping from character positions to annotations
 	 */
@@ -101,6 +105,8 @@ public class CoreferenceModel {
 
 	DocumentModel documentModel;
 
+	PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
 	public CoreferenceModel(DocumentModel documentModel, Preferences preferences) {
 		this.jcas = documentModel.getJcas();
 		this.preferences = preferences;
@@ -134,6 +140,10 @@ public class CoreferenceModel {
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
 		return crModelListeners.add(e);
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.addPropertyChangeListener(listener);
 	}
 
 	/**
@@ -501,6 +511,10 @@ public class CoreferenceModel {
 		return jcas;
 	}
 
+	public ImmutableSet<Flag> getFlags() {
+		return Flag.getDefaultSet();
+	}
+
 	public Map<Character, Entity> getKeyMap() {
 		return keyMap;
 	}
@@ -644,6 +658,10 @@ public class CoreferenceModel {
 
 	public boolean removeCoreferenceModelListener(Object o) {
 		return crModelListeners.remove(o);
+	}
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.removePropertyChangeListener(listener);
 	}
 
 	/**

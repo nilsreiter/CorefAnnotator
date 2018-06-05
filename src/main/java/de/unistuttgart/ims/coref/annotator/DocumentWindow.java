@@ -123,6 +123,7 @@ import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
+import de.unistuttgart.ims.coref.annotator.action.ToggleMentionFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
@@ -144,6 +145,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.Flag;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -187,6 +189,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 
 	// Sub windows
@@ -199,6 +202,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
+	JMenu mentionFlags, entityFlags;
 
 	// Settings
 	StylePlugin currentStyle;
@@ -223,15 +227,23 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
+		mentionFlags = new JMenu(Annotator.getString("menu_mention_flags"));
+		entityFlags = new JMenu(Annotator.getString("menu_entity_flags"));
+
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
 		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
+		treePopupMenu.add(mentionFlags);
+
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -241,8 +253,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
 		treePopupMenu.add(this.actions.formGroupAction);
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
+		treePopupMenu.add(entityFlags);
+
+		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
+		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
@@ -257,9 +271,21 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
-		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
 		tree.addKeyListener(treeKeyListener);
+
+		treeSelectionListener = new MyTreeSelectionListener(tree);
+		tree.addTreeSelectionListener(treeSelectionListener);
+
+		for (Flag f : Flag.getDefaultSet()) {
+			ToggleMentionFlagAction a = new ToggleMentionFlagAction(DocumentWindow.this, f);
+			treeSelectionListener.addListener(a);
+			if (f.getTargetClass().equals(Mention.class)) {
+				mentionFlags.add(new JCheckBoxMenuItem(a));
+			} else {
+				entityFlags.add(new JCheckBoxMenuItem(a));
+			}
+		}
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
@@ -1514,7 +1540,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}
 	}
 
-	class MyTreeSelectionListener extends CATreeSelectionListener {
+	class MyTreeSelectionListener extends CATreeSelectionEvent {
+
+		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 
 		public MyTreeSelectionListener(JTree tree) {
 			super(tree);
@@ -1542,12 +1570,22 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			actions.entityStatisticsAction.setEnabled(isEntity());
 
+			// inform all listeners
+			listeners.forEach(l -> l.valueChanged(this));
+
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
 			else
 				annotationSelected(null);
 		}
 
+		public void addListener(CATreeSelectionListener l) {
+			this.listeners.add(l);
+		}
+
+		public void removeListener(CATreeSelectionListener l) {
+			this.listeners.remove(l);
+		}
 	}
 
 	class CommentAction extends IkonAction {
@@ -1726,8 +1764,11 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		FileSaveAction fileSaveAction;
 		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
 		ToggleEntityGeneric toggleEntityGeneric;
+		@Deprecated
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
+		@Deprecated
 		ToggleMentionDifficult toggleMentionDifficult;
+		@Deprecated
 		ToggleMentionNonNominal toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;

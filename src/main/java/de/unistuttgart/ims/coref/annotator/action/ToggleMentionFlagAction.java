@@ -5,41 +5,43 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import org.eclipse.collections.impl.factory.Lists;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
-import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Flag;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
-@Deprecated
-public class ToggleMentionAmbiguous extends TargetedIkonAction<DocumentWindow> implements CAAction {
+public class ToggleMentionFlagAction extends TargetedIkonAction<DocumentWindow> implements CATreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	public ToggleMentionAmbiguous(DocumentWindow dw) {
-		super(dw, MaterialDesign.MDI_SHARE_VARIANT);
-		putValue(Action.NAME, Annotator.getString(Strings.ACTION_FLAG_MENTION_AMBIGUOUS));
+	Flag flag;
+
+	public ToggleMentionFlagAction(DocumentWindow dw, Flag flag) {
+		super(dw, flag.getTranslationKey(), flag.getIcon());
+		this.flag = flag;
+		// putValue(Action.SHORT_DESCRIPTION,
+		// Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
+				.edit(new Op.ToggleMentionFlag(flag.getStringValue(),
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionEvent l) {
+	public void valueChanged(CATreeSelectionEvent l) {
 		boolean en = l.isMention();
 		setEnabled(en);
-		putValue(Action.SELECTED_KEY, en && l.getFeatureStructures().allSatisfy(fs -> Util.isAmbiguous((Mention) fs)));
+		putValue(Action.SELECTED_KEY,
+				en && l.getFeatureStructures().allSatisfy(fs -> Util.isX(fs, flag.getStringValue())));
 	}
 
 }

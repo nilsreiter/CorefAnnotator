@@ -1,14 +1,12 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import javax.swing.Icon;
-
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
+import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -19,8 +17,9 @@ public class Flag {
 	private static ImmutableSet<Flag> defaultSet = null;
 
 	final String stringValue;
-	Icon icon;
+	Ikon ikon;
 	Class<? extends TOP> targetClass;
+	String translationKey;
 
 	private Flag(String stringValue, Class<? extends TOP> cl) {
 		this.stringValue = stringValue;
@@ -39,25 +38,38 @@ public class Flag {
 		return stringValue;
 	}
 
-	public Icon getIcon() {
-		return icon;
+	public Ikon getIcon() {
+		return ikon;
 	}
 
-	public Flag setIcon(Icon icon) {
-		this.icon = icon;
+	public Flag setIkon(Ikon icon) {
+		this.ikon = icon;
 		return this;
 	}
 
 	public static ImmutableSet<Flag> getDefaultSet() {
 		if (defaultSet == null) {
 			defaultSet = Sets.immutable.with(
-					getFlag(Constants.MENTION_FLAG_AMBIGUOUS, Mention.class)
-							.setIcon(FontIcon.of(MaterialDesign.MDI_SHARE_VARIANT)),
-					getFlag(Constants.MENTION_FLAG_DIFFICULT, Mention.class)
-							.setIcon(FontIcon.of(MaterialDesign.MDI_ALERT_BOX)),
-					getFlag(Constants.MENTION_FLAG_NON_NOMINAL, Mention.class)
-							.setIcon(FontIcon.of(MaterialDesign.MDI_FLAG)));
+					getFlag(Constants.MENTION_FLAG_AMBIGUOUS, Mention.class).setIkon(MaterialDesign.MDI_SHARE_VARIANT)
+							.setTranslationKey(Constants.Strings.MENTION_FLAG_AMBIGUOUS),
+					getFlag(Constants.MENTION_FLAG_DIFFICULT, Mention.class).setIkon(MaterialDesign.MDI_ALERT_BOX)
+							.setTranslationKey(Constants.Strings.MENTION_FLAG_DIFFICULT),
+					getFlag(Constants.MENTION_FLAG_NON_NOMINAL, Mention.class).setIkon(MaterialDesign.MDI_FLAG)
+							.setTranslationKey(Constants.Strings.MENTION_FLAG_NON_NOMINAL));
 		}
 		return defaultSet;
+	}
+
+	public String getTranslationKey() {
+		return translationKey;
+	}
+
+	public Flag setTranslationKey(String translationKey) {
+		this.translationKey = translationKey;
+		return this;
+	}
+
+	public Class<? extends TOP> getTargetClass() {
+		return targetClass;
 	}
 }
