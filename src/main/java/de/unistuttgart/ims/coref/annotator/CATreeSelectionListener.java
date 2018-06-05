@@ -1,7 +1,5 @@
 package de.unistuttgart.ims.coref.annotator;
 
-import javax.swing.event.TreeSelectionListener;
-
-public interface CATreeSelectionListener extends TreeSelectionListener {
+public interface CATreeSelectionListener {
 	void valueChanged(CATreeSelectionEvent e);
 }
