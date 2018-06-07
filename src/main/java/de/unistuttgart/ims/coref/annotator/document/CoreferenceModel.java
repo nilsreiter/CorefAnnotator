@@ -505,7 +505,10 @@ public class CoreferenceModel {
 	}
 
 	private void edit(Op.ToggleGenericFlag operation) {
+		MutableSet<Mention> mentions = Sets.mutable.empty();
 		operation.getObjects().forEach(m -> {
+			if (m instanceof Entity)
+				mentions.addAll(entityMentionMap.get((Entity) m));
 			if (Util.isX(m, operation.getFlag())) {
 				try {
 					Util.setFlags(m, Util.removeFrom(jcas, Util.getFlags(m), operation.getFlag()));
@@ -520,6 +523,7 @@ public class CoreferenceModel {
 				}
 		});
 		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(Event.Type.Update, mentions));
 
 	}
 
