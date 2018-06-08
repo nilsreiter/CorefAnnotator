@@ -12,6 +12,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
+@Deprecated
 public class Flag {
 
 	private static MutableMap<String, Flag> objectMap = Maps.mutable.empty();

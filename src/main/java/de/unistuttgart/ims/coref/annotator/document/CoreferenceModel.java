@@ -543,6 +543,7 @@ public class CoreferenceModel {
 		return jcas;
 	}
 
+	@Deprecated
 	public ImmutableSet<Flag> getFlags() {
 		return Flag.getDefaultSet();
 	}
