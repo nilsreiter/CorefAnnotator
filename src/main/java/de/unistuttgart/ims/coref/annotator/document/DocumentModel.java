@@ -26,6 +26,8 @@ public class DocumentModel implements Model {
 
 	EntityTreeModel treeModel;
 
+	FlagModel flagModel;
+
 	TypeSystemVersion typeSystemVersion;
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
@@ -135,6 +137,14 @@ public class DocumentModel implements Model {
 
 	public void signal() {
 		fireDocumentChangedEvent();
+	}
+
+	public FlagModel getFlagModel() {
+		return flagModel;
+	}
+
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
 	}
 
 }
