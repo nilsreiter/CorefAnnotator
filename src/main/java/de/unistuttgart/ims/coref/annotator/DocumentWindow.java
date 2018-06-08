@@ -137,6 +137,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
@@ -146,7 +147,6 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.Flag;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -277,19 +277,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		treeSelectionListener = new MyTreeSelectionListener(tree);
 		tree.addTreeSelectionListener(treeSelectionListener);
-
-		for (Flag f : Flag.getDefaultSet()) {
-			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, f);
-			treeSelectionListener.addListener(a);
-			if (f.getTargetClass().equals(Mention.class)) {
-				mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
-				mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
-			} else {
-				entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
-				entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
-			}
-
-		}
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
@@ -782,11 +769,31 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
-		model.getCoreferenceModel().addPropertyChangeListener(entityFlagsInMenuBar);
-		model.getCoreferenceModel().addPropertyChangeListener(entityFlagsInTreePopup);
-		model.getCoreferenceModel().addPropertyChangeListener(mentionFlagsInMenuBar);
-		model.getCoreferenceModel().addPropertyChangeListener(mentionFlagsInTreePopup);
+		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
+		model.getFlagModel().addFlagModelListener(entityFlagsInTreePopup);
+		model.getFlagModel().addFlagModelListener(mentionFlagsInMenuBar);
+		model.getFlagModel().addFlagModelListener(mentionFlagsInTreePopup);
 		documentModel = model;
+
+		for (Flag f : model.getFlagModel().getFlags()) {
+			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
+			treeSelectionListener.addListener(a);
+			try {
+				if (model.getFlagModel().getTargetClass(f).equals(Mention.class)) {
+					mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+					mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+				} else {
+					entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+					entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+				}
+			} catch (ClassNotFoundException e) {
+				mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+				mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+				entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+				entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+			}
+
+		}
 
 		// UI
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));

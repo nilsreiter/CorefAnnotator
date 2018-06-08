@@ -6,12 +6,14 @@ import javax.swing.Action;
 
 import org.eclipse.collections.impl.factory.Lists;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.document.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> implements CATreeSelectionListener {
@@ -19,10 +21,12 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 	private static final long serialVersionUID = 1L;
 
 	Flag flag;
+	FlagModel flagModel;
 
-	public ToggleFlagAction(DocumentWindow dw, Flag flag) {
-		super(dw, flag.getTranslationKey(), flag.getIcon());
+	public ToggleFlagAction(DocumentWindow dw, FlagModel flagModel, Flag flag) {
+		super(dw, flag.getLabel(), flagModel.getIkon(flag));
 		this.flag = flag;
+		this.flagModel = flagModel;
 		// putValue(Action.SHORT_DESCRIPTION,
 		// Annotator.getString(Strings.ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP));
 
@@ -30,18 +34,21 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleGenericFlag(flag.getStringValue(),
-						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
-								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
+		getTarget().getCoreferenceModel().edit(
+				new Op.ToggleGenericFlag(flag.getKey(), Lists.immutable.of(getTarget().getTree().getSelectionPaths())
+						.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}
 
 	@Override
 	public void valueChanged(CATreeSelectionEvent l) {
-		boolean en = l.isClass(flag.getTargetClass());
-		setEnabled(en);
-		putValue(Action.SELECTED_KEY,
-				en && l.getFeatureStructures().allSatisfy(fs -> Util.isX(fs, flag.getStringValue())));
+		boolean en;
+		try {
+			en = l.isClass(flagModel.getTargetClass(flag));
+			setEnabled(en);
+			putValue(Action.SELECTED_KEY, en && l.getFeatureStructures().allSatisfy(fs -> Util.isX(fs, flag.getKey())));
+		} catch (ClassNotFoundException e) {
+			Annotator.logger.catching(e);
+		}
 	}
 
 }

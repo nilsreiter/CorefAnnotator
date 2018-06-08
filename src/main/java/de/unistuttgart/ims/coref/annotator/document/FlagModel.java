@@ -3,8 +3,11 @@ package de.unistuttgart.ims.coref.annotator.document;
 import java.util.prefs.Preferences;
 
 import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -13,9 +16,12 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
-public class FlagModel {
+public class FlagModel implements Model {
 	DocumentModel documentModel;
+	private MutableSet<String> keys = Sets.mutable.empty();
+	MutableSet<FlagModelListener> listeners = Sets.mutable.empty();
 
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		this.documentModel = documentModel;
@@ -25,8 +31,30 @@ public class FlagModel {
 		}
 	}
 
-	public void addFlag(String label) {
+	public void addFlag(String label, Class<? extends TOP> targetClass) {
+		addFlag(label, targetClass, null);
+	}
 
+	public void addFlag(String label, Class<? extends TOP> targetClass, Ikon ikon) {
+		Flag f = new Flag(documentModel.getJcas());
+		f.addToIndexes();
+		f.setLabel(label);
+		String key = label;
+		int i = 0;
+		while (keys.contains(key)) {
+			key = label + "-" + i;
+		}
+		f.setKey(key);
+
+		if (ikon != null)
+			f.setIcon(ikon.toString());
+		f.setTargetClass(targetClass.getName());
+		f.addToIndexes();
+		fireFlagEvent(Event.get(this, Type.Add, f));
+	}
+
+	private void fireFlagEvent(FeatureStructureEvent evt) {
+		listeners.forEach(l -> l.flagEvent(evt));
 	}
 
 	public ImmutableList<Flag> getFlags() {
@@ -43,6 +71,7 @@ public class FlagModel {
 		flag.setIcon("MDI_SHARE_VARIANT");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
+		keys.add(Constants.MENTION_FLAG_AMBIGUOUS);
 
 		// difficult
 		flag = new Flag(documentModel.getJcas());
@@ -51,6 +80,7 @@ public class FlagModel {
 		flag.setIcon("MDI_ALERT_BOX");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
+		keys.add(Constants.MENTION_FLAG_DIFFICULT);
 
 		// non-nominal
 		flag = new Flag(documentModel.getJcas());
@@ -59,6 +89,7 @@ public class FlagModel {
 		flag.setIcon("MDI_FLAG");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
+		keys.add(Constants.MENTION_FLAG_NON_NOMINAL);
 
 		// generic
 		flag = new Flag(documentModel.getJcas());
@@ -67,6 +98,7 @@ public class FlagModel {
 		flag.setIcon("MDI_CLOUD");
 		flag.setTargetClass(Entity.class.getName());
 		flag.addToIndexes();
+		keys.add(Constants.ENTITY_FLAG_GENERIC);
 
 		// hidden
 		flag = new Flag(documentModel.getJcas());
@@ -75,6 +107,11 @@ public class FlagModel {
 		flag.setIcon("MDI_ACCOUNT_OUTLINE");
 		flag.setTargetClass(Entity.class.getName());
 		flag.addToIndexes();
+		keys.add(Constants.ENTITY_FLAG_HIDDEN);
+	}
+
+	public Class<?> getTargetClass(Flag f) throws ClassNotFoundException {
+		return Class.forName(f.getTargetClass());
 	}
 
 	public String getLocalizedLabel(Flag f) {
@@ -87,6 +124,14 @@ public class FlagModel {
 
 	public Ikon getIkon(Flag f) {
 		return MaterialDesign.valueOf(f.getIcon());
+	}
+
+	public boolean addFlagModelListener(FlagModelListener e) {
+		return listeners.add(e);
+	}
+
+	public boolean removeFlagModelListener(Object o) {
+		return listeners.remove(o);
 	}
 
 }

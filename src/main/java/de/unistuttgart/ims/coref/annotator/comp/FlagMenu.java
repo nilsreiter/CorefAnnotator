@@ -1,17 +1,16 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
-import de.unistuttgart.ims.coref.annotator.document.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 
-public class FlagMenu extends JMenu implements PropertyChangeListener {
+public class FlagMenu extends JMenu implements FlagModelListener {
 
 	private static final long serialVersionUID = 1L;
 	DocumentWindow dw;
@@ -22,12 +21,14 @@ public class FlagMenu extends JMenu implements PropertyChangeListener {
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals(CoreferenceModel.PROPERTY_EVENT_FLAG_ADDED)) {
-			Flag f = (Flag) evt.getNewValue();
-			ToggleFlagAction a = new ToggleFlagAction(dw, f);
+	public void flagEvent(FeatureStructureEvent event) {
+		switch (event.getType()) {
+		case Add:
+			ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), (Flag) event.getArgument1());
 			dw.getTreeSelectionListener().addListener(a);
 			add(new JCheckBoxMenuItem(a));
+			break;
+		default:
 		}
 	}
 
