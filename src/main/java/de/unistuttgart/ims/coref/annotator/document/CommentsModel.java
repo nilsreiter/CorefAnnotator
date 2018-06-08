@@ -17,7 +17,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 
-public class CommentsModel extends AbstractListModel<Comment> {
+public class CommentsModel extends AbstractListModel<Comment> implements Model {
 
 	MutableList<Comment> comments = Lists.mutable.empty();
 	MutableMap<FeatureStructure, Comment> commentMap = Maps.mutable.empty();
@@ -87,7 +87,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 		fireIntervalAdded(this, ind, ind);
 		if (comment instanceof AnnotationComment)
 			documentModel.getCoreferenceModel()
-					.fireEvent(Event.get(Event.Type.Add, null, ((AnnotationComment) comment).getAnnotation()));
+					.fireEvent(Event.get(this, Event.Type.Add, null, ((AnnotationComment) comment).getAnnotation()));
 
 	}
 
@@ -99,7 +99,7 @@ public class CommentsModel extends AbstractListModel<Comment> {
 			documentModel.getCoreferenceModel().characterPosition2AnnotationMap
 					.remove(((AnnotationComment) c).getAnnotation());
 			documentModel.getCoreferenceModel()
-					.fireEvent(Event.get(Event.Type.Remove, null, ((AnnotationComment) c).getAnnotation()));
+					.fireEvent(Event.get(this, Event.Type.Remove, null, ((AnnotationComment) c).getAnnotation()));
 		}
 		documentModel.setUnsavedChanges(true);
 		fireIntervalRemoved(this, index, index);

@@ -66,7 +66,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel {
+public class CoreferenceModel implements Model {
 
 	public static final String PROPERTY_EVENT_FLAG_ADDED = "FLAG_ADDED";
 
@@ -260,15 +260,15 @@ public class CoreferenceModel {
 			op.getObjects().getFirst().setKey(op.getNewKey().toString());
 			keyMap.put(op.getNewKey(), op.getEntity());
 			if (op.getPreviousOwner() != null)
-				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
+				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
 			else
-				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst()));
+				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst()));
 			history.push(op);
 		} else if (operation instanceof Op.UpdateEntityColor) {
 			Op.UpdateEntityColor op = (UpdateEntityColor) operation;
 			op.getObjects().getFirst().setColor(op.getNewColor());
-			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
-			fireEvent(Event.get(Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
 			history.push(operation);
 		} else if (operation instanceof Op.ToggleEntityFlag) {
 			edit((Op.ToggleEntityFlag) operation);
@@ -300,7 +300,7 @@ public class CoreferenceModel {
 			arr.addToIndexes();
 			op.getEntityGroup().removeFromIndexes();
 			op.getEntityGroup().setMembers(arr);
-			fireEvent(Event.get(Event.Type.Add, op.getEntityGroup(), op.getEntities()));
+			fireEvent(Event.get(this, Event.Type.Add, op.getEntityGroup(), op.getEntities()));
 			history.add(op);
 		} else if (operation instanceof Op.AddMentionsToNewEntity) {
 			Op.AddMentionsToNewEntity op = (Op.AddMentionsToNewEntity) operation;
@@ -313,25 +313,25 @@ public class CoreferenceModel {
 				} else
 					ms.add(addTo(op.getEntity(), span));
 			}
-			fireEvent(Event.get(Event.Type.Add, null, op.getEntity()));
-			fireEvent(Event.get(Event.Type.Add, op.getEntity(), ms.toImmutable()));
+			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
+			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), ms.toImmutable()));
 			history.push(op);
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (Op.AddMentionsToEntity) operation;
 			op.setMentions(op.getSpans().collect(sp -> {
 				return addTo(op.getEntity(), sp);
 			}));
-			fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
+			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
 			history.push(op);
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
 			op.setPart(addTo(op.getMention(), op.getSpan()));
-			fireEvent(Event.get(Event.Type.Add, op.getMention(), op.getPart()));
+			fireEvent(Event.get(this, Event.Type.Add, op.getMention(), op.getPart()));
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (Op.MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
-			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
 			fireEvent(op.toEvent());
 			history.push(op);
 		} else if (operation instanceof Op.MoveMentionPartToMention) {
@@ -342,7 +342,7 @@ public class CoreferenceModel {
 				op.getSource().setDiscontinuous(null);
 			});
 			fireEvent(op.toEvent());
-			fireEvent(Event.get(Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
+			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 			history.push(op);
 		} else if (operation instanceof Op.RemoveMention) {
 			edit((RemoveMention) operation);
@@ -362,7 +362,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (Op.RemovePart) operation;
 			remove(op.getPart());
-			fireEvent(Event.get(Type.Remove, op.getMention(), op.getPart()));
+			fireEvent(Event.get(this, Type.Remove, op.getMention(), op.getPart()));
 			history.push(op);
 		} else if (operation instanceof Op.RemoveSingletons) {
 			edit((Op.RemoveSingletons) operation);
@@ -379,7 +379,7 @@ public class CoreferenceModel {
 				eg.setMembers(i, op.getEntities().get(i));
 				entityEntityGroupMap.put(op.getEntities().get(i), eg);
 			}
-			fireEvent(Event.get(Event.Type.Add, null, eg));
+			fireEvent(Event.get(this, Event.Type.Add, null, eg));
 			op.setEntityGroup(eg);
 			history.push(op);
 		} else if (operation instanceof Op.MergeEntities) {
@@ -433,10 +433,10 @@ public class CoreferenceModel {
 				if (m.getDiscontinuous() != null) {
 					DetachedMentionPart dmp = m.getDiscontinuous();
 					remove(dmp);
-					fireEvent(Event.get(Type.Remove, m, dmp));
+					fireEvent(Event.get(this, Type.Remove, m, dmp));
 				}
 			});
-			fireEvent(Event.get(Event.Type.Remove, e, toRemove.toImmutable()));
+			fireEvent(Event.get(this, Event.Type.Remove, e, toRemove.toImmutable()));
 			allRemoved.addAll(toRemove);
 		});
 		op.setRemovedMentions(allRemoved.toImmutable());
@@ -449,10 +449,10 @@ public class CoreferenceModel {
 			if (m.getDiscontinuous() != null) {
 				DetachedMentionPart dmp = m.getDiscontinuous();
 				remove(dmp);
-				fireEvent(Event.get(Type.Remove, m, dmp));
+				fireEvent(Event.get(this, Type.Remove, m, dmp));
 			}
 		});
-		fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
+		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
 		history.push(op);
 	}
 
@@ -489,8 +489,8 @@ public class CoreferenceModel {
 			} else
 				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
 		});
-		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(Event.Type.Update, mentions));
+		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(this, Event.Type.Update, mentions));
 	}
 
 	@Deprecated
@@ -501,7 +501,7 @@ public class CoreferenceModel {
 			} else
 				m.setFlags(Util.addTo(jcas, m.getFlags(), operation.getFlag()));
 		});
-		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
 	}
 
 	private void edit(Op.ToggleGenericFlag operation) {
@@ -522,8 +522,8 @@ public class CoreferenceModel {
 					Annotator.logger.catching(e);
 				}
 		});
-		fireEvent(Event.get(Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(Event.Type.Update, mentions));
+		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(this, Event.Type.Update, mentions));
 
 	}
 
@@ -582,7 +582,7 @@ public class CoreferenceModel {
 		if (initialised)
 			return;
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
-			fireEvent(Event.get(Event.Type.Add, null, entity));
+			fireEvent(Event.get(this, Event.Type.Add, null, entity));
 			if (entity.getKey() != null)
 				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
 		}
@@ -590,10 +590,10 @@ public class CoreferenceModel {
 			entityMentionMap.put(mention.getEntity(), mention);
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
-			fireEvent(Event.get(Event.Type.Add, mention.getEntity(), mention));
+			fireEvent(Event.get(this, Event.Type.Add, mention.getEntity(), mention));
 			if (mention.getDiscontinuous() != null) {
 				registerAnnotation(mention.getDiscontinuous());
-				fireEvent(Event.get(Event.Type.Add, mention, mention.getDiscontinuous()));
+				fireEvent(Event.get(this, Event.Type.Add, mention, mention.getDiscontinuous()));
 			}
 		}
 		initialised = true;
@@ -612,8 +612,8 @@ public class CoreferenceModel {
 		if (biggest != null)
 			for (Entity n : nodes) {
 				if (n != tgt) {
-					fireEvent(Event.get(Event.Type.Move, n, tgt, entityMentionMap.get(n).toList().toImmutable()));
-					fireEvent(Event.get(Event.Type.Remove, n));
+					fireEvent(Event.get(this, Event.Type.Move, n, tgt, entityMentionMap.get(n).toList().toImmutable()));
+					fireEvent(Event.get(this, Event.Type.Remove, n));
 					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
 
 					entityMentionMap.removeAll(n);
@@ -659,7 +659,7 @@ public class CoreferenceModel {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
-		fireEvent(Event.get(Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
+		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
 			m.removeFromIndexes();
@@ -671,7 +671,7 @@ public class CoreferenceModel {
 
 		entityEntityGroupMap.removeAll(entity);
 
-		fireEvent(Event.get(Event.Type.Remove, null, entity));
+		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
 
@@ -716,7 +716,7 @@ public class CoreferenceModel {
 
 		}
 		eg.setMembers(arr);
-		fireEvent(Event.get(Event.Type.Remove, eg, entity));
+		fireEvent(Event.get(this, Event.Type.Remove, eg, entity));
 	}
 
 	public void undo() {
@@ -746,9 +746,9 @@ public class CoreferenceModel {
 				op.getEntity().setKey(null);
 			}
 			if (op.getPreviousOwner() != null)
-				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
+				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
 			else
-				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst()));
+				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst()));
 		} else if (operation instanceof Op.ToggleEntityFlag) {
 			edit((ToggleEntityFlag) operation);
 		} else if (operation instanceof Op.ToggleMentionFlag) {
@@ -756,8 +756,8 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.UpdateEntityColor) {
 			Op.UpdateEntityColor op = (UpdateEntityColor) operation;
 			op.getObjects().getFirst().setColor(op.getOldColor());
-			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
-			fireEvent(Event.get(Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects().flatCollect(e -> entityMentionMap.get(e))));
 		} else if (operation instanceof Op.AddEntityToEntityGroup) {
 			Op.AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
@@ -767,11 +767,11 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.AddMentionsToEntity) {
 			Op.AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
-			fireEvent(Event.get(Event.Type.Remove, op.getEntity(), op.getMentions()));
+			fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
 		} else if (operation instanceof Op.AttachPart) {
 			Op.AttachPart op = (AttachPart) operation;
 			remove(op.getPart());
-			fireEvent(Event.get(Event.Type.Remove, op.getMention(), op.getPart()));
+			fireEvent(Event.get(this, Event.Type.Remove, op.getMention(), op.getPart()));
 		} else if (operation instanceof Op.MoveMentionPartToMention) {
 			Op.MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
 			op.getObjects().forEach(d -> {
@@ -783,7 +783,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof Op.MoveMentionsToEntity) {
 			Op.MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
-			fireEvent(Event.get(Event.Type.Update, op.getObjects()));
+			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
 			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof Op.RemoveDuplicateMentionsInEntities) {
 			Op.RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
@@ -792,13 +792,13 @@ public class CoreferenceModel {
 				m.addToIndexes();
 				entityMentionMap.put(m.getEntity(), m);
 				registerAnnotation(m);
-				fireEvent(Event.get(Type.Add, m.getEntity(), m));
+				fireEvent(Event.get(this, Type.Add, m.getEntity(), m));
 			});
 		} else if (operation instanceof Op.RemovePart) {
 			Op.RemovePart op = (RemovePart) operation;
 			op.getPart().setMention(op.getMention());
 			op.getMention().setDiscontinuous(op.getPart());
-			fireEvent(Event.get(Type.Add, op.getMention(), op.getPart()));
+			fireEvent(Event.get(this, Type.Add, op.getMention(), op.getPart()));
 		} else if (operation instanceof Op.RemoveMention) {
 			undo((RemoveMention) operation);
 		} else if (operation instanceof Op.RemoveEntities) {
@@ -810,7 +810,7 @@ public class CoreferenceModel {
 						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
 				}
 			});
-			fireEvent(Event.get(Event.Type.Add, null, op.getEntities()));
+			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntities()));
 		} else if (operation instanceof Op.RemoveEntitiesFromEntityGroup) {
 			Op.RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
 			FSArray oldArr = op.getEntityGroup().getMembers();
@@ -832,11 +832,11 @@ public class CoreferenceModel {
 			for (Entity oldEntity : op.getEntities()) {
 				if (op.getEntity() != oldEntity) {
 					oldEntity.addToIndexes();
-					fireEvent(Event.get(Event.Type.Add, null, oldEntity));
+					fireEvent(Event.get(this, Event.Type.Add, null, oldEntity));
 					for (Mention m : op.getPreviousState().get(oldEntity)) {
 						moveTo(oldEntity, m);
 					}
-					fireEvent(Event.get(Type.Move, null, oldEntity,
+					fireEvent(Event.get(this, Type.Move, null, oldEntity,
 							op.getPreviousState().get(oldEntity).toList().toImmutable()));
 				}
 			}
@@ -844,7 +844,7 @@ public class CoreferenceModel {
 			Op.GroupEntities op = (GroupEntities) operation;
 			remove(op.getEntityGroup());
 			op.getEntities().forEach(e -> entityEntityGroupMap.remove(e, op.getEntityGroup()));
-			fireEvent(Event.get(Event.Type.Remove, null, op.getEntityGroup()));
+			fireEvent(Event.get(this, Event.Type.Remove, null, op.getEntityGroup()));
 		}
 	}
 
@@ -861,10 +861,10 @@ public class CoreferenceModel {
 			}
 		});
 		// fire event to draw them
-		fireEvent(Event.get(Event.Type.Add, op.getEntity(), op.getMentions()));
+		fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
 		// re-create attached parts (if any)
 		op.getMentions().select(m -> m.getDiscontinuous() != null)
-				.forEach(m -> fireEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous())));
+				.forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous())));
 
 	}
 
@@ -875,10 +875,10 @@ public class CoreferenceModel {
 			characterPosition2AnnotationMap.add(m);
 			m.addToIndexes();
 			m.getEntity().addToIndexes();
-			fireEvent(Event.get(Event.Type.Add, null, m.getEntity()));
-			fireEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+			fireEvent(Event.get(this, Event.Type.Add, null, m.getEntity()));
+			fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		});
-		fireEvent(Event.get(Event.Type.Add, null, op.getEntities()));
+		fireEvent(Event.get(this, Event.Type.Add, null, op.getEntities()));
 	}
 
 }

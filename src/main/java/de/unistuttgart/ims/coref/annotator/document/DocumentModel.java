@@ -16,7 +16,7 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
  * directly).
  *
  */
-public class DocumentModel {
+public class DocumentModel implements Model {
 
 	JCas jcas;
 
