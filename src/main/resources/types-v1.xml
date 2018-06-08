@@ -26,6 +26,11 @@
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 					<description>The class this flag can be applied to</description>
 				</featureDescription>
+				<featureDescription>
+					<name>Icon</name>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+					<description/>
+				</featureDescription>
 			</features>
 		</typeDescription>
 		<typeDescription>
