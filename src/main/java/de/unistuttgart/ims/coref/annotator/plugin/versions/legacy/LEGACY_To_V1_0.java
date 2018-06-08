@@ -88,13 +88,14 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	}
 
 	protected Mention getMention(JCas jcas, de.unistuttgart.ims.coref.annotator.api.Mention oldMention) {
-		if (!mentionMap.contains(oldMention)) {
+		if (!mentionMap.containsKey(oldMention)) {
 			Mention mention;
 			mention = new Mention(jcas);
 			mention.setBegin(oldMention.getBegin());
 			mention.setEnd(oldMention.getEnd());
 			mention.addToIndexes();
-			mention.setEntity(entityMap.get(oldMention.getEntity()));
+			mention.setEntity(getEntity(jcas, oldMention.getEntity()));
+
 			// this is a bit hacky, but for some reason a mention doesn't have an entity in
 			// an old file
 			if (mention.getEntity() == null) {
@@ -121,7 +122,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	protected Entity getEntity(JCas jcas, de.unistuttgart.ims.coref.annotator.api.Entity oldEntity) {
 		if (oldEntity == null)
 			return null;
-		if (!entityMap.contains(oldEntity)) {
+		if (!entityMap.containsKey(oldEntity)) {
 			Entity newEntity;
 			if (oldEntity instanceof de.unistuttgart.ims.coref.annotator.api.EntityGroup) {
 				de.unistuttgart.ims.coref.annotator.api.EntityGroup oldEntityGroup = (de.unistuttgart.ims.coref.annotator.api.EntityGroup) oldEntity;
