@@ -1784,7 +1784,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
+		@Deprecated
 		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		@Deprecated
 		ToggleEntityGeneric toggleEntityGeneric;
 		@Deprecated
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
