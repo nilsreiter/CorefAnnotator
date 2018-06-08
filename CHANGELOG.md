@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.2
+
+- Fixed an issue that prevented loading of the correct style
+
 ## 1.5.1
 
 - Fixes that hiding an entity didn't de-underline its mentions #127
