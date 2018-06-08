@@ -29,11 +29,11 @@ import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
 		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
 		"de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart",
 		"de.unistuttgart.ims.coref.annotator.api.AnnotationComment" }, outputs = {
-				"de.unistuttgart.ims.coref.annotator.api.v1_0.Entity",
-				"de.unistuttgart.ims.coref.annotator.api.v1_0.EntityGroup",
-				"de.unistuttgart.ims.coref.annotator.api.v1_0.Mention",
-				"de.unistuttgart.ims.coref.annotator.api.v1_0.DetachedMentionPart",
-				"de.unistuttgart.ims.coref.annotator.api.v1_0.AnnotationComment" })
+				"de.unistuttgart.ims.coref.annotator.api.v1.Entity",
+				"de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup",
+				"de.unistuttgart.ims.coref.annotator.api.v1.Mention",
+				"de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart",
+				"de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment" })
 public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
@@ -114,6 +114,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 				dmp.addToIndexes();
 				toRemove.add(oldDmp);
 			}
+			mentionMap.put(oldMention, mention);
 			toRemove.add(oldMention);
 		}
 		return mentionMap.get(oldMention);
