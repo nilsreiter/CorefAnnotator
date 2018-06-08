@@ -130,7 +130,6 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -150,7 +149,6 @@ import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
@@ -754,24 +752,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		splitPane.setVisible(true);
 
 		// Style
-		Meta meta = Util.getMeta(jcas);
 		StylePlugin sPlugin = null;
-
-		if (meta.getStylePlugin() != null) {
-			Object o = null;
-			try {
-				Class<?> pureClass = Class.forName(meta.getStylePlugin());
-				if (pureClass.isAssignableFrom(Plugin.class)) {
-					@SuppressWarnings("unchecked")
-					Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) pureClass;
-					o = Annotator.app.getPluginManager().getPlugin(pluginClass);
-				}
-				if (o != null && o instanceof StylePlugin)
-					sPlugin = (StylePlugin) o;
-			} catch (ClassNotFoundException e) {
-				Annotator.logger.catching(e);
-			}
+		try {
+			sPlugin = Annotator.app.getPluginManager().getStylePlugin(model.getStylePlugin());
+		} catch (ClassNotFoundException e1) {
+			Annotator.logger.catching(e1);
 		}
+
 		if (sPlugin == null)
 			sPlugin = Annotator.app.getPluginManager().getDefaultStylePlugin();
 
