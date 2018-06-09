@@ -171,12 +171,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	// actions
 	ActionContainer actions = new ActionContainer();
 
-	// controller
-	DocumentModel documentModel;
-
 	// Window components
 	JTree tree;
-	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;

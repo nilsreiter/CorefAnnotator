@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Iterator;
 
+import javax.swing.JTextPane;
+
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -19,6 +21,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	DocumentModel documentModel;
 	HighlightManager highlightManager;
+	JTextPane textPane;
 
 	@Override
 	public String getText() {
