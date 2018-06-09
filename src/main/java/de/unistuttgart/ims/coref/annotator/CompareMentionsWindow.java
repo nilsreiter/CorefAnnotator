@@ -577,7 +577,6 @@ public class CompareMentionsWindow extends AbstractWindow
 		revalidate();
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
@@ -614,6 +613,9 @@ public class CompareMentionsWindow extends AbstractWindow
 						highlightManager.underline((Annotation) fs);
 				}
 			}
+			break;
+		default:
+			break;
 		}
 	}
 
