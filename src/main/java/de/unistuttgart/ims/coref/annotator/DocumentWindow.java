@@ -690,16 +690,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			}
 	}
 
-	@Override
-	protected void entityEventMerge(FeatureStructureEvent event) {
-
-	}
-
-	@Override
-	protected void entityEventOp(FeatureStructureEvent event) {
-
-	}
-
 	public void setDocumentModel(DocumentModel model) {
 
 		tree.setModel(model.getTreeModel());

@@ -96,9 +96,14 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		}
 	}
 
-	protected abstract void entityEventMove(FeatureStructureEvent event);
+	protected void entityEventMove(FeatureStructureEvent event) {
+	}
 
-	protected abstract void entityEventMerge(FeatureStructureEvent event);
+	protected void entityEventMerge(FeatureStructureEvent event) {
 
-	protected abstract void entityEventOp(FeatureStructureEvent event);
+	}
+
+	protected void entityEventOp(FeatureStructureEvent event) {
+
+	}
 }
