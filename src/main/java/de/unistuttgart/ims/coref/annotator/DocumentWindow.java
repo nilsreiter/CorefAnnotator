@@ -114,6 +114,7 @@ import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -437,6 +438,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
+		toolsMenu.add(new ShowFlagEditor(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(Annotator.app));
@@ -723,17 +725,17 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			treeSelectionListener.addListener(a);
 			try {
 				if (model.getFlagModel().getTargetClass(f).equals(Mention.class)) {
-					mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
-					mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
+					mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+					mentionFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
 				} else {
-					entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
-					entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+					entityFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+					entityFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
 				}
 			} catch (ClassNotFoundException e) {
-				mentionFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
-				mentionFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
-				entityFlagsInMenuBar.add(new JCheckBoxMenuItem(a));
-				entityFlagsInTreePopup.add(new JCheckBoxMenuItem(a));
+				mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+				mentionFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+				entityFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+				entityFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
 			}
 
 		}
@@ -1073,6 +1075,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			lab1.setText(m.getCoveredText());
+			for (int i = 0; i < m.getFlags().size(); i++) {
+
+				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
+						FontIcon.of(MaterialDesign.MDI_FLAG));
+			}
 			if (Util.isNonNominal(m))
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
 						FontIcon.of(MaterialDesign.MDI_FLAG));

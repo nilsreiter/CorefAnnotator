@@ -18,6 +18,34 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
+/**
+ * <h2>Mapping of features to columns</h2>
+ * <table>
+ * <tr>
+ * <th>Column</th>
+ * <th>Feature</th>
+ * </tr>
+ * <tr>
+ * <td>1</td>
+ * <td>Icon</td>
+ * </tr>
+ * <tr>
+ * <td>2</td>
+ * <td>Key</td>
+ * </tr>
+ * <tr>
+ * <td>3</td>
+ * <td>Label</td>
+ * </tr>
+ * <tr>
+ * <td>4</td>
+ * <td>TargetClass</td>
+ * </tr>
+ * </table>
+ * 
+ * @author reiterns
+ *
+ */
 public class FlagModel implements Model {
 	DocumentModel documentModel;
 	private MutableSet<String> keys = Sets.mutable.empty();
@@ -132,6 +160,10 @@ public class FlagModel implements Model {
 
 	public boolean removeFlagModelListener(Object o) {
 		return listeners.remove(o);
+	}
+
+	public void updateFlag(Flag flag) {
+		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 
 }

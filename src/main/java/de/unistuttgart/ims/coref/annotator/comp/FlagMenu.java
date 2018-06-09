@@ -2,6 +2,10 @@ package de.unistuttgart.ims.coref.annotator.comp;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
@@ -14,6 +18,7 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 
 	private static final long serialVersionUID = 1L;
 	DocumentWindow dw;
+	private MutableMap<Flag, JMenuItem> actionMap = Maps.mutable.empty();
 
 	public FlagMenu(String s, DocumentWindow dw) {
 		super(s);
@@ -22,14 +27,29 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
+		Flag f = (Flag) event.getArgument1();
 		switch (event.getType()) {
+		case Remove:
+			remove(actionMap.get(f));
+			actionMap.remove(f);
+			break;
+		case Update:
+			if (actionMap.containsKey(f))
+				remove(actionMap.get(f));
+			//$FALL-THROUGH$
 		case Add:
-			ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), (Flag) event.getArgument1());
+			ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
 			dw.getTreeSelectionListener().addListener(a);
-			add(new JCheckBoxMenuItem(a));
+			add(f, new JCheckBoxMenuItem(a));
 			break;
 		default:
 		}
+	}
+
+	public JMenuItem add(Flag f, JMenuItem mi) {
+		actionMap.put(f, add(mi));
+		return mi;
+
 	}
 
 }
