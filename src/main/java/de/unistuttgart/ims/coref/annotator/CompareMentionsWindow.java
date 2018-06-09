@@ -306,12 +306,6 @@ public class CompareMentionsWindow extends AbstractWindow
 		this.mentionsInfoPane.add(getAgreementPanel(), -1);
 	}
 
-	public void entityEvent(Event event, Entity entity) {
-	}
-
-	public void entityGroupEvent(Event event, EntityGroup entity) {
-	}
-
 	protected double getAgreementInSpan(Span s) {
 		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
 
