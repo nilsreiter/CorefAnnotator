@@ -8,6 +8,8 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
+import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -20,6 +22,7 @@ public class DocumentModel implements Model {
 
 	JCas jcas;
 
+	@Deprecated
 	CommentsModel commentsModel;
 
 	CoreferenceModel coreferenceModel;
@@ -46,6 +49,7 @@ public class DocumentModel implements Model {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
+	@Deprecated
 	public CommentsModel getCommentsModel() {
 		return commentsModel;
 	}
@@ -105,6 +109,7 @@ public class DocumentModel implements Model {
 		fireDocumentChangedEvent();
 	}
 
+	@Deprecated
 	public void setCommentsModel(CommentsModel commentsModel) {
 		this.commentsModel = commentsModel;
 	}
@@ -145,6 +150,11 @@ public class DocumentModel implements Model {
 
 	public void setFlagModel(FlagModel flagModel) {
 		this.flagModel = flagModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 }

@@ -17,6 +17,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 
+@Deprecated
 public class CommentsModel extends AbstractListModel<Comment> implements Model {
 
 	MutableList<Comment> comments = Lists.mutable.empty();

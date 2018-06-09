@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.PreferenceChangeEvent;
@@ -40,7 +39,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.UIMAException;
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -61,7 +59,6 @@ import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -70,21 +67,20 @@ import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
-public class CompareMentionsWindow extends AbstractWindow
+public class CompareMentionsWindow extends AbstractTextWindow
 		implements HasTextView, CoreferenceModelListener, PreferenceChangeListener {
 
 	public class TextCaretListener implements CaretListener {
 
 		@Override
 		public void caretUpdate(CaretEvent e) {
-			if (mentionsTextPane.getSelectionStart() != mentionsTextPane.getSelectionEnd()) {
-				Span span = new Span(mentionsTextPane.getSelectionStart(), mentionsTextPane.getSelectionEnd());
+			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
+				Span span = new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 				stats.setAgreementInSpan(getAgreementInSpan(span));
 			}
 		}
@@ -143,7 +139,7 @@ public class CompareMentionsWindow extends AbstractWindow
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
 				JPopupMenu pMenu = new JPopupMenu();
-				int offset = mentionsTextPane.viewToModel(e.getPoint());
+				int offset = textPane.viewToModel(e.getPoint());
 
 				for (int i = 0; i < models.size(); i++) {
 					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models.get(i).getMentions(offset));
@@ -190,7 +186,6 @@ public class CompareMentionsWindow extends AbstractWindow
 
 	AbstractAction copyAction;
 
-	HighlightManager highlightManager;
 	MutableList<JCas> jcas;
 	MutableList<File> files;
 	int loadedJCas = 0;
@@ -199,7 +194,6 @@ public class CompareMentionsWindow extends AbstractWindow
 	JPanel mentionsInfoPane;
 	JPanel agreementPanel = null;
 
-	JTextPane mentionsTextPane;
 	MutableList<CoreferenceModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
 	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
@@ -304,12 +298,6 @@ public class CompareMentionsWindow extends AbstractWindow
 		stats.setAgreed(agreed);
 		stats.setTotalInOverlappingPart(totalInOverlappingPart);
 		this.mentionsInfoPane.add(getAgreementPanel(), -1);
-	}
-
-	public void entityEvent(Event event, Entity entity) {
-	}
-
-	public void entityGroupEvent(Event event, EntityGroup entity) {
 	}
 
 	protected double getAgreementInSpan(Span s) {
@@ -464,12 +452,12 @@ public class CompareMentionsWindow extends AbstractWindow
 
 	@Override
 	public Span getSelection() {
-		return new Span(mentionsTextPane.getSelectionStart(), mentionsTextPane.getSelectionEnd());
+		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
 	}
 
 	@Override
 	public String getText() {
-		return mentionsTextPane.getText();
+		return textPane.getText();
 	}
 
 	protected void initialiseActions() {
@@ -493,12 +481,12 @@ public class CompareMentionsWindow extends AbstractWindow
 	protected synchronized void initialiseText(JCas jcas2) {
 		if (textIsSet)
 			return;
-		mentionsTextPane.setText(jcas2.getDocumentText().replaceAll("\r", " "));
-		mentionsTextPane.setCaretPosition(0);
+		textPane.setText(jcas2.getDocumentText().replaceAll("\r", " "));
+		textPane.setCaretPosition(0);
 		textIsSet = true;
 
-		StyleManager.styleCharacter(mentionsTextPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
-		StyleManager.styleParagraph(mentionsTextPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
+		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
+		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 
 		drawAllAnnotations();
 	}
@@ -509,19 +497,19 @@ public class CompareMentionsWindow extends AbstractWindow
 		Caret caret = new Caret();
 
 		// JTabbedPane tabbedPane = new JTabbedPane();
-		mentionsTextPane = new JTextPane();
-		mentionsTextPane.setPreferredSize(new Dimension(500, 800));
-		mentionsTextPane.setDragEnabled(false);
-		mentionsTextPane.setEditable(false);
-		mentionsTextPane.setCaret(caret);
-		mentionsTextPane.getCaret().setVisible(true);
-		mentionsTextPane.addFocusListener(caret);
-		mentionsTextPane.setCaretPosition(0);
+		textPane = new JTextPane();
+		textPane.setPreferredSize(new Dimension(500, 800));
+		textPane.setDragEnabled(false);
+		textPane.setEditable(false);
+		textPane.setCaret(caret);
+		textPane.getCaret().setVisible(true);
+		textPane.addFocusListener(caret);
+		textPane.setCaretPosition(0);
 		// mentionsTextPane.addMouseListener(new TextMouseListener());
-		mentionsTextPane.getInputMap().put(
+		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				copyAction);
-		mentionsTextPane.addCaretListener(new TextCaretListener());
+		textPane.addCaretListener(new TextCaretListener());
 
 		mentionsInfoPane = new JPanel();
 		mentionsInfoPane.setLayout(new BoxLayout(mentionsInfoPane, BoxLayout.Y_AXIS));
@@ -536,14 +524,14 @@ public class CompareMentionsWindow extends AbstractWindow
 		mentionsInfoPane.add(Box.createVerticalGlue());
 		mentionsInfoPane.add(Box.createVerticalGlue());
 
-		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(mentionsTextPane,
+		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(textPane,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), mentionsInfoPane);
 		mentionsPane.setDividerLocation(500);
 
 		// tabbedPane.add("Mentions", mentionsPane);
 		// add(tabbedPane, BorderLayout.CENTER);
 		add(mentionsPane, BorderLayout.CENTER);
-		highlightManager = new HighlightManager(mentionsTextPane);
+		highlightManager = new HighlightManager(textPane);
 		setPreferredSize(new Dimension(800, 800));
 		pack();
 	}
@@ -577,44 +565,19 @@ public class CompareMentionsWindow extends AbstractWindow
 		revalidate();
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
-		Event.Type eventType = event.getType();
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		switch (eventType) {
-		case Add:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-					highlightManager.underline((Annotation) fs);
-				} else if (fs instanceof CommentAnchor) {
-					highlightManager.highlight((Annotation) fs);
-				}
-			}
-			break;
-		case Remove:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention) {
-					if (((Mention) fs).getDiscontinuous() != null)
-						highlightManager.undraw(((Mention) fs).getDiscontinuous());
-					highlightManager.undraw((Annotation) fs);
-				} else if (fs instanceof Annotation)
-					highlightManager.undraw((Annotation) fs);
+	protected void entityEventMove(FeatureStructureEvent event) {
 
-			}
-			break;
-		case Update:
-			for (FeatureStructure fs : event) {
-				if (fs instanceof Mention) {
-					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-						highlightManager.undraw((Annotation) fs);
-					else
-						highlightManager.underline((Annotation) fs);
-				}
-			}
-		}
+	}
+
+	@Override
+	protected void entityEventMerge(FeatureStructureEvent event) {
+
+	}
+
+	@Override
+	protected void entityEventOp(FeatureStructureEvent event) {
+
 	}
 
 	protected JMenu initialiseMenuFile() {
@@ -640,11 +603,6 @@ public class CompareMentionsWindow extends AbstractWindow
 		fileMenu.add(mainApplication.quitAction);
 
 		return fileMenu;
-	}
-
-	@Override
-	public JCas getJCas() {
-		return targetJCas;
 	}
 
 	public void setFile(File file, int index) {
