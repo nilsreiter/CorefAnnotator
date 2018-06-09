@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -174,7 +173,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	// controller
 	DocumentModel documentModel;
-	HighlightManager highlightManager;
 
 	// Window components
 	JTree tree;
@@ -685,46 +683,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			searchPanel = new SearchDialog(this, Annotator.app.getPreferences());
 		}
 		searchPanel.setVisible(true);
-	}
-
-	@Override
-	protected void entityEventAdd(FeatureStructureEvent event) {
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		while (iter.hasNext()) {
-			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-				highlightManager.underline((Annotation) fs);
-			} else if (fs instanceof CommentAnchor) {
-				highlightManager.highlight((Annotation) fs);
-			}
-		}
-	}
-
-	@Override
-	protected void entityEventRemove(FeatureStructureEvent event) {
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		while (iter.hasNext()) {
-			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention) {
-				if (((Mention) fs).getDiscontinuous() != null)
-					highlightManager.undraw(((Mention) fs).getDiscontinuous());
-				highlightManager.undraw((Annotation) fs);
-			} else if (fs instanceof Annotation)
-				highlightManager.undraw((Annotation) fs);
-
-		}
-	}
-
-	@Override
-	protected void entityEventUpdate(FeatureStructureEvent event) {
-		for (FeatureStructure fs : event) {
-			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-					highlightManager.undraw((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
-			}
-		}
 	}
 
 	@Override

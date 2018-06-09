@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.PreferenceChangeEvent;
@@ -40,7 +39,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.text.StyleContext;
 
 import org.apache.uima.UIMAException;
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -61,7 +59,6 @@ import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -189,7 +186,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	AbstractAction copyAction;
 
-	HighlightManager highlightManager;
 	MutableList<JCas> jcas;
 	MutableList<File> files;
 	int loadedJCas = 0;
@@ -568,46 +564,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.add(getAgreementPanel(), -1);
 		new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas).execute();
 		revalidate();
-	}
-
-	@Override
-	protected void entityEventAdd(FeatureStructureEvent event) {
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		while (iter.hasNext()) {
-			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-				highlightManager.underline((Annotation) fs);
-			} else if (fs instanceof CommentAnchor) {
-				highlightManager.highlight((Annotation) fs);
-			}
-		}
-	}
-
-	@Override
-	protected void entityEventRemove(FeatureStructureEvent event) {
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		while (iter.hasNext()) {
-			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention) {
-				if (((Mention) fs).getDiscontinuous() != null)
-					highlightManager.undraw(((Mention) fs).getDiscontinuous());
-				highlightManager.undraw((Annotation) fs);
-			} else if (fs instanceof Annotation)
-				highlightManager.undraw((Annotation) fs);
-
-		}
-	}
-
-	@Override
-	protected void entityEventUpdate(FeatureStructureEvent event) {
-		for (FeatureStructure fs : event) {
-			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-					highlightManager.undraw((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
-			}
-		}
 	}
 
 	@Override
