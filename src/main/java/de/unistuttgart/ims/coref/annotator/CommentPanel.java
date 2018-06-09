@@ -22,6 +22,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
+@Deprecated
 public class CommentPanel extends JPanel {
 
 	private static final Color TEXT_BACKGROUND_ENABLED = new Color(255, 255, 200);

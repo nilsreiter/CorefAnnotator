@@ -22,6 +22,7 @@ public class DocumentModel {
 
 	JCas jcas;
 
+	@Deprecated
 	CommentsModel commentsModel;
 
 	CoreferenceModel coreferenceModel;
@@ -46,6 +47,7 @@ public class DocumentModel {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
+	@Deprecated
 	public CommentsModel getCommentsModel() {
 		return commentsModel;
 	}
@@ -105,6 +107,7 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	@Deprecated
 	public void setCommentsModel(CommentsModel commentsModel) {
 		this.commentsModel = commentsModel;
 	}

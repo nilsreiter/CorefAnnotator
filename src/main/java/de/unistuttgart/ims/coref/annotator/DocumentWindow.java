@@ -181,6 +181,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 
 	// Sub windows
+	@Deprecated
 	CommentWindow commentsWindow;
 
 	// Menu components
@@ -609,12 +610,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			}
 
 		}.execute();
-	}
-
-	@Override
-	@Deprecated
-	public JCas getJCas() {
-		return jcas;
 	}
 
 	@Deprecated
@@ -1417,6 +1412,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		}
 
+		@Deprecated
 		private JMenu getCommentItem(CommentAnchor anno) {
 			Comment c = documentModel.getCommentsModel().get(anno);
 			StringBuilder b = new StringBuilder();
@@ -1489,6 +1485,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Deprecated
 	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1649,6 +1646,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.file = file;
 	}
 
+	@Deprecated
 	public CommentWindow getCommentsWindow() {
 		return commentsWindow;
 	}
@@ -1659,6 +1657,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
+		@Deprecated
 		AbstractAction commentAction = new CommentAction(null);
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
