@@ -22,7 +22,7 @@ public class CheckLoadability extends JCasAnnotator_ImplBase {
 					return;
 			}
 		}
-		throw new AnalysisEngineProcessException("locales/strings", "message.wrong_file_version",
+		throw new AnalysisEngineProcessException("locales/strings", "message.wrong_file_version.text",
 				new Object[] { is, TypeSystemVersion.getCurrent() });
 	}
 
