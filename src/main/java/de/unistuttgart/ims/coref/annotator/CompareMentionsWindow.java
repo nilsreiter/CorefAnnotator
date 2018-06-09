@@ -70,13 +70,12 @@ import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
-public class CompareMentionsWindow extends AbstractWindow
+public class CompareMentionsWindow extends AbstractTextWindow
 		implements HasTextView, CoreferenceModelListener, PreferenceChangeListener {
 
 	public class TextCaretListener implements CaretListener {
@@ -572,45 +571,58 @@ public class CompareMentionsWindow extends AbstractWindow
 	}
 
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
-		Event.Type eventType = event.getType();
+	protected void entityEventAdd(FeatureStructureEvent event) {
 		Iterator<FeatureStructure> iter = event.iterator(1);
-		switch (eventType) {
-		case Add:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-					highlightManager.underline((Annotation) fs);
-				} else if (fs instanceof CommentAnchor) {
-					highlightManager.highlight((Annotation) fs);
-				}
+		while (iter.hasNext()) {
+			FeatureStructure fs = iter.next();
+			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+				highlightManager.underline((Annotation) fs);
+			} else if (fs instanceof CommentAnchor) {
+				highlightManager.highlight((Annotation) fs);
 			}
-			break;
-		case Remove:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention) {
-					if (((Mention) fs).getDiscontinuous() != null)
-						highlightManager.undraw(((Mention) fs).getDiscontinuous());
-					highlightManager.undraw((Annotation) fs);
-				} else if (fs instanceof Annotation)
-					highlightManager.undraw((Annotation) fs);
-
-			}
-			break;
-		case Update:
-			for (FeatureStructure fs : event) {
-				if (fs instanceof Mention) {
-					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-						highlightManager.undraw((Annotation) fs);
-					else
-						highlightManager.underline((Annotation) fs);
-				}
-			}
-			break;
-		default:
-			break;
 		}
+	}
+
+	@Override
+	protected void entityEventRemove(FeatureStructureEvent event) {
+		Iterator<FeatureStructure> iter = event.iterator(1);
+		while (iter.hasNext()) {
+			FeatureStructure fs = iter.next();
+			if (fs instanceof Mention) {
+				if (((Mention) fs).getDiscontinuous() != null)
+					highlightManager.undraw(((Mention) fs).getDiscontinuous());
+				highlightManager.undraw((Annotation) fs);
+			} else if (fs instanceof Annotation)
+				highlightManager.undraw((Annotation) fs);
+
+		}
+	}
+
+	@Override
+	protected void entityEventUpdate(FeatureStructureEvent event) {
+		for (FeatureStructure fs : event) {
+			if (fs instanceof Mention) {
+				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+					highlightManager.undraw((Annotation) fs);
+				else
+					highlightManager.underline((Annotation) fs);
+			}
+		}
+	}
+
+	@Override
+	protected void entityEventMove(FeatureStructureEvent event) {
+
+	}
+
+	@Override
+	protected void entityEventMerge(FeatureStructureEvent event) {
+
+	}
+
+	@Override
+	protected void entityEventOp(FeatureStructureEvent event) {
+
 	}
 
 	protected JMenu initialiseMenuFile() {
