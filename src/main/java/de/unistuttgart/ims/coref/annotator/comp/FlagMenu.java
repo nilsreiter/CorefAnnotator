@@ -34,7 +34,8 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 			actionMap.remove(f);
 			break;
 		case Update:
-			remove(actionMap.get(f));
+			if (actionMap.containsKey(f))
+				remove(actionMap.get(f));
 			//$FALL-THROUGH$
 		case Add:
 			ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
