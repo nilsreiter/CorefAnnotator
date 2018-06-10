@@ -163,6 +163,7 @@ public class FlagModel implements Model {
 	}
 
 	public void updateFlag(Flag flag) {
+		Annotator.logger.entry(flag);
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 

@@ -6,6 +6,8 @@ import javax.swing.table.TableModel;
 
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
@@ -17,6 +19,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	public FlagTableModel(FlagModel fm) {
 		this.flagModel = fm;
+		this.flagModel.addFlagModelListener(this);
 	}
 
 	@Override
@@ -52,8 +55,9 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 			return Class.class;
 		case 2:
 		case 1:
-		case 0:
 			return String.class;
+		case 0:
+			return Ikon.class;
 		default:
 			return null;
 		}
@@ -71,7 +75,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		Flag f = flagModel.getFlags().get(rowIndex);
 		switch (columnIndex) {
 		case 0:
-			return f.getIcon();
+			return MaterialDesign.valueOf(f.getIcon());
 		case 1:
 			return f.getKey();
 		case 2:
@@ -92,11 +96,14 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		Annotator.logger.entry(aValue, rowIndex, columnIndex);
 		Flag f = flagModel.getFlags().get(rowIndex);
 		switch (columnIndex) {
+		case 1:
+			f.setIcon(((MaterialDesign) aValue).name());
+			break;
 		case 2:
 			f.setLabel((String) aValue);
 			break;
 		case 3:
-			f.setTargetClass(aValue.toString());
+			f.setTargetClass(((Class<?>) aValue).getCanonicalName());
 			break;
 		}
 		flagModel.updateFlag(f);
@@ -114,17 +121,19 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
+		Annotator.logger.entry(event);
+
 		TableModelEvent tme = null;
 		switch (event.getType()) {
 		case Add:
 			tme = new TableModelEvent(this, getRowCount() - 1);
 			break;
 		case Update:
-			tme = new TableModelEvent(this, flagModel.getFlags().indexOf(event.getArgument1()));
+			tme = new TableModelEvent(this, flagModel.getFlags().indexOf(event.getArgument(0)));
 			break;
 		default:
 		}
-
+		Annotator.logger.debug(tme);
 		if (tme != null)
 			for (TableModelListener l : tableModelListeners)
 				l.tableChanged(tme);

@@ -76,4 +76,9 @@ public class FeatureStructureEvent implements Event {
 	public void setSource(Object source) {
 		this.source = source;
 	}
+
+	@Override
+	public String toString() {
+		return getSource().toString() + " " + eventType + ": " + arguments.toString();
+	}
 }
