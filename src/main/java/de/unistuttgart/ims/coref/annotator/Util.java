@@ -238,8 +238,26 @@ public class Util {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		if (feature == null)
 			return new StringArray(fs.getCAS().getJCas(), 0);
-		else
-			return (StringArray) fs.getFeatureValue(feature);
+		else {
+			StringArray sa = (StringArray) fs.getFeatureValue(feature);
+			if (sa == null)
+				return new StringArray(fs.getCAS().getJCas(), 0);
+			else
+				return sa;
+		}
+	}
+
+	public static String[] getFlagsAsStringArray(FeatureStructure fs) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return new String[0];
+		else {
+			StringArray sa = (StringArray) fs.getFeatureValue(feature);
+			if (sa == null)
+				return new String[0];
+			else
+				return sa.toStringArray();
+		}
 	}
 
 	public static void setFlags(FeatureStructure fs, StringArray arr) throws CASException {

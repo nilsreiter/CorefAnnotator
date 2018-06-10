@@ -167,4 +167,11 @@ public class FlagModel implements Model {
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 
+	public Flag getFlag(String key) {
+		for (Flag f : getFlags())
+			if (f.getKey().equals(key))
+				return f;
+		return null;
+	}
+
 }

@@ -63,26 +63,6 @@ public class FlagEditor extends JFrame {
 		this.pack();
 	}
 
-	class TargetClassEditor extends DefaultCellEditor {
-
-		private static final long serialVersionUID = 1L;
-
-		public TargetClassEditor(JComboBox<Class<?>> comboBox) {
-			super(comboBox);
-		}
-
-	}
-
-	class CellEditor extends DefaultCellEditor {
-
-		private static final long serialVersionUID = 1L;
-
-		public CellEditor() {
-			super(new JTextField());
-		}
-
-	}
-
 	class TargetClassListCellRenderer extends DefaultListCellRenderer {
 
 		private static final long serialVersionUID = 1L;

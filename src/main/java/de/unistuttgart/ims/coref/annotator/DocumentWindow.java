@@ -145,6 +145,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -1074,23 +1075,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
+			FlagModel fm = documentModel.getFlagModel();
 			lab1.setText(m.getCoveredText());
-			for (int i = 0; i < m.getFlags().size(); i++) {
+			for (int i = 0; i < Util.getFlagsAsStringArray(m).length; i++) {
+				Flag f = fm.getFlag(m.getFlags(i));
+				addFlag(panel, Annotator.getString(f.getLabel()), FontIcon.of(fm.getIkon(f)));
+			}
 
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
-						FontIcon.of(MaterialDesign.MDI_FLAG));
-			}
-			if (Util.isNonNominal(m))
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
-						FontIcon.of(MaterialDesign.MDI_FLAG));
-			if (Util.isDifficult(m)) {
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_DIFFICULT),
-						FontIcon.of(MaterialDesign.MDI_ALERT_BOX));
-			}
-			if (Util.isAmbiguous(m)) {
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_AMBIGUOUS),
-						FontIcon.of(MaterialDesign.MDI_SHARE_VARIANT));
-			}
 			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT));
 			return panel;
 		}
