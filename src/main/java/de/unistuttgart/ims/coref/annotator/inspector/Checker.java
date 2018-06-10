@@ -7,6 +7,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 import javax.swing.SwingWorker;
 
+import org.apache.logging.log4j.Level;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -51,7 +52,9 @@ public class Checker extends SwingWorker<ListModel<Issue>, Object> {
 			boolean ok = true;
 			for (Detector<Mention> det : mentionDetectors) {
 				if (ok && det.detect(m, text)) {
-					listModel.addElement(det.getIssue(getDocumentModel(), m));
+					Issue issue = det.getIssue(getDocumentModel(), m);
+					Annotator.logger.log(Level.INFO, "Found issue {}", issue);
+					listModel.addElement(issue);
 					ok = false;
 				}
 			}
