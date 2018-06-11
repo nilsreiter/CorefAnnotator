@@ -44,6 +44,7 @@ public class FileConnectOpenAction extends IkonAction {
 		public void actionPerformed(ActionEvent e) {
 			SelectTwoFiles stf = (SelectTwoFiles) SwingUtilities.getWindowAncestor((Component) e.getSource());
 
+			// we need to use a CasCopier here
 			MergeFilesPlugin pl = new MergeFilesPlugin();
 			pl.setFiles(stf.getFiles().toImmutable());
 
