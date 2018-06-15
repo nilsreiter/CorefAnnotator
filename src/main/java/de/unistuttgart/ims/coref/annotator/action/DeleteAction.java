@@ -17,11 +17,11 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
@@ -61,7 +61,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		}
 
 		if (operation != null)
-			this.getTarget().getCoreferenceModel().edit(operation);
+			this.getTarget().getDocumentModel().edit(operation);
 		else
 			for (TreePath tp : getTarget().getTree().getSelectionPaths())
 				deleteSingle((CATreeNode) tp.getLastPathComponent());
@@ -71,23 +71,23 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		Operation operation = null;
 		if (tn.getFeatureStructure() instanceof Mention) {
 			int row = getTarget().getTree().getLeadSelectionRow() - 1;
-			getTarget().getCoreferenceModel().edit(new RemoveMention(tn.getFeatureStructure()));
+			getTarget().getDocumentModel().edit(new RemoveMention(tn.getFeatureStructure()));
 			getTarget().getTree().setSelectionRow(row);
 		} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-			getTarget().getCoreferenceModel().edit(new RemoveEntities(tn.getFeatureStructure()));
+			getTarget().getDocumentModel().edit(new RemoveEntities(tn.getFeatureStructure()));
 		} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
 			DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-			getTarget().getCoreferenceModel().edit(new RemovePart(dmp.getMention(), dmp));
+			getTarget().getDocumentModel().edit(new RemovePart(dmp.getMention(), dmp));
 		} else if (tn.isEntity()) {
 			FeatureStructure parentFs = tn.getParent().getFeatureStructure();
 			if (parentFs instanceof EntityGroup) {
 				operation = new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
 			} else if (tn.isLeaf()) {
-				getTarget().getCoreferenceModel().edit(new RemoveEntities(tn.getEntity()));
+				getTarget().getDocumentModel().edit(new RemoveEntities(tn.getEntity()));
 			}
 		}
 		if (operation != null)
-			getTarget().getCoreferenceModel().edit(operation);
+			getTarget().getDocumentModel().edit(operation);
 	}
 
 	@Override

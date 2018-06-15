@@ -24,7 +24,7 @@ public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> impl
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getCoreferenceModel()
+		getTarget().getDocumentModel()
 				.edit(new ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));

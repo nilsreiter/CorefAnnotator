@@ -233,7 +233,7 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public synchronized void edit(Operation operation) {
+	protected synchronized void edit(Operation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
@@ -362,7 +362,7 @@ public class CoreferenceModel {
 		documentModel.fireDocumentChangedEvent();
 	}
 
-	public void edit(MergeEntities op) {
+	protected void edit(MergeEntities op) {
 		MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
 		op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
 		op.setPreviousState(currentState.toImmutable());
@@ -370,7 +370,7 @@ public class CoreferenceModel {
 		registerEdit(op);
 	}
 
-	public void edit(RemoveDuplicateMentionsInEntities op) {
+	protected void edit(RemoveDuplicateMentionsInEntities op) {
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
 		op.getEntities().forEach(e -> {
@@ -414,7 +414,7 @@ public class CoreferenceModel {
 		registerEdit(op);
 	}
 
-	public void edit(RemoveMention op) {
+	protected void edit(RemoveMention op) {
 		op.getMentions().forEach(m -> {
 			remove(m, false);
 			if (m.getDiscontinuous() != null) {
@@ -427,7 +427,7 @@ public class CoreferenceModel {
 		registerEdit(op);
 	}
 
-	public void edit(RemoveSingletons operation) {
+	protected void edit(RemoveSingletons operation) {
 		MutableSet<Entity> entities = Sets.mutable.empty();
 		MutableSet<Mention> mentions = Sets.mutable.empty();
 		for (Entity entity : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class))) {
@@ -452,7 +452,7 @@ public class CoreferenceModel {
 		registerEdit(operation);
 	}
 
-	public void edit(ToggleEntityFlag operation) {
+	protected void edit(ToggleEntityFlag operation) {
 		MutableSet<Mention> mentions = Sets.mutable.empty();
 		operation.getObjects().forEach(e -> {
 			mentions.addAll(entityMentionMap.get(e));
@@ -467,7 +467,7 @@ public class CoreferenceModel {
 
 	}
 
-	public void edit(ToggleMentionFlag operation) {
+	protected void edit(ToggleMentionFlag operation) {
 		operation.getObjects().forEach(m -> {
 			if (Util.contains(m.getFlags(), operation.getFlag())) {
 				m.setFlags(Util.removeFrom(jcas, m.getFlags(), operation.getFlag()));

@@ -901,7 +901,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
 					if (operation != null) {
-						documentModel.getCoreferenceModel().edit(operation);
+						documentModel.edit(operation);
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -930,16 +930,15 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
 				}
-				documentModel.getCoreferenceModel()
-						.edit(new MoveMentionsToEntity((Entity) targetFS,
-								moved.select(n -> n.getFeatureStructure() instanceof Mention)
-										.collect(n -> n.getFeatureStructure())));
+				documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
+						moved.select(n -> n.getFeatureStructure() instanceof Mention)
+								.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
 				operation = new MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
 				return false;
 			if (operation != null)
-				documentModel.getCoreferenceModel().edit(operation);
+				documentModel.edit(operation);
 			return true;
 		}
 
@@ -985,7 +984,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					documentModel.getCoreferenceModel().edit(new UpdateEntityKey(newChar, etn.getEntity()));
+					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
@@ -1106,7 +1105,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			documentModel.getCoreferenceModel().edit(new RemoveMention(m));
+			documentModel.edit(new RemoveMention(m));
 		}
 
 	}
@@ -1116,7 +1115,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		public void keyTyped(KeyEvent e) {
 			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.getCoreferenceModel().edit(new AddMentionsToEntity(
+				documentModel.edit(new AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			} else if (e.getKeyChar() == ' ') {
 				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
@@ -1184,7 +1183,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.getCoreferenceModel().edit(new AddMentionsToEntity(m.getEntity(), spans));
+						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
 
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
@@ -1207,9 +1206,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
 			for (Mention m : Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class)))
-				documentModel.getCoreferenceModel().edit(new RemoveMention(m));
+				documentModel.edit(new RemoveMention(m));
 			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
-				documentModel.getCoreferenceModel().edit(new RemoveEntities(e));
+				documentModel.edit(new RemoveEntities(e));
 			documentModel.getCoreferenceModel().getHistory().clear();
 		}
 
@@ -1250,7 +1249,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().edit(new MergeEntities(getSelectedEntities()));
+			documentModel.edit(new MergeEntities(getSelectedEntities()));
 
 		}
 
@@ -1398,7 +1397,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							getCoreferenceModel().edit(new AddMentionsToEntity(entity, getSelection()));
+							documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
 						}
 					});
 					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
@@ -1587,8 +1586,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					for (TreePath tp : tree.getSelectionPaths()) {
 						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.getCoreferenceModel()
-									.edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
+							documentModel.edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
 						}
 					}
 					treeSearchField.setText("");

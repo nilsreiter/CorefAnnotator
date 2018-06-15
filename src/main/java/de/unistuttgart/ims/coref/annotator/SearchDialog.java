@@ -86,7 +86,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 			AddMentionsToEntity op = new AddMentionsToEntity(node.getEntity(),
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			documentWindow.getCoreferenceModel().edit(op);
+			documentWindow.getDocumentModel().edit(op);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to new entity");
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity(
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			documentWindow.getCoreferenceModel().edit(op);
+			documentWindow.getDocumentModel().edit(op);
 		}
 	}
 

@@ -16,8 +16,7 @@ public class RemoveSingletons extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getDocumentModel().getCoreferenceModel()
-				.edit(new de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons());
+		getTarget().getDocumentModel().edit(new de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons());
 	}
 
 }

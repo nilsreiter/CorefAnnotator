@@ -14,9 +14,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class RenameEntityAction extends DocumentWindowAction implements CAAction {
 
@@ -39,7 +39,7 @@ public class RenameEntityAction extends DocumentWindowAction implements CAAction
 				FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 		if (newLabel != null) {
 			RenameEntity op = new RenameEntity(selectedEntity, newLabel);
-			getTarget().getCoreferenceModel().edit(op);
+			getTarget().getDocumentModel().edit(op);
 		}
 	}
 

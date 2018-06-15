@@ -204,7 +204,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	JCas targetJCas;
 
-	CoreferenceModel targetModel;
+	DocumentModel targetModel;
 
 	boolean textIsSet = false;
 	int size = 0;

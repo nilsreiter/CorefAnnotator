@@ -1,5 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
@@ -9,6 +12,8 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -33,6 +38,8 @@ public class DocumentModel {
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
+	Deque<Operation> history = new LinkedList<Operation>();
+
 	boolean unsavedChanges = false;
 
 	public DocumentModel(JCas jcas) {
@@ -41,6 +48,11 @@ public class DocumentModel {
 
 	public boolean addDocumentStateListener(DocumentStateListener e) {
 		return documentStateListeners.add(e);
+	}
+
+	public void edit(Operation operation) {
+		if (operation instanceof CoreferenceModelOperation)
+			coreferenceModel.edit(operation);
 	}
 
 	protected void fireDocumentChangedEvent() {
@@ -71,6 +83,11 @@ public class DocumentModel {
 
 	public String getLanguage() {
 		return jcas.getDocumentLanguage();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -142,9 +159,17 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+	public void undo() {
+		if (!history.isEmpty()) {
+			undo(history.pop());
+			fireDocumentChangedEvent();
+		}
+	}
+
+	protected void undo(Operation operation) {
+		if (operation instanceof CoreferenceModelOperation) {
+			coreferenceModel.undo(operation);
+		}
 	}
 
 }

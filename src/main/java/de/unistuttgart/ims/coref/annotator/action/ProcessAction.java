@@ -53,7 +53,7 @@ public class ProcessAction extends DocumentWindowAction implements DocumentState
 
 					for (String surface : map.keySet()) {
 						Operation operation = new AddMentionsToNewEntity(map.get(surface));
-						getTarget().getDocumentModel().getCoreferenceModel().edit(operation);
+						getTarget().getDocumentModel().edit(operation);
 					}
 
 					getTarget().stopIndeterminateProgress();
