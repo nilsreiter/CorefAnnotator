@@ -6,10 +6,9 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.Op;
-import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 
-public abstract class MoveOp<M extends FeatureStructure, C extends FeatureStructure> implements Op {
+public abstract class MoveOp<M extends FeatureStructure, C extends FeatureStructure>
+		implements CoreferenceModelOperation {
 	ImmutableList<M> objects;
 	C source;
 	C target;

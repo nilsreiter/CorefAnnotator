@@ -4,9 +4,7 @@ import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.document.Op;
-
-public abstract class UpdateOp<T extends FeatureStructure> implements Op {
+public abstract class UpdateOp<T extends FeatureStructure> implements CoreferenceModelOperation {
 	ImmutableList<T> objects;
 
 	@SafeVarargs

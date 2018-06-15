@@ -4,9 +4,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class RemoveSingletons implements Op {
+public class RemoveSingletons implements CoreferenceModelOperation {
 	ImmutableList<Mention> mentions;
 	ImmutableList<Entity> entities;
 

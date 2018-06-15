@@ -5,9 +5,8 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class RemoveEntitiesFromEntityGroup implements Op {
+public class RemoveEntitiesFromEntityGroup implements CoreferenceModelOperation {
 	ImmutableList<Entity> entities;
 	EntityGroup entityGroup;
 

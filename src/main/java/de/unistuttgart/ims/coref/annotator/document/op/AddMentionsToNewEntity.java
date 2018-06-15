@@ -5,9 +5,8 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class AddMentionsToNewEntity implements Op {
+public class AddMentionsToNewEntity implements CoreferenceModelOperation {
 	Entity entity;
 	ImmutableList<Span> spans;
 

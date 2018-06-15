@@ -6,9 +6,8 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class MergeEntities implements Op {
+public class MergeEntities implements CoreferenceModelOperation {
 	ImmutableList<Entity> entities;
 	Entity entity;
 	ImmutableSetMultimap<Entity, Mention> previousState;

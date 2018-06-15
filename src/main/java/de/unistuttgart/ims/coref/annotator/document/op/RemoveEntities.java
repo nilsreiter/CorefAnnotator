@@ -7,9 +7,8 @@ import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
-public class RemoveEntities implements Op {
+public class RemoveEntities implements CoreferenceModelOperation {
 	ImmutableList<Entity> entities;
 	public MutableSetMultimap<Entity, EntityGroup> entityEntityGroupMap = Multimaps.mutable.set.empty();
 
