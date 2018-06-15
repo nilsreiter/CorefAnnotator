@@ -42,7 +42,8 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 
 public class TestCoreferenceModel {
 
-	CoreferenceModel model;
+	DocumentModel model;
+	CoreferenceModel cmodel;
 	JCas jcas;
 	static Preferences preferences;
 	DummyListener listener;
@@ -56,9 +57,10 @@ public class TestCoreferenceModel {
 	@Before
 	public void setUp() throws UIMAException {
 		jcas = JCasFactory.createText("the dog barks.");
-		model = new CoreferenceModel(new DocumentModel(jcas), preferences);
+		model = new DocumentModel(jcas);
+		cmodel = new CoreferenceModel(model, preferences);
 		listener = new DummyListener();
-		model.addCoreferenceModelListener(listener);
+		cmodel.addCoreferenceModelListener(listener);
 	}
 
 	@Test
@@ -66,10 +68,10 @@ public class TestCoreferenceModel {
 		model.edit(new AddMentionsToNewEntity(new Span(0, 2)));
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
-		assertFalse(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
 		assertNotNull(m.getEntity());
@@ -83,10 +85,10 @@ public class TestCoreferenceModel {
 		model.undo();
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
-		assertTrue(model.getMentions(0).isEmpty());
-		assertTrue(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertTrue(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		assertEquals(Lists.immutable.of(Type.Add, Type.Add, Type.Remove, Type.Remove),
 				listener.events.collect(ev -> ev.eventType));
@@ -105,10 +107,10 @@ public class TestCoreferenceModel {
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
 		assertEquals(e, m.getEntity());
@@ -120,10 +122,10 @@ public class TestCoreferenceModel {
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertTrue(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertTrue(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		assertEquals(2, listener.events.size());
 		assertEquals(Lists.immutable.of(Event.Type.Add, Event.Type.Remove),
@@ -133,7 +135,7 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testEditAttachPart() {
-		Mention m = model.createMention(1, 3);
+		Mention m = cmodel.createMention(1, 3);
 
 		model.edit(new AttachPart(m, new Span(4, 5)));
 
@@ -141,13 +143,13 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertFalse(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		assertEquals(Lists.immutable.of(Type.Add), listener.events.collect(ev -> ev.eventType));
 
@@ -158,13 +160,13 @@ public class TestCoreferenceModel {
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(0, JCasUtil.select(jcas, DetachedMentionPart.class).size());
 
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertTrue(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		assertEquals(Lists.immutable.of(Type.Add, Type.Remove), listener.events.collect(ev -> ev.eventType));
 
@@ -172,39 +174,39 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testEditRemoveMention() {
-		Mention m = model.createMention(1, 3);
+		Mention m = cmodel.createMention(1, 3);
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		model.edit(new RemoveMention(m));
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertTrue(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertTrue(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 		model.undo();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
 
 	}
 
 	@Test
 	public void testEditRemoveMention2() {
-		Mention m = model.createMention(1, 3);
-		DetachedMentionPart dmp = model.createDetachedMentionPart(4, 6);
+		Mention m = cmodel.createMention(1, 3);
+		DetachedMentionPart dmp = cmodel.createDetachedMentionPart(4, 6);
 		m.setDiscontinuous(dmp);
 		dmp.setMention(m);
 
@@ -212,13 +214,13 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertFalse(model.getMentions(4).isEmpty());
-		assertFalse(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(4).isEmpty());
+		assertFalse(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		model.edit(new RemoveMention(m));
 
@@ -228,13 +230,13 @@ public class TestCoreferenceModel {
 		assertFalse(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(0, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertTrue(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertTrue(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertTrue(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		model.undo();
 
@@ -242,13 +244,13 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertFalse(model.getMentions(4).isEmpty());
-		assertFalse(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(4).isEmpty());
+		assertFalse(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 	}
 
 	@Test
@@ -298,30 +300,30 @@ public class TestCoreferenceModel {
 		model.edit(new AddMentionsToNewEntity(new Span(4, 5), new Span(6, 7)));
 		MutableList<Entity> entities = Lists.mutable.withAll(JCasUtil.select(jcas, Entity.class));
 
-		Mention m = ((Mention) model.getMentions(0).iterator().next());
+		Mention m = ((Mention) cmodel.getMentions(0).iterator().next());
 		assertNotEquals(entities.get(1), m.getEntity());
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
 		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
-		assertEquals(2, model.entityMentionMap.get(entities.get(1)).size());
-		assertEquals(2, model.entityMentionMap.get(entities.get(0)).size());
+		assertEquals(2, cmodel.entityMentionMap.get(entities.get(1)).size());
+		assertEquals(2, cmodel.entityMentionMap.get(entities.get(0)).size());
 
 		model.edit(new MoveMentionsToEntity(entities.get(1), m));
 
 		assertEquals(entities.get(1), m.getEntity());
 		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
 		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
-		assertEquals(3, model.entityMentionMap.get(entities.get(1)).size());
-		assertEquals(1, model.entityMentionMap.get(entities.get(0)).size());
+		assertEquals(3, cmodel.entityMentionMap.get(entities.get(1)).size());
+		assertEquals(1, cmodel.entityMentionMap.get(entities.get(0)).size());
 
 		model.undo();
 
 		assertNotEquals(entities.get(1), m.getEntity());
 		assertEquals(2, JCasUtil.select(jcas, Entity.class).size());
 		assertEquals(4, JCasUtil.select(jcas, Mention.class).size());
-		assertEquals(2, model.entityMentionMap.get(entities.get(1)).size());
-		assertEquals(2, model.entityMentionMap.get(entities.get(0)).size());
+		assertEquals(2, cmodel.entityMentionMap.get(entities.get(1)).size());
+		assertEquals(2, cmodel.entityMentionMap.get(entities.get(0)).size());
 
 	}
 
@@ -378,8 +380,8 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testSequence1() {
-		Entity e = model.createEntity("test");
-		Mention m = model.createMention(1, 3);
+		Entity e = cmodel.createEntity("test");
+		Mention m = cmodel.createMention(1, 3);
 		m.setEntity(e);
 
 		model.edit(new AttachPart(m, new Span(4, 5)));
@@ -388,13 +390,13 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertFalse(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		model.edit(new RemoveMention(m));
 
@@ -402,13 +404,13 @@ public class TestCoreferenceModel {
 		assertFalse(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(0, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(0, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertTrue(model.getMentions(1).isEmpty());
-		assertTrue(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertTrue(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertTrue(cmodel.getMentions(1).isEmpty());
+		assertTrue(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		model.undo();
 
@@ -416,13 +418,13 @@ public class TestCoreferenceModel {
 		assertTrue(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertFalse(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertFalse(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		model.undo();
 
@@ -430,13 +432,13 @@ public class TestCoreferenceModel {
 		assertFalse(JCasUtil.exists(jcas, DetachedMentionPart.class));
 		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(0, JCasUtil.select(jcas, DetachedMentionPart.class).size());
-		assertTrue(model.getMentions(0).isEmpty());
-		assertFalse(model.getMentions(1).isEmpty());
-		assertFalse(model.getMentions(2).isEmpty());
-		assertTrue(model.getMentions(3).isEmpty());
-		assertTrue(model.getMentions(4).isEmpty());
-		assertTrue(model.getMentions(5).isEmpty());
-		assertTrue(model.getMentions(6).isEmpty());
+		assertTrue(cmodel.getMentions(0).isEmpty());
+		assertFalse(cmodel.getMentions(1).isEmpty());
+		assertFalse(cmodel.getMentions(2).isEmpty());
+		assertTrue(cmodel.getMentions(3).isEmpty());
+		assertTrue(cmodel.getMentions(4).isEmpty());
+		assertTrue(cmodel.getMentions(5).isEmpty());
+		assertTrue(cmodel.getMentions(6).isEmpty());
 
 		assertEquals(0, model.getHistory().size());
 	}
