@@ -7,6 +7,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import de.unistuttgart.ims.coref.annotator.document.op.Op;
+
 public interface Event extends Iterable<FeatureStructure> {
 	public enum Type {
 		/**

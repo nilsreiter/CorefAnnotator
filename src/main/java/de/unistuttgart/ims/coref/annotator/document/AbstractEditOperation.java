@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import de.unistuttgart.ims.coref.annotator.document.op.Op;
+
 public abstract class AbstractEditOperation implements Op {
 	boolean run = false;
 
