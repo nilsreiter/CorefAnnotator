@@ -26,7 +26,7 @@ public class ShowHistoryAction extends DocumentWindowAction {
 		JDialog frame = new JDialog(getTarget());
 		frame.setModal(true);
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (Operation edit : getTarget().getCoreferenceModel().getHistory())
+		for (Operation edit : getTarget().getDocumentModel().getHistory())
 			model.addElement(edit.toString());
 
 		JList<String> list = new JList<String>();

@@ -1209,7 +1209,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				documentModel.edit(new RemoveMention(m));
 			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
 				documentModel.edit(new RemoveEntities(e));
-			documentModel.getCoreferenceModel().getHistory().clear();
+			documentModel.getHistory().clear();
 		}
 
 	}

@@ -53,6 +53,7 @@ public class DocumentModel {
 	public void edit(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
+		history.push(operation);
 	}
 
 	protected void fireDocumentChangedEvent() {
@@ -99,7 +100,7 @@ public class DocumentModel {
 	}
 
 	public boolean isSavable() {
-		return hasUnsavedChanges() || coreferenceModel.getHistory().size() > 0;
+		return hasUnsavedChanges() || getHistory().size() > 0;
 	}
 
 	/**
@@ -170,6 +171,10 @@ public class DocumentModel {
 		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.undo(operation);
 		}
+	}
+
+	public Deque<Operation> getHistory() {
+		return history;
 	}
 
 }
