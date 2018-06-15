@@ -8,12 +8,13 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelFactory;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 
+@Deprecated
 public class CommentWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;

@@ -28,7 +28,7 @@ public abstract class AbstractWindow extends JFrame {
 	Thread messageVoider;
 	JMenuBar menuBar = new JMenuBar();
 
-	static JMenu menu_settings = null;
+	JMenu menu_settings = null;
 
 	protected void initializeWindow() {
 		SpringLayout springs = new SpringLayout();
@@ -114,8 +114,6 @@ public abstract class AbstractWindow extends JFrame {
 	}
 
 	public JMenu initialiseMenuSettings() {
-		if (menu_settings != null)
-			return menu_settings;
 		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
@@ -130,6 +128,8 @@ public abstract class AbstractWindow extends JFrame {
 		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
 		return menu_settings;
 
 	}

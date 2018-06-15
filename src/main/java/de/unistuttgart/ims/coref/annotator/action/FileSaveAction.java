@@ -31,6 +31,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		target.setIndeterminateProgress();
 		SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
 				(file, jcas) -> {
+					target.getDocumentModel().getCoreferenceModel().getHistory().clear();
 					target.setWindowTitle();
 					target.stopIndeterminateProgress();
 				});

@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
-import de.unistuttgart.ims.coref.annotator.plugins.MergeFilesPlugin;
+import de.unistuttgart.ims.coref.annotator.uima.MergeFilesPlugin;
 
 public class FileMergeOpenAction extends IkonAction {
 

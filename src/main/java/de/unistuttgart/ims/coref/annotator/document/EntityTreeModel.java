@@ -2,11 +2,14 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -18,10 +21,10 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
 	private static final long serialVersionUID = 1L;
@@ -38,6 +41,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	 */
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 
+	String currentSearchString = null;
+
 	public EntityTreeModel(CoreferenceModel docMod) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.coreferenceModel = docMod;
@@ -46,6 +51,18 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.initialise();
 		this.resort();
 
+	}
+
+	private CATreeNode createNode(FeatureStructure fs) {
+		CATreeNode node = null;
+		if (fs instanceof Entity) {
+			node = new CATreeNode(fs, ((Entity) fs).getLabel());
+		} else if (fs instanceof Annotation) {
+			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		}
+		if (node != null)
+			fsMap.put(fs, node);
+		return node;
 	}
 
 	@Override
@@ -112,6 +129,16 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		}
 	}
 
+	protected CATreeNode get(Object m) {
+		if (m == null)
+			return getRoot();
+		return fsMap.get(m);
+	}
+
+	public EntitySortOrder getEntitySortOrder() {
+		return entitySortOrder;
+	}
+
 	private int getInsertPosition(CATreeNode newParent, FeatureStructure newChildFS) {
 		int ind = 0;
 		if (newChildFS instanceof Annotation)
@@ -123,28 +150,6 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				ind++;
 			}
 		return ind;
-	}
-
-	private CATreeNode createNode(FeatureStructure fs) {
-		CATreeNode node = null;
-		if (fs instanceof Entity) {
-			node = new CATreeNode(fs, ((Entity) fs).getLabel());
-		} else if (fs instanceof Annotation) {
-			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
-		}
-		if (node != null)
-			fsMap.put(fs, node);
-		return node;
-	}
-
-	protected CATreeNode get(Object m) {
-		if (m == null)
-			return getRoot();
-		return fsMap.get(m);
-	}
-
-	public EntitySortOrder getEntitySortOrder() {
-		return entitySortOrder;
 	}
 
 	public Object[] getPathToRoot(FeatureStructure fs) {
@@ -164,8 +169,40 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
 			entityEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+			if (m.getDiscontinuous() != null)
+				entityEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
+	}
+
+	protected boolean matches(Pattern pattern, CATreeNode e) {
+		if (!e.isEntity())
+			return false;
+		Matcher m;
+
+		if (e.getEntity().getLabel() != null) {
+			m = pattern.matcher(e.getEntity().getLabel());
+			if (m.find())
+				return true;
+		}
+		StringArray flags = e.getEntity().getFlags();
+		if (flags != null)
+			for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
+				m = pattern.matcher(e.getEntity().getFlags(i));
+				if (m.find())
+					return true;
+			}
+		for (int i = 0; i < e.getChildCount(); i++) {
+			FeatureStructure child = e.getChildAt(i).getFeatureStructure();
+			if (child instanceof Annotation) {
+				String mc = ((Annotation) child).getCoveredText();
+				m = pattern.matcher(mc);
+				if (m.find())
+					return true;
+			}
+		}
+		return false;
+
 	}
 
 	public void optResort() {
@@ -173,8 +210,41 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			resort();
 	}
 
+	public void rankBySearchString(String s) {
+		currentSearchString = s;
+		if (s == null)
+			return;
+		Pattern pattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+		if (s.length() >= 1) {
+			for (int i = 0; i < getRoot().getChildCount(); i++) {
+				CATreeNode tn = getRoot().getChildAt(i);
+				if (tn.isEntity()) {
+					tn.setRank(matches(pattern, tn) ? 60 : 40);
+				}
+			}
+			resort(EntitySortOrder.getVisibilitySortOrder(getEntitySortOrder().getComparator()));
+		} else {
+			unRankBySearch();
+		}
+	}
+
+	public void unRankBySearch() {
+		currentSearchString = null;
+		for (int i = 0; i < getRoot().getChildCount(); i++) {
+			CATreeNode tn = getRoot().getChildAt(i);
+			if (tn.isEntity()) {
+				tn.setRank(50);
+
+			}
+		}
+		resort();
+	}
+
 	public void resort() {
-		resort(entitySortOrder.getComparator());
+		if (currentSearchString != null)
+			rankBySearchString(currentSearchString);
+		else
+			resort(entitySortOrder.getComparator());
 	}
 
 	public void resort(Comparator<CATreeNode> comparator) {

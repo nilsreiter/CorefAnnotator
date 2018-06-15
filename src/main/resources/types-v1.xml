@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<typeSystemDescription
+	xmlns="http://uima.apache.org/resourceSpecifier">
+	<name>Coref Annotator</name>
+	<description />
+	<version>1</version>
+	<vendor>Nils Reiter</vendor>
+	<types>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Mention</name>
+			<description>A mention in the text.</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Entity</name>
+					<description>the entity that this mention belongs to.</description>
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+					</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Discontinuous</name>
+					<description>If this mention is discontinuous, the detached part is stored here.</description>
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
+					</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Flags</name>
+					<description>An array of strings that stores flags</description>
+					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Entity</name>
+			<description>An entity, that is not linked to a specific text segment.</description>
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Label</name>
+					<description>A label of the entity, shown in the tree view.</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Color</name>
+					<description>The color used for underlining</description>
+					<rangeTypeName>uima.cas.Integer</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Key</name>
+					<description>The key for keyboard based annotation</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Flags</name>
+					<description>An array of strings that stores flags</description>
+					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Hidden</name>
+					<description>A boolean to indicate whether this entity has been hidden</description>
+					<rangeTypeName>uima.cas.Boolean</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>XmlId</name>
+					<description>A field to store the xml id of the entity, if it has been loaded from TEI/XML</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup</name>
+			<description>Represents an entity group</description>
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Members</name>
+					<description>An array containin the members of the group</description>
+					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
+					<elementType>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+					</elementType>
+					<multipleReferencesAllowed>false</multipleReferencesAllowed>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
+			</name>
+			<description>For detached relative clauses etc., this is used to mark them</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Mention</name>
+					<description>A pointer to the mention this detached part belongs to</description>
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Comment</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Author</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Value</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionComment</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Comment
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Mention</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment
+			</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Comment
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Annotation</name>
+					<description />
+					<rangeTypeName>uima.tcas.Annotation</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor</name>
+			<description />
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+		</typeDescription>
+	</types>
+</typeSystemDescription>

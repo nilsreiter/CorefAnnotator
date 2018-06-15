@@ -2,9 +2,10 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Comparator;
 
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 
+@Deprecated
 public enum CommentSortOrder {
 	POSITION;
 

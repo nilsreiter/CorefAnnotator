@@ -15,7 +15,7 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -62,7 +62,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public Class<? extends StylePlugin> getStylePlugin() {
-		return QDStylePlugin.class;
+		return DefaultStylePlugin.class;
 	}
 
 	@Override

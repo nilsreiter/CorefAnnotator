@@ -17,11 +17,12 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.DeleteCommentAction;
 import de.unistuttgart.ims.coref.annotator.action.DocumentWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.Comment;
+import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
+import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
+@Deprecated
 public class CommentPanel extends JPanel {
 
 	private static final Color TEXT_BACKGROUND_ENABLED = new Color(255, 255, 200);
