@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
 
 public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> implements CAAction {
 	private static final long serialVersionUID = 1L;
@@ -25,7 +25,7 @@ public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> impl
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN,
+				.edit(new ToggleEntityFlag(Constants.ENTITY_FLAG_HIDDEN,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}

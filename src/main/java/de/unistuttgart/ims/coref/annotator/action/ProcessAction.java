@@ -19,6 +19,7 @@ import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 
 public class ProcessAction extends DocumentWindowAction implements DocumentStateListener {
@@ -51,7 +52,7 @@ public class ProcessAction extends DocumentWindowAction implements DocumentState
 					}
 
 					for (String surface : map.keySet()) {
-						Op op = new Op.AddMentionsToNewEntity(map.get(surface));
+						Op op = new AddMentionsToNewEntity(map.get(surface));
 						getTarget().getDocumentModel().getCoreferenceModel().edit(op);
 					}
 

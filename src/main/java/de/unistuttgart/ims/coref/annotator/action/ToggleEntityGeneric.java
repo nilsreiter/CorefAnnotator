@@ -13,9 +13,9 @@ import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> implements CAAction {
 	private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> impl
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
+				.edit(new ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}

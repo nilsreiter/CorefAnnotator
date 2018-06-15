@@ -12,7 +12,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 
 public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
 
@@ -32,7 +32,7 @@ public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
 		Color newColor = JColorChooser.showDialog(getTarget(),
 				Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
 		if (color != newColor) {
-			getTarget().getCoreferenceModel().edit(new Op.UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
+			getTarget().getCoreferenceModel().edit(new UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
 		}
 
 	}

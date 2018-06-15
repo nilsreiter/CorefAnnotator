@@ -13,9 +13,9 @@ import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class ToggleMentionDifficult extends TargetedIkonAction<DocumentWindow> implements CAAction {
 
@@ -30,7 +30,7 @@ public class ToggleMentionDifficult extends TargetedIkonAction<DocumentWindow> i
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
+				.edit(new ToggleMentionFlag(Constants.MENTION_FLAG_DIFFICULT,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}

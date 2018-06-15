@@ -45,7 +45,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
 	class ListTransferHandler extends TransferHandler {
@@ -83,7 +84,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			Annotator.logger.debug("Adding search results to entity");
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 
-			Op.AddMentionsToEntity op = new Op.AddMentionsToEntity(node.getEntity(),
+			AddMentionsToEntity op = new AddMentionsToEntity(node.getEntity(),
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getCoreferenceModel().edit(op);
 		}
@@ -101,7 +102,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to new entity");
-			Op.AddMentionsToNewEntity op = new Op.AddMentionsToNewEntity(
+			AddMentionsToNewEntity op = new AddMentionsToNewEntity(
 					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getCoreferenceModel().edit(op);
 		}
