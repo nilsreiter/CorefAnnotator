@@ -148,7 +148,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -892,16 +892,16 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					@SuppressWarnings("unchecked")
 					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					Op op = null;
+					Operation operation = null;
 					if (targetFS == null) {
-						op = new AddMentionsToNewEntity(paList);
+						operation = new AddMentionsToNewEntity(paList);
 					} else if (targetFS instanceof Entity) {
-						op = new AddMentionsToEntity((Entity) targetFS, paList);
+						operation = new AddMentionsToEntity((Entity) targetFS, paList);
 					} else if (targetFS instanceof Mention) {
-						op = new AttachPart((Mention) targetFS, paList.getFirst());
+						operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
-					if (op != null) {
-						documentModel.getCoreferenceModel().edit(op);
+					if (operation != null) {
+						documentModel.getCoreferenceModel().edit(operation);
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -923,7 +923,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
 			Annotator.logger.debug("Moving {} things", moved.size());
-			Op operation = null;
+			Operation operation = null;
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
 					operation = new AddEntityToEntityGroup((EntityGroup) targetFS,

@@ -11,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.op.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 
 public class ShowHistoryAction extends DocumentWindowAction {
 
@@ -26,7 +26,7 @@ public class ShowHistoryAction extends DocumentWindowAction {
 		JDialog frame = new JDialog(getTarget());
 		frame.setModal(true);
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (Op edit : getTarget().getCoreferenceModel().getHistory())
+		for (Operation edit : getTarget().getCoreferenceModel().getHistory())
 			model.addElement(edit.toString());
 
 		JList<String> list = new JList<String>();

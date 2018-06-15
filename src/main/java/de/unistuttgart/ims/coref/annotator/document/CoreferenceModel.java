@@ -46,7 +46,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsInEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
@@ -100,7 +100,7 @@ public class CoreferenceModel {
 
 	boolean initialised = false;
 
-	Deque<Op> history = new LinkedList<Op>();
+	Deque<Operation> history = new LinkedList<Operation>();
 
 	DocumentModel documentModel;
 
@@ -233,7 +233,7 @@ public class CoreferenceModel {
 		return m;
 	}
 
-	public synchronized void edit(Op operation) {
+	public synchronized void edit(Operation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
@@ -487,7 +487,7 @@ public class CoreferenceModel {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
-	public Deque<Op> getHistory() {
+	public Deque<Operation> getHistory() {
 		return history;
 	}
 
@@ -590,7 +590,7 @@ public class CoreferenceModel {
 		characterPosition2AnnotationMap.add(a);
 	}
 
-	private void registerEdit(Op operation) {
+	private void registerEdit(Operation operation) {
 		history.push(operation);
 		documentModel.fireDocumentChangedEvent();
 	}
@@ -674,7 +674,7 @@ public class CoreferenceModel {
 		}
 	}
 
-	protected void undo(Op operation) {
+	protected void undo(Operation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;

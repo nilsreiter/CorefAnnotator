@@ -1,4 +1,4 @@
 package de.unistuttgart.ims.coref.annotator.document.op;
 
-public interface Op {
+public interface Operation {
 }
