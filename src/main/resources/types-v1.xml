@@ -19,7 +19,8 @@
 				</featureDescription>
 				<featureDescription>
 					<name>Discontinuous</name>
-					<description>If this mention is discontinuous, the detached part is stored here.</description>
+					<description>If this mention is discontinuous, the detached part is
+						stored here.</description>
 					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
 					</rangeTypeName>
 				</featureDescription>
@@ -32,12 +33,14 @@
 		</typeDescription>
 		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Entity</name>
-			<description>An entity, that is not linked to a specific text segment.</description>
+			<description>An entity, that is not linked to a specific text
+				segment.</description>
 			<supertypeName>uima.cas.TOP</supertypeName>
 			<features>
 				<featureDescription>
 					<name>Label</name>
-					<description>A label of the entity, shown in the tree view.</description>
+					<description>A label of the entity, shown in the tree view.
+					</description>
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
@@ -57,12 +60,14 @@
 				</featureDescription>
 				<featureDescription>
 					<name>Hidden</name>
-					<description>A boolean to indicate whether this entity has been hidden</description>
+					<description>A boolean to indicate whether this entity has been
+						hidden</description>
 					<rangeTypeName>uima.cas.Boolean</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
 					<name>XmlId</name>
-					<description>A field to store the xml id of the entity, if it has been loaded from TEI/XML</description>
+					<description>A field to store the xml id of the entity, if it has
+						been loaded from TEI/XML</description>
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
 			</features>
@@ -75,7 +80,8 @@
 			<features>
 				<featureDescription>
 					<name>Members</name>
-					<description>An array containin the members of the group</description>
+					<description>An array containin the members of the group
+					</description>
 					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
 					<elementType>de.unistuttgart.ims.coref.annotator.api.v1.Entity
 					</elementType>
@@ -86,12 +92,14 @@
 		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart
 			</name>
-			<description>For detached relative clauses etc., this is used to mark them</description>
+			<description>For detached relative clauses etc., this is used to mark
+				them</description>
 			<supertypeName>uima.tcas.Annotation</supertypeName>
 			<features>
 				<featureDescription>
 					<name>Mention</name>
-					<description>A pointer to the mention this detached part belongs to</description>
+					<description>A pointer to the mention this detached part belongs to
+					</description>
 					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
 					</rangeTypeName>
 				</featureDescription>
@@ -115,7 +123,8 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionComment</name>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionComment
+			</name>
 			<description />
 			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.Comment
 			</supertypeName>
@@ -146,6 +155,70 @@
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor</name>
 			<description />
 			<supertypeName>uima.tcas.Annotation</supertypeName>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation
+			</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>RelationType</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation
+			</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Source</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+					</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Target</name>
+					<description />
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+					</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation
+			</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation
+			</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Entities</name>
+					<description />
+					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
+					<elementType>de.unistuttgart.ims.coref.annotator.api.v1.Entity
+					</elementType>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType
+			</name>
+			<description />
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Label</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
 		</typeDescription>
 	</types>
 </typeSystemDescription>
