@@ -667,7 +667,7 @@ public class CoreferenceModel {
 		fireEvent(Event.get(Event.Type.Remove, eg, entity));
 	}
 
-	public void undo() {
+	protected void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
 			documentModel.fireDocumentChangedEvent();

@@ -27,7 +27,7 @@ public class UndoAction extends DocumentWindowAction implements DocumentStateLis
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getDocumentModel().getCoreferenceModel().undo();
+		getTarget().getDocumentModel().undo();
 	}
 
 	@Override
