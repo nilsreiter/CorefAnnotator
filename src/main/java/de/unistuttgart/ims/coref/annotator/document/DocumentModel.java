@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -34,6 +35,8 @@ public class DocumentModel {
 
 	EntityTreeModel treeModel;
 
+	RelationModel relationModel;
+
 	TypeSystemVersion typeSystemVersion;
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
@@ -53,6 +56,8 @@ public class DocumentModel {
 	public void edit(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
+		else if (operation instanceof RelationModelOperation)
+			relationModel.edit((RelationModelOperation) operation);
 		history.push(operation);
 	}
 
@@ -134,6 +139,10 @@ public class DocumentModel {
 		this.coreferenceModel = coreferenceModel;
 	}
 
+	public void setRelationModel(RelationModel relationModel) {
+		this.relationModel = relationModel;
+	}
+
 	protected void setFileFormat(TypeSystemVersion typeSystemVersion) {
 		this.typeSystemVersion = typeSystemVersion;
 	}
@@ -170,6 +179,8 @@ public class DocumentModel {
 	protected void undo(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.undo(operation);
+		} else if (operation instanceof RelationModelOperation) {
+			relationModel.undo((RelationModelOperation) operation);
 		}
 	}
 

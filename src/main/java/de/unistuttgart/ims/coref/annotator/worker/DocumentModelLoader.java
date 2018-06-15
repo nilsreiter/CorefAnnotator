@@ -15,6 +15,7 @@ import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
+import de.unistuttgart.ims.coref.annotator.document.RelationModel;
 
 public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
@@ -46,6 +47,9 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 		EntityTreeModel etm = new EntityTreeModel(cModel);
 
+		RelationModel relationModel = new RelationModel(documentModel);
+
+		documentModel.setRelationModel(relationModel);
 		documentModel.setCoreferenceModel(cModel);
 		documentModel.setTreeModel(etm);
 		documentModel.setCommentsModel(new CommentsModel(documentModel));

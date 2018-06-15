@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
@@ -232,4 +233,13 @@ public class Util {
 		return list;
 	}
 
+	public static FSArray toFSArray(JCas jcas, Collection<? extends FeatureStructure> fs) {
+		FSArray arr = new FSArray(jcas, fs.size());
+		int i = 0;
+		for (FeatureStructure f : fs) {
+			arr.set(i++, f);
+		}
+		arr.addToIndexes();
+		return arr;
+	}
 }
