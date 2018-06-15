@@ -188,4 +188,8 @@ public class DocumentModel {
 		return history;
 	}
 
+	public RelationModel getRelationModel() {
+		return relationModel;
+	}
+
 }

@@ -35,10 +35,12 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -47,6 +49,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -134,6 +137,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -165,6 +169,19 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
+	public class RelationListRenderer extends DefaultListCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		public Component getListCellRendererComponent​(JList<?> list, Object value, int index, boolean isSelected,
+				boolean cellHasFocus) {
+			JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			EntityRelation er = (EntityRelation) value;
+			c.setText(er.getRelationType().getLabel());
+			return c;
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Deprecated
@@ -189,6 +206,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
+	JList<EntityRelation> relationsList = new JList<EntityRelation>();
 
 	// Sub windows
 	@Deprecated
@@ -317,11 +335,17 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
+		relationsList.setCellRenderer(new RelationListRenderer());
+
 		// split pane
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
 		splitPane.setVisible(false);
 		splitPane.setDividerLocation(500);
-		getContentPane().add(splitPane);
+
+		JTabbedPane tabbed = new JTabbedPane();
+		tabbed.add(Annotator.getString("tabs.text"), splitPane);
+		tabbed.add(Annotator.getString("tabs.relations"), relationsList);
+		getContentPane().add(tabbed);
 
 		setPreferredSize(new Dimension(800, 800));
 		pack();
@@ -701,6 +725,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
 		documentModel = model;
+
+		relationsList.setModel(model.getRelationModel());
 
 		// UI
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));

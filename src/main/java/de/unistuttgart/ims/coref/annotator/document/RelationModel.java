@@ -1,8 +1,13 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import org.apache.uima.fit.util.JCasUtil;
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
@@ -11,15 +16,21 @@ import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
 import de.unistuttgart.ims.uima.io.xml.ArrayUtil;
 
-public class RelationModel {
+public class RelationModel implements ListModel<EntityRelation> {
 	DocumentModel documentModel;
+
+	private MutableList<EntityRelation> list = Lists.mutable.empty();
+
+	MutableList<RelationModelListener> listeners = Lists.mutable.empty();
+	MutableList<ListDataListener> listDataListeners = Lists.mutable.empty();
 
 	public RelationModel(DocumentModel documentModel) {
 		this.documentModel = documentModel;
+		list.addAll(JCasUtil.select(documentModel.getJcas(), EntityRelation.class));
 	}
 
-	public ImmutableSet<EntityRelation> getRelations() {
-		return Sets.immutable.withAll(JCasUtil.select(documentModel.getJcas(), EntityRelation.class));
+	public boolean addRelationModelListener(RelationModelListener e) {
+		return listeners.add(e);
 	}
 
 	protected void edit(RelationModelOperation op) {
@@ -41,6 +52,18 @@ public class RelationModel {
 		erel.setRelationType(op.getRelationType());
 		erel.addToIndexes();
 		op.setRelation(erel);
+		list.add(erel);
+
+		ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, list.size() - 2, list.size() - 1);
+		listDataListeners.forEach(l -> l.intervalAdded(lde));
+	}
+
+	public ImmutableList<EntityRelation> getRelations() {
+		return list.toImmutable();
+	}
+
+	public boolean removeRelationModelListener(Object o) {
+		return listeners.remove(o);
 	}
 
 	protected void undo(RelationModelOperation op) {
@@ -49,5 +72,25 @@ public class RelationModel {
 
 	protected void undo(RelateEntities op) {
 		op.getRelation().removeFromIndexes();
+	}
+
+	@Override
+	public int getSize() {
+		return getRelations().size();
+	}
+
+	@Override
+	public EntityRelation getElementAt(int index) {
+		return getRelations().get(index);
+	}
+
+	@Override
+	public void addListDataListener(ListDataListener l) {
+		listDataListeners.add(l);
+	}
+
+	@Override
+	public void removeListDataListener(ListDataListener l) {
+		listDataListeners.remove(l);
 	}
 }
