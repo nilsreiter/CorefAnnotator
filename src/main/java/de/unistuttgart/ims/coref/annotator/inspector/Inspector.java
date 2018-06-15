@@ -4,25 +4,26 @@ import java.awt.BorderLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.comp.PanelList;
 
 public class Inspector extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	JList<Issue> issueList;
+	PanelList<Issue, JPanel> issueList;
 
 	public Inspector(DocumentWindow dw) {
 		super(dw);
 
 		DefaultListModel<Issue> listModel = new DefaultListModel<Issue>();
-		issueList = new JList<Issue>(listModel);
-		issueList.setCellRenderer(new IssuePanelFactory());
+		issueList = new PanelList<Issue, JPanel>(new IssuePanelFactory());
 		getContentPane().add(new JToolBar(), BorderLayout.NORTH);
 		getContentPane().add(new JScrollPane(issueList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
@@ -39,10 +40,9 @@ public class Inspector extends JDialog {
 
 	public void setListModel(ListModel<Issue> listModel) {
 		issueList.setModel(listModel);
-		// if (listModel.getSize() > 0)
-		// issueList.intervalAdded(
-		// new ListDataEvent(listModel, ListDataEvent.INTERVAL_ADDED, 0,
-		// listModel.getSize() - 1));
+		if (listModel.getSize() > 0)
+			issueList.intervalAdded(
+					new ListDataEvent(listModel, ListDataEvent.INTERVAL_ADDED, 0, listModel.getSize() - 1));
 		setVisible(true);
 		pack();
 	}
