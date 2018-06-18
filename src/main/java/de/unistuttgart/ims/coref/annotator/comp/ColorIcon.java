@@ -34,7 +34,7 @@ public class ColorIcon implements Icon {
 		iHeight = height;
 
 		color = c;
-		border = Color.black;
+		border = c;
 		insets = new Insets(1, 1, 1, 1);
 	}
 

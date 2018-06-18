@@ -111,6 +111,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.NewRelation;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
@@ -302,6 +303,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		controls.add(actions.formGroupAction);
 		controls.add(actions.mergeSelectedEntitiesAction);
 		controls.add(actions.showSearchPanelAction);
+		controls.add(new NewRelation(this));
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())

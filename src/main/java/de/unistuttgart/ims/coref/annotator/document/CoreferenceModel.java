@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -12,6 +13,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
@@ -65,6 +67,10 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  *
  */
 public class CoreferenceModel {
+
+	public static enum EntitySorter {
+		LABEL, CHILDREN, COLOR
+	}
 
 	/**
 	 * A mapping from character positions to annotations
@@ -468,6 +474,26 @@ public class CoreferenceModel {
 
 	public ImmutableSet<Mention> get(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
+	}
+
+	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
+
+		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
+		return eset.toSortedList(new Comparator<Entity>() {
+
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				switch (entitySorter) {
+				case CHILDREN:
+					return Integer.compare(entityMentionMap.get(o2).size(), entityMentionMap.get(o1).size());
+				case COLOR:
+					return Integer.compare(o1.getColor(), o2.getColor());
+				default:
+					return o1.getLabel().compareTo(o2.getLabel());
+				}
+			}
+
+		}).toImmutable();
 	}
 
 	public JCas getJCas() {
