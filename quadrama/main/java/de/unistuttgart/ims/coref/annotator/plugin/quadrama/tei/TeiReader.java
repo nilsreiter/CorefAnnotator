@@ -121,7 +121,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			}
 		});
 
-		gxr.addRule("div", Segment.class);
+		gxr.addRule("[type=act]", Segment.class, (s, e) -> {
+			s.setLabel(e.selectFirst("div > desc > title").text());
+		});
 
 		Resource res = nextFile();
 
