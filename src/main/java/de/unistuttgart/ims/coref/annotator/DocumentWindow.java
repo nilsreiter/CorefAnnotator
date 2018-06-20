@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -20,11 +21,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -126,7 +129,6 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -134,11 +136,11 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator2;
+import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
-import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Op;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
@@ -146,13 +148,12 @@ import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractWindow implements CaretListener, TreeModelListener,
+public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
@@ -171,13 +172,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	// actions
 	ActionContainer actions = new ActionContainer();
 
-	// controller
-	DocumentModel documentModel;
-	HighlightManager highlightManager;
-
 	// Window components
 	JTree tree;
-	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
@@ -187,6 +183,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	SegmentIndicator2 segmentIndicator;
 
 	// Sub windows
+	@Deprecated
 	CommentWindow commentsWindow;
 
 	// Menu components
@@ -557,7 +554,21 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
 			setVisible(false);
 			dispose();
-			Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
+					Annotator.getString("message.wrong_file_version.help") };
+			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
+					ex.getCause().getLocalizedMessage(), options, new BooleanSupplier[] { () -> {
+						return true;
+					}, () -> {
+						try {
+							Desktop.getDesktop().browse(
+									new URI("https://github.com/nilsreiter/CorefAnnotator/wiki/File-format-versions"));
+						} catch (IOException | URISyntaxException e) {
+							Annotator.logger.catching(e);
+						}
+						return true;
+					} });
+
 		});
 		lai.execute();
 
@@ -604,12 +615,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			}
 
 		}.execute();
-	}
-
-	@Override
-	@Deprecated
-	public JCas getJCas() {
-		return jcas;
 	}
 
 	@Deprecated
@@ -677,53 +682,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
-		Event.Type eventType = event.getType();
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		switch (eventType) {
-		case Add:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-					highlightManager.underline((Annotation) fs);
-				} else if (fs instanceof CommentAnchor) {
-					highlightManager.highlight((Annotation) fs);
-				}
+	protected void entityEventMove(FeatureStructureEvent event) {
+		for (FeatureStructure fs : event)
+			if (fs instanceof Mention) {
+				highlightManager.undraw((Annotation) fs);
+				highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
 			}
-			break;
-		case Remove:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention) {
-					if (((Mention) fs).getDiscontinuous() != null)
-						highlightManager.undraw(((Mention) fs).getDiscontinuous());
-					highlightManager.undraw((Annotation) fs);
-				} else if (fs instanceof Annotation)
-					highlightManager.undraw((Annotation) fs);
-
-			}
-			break;
-		case Move:
-			for (FeatureStructure fs : event)
-				if (fs instanceof Mention) {
-					highlightManager.undraw((Annotation) fs);
-					highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
-				}
-			break;
-		case Update:
-			for (FeatureStructure fs : event) {
-				if (fs instanceof Mention) {
-					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-						highlightManager.undraw((Annotation) fs);
-					else
-						highlightManager.underline((Annotation) fs);
-				}
-			}
-			break;
-		default:
-			break;
-		}
-
 	}
 
 	public void setDocumentModel(DocumentModel model) {
@@ -742,24 +706,13 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		splitPane.setVisible(true);
 
 		// Style
-		Meta meta = Util.getMeta(jcas);
 		StylePlugin sPlugin = null;
-
-		if (meta.getStylePlugin() != null) {
-			Object o = null;
-			try {
-				Class<?> pureClass = Class.forName(meta.getStylePlugin());
-				if (pureClass.isAssignableFrom(Plugin.class)) {
-					@SuppressWarnings("unchecked")
-					Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) pureClass;
-					o = Annotator.app.getPluginManager().getPlugin(pluginClass);
-				}
-				if (o != null && o instanceof StylePlugin)
-					sPlugin = (StylePlugin) o;
-			} catch (ClassNotFoundException e) {
-				Annotator.logger.catching(e);
-			}
+		try {
+			sPlugin = Annotator.app.getPluginManager().getStylePlugin(model.getStylePlugin());
+		} catch (ClassNotFoundException e1) {
+			Annotator.logger.catching(e1);
 		}
+
 		if (sPlugin == null)
 			sPlugin = Annotator.app.getPluginManager().getDefaultStylePlugin();
 
@@ -1468,6 +1421,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		}
 
+		@Deprecated
 		private JMenu getCommentItem(CommentAnchor anno) {
 			Comment c = documentModel.getCommentsModel().get(anno);
 			StringBuilder b = new StringBuilder();
@@ -1540,6 +1494,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
+	@Deprecated
 	class CommentAction extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -1700,6 +1655,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.file = file;
 	}
 
+	@Deprecated
 	public CommentWindow getCommentsWindow() {
 		return commentsWindow;
 	}
@@ -1710,6 +1666,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
+		@Deprecated
 		AbstractAction commentAction = new CommentAction(null);
 		AbstractAction copyAction;
 		DeleteAction deleteAction;

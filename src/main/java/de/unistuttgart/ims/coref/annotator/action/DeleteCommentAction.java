@@ -11,6 +11,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.document.CommentsModel;
 
+@Deprecated
 public class DeleteCommentAction extends IkonAction {
 
 	private static final long serialVersionUID = 1L;
