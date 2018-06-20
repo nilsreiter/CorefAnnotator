@@ -135,8 +135,8 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator2;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
+import de.unistuttgart.ims.coref.annotator.comp.SegmentIndicator2;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -306,15 +306,18 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		highlightManager = new HighlightManager(textPane);
 
-		segmentIndicator = new SegmentIndicator2();
-		leftPanel.add(segmentIndicator, BorderLayout.WEST);
+		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		// scrollPane.setRowHeaderView(segmentIndicator);
+		leftPanel.add(scrollPane, BorderLayout.CENTER);
+		segmentIndicator = new SegmentIndicator2(scrollPane);
 
-		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+		scrollPane.setVerticalScrollBar(segmentIndicator);
+		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
 		// split pane
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-		splitPane.setVisible(false);
+		splitPane.setVisible(true);
 		splitPane.setDividerLocation(500);
 		getContentPane().add(splitPane);
 
@@ -696,7 +699,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
 		model.getSegmentModel().addListDataListener(segmentIndicator);
-		segmentIndicator.setVisible(true);
+		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
 
 		// UI

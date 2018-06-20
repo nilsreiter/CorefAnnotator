@@ -28,8 +28,9 @@ public class SegmentModel implements ListModel<Segment> {
 
 	protected void loadJCas(JCas jcas) {
 		Map<Segment, Collection<Segment>> index = JCasUtil.indexCovering(jcas, Segment.class, Segment.class);
-		topLevelSegments = Lists.immutable.withAll(index.keySet()).toSortedList(new AnnotationComparator())
-				.toImmutable();
+
+		topLevelSegments = Lists.mutable.withAll(JCasUtil.select(jcas, Segment.class)).reject(s -> index.containsKey(s))
+				.toSortedList(new AnnotationComparator()).toImmutable();
 	}
 
 	public ImmutableList<Segment> getTopLevelSegments() {
