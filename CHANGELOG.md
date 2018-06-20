@@ -3,6 +3,13 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.3
+
+- Fixed a bug that caused detached mention parts to disappear 
+  after conversion #131
+- Fixed an issue that caused entities to be disrupted after 
+  conversion #129
+
 ## 1.5.2
 
 - Fixed an issue that prevented loading of the correct style
