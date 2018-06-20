@@ -111,6 +111,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 				dmp.setEnd(oldDmp.getEnd());
 				dmp.setMention(mention);
 				dmp.addToIndexes();
+				mention.setDiscontinuous(dmp);
 				toRemove.add(oldDmp);
 			}
 			toRemove.add(oldMention);
