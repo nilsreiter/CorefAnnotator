@@ -234,6 +234,8 @@ public class CoreferenceModel {
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
+		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
+			edit((RemoveDuplicateMentionsInEntities) operation);
 		} else if (operation instanceof UpdateEntityKey) {
 			UpdateEntityKey op = (UpdateEntityKey) operation;
 			if (keyMap.containsKey(op.getNewKey())) {
@@ -339,6 +341,12 @@ public class CoreferenceModel {
 			}
 			fireEvent(Event.get(Event.Type.Add, null, eg));
 			op.setEntityGroup(eg);
+		} else if (operation instanceof RemoveMention) {
+			edit((RemoveMention) operation);
+		} else if (operation instanceof RemoveSingletons) {
+			edit((RemoveSingletons) operation);
+		} else if (operation instanceof MergeEntities) {
+			edit((MergeEntities) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
