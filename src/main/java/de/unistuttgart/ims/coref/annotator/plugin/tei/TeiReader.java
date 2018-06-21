@@ -19,6 +19,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -63,6 +64,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			}
 			m.setEntity(entity);
 		});
+
+		gxr.addRule("div", Segment.class);
 
 		Resource res = nextFile();
 

@@ -140,7 +140,9 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
+import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -208,6 +210,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	JList<EntityRelation> relationsList = new JList<EntityRelation>();
+	SegmentedScrollBar<Segment> segmentIndicator;
 
 	// Sub windows
 	@Deprecated
@@ -334,14 +337,20 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		highlightManager = new HighlightManager(textPane);
 
-		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		// scrollPane.setRowHeaderView(segmentIndicator);
+		leftPanel.add(scrollPane, BorderLayout.CENTER);
+		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
 
 		relationsList.setCellRenderer(new RelationListRenderer());
 
+		scrollPane.setVerticalScrollBar(segmentIndicator);
+		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
+
 		// split pane
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-		splitPane.setVisible(false);
+		splitPane.setVisible(true);
 		splitPane.setDividerLocation(500);
 
 		JTabbedPane tabbed = new JTabbedPane();
@@ -726,6 +735,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
+		model.getSegmentModel().addListDataListener(segmentIndicator);
+		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
 
 		relationsList.setModel(model.getRelationModel());
@@ -765,6 +776,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
+
+		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);

@@ -33,6 +33,8 @@ public class DocumentModel {
 
 	CoreferenceModel coreferenceModel;
 
+	SegmentModel segmentModel;
+
 	EntityTreeModel treeModel;
 
 	RelationModel relationModel;
@@ -174,6 +176,17 @@ public class DocumentModel {
 			undo(history.pop());
 			fireDocumentChangedEvent();
 		}
+	public SegmentModel getSegmentModel() {
+		return segmentModel;
+	}
+
+	public void setSegmentModel(SegmentModel segmentModel) {
+		this.segmentModel = segmentModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	protected void undo(Operation operation) {
