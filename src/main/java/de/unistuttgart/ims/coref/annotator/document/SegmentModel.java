@@ -55,7 +55,7 @@ public class SegmentModel implements ListModel<Segment> {
 	public void addListDataListener(ListDataListener l) {
 		listeners.add(l);
 		if (!topLevelSegments.isEmpty())
-			l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, getSize() - 1));
+			l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, getSize()));
 	}
 
 	@Override
