@@ -24,7 +24,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.document.SegmentModel;
 
-public class SegmentIndicator2 extends JScrollBar implements ListDataListener {
+public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,7 +36,7 @@ public class SegmentIndicator2 extends JScrollBar implements ListDataListener {
 	private boolean blockIncrementSet;
 	JScrollPane scrollPane;
 
-	public SegmentIndicator2(JScrollPane jsp) {
+	public SegmentedScrollBar(JScrollPane jsp) {
 		super(JScrollBar.VERTICAL);
 		this.putClientProperty("JScrollBar.fastWheelScrolling", Boolean.TRUE);
 		this.scrollPane = jsp;
