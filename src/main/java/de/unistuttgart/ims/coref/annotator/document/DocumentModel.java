@@ -59,7 +59,7 @@ public class DocumentModel {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
 		else if (operation instanceof RelationModelOperation)
-			relationModel.edit((RelationModelOperation) operation);
+			relationModel.edit(operation);
 		history.push(operation);
 	}
 

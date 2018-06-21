@@ -136,6 +136,7 @@ import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
@@ -176,13 +177,22 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		private static final long serialVersionUID = 1L;
 
-		public Component getListCellRendererComponent​(JList<?> list, Object value, int index, boolean isSelected,
+		@Override
+		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
-			JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			EntityRelation er = (EntityRelation) value;
-			c.setText(er.getRelationType().getLabel());
-			return c;
+			StringBuilder b = new StringBuilder();
+			if (er.getRelationType().getDirected()) {
+				DirectedEntityRelation der = (DirectedEntityRelation) er;
+				b.append(der.getSource().getLabel()).append(' ');
+				b.append(der.getRelationType().getLabel()).append(' ');
+				b.append(der.getTarget().getLabel());
+			}
+			String s = b.toString();
+			return super.getListCellRendererComponent(list, s, index, isSelected, cellHasFocus);
+
 		}
+
 	}
 
 	private static final long serialVersionUID = 1L;
