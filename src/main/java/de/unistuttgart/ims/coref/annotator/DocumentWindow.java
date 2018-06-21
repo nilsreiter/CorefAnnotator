@@ -135,6 +135,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -180,7 +181,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
-	SegmentedScrollBar segmentIndicator;
+	SegmentedScrollBar<Segment> segmentIndicator;
 
 	// Sub windows
 	@Deprecated
@@ -310,7 +311,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		// scrollPane.setRowHeaderView(segmentIndicator);
 		leftPanel.add(scrollPane, BorderLayout.CENTER);
-		segmentIndicator = new SegmentedScrollBar(scrollPane);
+		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
 
 		scrollPane.setVerticalScrollBar(segmentIndicator);
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
