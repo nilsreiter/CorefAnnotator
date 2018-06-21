@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.comp;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -46,27 +47,24 @@ public class SegmentIndicator2 extends JScrollBar implements ListDataListener {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D) g;
-		Color lgray = new Color(240, 240, 240);
-		Font originalFont = g2.getFont(); // Font.getFont(Font.DIALOG);
+		Font originalFont = new Font(Font.DIALOG, Font.PLAIN, 12); // g2.getFont().der.deriveFont(Font.SANS_SERIF);
+		FontMetrics fm = g2.getFontMetrics(originalFont);
 
 		AffineTransform affineTransform = new AffineTransform();
 		affineTransform.rotate(Math.toRadians(90), 0, 0);
 		Font rotatedFont = originalFont.deriveFont(affineTransform);
 
 		g2.setColor(Color.black);
+		g2.setFont(rotatedFont);
 		for (Segment segment : segmentList) {
 			int y = scale(segment.getBegin());
 			int h = scale(segment.getEnd()) - y;
 			g2.drawLine(0, y, getWidth(), y);
 			g2.drawLine(0, y + h, getWidth(), y + h);
-			// g2.drawRect(1, y, getWidth() - 2, h - 1);
 			if (segment.getLabel() != null) {
-				g2.setFont(rotatedFont);
-				g2.setColor(Color.black);
-				int sw = g2.getFontMetrics(originalFont).stringWidth(segment.getLabel());
+				int sw = fm.stringWidth(segment.getLabel());
 				int spos = (int) (y + h * 0.5 - sw * 0.5);
-				g2.drawString(segment.getLabel(), 5, spos);
-				g2.setFont(originalFont);
+				g2.drawString(segment.getLabel(), 3, spos);
 			}
 
 		}
@@ -107,17 +105,22 @@ public class SegmentIndicator2 extends JScrollBar implements ListDataListener {
 		if (e.getType() == ListDataEvent.INTERVAL_ADDED && e.getIndex0() != e.getIndex1())
 			segmentList.addAll(e.getIndex0(),
 					((SegmentModel) e.getSource()).getElementsAt(e.getIndex0(), e.getIndex1()).castToCollection());
+		repaint();
 	}
 
 	@Override
 	public void intervalRemoved(ListDataEvent e) {
 		for (int i = e.getIndex1() - 1; i >= e.getIndex0(); i--)
 			segmentList.remove(i);
+		repaint();
+
 	}
 
 	@Override
 	public void contentsChanged(ListDataEvent e) {
-
+		segmentList.clear();
+		segmentList.addAll(((SegmentModel) e.getSource()).getTopLevelSegments().castToCollection());
+		repaint();
 	}
 
 	@Override
