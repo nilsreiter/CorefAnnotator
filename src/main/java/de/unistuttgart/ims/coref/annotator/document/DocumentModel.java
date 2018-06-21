@@ -26,24 +26,24 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  */
 public class DocumentModel {
 
-	JCas jcas;
-
 	@Deprecated
 	CommentsModel commentsModel;
 
 	CoreferenceModel coreferenceModel;
 
+	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
+
+	Deque<Operation> history = new LinkedList<Operation>();
+
+	JCas jcas;
+
+	RelationModel relationModel;
+
 	SegmentModel segmentModel;
 
 	EntityTreeModel treeModel;
 
-	RelationModel relationModel;
-
 	TypeSystemVersion typeSystemVersion;
-
-	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
-
-	Deque<Operation> history = new LinkedList<Operation>();
 
 	boolean unsavedChanges = false;
 
@@ -80,6 +80,10 @@ public class DocumentModel {
 		return typeSystemVersion;
 	}
 
+	public Deque<Operation> getHistory() {
+		return history;
+	}
+
 	/**
 	 * Don't use! This method will become protected at some point.
 	 * 
@@ -91,6 +95,14 @@ public class DocumentModel {
 
 	public String getLanguage() {
 		return jcas.getDocumentLanguage();
+	}
+
+	public RelationModel getRelationModel() {
+		return relationModel;
+	}
+
+	public SegmentModel getSegmentModel() {
+		return segmentModel;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -141,10 +153,6 @@ public class DocumentModel {
 		this.coreferenceModel = coreferenceModel;
 	}
 
-	public void setRelationModel(RelationModel relationModel) {
-		this.relationModel = relationModel;
-	}
-
 	protected void setFileFormat(TypeSystemVersion typeSystemVersion) {
 		this.typeSystemVersion = typeSystemVersion;
 	}
@@ -156,6 +164,14 @@ public class DocumentModel {
 	public void setLanguage(String l) {
 		jcas.setDocumentLanguage(l);
 		fireDocumentChangedEvent();
+	}
+
+	public void setRelationModel(RelationModel relationModel) {
+		this.relationModel = relationModel;
+	}
+
+	public void setSegmentModel(SegmentModel segmentModel) {
+		this.segmentModel = segmentModel;
 	}
 
 	public void setTreeModel(EntityTreeModel treeModel) {
@@ -176,17 +192,6 @@ public class DocumentModel {
 			undo(history.pop());
 			fireDocumentChangedEvent();
 		}
-	public SegmentModel getSegmentModel() {
-		return segmentModel;
-	}
-
-	public void setSegmentModel(SegmentModel segmentModel) {
-		this.segmentModel = segmentModel;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	protected void undo(Operation operation) {
@@ -195,14 +200,6 @@ public class DocumentModel {
 		} else if (operation instanceof RelationModelOperation) {
 			relationModel.undo((RelationModelOperation) operation);
 		}
-	}
-
-	public Deque<Operation> getHistory() {
-		return history;
-	}
-
-	public RelationModel getRelationModel() {
-		return relationModel;
 	}
 
 }
