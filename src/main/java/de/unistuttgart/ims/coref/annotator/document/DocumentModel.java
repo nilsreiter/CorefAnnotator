@@ -25,20 +25,22 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  */
 public class DocumentModel {
 
-	JCas jcas;
-
 	@Deprecated
 	CommentsModel commentsModel;
 
 	CoreferenceModel coreferenceModel;
 
-	EntityTreeModel treeModel;
-
-	TypeSystemVersion typeSystemVersion;
-
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
 	Deque<Operation> history = new LinkedList<Operation>();
+
+	JCas jcas;
+
+	SegmentModel segmentModel;
+
+	EntityTreeModel treeModel;
+
+	TypeSystemVersion typeSystemVersion;
 
 	boolean unsavedChanges = false;
 
@@ -73,6 +75,10 @@ public class DocumentModel {
 		return typeSystemVersion;
 	}
 
+	public Deque<Operation> getHistory() {
+		return history;
+	}
+
 	/**
 	 * Don't use! This method will become protected at some point.
 	 * 
@@ -84,6 +90,10 @@ public class DocumentModel {
 
 	public String getLanguage() {
 		return jcas.getDocumentLanguage();
+	}
+
+	public SegmentModel getSegmentModel() {
+		return segmentModel;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -147,6 +157,10 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	public void setSegmentModel(SegmentModel segmentModel) {
+		this.segmentModel = segmentModel;
+	}
+
 	public void setTreeModel(EntityTreeModel treeModel) {
 		this.treeModel = treeModel;
 	}
@@ -171,10 +185,6 @@ public class DocumentModel {
 		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.undo(operation);
 		}
-	}
-
-	public Deque<Operation> getHistory() {
-		return history;
 	}
 
 }
