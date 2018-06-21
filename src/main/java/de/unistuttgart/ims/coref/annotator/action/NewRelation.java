@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -22,6 +23,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 
 public class NewRelation extends DocumentWindowAction {
 
@@ -56,6 +58,18 @@ public class NewRelation extends DocumentWindowAction {
 		panel.add(entitySelector2);
 
 		JButton okButton = new JButton("ok");
+		okButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getTarget().getDocumentModel()
+						.edit(new RelateEntities((EntityRelationType) relationSelector.getSelectedItem(),
+								(Entity) entitySelector1.getSelectedItem(),
+								(Entity) entitySelector2.getSelectedItem()));
+				dialog.setVisible(false);
+				dialog.dispose();
+			}
+		});
+
 		dialog.getContentPane().add(panel, BorderLayout.CENTER);
 		dialog.getContentPane().add(okButton, BorderLayout.SOUTH);
 		dialog.setVisible(true);
