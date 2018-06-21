@@ -10,9 +10,9 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 
 public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
 
@@ -29,10 +29,10 @@ public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
 		CATreeNode etn = (CATreeNode) getTarget().getTree().getLastSelectedPathComponent();
 		Color color = new Color(etn.getEntity().getColor());
 
-		Color newColor = JColorChooser.showDialog(getTarget(),
-				Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT), color);
+		Color newColor = JColorChooser.showDialog(getTarget(), Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT),
+				color);
 		if (color != newColor) {
-			getTarget().getCoreferenceModel().edit(new Op.UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
+			getTarget().getDocumentModel().edit(new UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
 		}
 
 	}

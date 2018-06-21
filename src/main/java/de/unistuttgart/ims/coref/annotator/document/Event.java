@@ -7,6 +7,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+
 public interface Event extends Iterable<FeatureStructure> {
 	public enum Type {
 		/**
@@ -34,7 +36,7 @@ public interface Event extends Iterable<FeatureStructure> {
 
 	Type getType();
 
-	Op getOp();
+	Operation getOp();
 
 	int getArity();
 
