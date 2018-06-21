@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -18,17 +19,18 @@ import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
+import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.document.SegmentModel;
 
-public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
+public class SegmentedScrollBar<T extends Annotation> extends JScrollBar implements ListDataListener {
 
 	private static final long serialVersionUID = 1L;
 
-	MutableList<Segment> segmentList = Lists.mutable.empty();
+	MutableList<T> segmentList = Lists.mutable.empty();
 
 	int lastCharacterPosition = Integer.MAX_VALUE;
 
@@ -56,15 +58,18 @@ public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
 
 		g2.setColor(Color.black);
 		g2.setFont(rotatedFont);
-		for (Segment segment : segmentList) {
+		for (T segment : segmentList) {
 			int y = scale(segment.getBegin());
 			int h = scale(segment.getEnd()) - y;
 			g2.drawLine(0, y, getWidth(), y);
 			g2.drawLine(0, y + h, getWidth(), y + h);
-			if (segment.getLabel() != null) {
-				int sw = fm.stringWidth(segment.getLabel());
-				int spos = (int) (y + h * 0.5 - sw * 0.5);
-				g2.drawString(segment.getLabel(), 3, spos);
+			if (segment instanceof Segment) {
+				Segment seg = (Segment) segment;
+				if (seg.getLabel() != null) {
+					int sw = fm.stringWidth(seg.getLabel());
+					int spos = (int) (y + h * 0.5 - sw * 0.5);
+					g2.drawString(seg.getLabel(), 3, spos);
+				}
 			}
 
 		}
@@ -84,11 +89,11 @@ public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
 		return (int) ((vpos / maxDoc) * maxView);
 	}
 
-	public MutableList<Segment> getSegmentList() {
+	public MutableList<T> getSegmentList() {
 		return segmentList;
 	}
 
-	public void setSegmentList(MutableList<Segment> segmentList) {
+	public void setSegmentList(MutableList<T> segmentList) {
 		this.segmentList = segmentList;
 	}
 
@@ -100,11 +105,12 @@ public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
 		this.lastCharacterPosition = lastCharacterPosition;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void intervalAdded(ListDataEvent e) {
 		if (e.getType() == ListDataEvent.INTERVAL_ADDED && e.getIndex0() != e.getIndex1())
-			segmentList.addAll(e.getIndex0(),
-					((SegmentModel) e.getSource()).getElementsAt(e.getIndex0(), e.getIndex1()).castToCollection());
+			segmentList.addAll(e.getIndex0(), (Collection<? extends T>) ((SegmentModel) e.getSource())
+					.getElementsAt(e.getIndex0(), e.getIndex1()).castToCollection());
 		repaint();
 	}
 
@@ -116,10 +122,12 @@ public class SegmentedScrollBar extends JScrollBar implements ListDataListener {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void contentsChanged(ListDataEvent e) {
 		segmentList.clear();
-		segmentList.addAll(((SegmentModel) e.getSource()).getTopLevelSegments().castToCollection());
+		segmentList.addAll(
+				(Collection<? extends T>) ((SegmentModel) e.getSource()).getTopLevelSegments().castToCollection());
 		repaint();
 	}
 
