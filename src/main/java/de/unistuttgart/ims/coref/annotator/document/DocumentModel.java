@@ -22,9 +22,6 @@ public class DocumentModel {
 
 	JCas jcas;
 
-	@Deprecated
-	CommentsModel commentsModel;
-
 	CoreferenceModel coreferenceModel;
 
 	SegmentModel segmentModel;
@@ -47,11 +44,6 @@ public class DocumentModel {
 
 	protected void fireDocumentChangedEvent() {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
-	}
-
-	@Deprecated
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
 	}
 
 	public CoreferenceModel getCoreferenceModel() {
@@ -107,11 +99,6 @@ public class DocumentModel {
 
 		unsavedChanges = true;
 		fireDocumentChangedEvent();
-	}
-
-	@Deprecated
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
 	}
 
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
