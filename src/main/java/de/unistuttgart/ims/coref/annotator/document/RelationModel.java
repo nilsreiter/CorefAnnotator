@@ -13,6 +13,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
 import de.unistuttgart.ims.uima.io.xml.ArrayUtil;
@@ -32,6 +33,7 @@ public class RelationModel implements ListModel<EntityRelation> {
 		if (!JCasUtil.exists(documentModel.getJcas(), EntityRelationType.class)) {
 			EntityRelationType ert = new EntityRelationType(documentModel.getJcas());
 			ert.setLabel("parent of");
+			ert.setDirected(true);
 			ert.addToIndexes();
 		}
 	}
@@ -40,8 +42,11 @@ public class RelationModel implements ListModel<EntityRelation> {
 		return listeners.add(e);
 	}
 
-	protected void edit(RelationModelOperation op) {
-
+	protected void edit(Operation op) {
+		if (op instanceof RelateEntities)
+			edit((RelateEntities) op);
+		else
+			throw new UnsupportedOperationException();
 	}
 
 	protected void edit(RelateEntities op) {
@@ -61,7 +66,7 @@ public class RelationModel implements ListModel<EntityRelation> {
 		op.setRelation(erel);
 		list.add(erel);
 
-		ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, list.size() - 2, list.size() - 1);
+		ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, list.size() - 1, list.size());
 		listDataListeners.forEach(l -> l.intervalAdded(lde));
 	}
 
