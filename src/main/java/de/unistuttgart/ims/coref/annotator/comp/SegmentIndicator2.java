@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -13,6 +14,8 @@ import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -70,7 +73,17 @@ public class SegmentIndicator2 extends JScrollBar implements ListDataListener {
 	}
 
 	private int scale(double vpos) {
-		return (int) ((vpos / getLastCharacterPosition()) * getHeight());
+		int maxDoc = getLastCharacterPosition();
+		int maxView = getHeight();
+		try {
+			Rectangle2D r = ((JTextComponent) scrollPane.getViewport().getView()).modelToView((int) vpos);
+			vpos = r.getY();
+			maxDoc = getMaximum();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+
+		return (int) ((vpos / maxDoc) * maxView);
 	}
 
 	public MutableList<Segment> getSegmentList() {
