@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.Op;
 
 public class RemoveSingletons extends DocumentWindowAction {
 
@@ -17,7 +16,7 @@ public class RemoveSingletons extends DocumentWindowAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getDocumentModel().getCoreferenceModel().edit(new Op.RemoveSingletons());
+		getTarget().getDocumentModel().edit(new de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons());
 	}
 
 }

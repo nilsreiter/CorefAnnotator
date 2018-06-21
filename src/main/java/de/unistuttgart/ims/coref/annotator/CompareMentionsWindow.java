@@ -68,7 +68,7 @@ import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
@@ -99,7 +99,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			targetModel.edit(new Op.AddMentionsToNewEntity(span));
+			targetModel.edit(new AddMentionsToNewEntity(span));
 		}
 
 	}
@@ -204,7 +204,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	JCas targetJCas;
 
-	CoreferenceModel targetModel;
+	DocumentModel targetModel;
 
 	boolean textIsSet = false;
 	int size = 0;
