@@ -1,6 +1,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1228106.svg)](https://doi.org/10.5281/zenodo.1228106)
 [![Build Status](https://travis-ci.org/nilsreiter/CorefAnnotator.svg?branch=master)](https://travis-ci.org/nilsreiter/CorefAnnotator)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Github All Releases](https://img.shields.io/github/downloads/nilsreiter/CorefAnnotator/total.svg)
+![GitHub (pre-)release](https://img.shields.io/github/release/nilsreiter/CorefAnnotator/all.svg)
 
 # Coref Annotator
 
