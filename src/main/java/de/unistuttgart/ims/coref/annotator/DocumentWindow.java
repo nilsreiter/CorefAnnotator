@@ -56,6 +56,7 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
@@ -144,6 +145,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.CircleColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
@@ -172,7 +174,6 @@ import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
-import sun.swing.DefaultLookup;
 
 public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
@@ -192,13 +193,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			Color fg = null;
 
 			JList.DropLocation dropLocation = list.getDropLocation();
-			if (dropLocation != null && !dropLocation.isInsert() && dropLocation.getIndex() == index) {
-
-				bg = DefaultLookup.getColor(panel, ui, "List.dropCellBackground");
-				fg = DefaultLookup.getColor(panel, ui, "List.dropCellForeground");
-
-				isSelected = true;
-			}
 
 			if (isSelected) {
 				panel.setBackground(bg == null ? list.getSelectionBackground() : bg);
@@ -213,10 +207,15 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			Border border = null;
 			if (cellHasFocus) {
 				if (isSelected) {
-					border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
+					border = (Border) LookAndFeel.getDesktopPropertyValue("List.focusSelectedCellHighlightBorder",
+							BorderFactory.createEmptyBorder());
+					// border = DefaultLookup.getBorder(this, ui,
+					// "List.focusSelectedCellHighlightBorder");
 				}
 				if (border == null) {
-					border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+					// border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+					border = (Border) LookAndFeel.getDesktopPropertyValue("List.focusCellHighlightBorder",
+							BorderFactory.createEmptyBorder());
 				}
 			} else {
 				border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
@@ -224,19 +223,30 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			panel.setBorder(border);
 
 			EntityRelation er = value;
+			JLabel label;
+			label = new JLabel(er.getRelationType().getLabel());
+			panel.add(label);
 			if (er.getRelationType().getDirected()) {
 				DirectedEntityRelation der = (DirectedEntityRelation) er;
-				panel.add(new JLabel(der.getRelationType().getLabel()));
-				JLabel label;
 				label = new JLabel(der.getSource().getLabel());
 				label.setIcon(new CircleColorIcon(14, new Color(der.getSource().getColor())));
 				panel.add(label);
 				label = new JLabel(der.getTarget().getLabel());
 				label.setIcon(new CircleColorIcon(14, new Color(der.getTarget().getColor())));
 				panel.add(label);
+			} else {
+				SymmetricEntityRelation uer = (SymmetricEntityRelation) er;
+				for (int i = 0; i < uer.getEntities().size(); i++)
+					panel.add(getLabel(uer.getEntities(i)));
 			}
 
 			return panel;
+		}
+
+		protected JLabel getLabel(Entity e) {
+			JLabel label = new JLabel(e.getLabel());
+			label.setIcon(new CircleColorIcon(14, new Color(e.getColor())));
+			return label;
 		}
 
 	}
