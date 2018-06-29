@@ -38,7 +38,6 @@ public class DocumentModel {
 	JCas jcas;
 
 	RelationModel relationModel;
-
 	SegmentModel segmentModel;
 
 	EntityTreeModel treeModel;
