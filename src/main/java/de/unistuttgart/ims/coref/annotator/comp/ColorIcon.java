@@ -21,6 +21,10 @@ public class ColorIcon implements Icon {
 		this(32, 16);
 	}
 
+	public ColorIcon(Color color) {
+		this(32, 16, color);
+	}
+
 	// ---------------------------------------------------------------------------
 
 	public ColorIcon(int width, int height) {
