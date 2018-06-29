@@ -32,10 +32,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -55,10 +55,12 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -142,6 +144,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.CircleColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -169,28 +172,71 @@ import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
+import sun.swing.DefaultLookup;
 
 public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
-	public class RelationListRenderer extends DefaultListCellRenderer {
+	public class RelationListRenderer extends JPanel implements ListCellRenderer<EntityRelation> {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-				boolean cellHasFocus) {
-			EntityRelation er = (EntityRelation) value;
-			StringBuilder b = new StringBuilder();
+		public Component getListCellRendererComponent(JList<? extends EntityRelation> list, EntityRelation value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+			setComponentOrientation(list.getComponentOrientation());
+
+			Color bg = null;
+			Color fg = null;
+
+			JList.DropLocation dropLocation = list.getDropLocation();
+			if (dropLocation != null && !dropLocation.isInsert() && dropLocation.getIndex() == index) {
+
+				bg = DefaultLookup.getColor(panel, ui, "List.dropCellBackground");
+				fg = DefaultLookup.getColor(panel, ui, "List.dropCellForeground");
+
+				isSelected = true;
+			}
+
+			if (isSelected) {
+				panel.setBackground(bg == null ? list.getSelectionBackground() : bg);
+				panel.setForeground(fg == null ? list.getSelectionForeground() : fg);
+			} else {
+				panel.setBackground(list.getBackground());
+				panel.setForeground(list.getForeground());
+			}
+
+			panel.setEnabled(list.isEnabled());
+			panel.setFont(list.getFont());
+			Border border = null;
+			if (cellHasFocus) {
+				if (isSelected) {
+					border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
+				}
+				if (border == null) {
+					border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+				}
+			} else {
+				border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+			}
+			panel.setBorder(border);
+
+			EntityRelation er = value;
 			if (er.getRelationType().getDirected()) {
 				DirectedEntityRelation der = (DirectedEntityRelation) er;
-				b.append(der.getSource().getLabel()).append(' ');
-				b.append(der.getRelationType().getLabel()).append(' ');
-				b.append(der.getTarget().getLabel());
+				panel.add(new JLabel(der.getRelationType().getLabel()));
+				JLabel label;
+				label = new JLabel(der.getSource().getLabel());
+				label.setIcon(new CircleColorIcon(14, new Color(der.getSource().getColor())));
+				panel.add(label);
+				label = new JLabel(der.getTarget().getLabel());
+				label.setIcon(new CircleColorIcon(14, new Color(der.getTarget().getColor())));
+				panel.add(label);
 			}
-			String s = b.toString();
-			return super.getListCellRendererComponent(list, s, index, isSelected, cellHasFocus);
 
+			return panel;
 		}
 
 	}
