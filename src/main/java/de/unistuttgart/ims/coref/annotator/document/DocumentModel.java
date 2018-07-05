@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -98,7 +99,9 @@ public class DocumentModel {
 
 	@SuppressWarnings("unchecked")
 	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+		if (Util.getMeta(jcas) != null && Util.getMeta(jcas).getStylePlugin() != null)
+			return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+		return DefaultStylePlugin.class;
 	}
 
 	public EntityTreeModel getTreeModel() {
