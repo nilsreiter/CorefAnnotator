@@ -26,6 +26,11 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 		// this.setPreferredSize(new Dimension(200, 300));
 	}
 
+	public PanelList() {
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		// this.setPreferredSize(new Dimension(200, 300));
+	}
+
 	public U getPanel(T obj) {
 		if (!panelMap.containsKey(obj)) {
 			panelMap.put(obj, factory.getPanel(obj));
@@ -72,15 +77,23 @@ public class PanelList<T, U extends JPanel> extends JPanel implements ListDataLi
 	public void setSelection(T c) {
 		for (T t : panelMap.keySet()) {
 			if (c == null || t == c)
-				panelMap.get(t).setEnabled(true);
+				get(t).setEnabled(true);
 			else
-				panelMap.get(t).setEnabled(false);
+				get(t).setEnabled(false);
 		}
 		contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, model.getSize()));
 	}
 
 	public U get(T c) {
 		return panelMap.get(c);
+	}
+
+	public PanelFactory<T, U> getFactory() {
+		return factory;
+	}
+
+	public void setFactory(PanelFactory<T, U> factory) {
+		this.factory = factory;
 	}
 
 }

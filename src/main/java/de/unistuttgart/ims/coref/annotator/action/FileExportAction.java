@@ -60,7 +60,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 			target.setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 
 			Annotator.app.setCurrentDirectory(f.getParentFile());
-			ExportWorker worker = new ExportWorker(f, target.getJCas(), plugin, (file, jcas) -> {
+			ExportWorker worker = new ExportWorker(f, target.getDocumentModel().getJcas(), plugin, (file, jcas) -> {
 				target.stopIndeterminateProgress();
 				target.setMessage("");
 			});

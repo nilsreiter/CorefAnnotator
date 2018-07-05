@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.function.BiConsumer;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.SwingWorker;
 
@@ -28,8 +29,18 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 	@Override
 	protected Object doInBackground() throws Exception {
 
-		try (OutputStream os = new FileOutputStream(file)) {
-			XmiCasSerializer.serialize(jcas.getCas(), os);
+		OutputStream os = null;
+		try {
+			if (file.getName().endsWith(".xmi")) {
+				os = new FileOutputStream(file);
+			} else if (file.getName().endsWith(".gz")) {
+				os = new GZIPOutputStream(new FileOutputStream(file));
+			}
+			if (os != null)
+				XmiCasSerializer.serialize(jcas.getCas(), os);
+		} finally {
+			if (os != null)
+				os.close();
 		}
 
 		return null;
@@ -45,7 +56,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 			Annotator.app.recentFiles.add(0, file);
 			Annotator.app.refreshRecents();
 			Annotator.app.setCurrentDirectory(file.getParentFile());
-			target.getDocumentModel().getCoreferenceModel().getHistory().clear();
+			target.getDocumentModel().getHistory().clear();
 			target.setFile(file);
 			target.setWindowTitle();
 			target.stopIndeterminateProgress();

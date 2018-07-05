@@ -3,6 +3,21 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.3
+
+- Fixed a bug that caused detached mention parts to disappear 
+  after conversion #131
+- Fixed an issue that caused entities to be disrupted after 
+  conversion #129
+
+## 1.5.2
+
+- Fixed an issue that prevented loading of the correct style
+
+## 1.5.1
+
+- Fixes that hiding an entity didn't de-underline its mentions #127
+
 ## 1.5.0
 
 - Searching in the tree view now behaves slightly different: If a new 
@@ -24,6 +39,24 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   converted automatically. #101
 - The user can now control whether singletons are ignored for comparing
   two annotation files. #106
+- Compressed files: If the file name entered in the Save As dialog ends 
+  on ".xmi.gz", the file will be gzipped and therefore take much less 
+  space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
+  can be loaded directly as usual. #125
+- QuaDramA/CRETA-specific importers that we used to import files from 
+  WebAnno have been removed. Import (of coreference annotations) from 
+  WebAnno can still be done using the dkpro importer. #124
+- JSON export: Coreference annotations can now be exported as JSON
+  files. The file contains a list of tokens, and each token can be 
+  associated with one or more entities. This JSON format will be 
+  importable by [rCat](http://www.rcat-ims.de:5000/) in the future. #120
+
+## 1.4.4
+
+- Fixed an issue in the compare view that led to displaced underlines.
+  Root cause was the handling of windows-style newlines `\r\n` #114
+- Fixed an issue in the TEI importer that caused the document title to 
+  be wrong #119
 
 ## 1.4.3
 

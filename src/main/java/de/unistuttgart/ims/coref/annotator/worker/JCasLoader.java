@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.apache.uima.UIMAException;
@@ -24,53 +25,39 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
+import de.unistuttgart.ims.coref.annotator.uima.Fix131;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
-	@Deprecated
-	DocumentWindow documentWindow;
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
 	IOPlugin flavor;
 	File file = null;
 	String language = null;
-	Consumer<JCas> consumer = null;
+	Consumer<JCas> success = null;
+	Consumer<Exception> failConsumer = null;
 
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, InputStream inputStream,
-			TypeSystemDescription typeSystemDescription, IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.inputStream = inputStream;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.language = language;
-	}
-
-	@Deprecated
-	public JCasLoader(DocumentWindow documentWindow, File file, TypeSystemDescription typeSystemDescription,
-			IOPlugin flavor, String language) {
-		this.documentWindow = documentWindow;
-		this.typeSystemDescription = typeSystemDescription;
+	public JCasLoader(File file, IOPlugin flavor, String language, Consumer<JCas> consumer,
+			Consumer<Exception> failConsumer) {
+		this.success = consumer;
+		this.failConsumer = failConsumer;
+		try {
+			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
+		} catch (ResourceInitializationException e) {
+			e.printStackTrace();
+		}
 		this.flavor = flavor;
 		this.file = file;
 		this.language = language;
 	}
 
-	public JCasLoader(Consumer<JCas> consumer, File file, TypeSystemDescription typeSystemDescription, IOPlugin flavor,
-			String language) {
-		this.consumer = consumer;
-		this.typeSystemDescription = typeSystemDescription;
-		this.flavor = flavor;
-		this.file = file;
-		this.language = language;
-	}
-
-	public JCasLoader(Consumer<JCas> consumer, File file) {
-		this.consumer = consumer;
+	public JCasLoader(File file, Consumer<JCas> consumer, Consumer<Exception> failConsumer) {
+		this.failConsumer = failConsumer;
+		this.success = consumer;
 		try {
 			this.typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 		} catch (ResourceInitializationException e) {
@@ -111,22 +98,34 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		return jcas;
 	}
 
-	private JCas readFile() throws ResourceInitializationException {
+	private JCas readFile() throws IOException, UIMAException {
 		JCasIterator iter;
 
-		CollectionReaderDescription crd = flavor.getReader(file);
+		if (flavor instanceof DirectFileIOPlugin) {
+			JCas jcas = ((DirectFileIOPlugin) flavor).getJCas(file);
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
+			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
-		AggregateBuilder b = new AggregateBuilder();
-		if (getLanguage() != null)
-			b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class, SetJCasLanguage.PARAM_LANGUAGE,
-					getLanguage()));
-		b.add(flavor.getImporter());
+			SimplePipeline.runPipeline(jcas, b.createAggregateDescription());
+			return jcas;
+		} else {
+			CollectionReaderDescription crd = flavor.getReader(file);
 
-	
+			AggregateBuilder b = new AggregateBuilder();
+			if (getLanguage() != null)
+				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
+						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
+			b.add(flavor.getImporter());
+			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
-		iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
-		if (iter.hasNext()) {
-			return iter.next();
+			iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
+			if (iter.hasNext()) {
+				return iter.next();
+			}
 		}
 		return null;
 
@@ -145,9 +144,16 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.consumer.accept(get());
+			this.success.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					failConsumer.accept(e);
+				}
+
+			});
 		}
 	}
 

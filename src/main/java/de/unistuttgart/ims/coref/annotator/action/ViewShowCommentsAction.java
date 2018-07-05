@@ -7,6 +7,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
+@Deprecated
 public class ViewShowCommentsAction extends TargetedIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
