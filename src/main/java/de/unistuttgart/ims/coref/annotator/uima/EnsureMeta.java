@@ -9,6 +9,13 @@ import org.apache.uima.jcas.JCas;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 
+/**
+ * This component checks whether a Meta annotation exists. If there is none, we
+ * create one and fill a few fields
+ * 
+ * @author reiterns
+ *
+ */
 public class EnsureMeta extends JCasAnnotator_ImplBase {
 
 	public static final String PARAM_TS_VERSION = "TS_VERSION";
