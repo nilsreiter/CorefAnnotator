@@ -3,6 +3,14 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.4
+
+- Fixed that creating new documents from plain text (and others) did
+  not set the correct file version number #137
+- Fixed that the style is not correctly set when importing QuaDramA 
+  files #139
+- Fixed that hidden entities also have their properties in gray #133
+
 ## 1.5.3
 
 - Fixed a bug that caused detached mention parts to disappear 

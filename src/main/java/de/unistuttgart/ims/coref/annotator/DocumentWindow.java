@@ -1015,8 +1015,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		CATreeNode treeNode;
 
-		protected void addFlag(JPanel panel, String textLabel, Icon icon) {
+		protected void addFlag(JPanel panel, String textLabel, Icon icon, Color color) {
 			JLabel l = new JLabel();
+			if (color != null)
+				l.setForeground(color);
 			if (showText)
 				l.setText(textLabel);
 			l.setIcon(icon);
@@ -1026,13 +1028,18 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
-			if (Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50) {
+
+			boolean isGrey = Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50;
+			Color entityColor = new Color(entity.getColor());
+
+			if (isGrey) {
 				lab1.setForeground(Color.GRAY);
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_OUTLINE, Color.GRAY));
 			} else {
 				lab1.setForeground(Color.BLACK);
-				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
+
 			if (entity.getKey() != null) {
 				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
@@ -1042,7 +1049,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC), FontIcon.of(MaterialDesign.MDI_CLOUD));
+				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC),
+						FontIcon.of(MaterialDesign.MDI_CLOUD, (isGrey ? Color.GRAY : Color.BLACK)),
+						(isGrey ? Color.GRAY : null));
 			}
 			return panel;
 		}
@@ -1051,14 +1060,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			lab1.setText(m.getCoveredText());
 			if (Util.isNonNominal(m))
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
-						FontIcon.of(MaterialDesign.MDI_FLAG));
+						FontIcon.of(MaterialDesign.MDI_FLAG), null);
 			if (Util.isDifficult(m)) {
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_DIFFICULT),
-						FontIcon.of(MaterialDesign.MDI_ALERT_BOX));
+						FontIcon.of(MaterialDesign.MDI_ALERT_BOX), null);
 			}
 			if (Util.isAmbiguous(m)) {
 				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_AMBIGUOUS),
-						FontIcon.of(MaterialDesign.MDI_SHARE_VARIANT));
+						FontIcon.of(MaterialDesign.MDI_SHARE_VARIANT), null);
 			}
 			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT));
 			return panel;
