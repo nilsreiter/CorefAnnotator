@@ -96,6 +96,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
@@ -257,7 +258,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
-		tree.addKeyListener(treeKeyListener);
+
+		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
+		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
@@ -1613,6 +1616,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
+	@Deprecated
 	class TreeKeyListener implements KeyListener {
 
 		boolean ignoreNext = false;
@@ -1748,5 +1752,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 		}
 		return Sets.immutable.of(entities);
+	}
+
+	public JTextField getTreeSearchField() {
+		return treeSearchField;
 	}
 }
