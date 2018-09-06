@@ -1613,6 +1613,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 	}
 
+	@Deprecated
 	class TreeKeyListener implements KeyListener {
 
 		boolean ignoreNext = false;
@@ -1748,5 +1749,9 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 		}
 		return Sets.immutable.of(entities);
+	}
+
+	public JTextField getTreeSearchField() {
+		return treeSearchField;
 	}
 }
