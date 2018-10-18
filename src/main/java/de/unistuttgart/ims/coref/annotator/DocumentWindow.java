@@ -76,7 +76,6 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -128,10 +127,7 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -193,10 +189,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
-
-	// Sub windows
-	@Deprecated
-	CommentWindow commentsWindow;
 
 	// Menu components
 	JMenu documentMenu;
@@ -421,7 +413,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		}
 		viewMenu.add(viewStyleMenu);
-		viewMenu.add(new ViewShowCommentsAction(this));
 		return viewMenu;
 
 	}
@@ -484,7 +475,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		entityMenu.add(new JMenuItem(actions.undoAction));
 		entityMenu.add(new JMenuItem(actions.copyAction));
 		entityMenu.add(new JMenuItem(actions.deleteAction));
-		entityMenu.add(new JMenuItem(actions.commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
@@ -739,7 +729,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// final
 		setMessage("");
 
-		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 
@@ -1393,7 +1382,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 			}
 
-			Set<Entity> candidates = Sets.mutable.empty();
+				Set<Entity> candidates = Sets.mutable.empty();
 			if (selection) {
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						Annotator.app.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
@@ -1407,15 +1396,15 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				textPopupMenu.add(actions.newEntityAction);
 				if (!candidates.isEmpty()) {
-					candidates.forEach(entity -> {
-						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
-						mi.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
-							}
-						});
-						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+				candidates.forEach(entity -> {
+					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
+						}
+					});
+					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
 						textPopupMenu.add(mi);
 					});
 				}
@@ -1446,21 +1435,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		@Override
 		public void popupMenuCanceled(PopupMenuEvent e) {
 
-		}
-
-		@Deprecated
-		private JMenu getCommentItem(CommentAnchor anno) {
-			Comment c = documentModel.getCommentsModel().get(anno);
-			StringBuilder b = new StringBuilder();
-			if (c.getAuthor() != null)
-				b.append(c.getAuthor());
-			else
-				b.append("Unknown author");
-			JMenu subMenu = new JMenu(b.toString());
-			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
-			subMenu.add(commentsWindow.commentList.get(c).editAction);
-			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
-			return subMenu;
 		}
 
 		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
@@ -1517,27 +1491,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				annotationSelected(getAnnotation(0));
 			else
 				annotationSelected(null);
-		}
-
-	}
-
-	@Deprecated
-	class CommentAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		Comment comment;
-
-		public CommentAction(Comment c) {
-			super(MaterialDesign.MDI_MESSAGE_PLUS);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_COMMENT));
-			this.comment = c;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			commentsWindow.setVisible(true);
-			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
 		}
 
 	}
@@ -1682,19 +1635,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.file = file;
 	}
 
-	@Deprecated
-	public CommentWindow getCommentsWindow() {
-		return commentsWindow;
-	}
-
 	class ActionContainer {
 
 		AbstractAction clearAction = new ClearAction();
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
-		@Deprecated
-		AbstractAction commentAction = new CommentAction(null);
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
