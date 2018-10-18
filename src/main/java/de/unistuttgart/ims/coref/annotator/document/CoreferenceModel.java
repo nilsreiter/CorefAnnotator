@@ -347,6 +347,10 @@ public class CoreferenceModel {
 			edit((RemoveSingletons) operation);
 		} else if (operation instanceof MergeEntities) {
 			edit((MergeEntities) operation);
+		} else if (operation instanceof ToggleMentionFlag) {
+			edit((ToggleMentionFlag) operation);
+		} else if (operation instanceof ToggleEntityFlag) {
+			edit((ToggleEntityFlag) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
