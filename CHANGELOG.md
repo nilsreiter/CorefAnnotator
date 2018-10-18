@@ -3,6 +3,15 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.6.0
+
+- Removed commenting system #130
+- Context menu in the text view is now flatter #146
+- Clicking on an entity now highlights all mentions of it #142
+- If segments are annotated in the XMI file, they can now be 
+  displayed in the scroll bar. This is a preparation for segment 
+  support, and not yet directly usable. #84
+
 ## 1.5.5
 
 - Fixed an issue that resulted in copied mentions #141
