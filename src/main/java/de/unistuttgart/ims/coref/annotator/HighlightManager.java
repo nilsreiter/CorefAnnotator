@@ -152,6 +152,10 @@ class HighlightManager {
 
 	}
 
+	public void unHighlight() {
+		highlightMap.values().forEach(o -> hilit.removeHighlight(o));
+	}
+
 	public void unHighlight(Annotation a) {
 		Object hi = highlightMap.get(a);
 		if (hi != null)
