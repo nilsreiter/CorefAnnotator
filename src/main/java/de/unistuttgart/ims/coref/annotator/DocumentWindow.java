@@ -1134,14 +1134,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				documentModel.edit(new AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			} else if (e.getKeyChar() == ' ') {
-				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-					Rectangle p;
-					try {
-						p = textPane.modelToView(textPane.getSelectionStart());
-						textPopupMenu.show(e.getComponent(), p.x, p.y);
-					} catch (BadLocationException e1) {
-						Annotator.logger.catching(e1);
-					}
+				Rectangle p;
+				try {
+					p = textPane.modelToView(textPane.getSelectionStart());
+					textPopupMenu.show(e.getComponent(), p.x, p.y + 15);
+				} catch (BadLocationException e1) {
+					Annotator.logger.catching(e1);
 				}
 			}
 		}
@@ -1360,7 +1358,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	class PopupListener implements PopupMenuListener {
 		@Override
 		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-			int offset = mouseClickedPosition;
+			int offset = mouseClickedPosition != -1 ? mouseClickedPosition : textPane.getSelectionStart();
 			boolean selection = textPane.getSelectionStart() != textPane.getSelectionEnd();
 
 			MutableList<Action> exportActions = Lists.mutable.empty();
@@ -1370,10 +1368,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
 			}
 
-			MutableList<Annotation> localAnnotations = Lists.mutable
+			MutableSet<Annotation> localAnnotations = Sets.mutable
 					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
 
-			MutableList<Annotation> mentions = localAnnotations
+			if (selection)
+				for (int i = textPane.getSelectionStart(); i <= textPane.getSelectionEnd(); i++)
+					localAnnotations.addAll(documentModel.getCoreferenceModel().getMentions(i));
+
+			MutableSet<Annotation> mentions = localAnnotations
 					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 
 			for (Annotation anno : mentions) {
@@ -1384,7 +1386,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 			}
 
-				Set<Entity> candidates = Sets.mutable.empty();
+			Set<Entity> candidates = Sets.mutable.empty();
 			if (selection) {
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						Annotator.app.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
@@ -1398,15 +1400,15 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				textPopupMenu.add(actions.newEntityAction);
 				if (!candidates.isEmpty()) {
-				candidates.forEach(entity -> {
-					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
-						}
-					});
-					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+					candidates.forEach(entity -> {
+						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
+						mi.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
+							}
+						});
+						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
 						textPopupMenu.add(mi);
 					});
 				}
