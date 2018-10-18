@@ -1359,13 +1359,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		@Override
 		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 			int offset = mouseClickedPosition;
+			boolean selection = textPane.getSelectionStart() != textPane.getSelectionEnd();
 
-			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-				JMenu exampleExportMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
-				exampleExportMenu.setIcon(FontIcon.of(MaterialDesign.MDI_CODE_TAGS));
-				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
-				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
-				textPopupMenu.add(exampleExportMenu);
+			MutableList<Action> exportActions = Lists.mutable.empty();
+			MutableList<JMenu> mentionActions = Lists.mutable.empty();
+			if (selection) {
+				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
+				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
 			}
 
 			MutableList<Annotation> localAnnotations = Lists.mutable
@@ -1374,27 +1374,28 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			MutableList<Annotation> mentions = localAnnotations
 					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 
-			JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
 			for (Annotation anno : mentions) {
 				if (anno instanceof Mention)
-					subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+					mentionActions.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
 				else if (anno instanceof DetachedMentionPart)
-					subMenu.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+					mentionActions
+							.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 			}
-			if (subMenu.getMenuComponentCount() > 0)
-				textPopupMenu.add(subMenu);
-
-			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
 
 				Set<Entity> candidates = Sets.mutable.empty();
+			if (selection) {
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						Annotator.app.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
 						Annotator.app.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
-				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
-				candMenu.add(actions.newEntityAction);
-				candMenu.addSeparator();
+			}
+
+			if (selection) {
+				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				textPopupMenu.add(actions.newEntityAction);
+				if (!candidates.isEmpty()) {
 				candidates.forEach(entity -> {
 					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
 					mi.addActionListener(new ActionListener() {
@@ -1404,13 +1405,25 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						}
 					});
 					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
-					candMenu.add(mi);
-				});
-
-				textPopupMenu.add(candMenu);
-
+						textPopupMenu.add(mi);
+					});
+				}
 			}
-
+			if (!mentionActions.isEmpty()) {
+				if (selection)
+					textPopupMenu.addSeparator();
+				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				mentionActions.forEach(mi -> {
+					textPopupMenu.add(mi);
+				});
+			}
+			if (!exportActions.isEmpty()) {
+				textPopupMenu.addSeparator();
+				textPopupMenu.add(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				exportActions.forEach(ea -> textPopupMenu.add(ea));
+			}
 		}
 
 		@Override

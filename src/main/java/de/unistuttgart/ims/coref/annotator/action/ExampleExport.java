@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
@@ -27,10 +29,19 @@ public class ExampleExport extends DocumentWindowAction {
 		MARKDOWN, PLAINTEXT
 	};
 
+	static Ikon getIkon(Format fmt) {
+		switch (fmt) {
+		case MARKDOWN:
+			return MaterialDesign.MDI_MARKDOWN;
+		default:
+			return MaterialDesign.MDI_FORMAT_TEXT;
+		}
+	}
+
 	Format format;
 
 	public ExampleExport(DocumentWindow dw, Format format) {
-		super(dw, Annotator.getString("format." + format.toString()), false);
+		super(dw, Annotator.getString("format." + format.toString()), false, getIkon(format));
 		this.format = format;
 	}
 
