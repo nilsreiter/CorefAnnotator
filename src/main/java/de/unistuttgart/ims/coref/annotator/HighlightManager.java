@@ -38,9 +38,9 @@ class HighlightManager {
 		underlineMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			draw(m, new Color(m.getEntity().getColor()), false, false, null);
+			highlight(m, new Color(m.getEntity().getColor()), false, false, null);
 			if (m.getDiscontinuous() != null)
-				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+				highlight(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 
 		}
 		textComponent.repaint();
@@ -62,21 +62,17 @@ class HighlightManager {
 		}
 	}
 
-	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
+	protected void highlight(Annotation a, Color c, boolean dotted, boolean repaint,
 			LayeredHighlighter.LayerPainter painter) {
 		if (painter == null)
 			throw new NullPointerException();
-		Object hi = underlineMap.get(a);
-		Span span = new Span(a);
+		Object hi = highlightMap.get(a);
 		if (hi != null) {
-			spanCounter.subtract(span, hi);
 			hilit.removeHighlight(hi);
 		}
 		try {
-			int n = spanCounter.getNextLevel(span);
 			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
-			spanCounter.add(span, hi, n);
-			underlineMap.put(a, hi);
+			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
 				textComponent.repaint();
@@ -91,7 +87,7 @@ class HighlightManager {
 	}
 
 	public void highlight(Annotation a) {
-		draw(a, new Color(255, 255, 150), false, false,
+		highlight(a, new Color(255, 255, 150), false, false,
 				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
 	}
 
