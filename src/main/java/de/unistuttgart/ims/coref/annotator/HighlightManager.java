@@ -19,6 +19,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 class HighlightManager {
 	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
+	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
 	RangedCounter spanCounter = new RangedCounter();
@@ -45,8 +46,26 @@ class HighlightManager {
 		textComponent.repaint();
 	}
 
+	protected void underline(Annotation a, Color c, boolean dotted, boolean repaint) {
+		Span span = new Span(a);
+		try {
+
+			int n = spanCounter.getNextLevel(span);
+			Object hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+			spanCounter.add(span, hi, n);
+			underlineMap.put(a, hi);
+			// TODO: this is overkill, but didn't work otherwise
+			if (repaint)
+				textComponent.repaint();
+		} catch (BadLocationException e) {
+			Annotator.logger.catching(e);
+		}
+	}
+
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
 			LayeredHighlighter.LayerPainter painter) {
+		if (painter == null)
+			throw new NullPointerException();
 		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
@@ -55,10 +74,7 @@ class HighlightManager {
 		}
 		try {
 			int n = spanCounter.getNextLevel(span);
-			if (painter == null)
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-			else
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
 			spanCounter.add(span, hi, n);
 			underlineMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
@@ -88,15 +104,15 @@ class HighlightManager {
 
 	public void underline(DetachedMentionPart dmp) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true, null);
+		underline(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, new Color(m.getEntity().getColor()), false, true, null);
+		underline(m, new Color(m.getEntity().getColor()), false, true);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
+			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
@@ -105,27 +121,45 @@ class HighlightManager {
 			underline((Mention) m, color);
 		else {
 			hilit.setDrawsLayeredHighlights(true);
-			draw(m, color, false, true, null);
+			underline(m, color, false, true);
 			hilit.setDrawsLayeredHighlights(false);
 		}
 	}
 
 	public void underline(Mention m, Color color) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, color, false, true, null);
+		underline(m, color, false, true);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), color, true, true, null);
+			underline(m.getDiscontinuous(), color, true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, boolean repaint) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, new Color(m.getEntity().getColor()), false, false, null);
+		underline(m, new Color(m.getEntity().getColor()), false, false);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
+	public void unUnderline(Annotation a) {
+		Object hi = underlineMap.get(a);
+		Span span = new Span(a);
+		if (span != null)
+			spanCounter.subtract(span, hi);
+		if (hi != null)
+			hilit.removeHighlight(hi);
+
+	}
+
+	public void unHighlight(Annotation a) {
+		Object hi = highlightMap.get(a);
+		if (hi != null)
+			hilit.removeHighlight(hi);
+
+	}
+
+	@Deprecated
 	public void undraw(Annotation a) {
 		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
