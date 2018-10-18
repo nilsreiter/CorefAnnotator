@@ -692,7 +692,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event)
 			if (fs instanceof Mention) {
-				highlightManager.undraw((Annotation) fs);
+				highlightManager.unUnderline((Annotation) fs);
 				highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
 			}
 	}
@@ -1476,7 +1476,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
-			else
+			else if (isSingle() && isEntity()) {
+				highlightManager.unHighlight();
+				documentModel.getCoreferenceModel().getMentions(getEntity(0))
+						.forEach(m -> highlightManager.highlight(m));
+			} else
 				annotationSelected(null);
 		}
 
