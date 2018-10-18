@@ -18,7 +18,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 class HighlightManager {
-	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
+	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
 	RangedCounter spanCounter = new RangedCounter();
@@ -34,7 +34,7 @@ class HighlightManager {
 	@Deprecated
 	public void clearAndDrawAllAnnotations(JCas jcas) {
 		hilit.removeAllHighlights();
-		highlightMap.clear();
+		underlineMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			draw(m, new Color(m.getEntity().getColor()), false, false, null);
@@ -47,7 +47,7 @@ class HighlightManager {
 
 	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
 			LayeredHighlighter.LayerPainter painter) {
-		Object hi = highlightMap.get(a);
+		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
 		if (hi != null) {
 			spanCounter.subtract(span, hi);
@@ -60,7 +60,7 @@ class HighlightManager {
 			else
 				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
 			spanCounter.add(span, hi, n);
-			highlightMap.put(a, hi);
+			underlineMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
 				textComponent.repaint();
@@ -127,7 +127,7 @@ class HighlightManager {
 	}
 
 	public void undraw(Annotation a) {
-		Object hi = highlightMap.get(a);
+		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
 		if (span != null)
 			spanCounter.subtract(span, hi);
