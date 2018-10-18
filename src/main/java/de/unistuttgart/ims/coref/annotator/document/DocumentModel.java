@@ -26,9 +26,6 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  */
 public class DocumentModel {
 
-	@Deprecated
-	CommentsModel commentsModel;
-
 	CoreferenceModel coreferenceModel;
 
 	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
@@ -61,11 +58,6 @@ public class DocumentModel {
 
 	protected void fireDocumentChangedEvent() {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
-	}
-
-	@Deprecated
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
 	}
 
 	public CoreferenceModel getCoreferenceModel() {
@@ -136,11 +128,6 @@ public class DocumentModel {
 
 		unsavedChanges = true;
 		fireDocumentChangedEvent();
-	}
-
-	@Deprecated
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
 	}
 
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
