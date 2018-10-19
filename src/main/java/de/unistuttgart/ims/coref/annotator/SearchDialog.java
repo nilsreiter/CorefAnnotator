@@ -72,7 +72,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			CATreeNode node = (CATreeNode) documentWindow.tree.getSelectionPath().getLastPathComponent();
 
 			AddMentionsToEntity op = new AddMentionsToEntity(node.getEntity(),
-					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
+					Lists.immutable.withAll(text_list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getDocumentModel().edit(op);
 		}
 	}
@@ -90,7 +90,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to new entity");
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity(
-					Lists.immutable.withAll(list.getSelectedValuesList()).collect(r -> r.getSpan()));
+					Lists.immutable.withAll(text_list.getSelectedValuesList()).collect(r -> r.getSpan()));
 			documentWindow.getDocumentModel().edit(op);
 		}
 	}
@@ -178,10 +178,21 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			struct_lm.clear();
+			int found = 0;
 			JCas jcas = documentWindow.getDocumentModel().getJcas();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				if (Util.isX(m, flag))
+				if (Util.isX(m, flag)) {
 					struct_lm.addElement(new MentionSearchResult(m));
+					found++;
+				}
+			}
+
+			if (found > 0) {
+				searchResultsLabel.setText(
+						(found > limit ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " "
+								: "") + struct_lm.size() + " "
+								+ Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+
 			}
 		}
 
@@ -246,6 +257,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 					Integer.min(span.end + contexts, text.length() - 1));
 		}
 	}
+
 	class SearchResultRenderer implements ListCellRenderer<SearchResult> {
 
 		Font contextFont;
@@ -289,6 +301,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 
 	}
+
 	class StructuredSearchResultListSelectionListener implements ListSelectionListener {
 
 		@Override
@@ -314,6 +327,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		boolean treeCondition = false;
 
 		boolean listCondition = false;
+
 		public TSL(JTree tree) {
 			super(tree);
 		}
@@ -321,14 +335,14 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()) {
-				if (list.getSelectedIndices().length == 1) {
+				if (text_list.getSelectedIndices().length == 1) {
 					SearchResult result = text_lm
 							.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
 					documentWindow.textPane.setCaretPosition(result.getEnd());
 				}
-				listCondition = (list.getSelectedValuesList().size() > 0);
+				listCondition = (text_list.getSelectedValuesList().size() > 0);
 				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
-				annotateSelectedFindingsAsNew.setEnabled(list.getSelectedValuesList().size() > 0);
+				annotateSelectedFindingsAsNew.setEnabled(text_list.getSelectedValuesList().size() > 0);
 				Annotator.logger.debug("Setting listCondition to {}", listCondition);
 			}
 		}
@@ -347,6 +361,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 
 	}
+
 	final static Color HILIT_COLOR = Color.black;
 	private static final long serialVersionUID = 1L;
 	Highlighter hilit;
@@ -355,7 +370,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	String text;
 	DefaultListModel<SearchResult> text_lm = new DefaultListModel<SearchResult>();
 	DefaultListModel<MentionSearchResult> struct_lm = new DefaultListModel<MentionSearchResult>();
-	JList<SearchResult> list;
+	JList<SearchResult> text_list;
 	JTextField textField;
 
 	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
@@ -370,6 +385,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
+	JList<MentionSearchResult> struct_list;
 
 	public SearchDialog(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
@@ -406,15 +422,14 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(bar);
 
-		JList<MentionSearchResult> list = new JList<MentionSearchResult>(struct_lm);
-		list.getSelectionModel().addListSelectionListener(new StructuredSearchResultListSelectionListener());
-		list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setCellRenderer(new SearchResultRenderer());
-		list.setVisibleRowCount(10);
-		list.setDragEnabled(false);
+		struct_list = new JList<MentionSearchResult>(struct_lm);
+		struct_list.getSelectionModel().addListSelectionListener(new StructuredSearchResultListSelectionListener());
+		struct_list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		struct_list.setCellRenderer(new SearchResultRenderer());
+		struct_list.setVisibleRowCount(10);
+		struct_list.setDragEnabled(false);
 
-		JScrollPane listScroller = new JScrollPane(list);
-		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
+		JScrollPane listScroller = new JScrollPane(struct_list);
 
 		JPanel textSearchPanel = new JPanel();
 		textSearchPanel.setLayout(new BorderLayout());
@@ -438,16 +453,15 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		searchPanel.add(textField);
 		searchPanel.add(bar);
 
-		list = new JList<SearchResult>(text_lm);
-		list.getSelectionModel().addListSelectionListener(tsl);
-		list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		list.setCellRenderer(new SearchResultRenderer());
-		list.setVisibleRowCount(10);
-		list.setTransferHandler(new ListTransferHandler());
-		list.setDragEnabled(true);
+		text_list = new JList<SearchResult>(text_lm);
+		text_list.getSelectionModel().addListSelectionListener(tsl);
+		text_list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		text_list.setCellRenderer(new SearchResultRenderer());
+		text_list.setVisibleRowCount(10);
+		text_list.setTransferHandler(new ListTransferHandler());
+		text_list.setDragEnabled(true);
 
-		JScrollPane listScroller = new JScrollPane(list);
-		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
+		JScrollPane listScroller = new JScrollPane(text_list);
 
 		JPanel textSearchPanel = new JPanel();
 		textSearchPanel.setLayout(new BorderLayout());
@@ -472,6 +486,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
+		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
@@ -507,8 +522,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	}
 
 	public synchronized void search(String s) {
-		list.getSelectionModel().removeListSelectionListener(tsl);
-		list.clearSelection();
+		text_list.getSelectionModel().removeListSelectionListener(tsl);
+		text_list.clearSelection();
 		annotateSelectedFindings.setEnabled(false);
 		annotateSelectedFindingsAsNew.setEnabled(false);
 		searchResultsLabel.setText("");
@@ -531,7 +546,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 				}
 				finding++;
 			}
-			list.getSelectionModel().addListSelectionListener(tsl);
+			text_list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
 
 			searchResultsLabel.setText(
