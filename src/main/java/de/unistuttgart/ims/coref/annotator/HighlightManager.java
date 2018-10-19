@@ -48,8 +48,13 @@ class HighlightManager {
 
 	protected void underline(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Span span = new Span(a);
-		try {
 
+		try {
+			if (underlineMap.containsKey(a)) {
+				Object hi = underlineMap.get(a);
+				spanCounter.subtract(span, hi);
+				hilit.removeHighlight(hi);
+			}
 			int n = spanCounter.getNextLevel(span);
 			Object hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
 			spanCounter.add(span, hi, n);
