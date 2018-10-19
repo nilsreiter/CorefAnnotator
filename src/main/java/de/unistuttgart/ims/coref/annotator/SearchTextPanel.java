@@ -1,8 +1,11 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -28,6 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
 import org.eclipse.collections.impl.factory.Lists;
@@ -38,7 +42,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
-public class SearchTextPanel extends JPanel implements DocumentListener {
+public class SearchTextPanel extends JPanel implements DocumentListener, WindowListener {
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -172,6 +176,9 @@ public class SearchTextPanel extends JPanel implements DocumentListener {
 	public SearchTextPanel(SearchContainer sd) {
 		searchDialog = sd;
 
+		hilit = sd.getDocumentWindow().getTextPane().getHighlighter();
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+
 		tsl = new TSL(searchDialog.getDocumentWindow().tree);
 		annotateSelectedFindings.setEnabled(false);
 
@@ -202,9 +209,14 @@ public class SearchTextPanel extends JPanel implements DocumentListener {
 
 		JScrollPane listScroller = new JScrollPane(text_list);
 
+		JPanel statusbar = new JPanel();
+		statusbar.add(searchResultsLabel);
+		statusbar.add(selectedEntityLabel);
+
 		setLayout(new BorderLayout());
 		add(searchPanel, BorderLayout.NORTH);
 		add(listScroller, BorderLayout.CENTER);
+		add(statusbar, BorderLayout.SOUTH);
 	}
 
 	@Override
@@ -280,6 +292,40 @@ public class SearchTextPanel extends JPanel implements DocumentListener {
 
 		}
 		searchDialog.pack();
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		for (Object o : highlights)
+			hilit.removeHighlight(o);
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
 
 	}
 }

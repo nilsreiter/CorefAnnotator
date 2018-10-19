@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
-public class SearchAnnotationPanel extends JPanel {
+public class SearchAnnotationPanel extends JPanel implements WindowListener {
 
 	class SearchFlaggedMentions extends IkonAction {
 		private static final long serialVersionUID = 1L;
@@ -104,7 +106,7 @@ public class SearchAnnotationPanel extends JPanel {
 			if (e.getValueIsAdjusting())
 				return;
 
-			int index = e.getLastIndex();
+			int index = text_list.getSelectedIndex();
 			SearchResultMention sr;
 			try {
 				sr = struct_lm.get(index);
@@ -148,7 +150,7 @@ public class SearchAnnotationPanel extends JPanel {
 
 		text_list = new JList<SearchResultMention>(struct_lm);
 		text_list.getSelectionModel().addListSelectionListener(new StructuredSearchResultListSelectionListener());
-		text_list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		text_list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		text_list.setCellRenderer(
 				new SearchResultRenderer<SearchResult>(searchDialog.getText(), searchDialog.getContexts()));
 		text_list.setVisibleRowCount(10);
@@ -159,6 +161,49 @@ public class SearchAnnotationPanel extends JPanel {
 		setLayout(new BorderLayout());
 		add(searchPanel, BorderLayout.NORTH);
 		add(listScroller, BorderLayout.CENTER);
+		add(searchResultsLabel, BorderLayout.SOUTH);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
