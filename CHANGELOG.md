@@ -11,6 +11,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - If segments are annotated in the XMI file, they can now be 
   displayed in the scroll bar. This is a preparation for segment 
   support, and not yet directly usable. #84
+- The search panel now has a second tab that allows searching for 
+  mention flags #42
 
 ## 1.5.5
 
