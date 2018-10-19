@@ -306,18 +306,26 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			if (!e.getValueIsAdjusting()) {
-				int index = e.getLastIndex();
-				MentionSearchResult sr = struct_lm.get(index);
-				Mention m = sr.getMention();
 
-				Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
-				TreePath tp = new TreePath(path);
-				documentWindow.getTree().setSelectionPath(tp);
-				documentWindow.getTree().scrollPathToVisible(tp);
+			if (e.getValueIsAdjusting())
+				return;
 
-				documentWindow.annotationSelected(m);
+			int index = e.getLastIndex();
+			MentionSearchResult sr;
+			try {
+				sr = struct_lm.get(index);
+			} catch (ArrayIndexOutOfBoundsException ex) {
+				return;
 			}
+			Mention m = sr.getMention();
+
+			Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
+			TreePath tp = new TreePath(path);
+			documentWindow.getTree().setSelectionPath(tp);
+			documentWindow.getTree().scrollPathToVisible(tp);
+
+			documentWindow.annotationSelected(m);
+
 		}
 
 	}
