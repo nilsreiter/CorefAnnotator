@@ -76,6 +76,7 @@ public class Constants {
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
+		public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
 		public static final String ACTION_COMMENT_DELETE = "action.comment.delete";

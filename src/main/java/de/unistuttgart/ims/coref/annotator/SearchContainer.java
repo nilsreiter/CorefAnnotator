@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
 public interface SearchContainer {
-	int getLimit();
 
 	int getContexts();
 

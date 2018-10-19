@@ -177,6 +177,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		bar.add(runSearch);
 		bar.add(annotateSelectedFindings);
 		bar.add(annotateSelectedFindingsAsNew);
+		bar.add(clearFindings);
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(textField);

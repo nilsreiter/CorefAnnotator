@@ -7,7 +7,6 @@ import java.awt.event.WindowListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JTabbedPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -19,10 +18,6 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	String text;
 
 	int contexts = Defaults.CFG_SEARCH_RESULTS_CONTEXT;
-
-	int limit = 1000;
-
-	JList<SearchResultMention> struct_list;
 
 	public SearchDialog(DocumentWindow xdw, Preferences configuration) {
 		documentWindow = xdw;
@@ -100,15 +95,6 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	@Override
 	public void windowOpened(WindowEvent e) {
 
-	}
-
-	@Override
-	public int getLimit() {
-		return limit;
-	}
-
-	public void setLimit(int limit) {
-		this.limit = limit;
 	}
 
 	@Override

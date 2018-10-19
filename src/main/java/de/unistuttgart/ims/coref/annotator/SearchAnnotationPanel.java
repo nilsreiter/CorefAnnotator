@@ -12,6 +12,7 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.fit.util.JCasUtil;
@@ -41,6 +42,12 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				if (Util.isX(m, flag)) {
 					listModel.addElement(new SearchResultMention(searchContainer, m));
+					try {
+						highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+
 				}
 			}
 
@@ -105,9 +112,6 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 			TreePath tp = new TreePath(path);
 			searchContainer.getDocumentWindow().getTree().setSelectionPath(tp);
 			searchContainer.getDocumentWindow().getTree().scrollPathToVisible(tp);
-
-			searchContainer.getDocumentWindow().annotationSelected(m);
-
 		}
 
 	}
@@ -125,6 +129,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 		bar.add(new SearchFlaggedMentionsAmbiguous());
 		bar.add(new SearchFlaggedMentionsDifficult());
 		bar.add(new SearchFlaggedMentionsNonNominal());
+		bar.add(clearFindings);
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(bar);
