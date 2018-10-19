@@ -1,20 +1,16 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,8 +27,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -42,7 +36,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
-public class SearchTextPanel extends JPanel implements DocumentListener, WindowListener {
+public class SearchTextPanel extends SearchPanel<SearchResult> implements DocumentListener, WindowListener {
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -57,12 +51,12 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Annotator.logger.debug("Adding search results to entity");
-			CATreeNode node = (CATreeNode) searchDialog.getDocumentWindow().getTree().getSelectionPath()
+			CATreeNode node = (CATreeNode) searchContainer.getDocumentWindow().getTree().getSelectionPath()
 					.getLastPathComponent();
 
 			AddMentionsToEntity op = new AddMentionsToEntity(node.getEntity(),
 					Lists.immutable.withAll(text_list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			searchDialog.getDocumentWindow().getDocumentModel().edit(op);
+			searchContainer.getDocumentWindow().getDocumentModel().edit(op);
 		}
 	}
 
@@ -80,7 +74,7 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 			Annotator.logger.debug("Adding search results to new entity");
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity(
 					Lists.immutable.withAll(text_list.getSelectedValuesList()).collect(r -> r.getSpan()));
-			searchDialog.getDocumentWindow().getDocumentModel().edit(op);
+			searchContainer.getDocumentWindow().getDocumentModel().edit(op);
 		}
 	}
 
@@ -93,7 +87,7 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 			@SuppressWarnings("unchecked")
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
-			return new PotentialAnnotationTransfer(searchDialog.getDocumentWindow().getTextPane(),
+			return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
 					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
 		}
 
@@ -133,9 +127,9 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()) {
 				if (text_list.getSelectedIndices().length == 1) {
-					SearchResult result = text_lm
+					SearchResult result = listModel
 							.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
-					searchDialog.getDocumentWindow().getTextPane().setCaretPosition(result.getEnd());
+					searchContainer.getDocumentWindow().getTextPane().setCaretPosition(result.getEnd());
 				}
 				listCondition = (text_list.getSelectedValuesList().size() > 0);
 				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
@@ -164,22 +158,14 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 	JList<SearchResult> text_list;
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
-	DefaultListModel<SearchResult> text_lm = new DefaultListModel<SearchResult>();
 	TSL tsl = null;
-	Highlighter hilit;
-	Highlighter.HighlightPainter painter;
-	Set<Object> highlights = new HashSet<Object>();
-	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
+	JLabel selectedEntityLabel = new JLabel();
 	int limit = 1000;
-	SearchContainer searchDialog;
 
 	public SearchTextPanel(SearchContainer sd) {
-		searchDialog = sd;
+		super(sd);
 
-		hilit = sd.getDocumentWindow().getTextPane().getHighlighter();
-		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
-
-		tsl = new TSL(searchDialog.getDocumentWindow().tree);
+		tsl = new TSL(searchContainer.getDocumentWindow().tree);
 		annotateSelectedFindings.setEnabled(false);
 
 		textField = new JTextField(20);
@@ -196,16 +182,16 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 		searchPanel.add(textField);
 		searchPanel.add(bar);
 
-		text_list = new JList<SearchResult>(text_lm);
+		text_list = new JList<SearchResult>(listModel);
 		text_list.getSelectionModel().addListSelectionListener(tsl);
 		text_list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		text_list.setCellRenderer(
-				new SearchResultRenderer<SearchResult>(searchDialog.getText(), searchDialog.getContexts()));
+				new SearchResultRenderer<SearchResult>(searchContainer.getText(), searchContainer.getContexts()));
 		text_list.setVisibleRowCount(10);
 		text_list.setTransferHandler(new ListTransferHandler());
 		text_list.setDragEnabled(true);
 
-		searchDialog.getDocumentWindow().getTree().addTreeSelectionListener(tsl);
+		searchContainer.getDocumentWindow().getTree().addTreeSelectionListener(tsl);
 
 		JScrollPane listScroller = new JScrollPane(text_list);
 
@@ -263,20 +249,15 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 		text_list.clearSelection();
 		annotateSelectedFindings.setEnabled(false);
 		annotateSelectedFindingsAsNew.setEnabled(false);
-		searchResultsLabel.setText("");
-		text_lm.clear();
-		for (Object o : highlights) {
-			hilit.removeHighlight(o);
-		}
-		highlights.clear();
+		clearResults();
 		if (s.length() > 0) {
 
 			Pattern p = Pattern.compile(s);
-			Matcher m = p.matcher(searchDialog.getDocumentWindow().getText());
+			Matcher m = p.matcher(searchContainer.getDocumentWindow().getText());
 			int finding = 0;
 			while (m.find() && finding < limit) {
 				try {
-					text_lm.addElement(new SearchResult(this.searchDialog, m.start(), m.end()));
+					listModel.addElement(new SearchResult(this.searchContainer, m.start(), m.end()));
 					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
 				} catch (BadLocationException e) {
 					e.printStackTrace();
@@ -285,22 +266,9 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 			}
 			text_list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
-
-			searchResultsLabel.setText(
-					(m.find() ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " " : "")
-							+ text_lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
-
 		}
-		searchDialog.pack();
-
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
+		updateLabel();
+		searchContainer.pack();
 
 	}
 
@@ -311,21 +279,4 @@ public class SearchTextPanel extends JPanel implements DocumentListener, WindowL
 
 	}
 
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-
-	}
 }

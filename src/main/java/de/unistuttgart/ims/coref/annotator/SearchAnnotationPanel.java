@@ -2,12 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -16,7 +12,6 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.fit.util.JCasUtil;
@@ -27,7 +22,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
-public class SearchAnnotationPanel extends JPanel implements WindowListener {
+public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> implements WindowListener {
 
 	class SearchFlaggedMentions extends IkonAction {
 		private static final long serialVersionUID = 1L;
@@ -41,25 +36,16 @@ public class SearchAnnotationPanel extends JPanel implements WindowListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			struct_lm.clear();
-			searchResultsLabel.setText("");
-			int found = 0;
-			JCas jcas = searchDialog.getDocumentWindow().getDocumentModel().getJcas();
+			clearResults();
+			JCas jcas = searchContainer.getDocumentWindow().getDocumentModel().getJcas();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				if (Util.isX(m, flag)) {
-					struct_lm.addElement(new SearchResultMention(searchDialog, m));
-					found++;
+					listModel.addElement(new SearchResultMention(searchContainer, m));
 				}
 			}
 
-			if (found > 0) {
-				searchResultsLabel.setText(
-						(found > limit ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " "
-								: "") + struct_lm.size() + " "
-								+ Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
-
-			}
-			searchDialog.pack();
+			updateLabel();
+			searchContainer.pack();
 
 		}
 
@@ -109,18 +95,18 @@ public class SearchAnnotationPanel extends JPanel implements WindowListener {
 			int index = text_list.getSelectedIndex();
 			SearchResultMention sr;
 			try {
-				sr = struct_lm.get(index);
+				sr = listModel.get(index);
 			} catch (ArrayIndexOutOfBoundsException ex) {
 				return;
 			}
 			Mention m = sr.getMention();
 
-			Object[] path = searchDialog.getDocumentWindow().getDocumentModel().getTreeModel().getPathToRoot(m);
+			Object[] path = searchContainer.getDocumentWindow().getDocumentModel().getTreeModel().getPathToRoot(m);
 			TreePath tp = new TreePath(path);
-			searchDialog.getDocumentWindow().getTree().setSelectionPath(tp);
-			searchDialog.getDocumentWindow().getTree().scrollPathToVisible(tp);
+			searchContainer.getDocumentWindow().getTree().setSelectionPath(tp);
+			searchContainer.getDocumentWindow().getTree().scrollPathToVisible(tp);
 
-			searchDialog.getDocumentWindow().annotationSelected(m);
+			searchContainer.getDocumentWindow().annotationSelected(m);
 
 		}
 
@@ -128,16 +114,11 @@ public class SearchAnnotationPanel extends JPanel implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 	JList<SearchResultMention> text_list;
-	DefaultListModel<SearchResultMention> struct_lm = new DefaultListModel<SearchResultMention>();
-	Highlighter hilit;
-	Highlighter.HighlightPainter painter;
-	Set<Object> highlights = new HashSet<Object>();
-	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
+	JLabel selectedEntityLabel = new JLabel();
 	int limit = 1000;
-	SearchContainer searchDialog;
 
 	public SearchAnnotationPanel(SearchContainer sd) {
-		searchDialog = sd;
+		super(sd);
 
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
@@ -148,11 +129,11 @@ public class SearchAnnotationPanel extends JPanel implements WindowListener {
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(bar);
 
-		text_list = new JList<SearchResultMention>(struct_lm);
+		text_list = new JList<SearchResultMention>(listModel);
 		text_list.getSelectionModel().addListSelectionListener(new StructuredSearchResultListSelectionListener());
 		text_list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		text_list.setCellRenderer(
-				new SearchResultRenderer<SearchResult>(searchDialog.getText(), searchDialog.getContexts()));
+				new SearchResultRenderer<SearchResult>(searchContainer.getText(), searchContainer.getContexts()));
 		text_list.setVisibleRowCount(10);
 		text_list.setDragEnabled(false);
 
@@ -162,48 +143,6 @@ public class SearchAnnotationPanel extends JPanel implements WindowListener {
 		add(searchPanel, BorderLayout.NORTH);
 		add(listScroller, BorderLayout.CENTER);
 		add(searchResultsLabel, BorderLayout.SOUTH);
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
