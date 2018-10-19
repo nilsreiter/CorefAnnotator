@@ -194,6 +194,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 								+ Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
 
 			}
+			pack();
+
 		}
 
 	}
