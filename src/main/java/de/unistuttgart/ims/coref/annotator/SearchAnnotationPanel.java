@@ -4,11 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
+import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -120,16 +123,27 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 	JList<SearchResultMention> text_list;
 	JLabel selectedEntityLabel = new JLabel();
 	int limit = 1000;
+	JToggleButton b1;
+	JToggleButton b2;
+	JToggleButton b3;
 
 	public SearchAnnotationPanel(SearchContainer sd) {
 		super(sd);
 
-		JToolBar bar = new JToolBar();
-		bar.setFloatable(false);
-		bar.add(new SearchFlaggedMentionsAmbiguous());
-		bar.add(new SearchFlaggedMentionsDifficult());
-		bar.add(new SearchFlaggedMentionsNonNominal());
-		bar.add(clearFindings);
+		JPanel bar = new JPanel();
+		// bar.setFloatable(false);
+
+		b1 = new JToggleButton(new SearchFlaggedMentionsAmbiguous());
+		b2 = new JToggleButton(new SearchFlaggedMentionsDifficult());
+		b3 = new JToggleButton(new SearchFlaggedMentionsNonNominal());
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(b1);
+		bg.add(b2);
+		bg.add(b3);
+		bar.add(b1);
+		bar.add(b2);
+		bar.add(b3);
+		bar.add(new JButton(clearFindings));
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.add(bar);
@@ -148,6 +162,13 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 		add(searchPanel, BorderLayout.NORTH);
 		add(listScroller, BorderLayout.CENTER);
 		add(searchResultsLabel, BorderLayout.SOUTH);
+	}
+
+	@Override
+	public void clearEvent() {
+		b1.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
+		b2.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
+		b3.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
 	}
 
 }

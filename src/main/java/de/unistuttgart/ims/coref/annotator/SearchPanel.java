@@ -33,6 +33,7 @@ public abstract class SearchPanel<T> extends JPanel implements WindowListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			clearResults();
+			clearEvent();
 		}
 
 	}
@@ -69,6 +70,10 @@ public abstract class SearchPanel<T> extends JPanel implements WindowListener {
 		clearFindings.setEnabled(listModel.size() > 0);
 		searchResultsLabel
 				.setText(listModel.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+	}
+
+	protected void clearEvent() {
+
 	}
 
 	@Override
