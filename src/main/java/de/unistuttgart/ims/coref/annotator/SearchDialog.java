@@ -178,6 +178,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			struct_lm.clear();
+			searchResultsLabel.setText("");
 			int found = 0;
 			JCas jcas = documentWindow.getDocumentModel().getJcas();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
