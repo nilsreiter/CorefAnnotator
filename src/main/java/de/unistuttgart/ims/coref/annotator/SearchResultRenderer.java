@@ -9,6 +9,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 class SearchResultRenderer<T extends SearchResult> implements ListCellRenderer<T> {
@@ -44,7 +46,10 @@ class SearchResultRenderer<T extends SearchResult> implements ListCellRenderer<T
 		left.setFont(contextFont);
 		right.setFont(contextFont);
 
-		JLabel center = new JLabel(text.substring(value.getSpan().begin, value.getSpan().end));
+		String centerString = StringUtils.abbreviateMiddle(text.substring(value.getSpan().begin, value.getSpan().end),
+				"...", 40);
+
+		JLabel center = new JLabel(centerString);
 		center.setFont(centerFont);
 		if (value instanceof SearchResultMention) {
 			Mention m = ((SearchResultMention) value).getMention();
