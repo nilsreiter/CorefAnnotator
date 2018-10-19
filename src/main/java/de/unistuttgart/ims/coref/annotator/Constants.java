@@ -116,6 +116,10 @@ public class Constants {
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
 		public static final String ACTION_SEARCH = "action.search";
+		public static final String ACTION_SEARCH_MENTION = "action.search.mention";
+		public static final String ACTION_SEARCH_MENTION_AMBIGUOUS = "action.search.mention.ambiguous";
+		public static final String ACTION_SEARCH_MENTION_DIFFICULT = "action.search.mention.difficult";
+		public static final String ACTION_SEARCH_MENTION_NONNOMINAL = "action.search.mention.nonnominal";
 		public static final String ACTION_SET_ANNOTATOR_NAME = "action.set_annotator_name";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
@@ -196,6 +200,8 @@ public class Constants {
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
+		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
+		public static final String SEARCH_WINDOW_TAB_STRUCTURE = "search.window.tab.structure";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String STAT_AGR_TITLE = "stat.agr.title";

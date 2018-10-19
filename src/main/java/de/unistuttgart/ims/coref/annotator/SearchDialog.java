@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -39,35 +40,21 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.tree.TreePath;
 
+import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener {
-	class ListTransferHandler extends TransferHandler {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Transferable createTransferable(JComponent comp) {
-			@SuppressWarnings("unchecked")
-			JList<SearchResult> list = (JList<SearchResult>) comp;
-
-			return new PotentialAnnotationTransfer(documentWindow.textPane,
-					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
-		}
-
-		@Override
-		public int getSourceActions(JComponent c) {
-			return TransferHandler.LINK;
-		}
-	}
-
 	class AnnotateSelectedFindings extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -108,6 +95,60 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
+	class ListTransferHandler extends TransferHandler {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Transferable createTransferable(JComponent comp) {
+			@SuppressWarnings("unchecked")
+			JList<SearchResult> list = (JList<SearchResult>) comp;
+
+			return new PotentialAnnotationTransfer(documentWindow.textPane,
+					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
+		}
+
+		@Override
+		public int getSourceActions(JComponent c) {
+			return TransferHandler.LINK;
+		}
+	}
+
+	class MentionSearchResult extends SearchResult {
+
+		Mention mention;
+
+		public MentionSearchResult(Mention m) {
+			super(m.getBegin(), m.getEnd());
+			this.mention = m;
+		}
+
+		@Override
+		public int getBegin() {
+			return span.begin;
+		}
+
+		@Override
+		public int getEnd() {
+			return span.end;
+		}
+
+		public Mention getMention() {
+			return mention;
+		}
+
+		@Override
+		public Span getSpan() {
+			return span;
+		}
+
+		@Override
+		public String toString() {
+			return text.substring(Integer.max(span.begin - contexts, 0),
+					Integer.min(span.end + contexts, text.length() - 1));
+		}
+	}
+
 	class RunSearch extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -124,21 +165,207 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	}
 
-	final static Color HILIT_COLOR = Color.black;
+	class SearchFlaggedMentions extends IkonAction {
+		private static final long serialVersionUID = 1L;
 
+		String flag;
+
+		public SearchFlaggedMentions(String s, String key, Ikon ik) {
+			super(key, ik);
+			this.flag = s;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			struct_lm.clear();
+			JCas jcas = documentWindow.getDocumentModel().getJcas();
+			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+				if (Util.isX(m, flag))
+					struct_lm.addElement(new MentionSearchResult(m));
+			}
+		}
+
+	}
+
+	class SearchFlaggedMentionsAmbiguous extends SearchFlaggedMentions {
+
+		private static final long serialVersionUID = 1L;
+
+		public SearchFlaggedMentionsAmbiguous() {
+			super(Constants.MENTION_FLAG_AMBIGUOUS, Constants.Strings.ACTION_SEARCH_MENTION_AMBIGUOUS,
+					MaterialDesign.MDI_SHARE_VARIANT);
+		}
+
+	}
+
+	class SearchFlaggedMentionsDifficult extends SearchFlaggedMentions {
+
+		private static final long serialVersionUID = 1L;
+
+		public SearchFlaggedMentionsDifficult() {
+			super(Constants.MENTION_FLAG_DIFFICULT, Constants.Strings.ACTION_SEARCH_MENTION_DIFFICULT,
+					MaterialDesign.MDI_ALERT_BOX);
+		}
+
+	}
+
+	class SearchFlaggedMentionsNonNominal extends SearchFlaggedMentions {
+
+		private static final long serialVersionUID = 1L;
+
+		public SearchFlaggedMentionsNonNominal() {
+			super(Constants.MENTION_FLAG_NON_NOMINAL, Constants.Strings.ACTION_SEARCH_MENTION_NONNOMINAL,
+					MaterialDesign.MDI_FLAG);
+		}
+
+	}
+
+	class SearchResult {
+		Span span;
+
+		public SearchResult(int begin, int end) {
+			super();
+			this.span = new Span(begin, end);
+		}
+
+		public int getBegin() {
+			return span.begin;
+		}
+
+		public int getEnd() {
+			return span.end;
+		}
+
+		public Span getSpan() {
+			return span;
+		}
+
+		@Override
+		public String toString() {
+			return text.substring(Integer.max(span.begin - contexts, 0),
+					Integer.min(span.end + contexts, text.length() - 1));
+		}
+	}
+	class SearchResultRenderer implements ListCellRenderer<SearchResult> {
+
+		Font contextFont;
+		Font centerFont;
+
+		public SearchResultRenderer() {
+			contextFont = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
+			centerFont = new Font(Font.SANS_SERIF, Font.BOLD, 13);
+		}
+
+		@Override
+		public Component getListCellRendererComponent(JList<? extends SearchResult> list, SearchResult value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+
+			JPanel panel = new JPanel();
+			if (isSelected) {
+				panel.setBackground(list.getSelectionBackground());
+				panel.setForeground(list.getSelectionForeground());
+			} else {
+				panel.setBackground(list.getBackground());
+				panel.setForeground(list.getForeground());
+			}
+			JLabel left = new JLabel(
+					text.substring(Integer.max(value.getSpan().begin - contexts, 0), value.getSpan().begin));
+			JLabel right = new JLabel(text.substring(value.getSpan().end,
+					Integer.min(value.getSpan().end + contexts, text.length() - 1)));
+			left.setFont(contextFont);
+			right.setFont(contextFont);
+
+			JLabel center = new JLabel(text.substring(value.getSpan().begin, value.getSpan().end));
+			center.setFont(centerFont);
+			if (value instanceof MentionSearchResult) {
+				Mention m = ((MentionSearchResult) value).getMention();
+				center.setForeground(new Color(m.getEntity().getColor()));
+			}
+			panel.add(left);
+			panel.add(center);
+			panel.add(right);
+
+			return panel;
+		}
+
+	}
+	class StructuredSearchResultListSelectionListener implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				int index = e.getLastIndex();
+				MentionSearchResult sr = struct_lm.get(index);
+				Mention m = sr.getMention();
+
+				Object[] path = documentWindow.getDocumentModel().getTreeModel().getPathToRoot(m);
+				TreePath tp = new TreePath(path);
+				documentWindow.getTree().setSelectionPath(tp);
+				documentWindow.getTree().scrollPathToVisible(tp);
+
+				documentWindow.annotationSelected(m);
+			}
+		}
+
+	}
+
+	class TSL extends CATreeSelectionListener implements ListSelectionListener {
+
+		boolean treeCondition = false;
+
+		boolean listCondition = false;
+		public TSL(JTree tree) {
+			super(tree);
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				if (list.getSelectedIndices().length == 1) {
+					SearchResult result = text_lm
+							.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
+					documentWindow.textPane.setCaretPosition(result.getEnd());
+				}
+				listCondition = (list.getSelectedValuesList().size() > 0);
+				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
+				annotateSelectedFindingsAsNew.setEnabled(list.getSelectedValuesList().size() > 0);
+				Annotator.logger.debug("Setting listCondition to {}", listCondition);
+			}
+		}
+
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			collectData(e);
+			treeCondition = (isSingle() && isEntity());
+			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
+			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
+			if (treeCondition)
+				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
+						+ ((Entity) featureStructures.get(0)).getLabel());
+			else
+				selectedEntityLabel.setText("");
+		}
+
+	}
+	final static Color HILIT_COLOR = Color.black;
 	private static final long serialVersionUID = 1L;
 	Highlighter hilit;
 	Highlighter.HighlightPainter painter;
-
 	DocumentWindow documentWindow;
 	String text;
-	DefaultListModel<SearchResult> lm = new DefaultListModel<SearchResult>();
+	DefaultListModel<SearchResult> text_lm = new DefaultListModel<SearchResult>();
+	DefaultListModel<MentionSearchResult> struct_lm = new DefaultListModel<MentionSearchResult>();
 	JList<SearchResult> list;
 	JTextField textField;
+
 	JLabel searchResultsLabel = new JLabel(), selectedEntityLabel = new JLabel();
+
 	int contexts = Defaults.CFG_SEARCH_RESULTS_CONTEXT;
+
 	Set<Object> highlights = new HashSet<Object>();
+
 	TSL tsl = null;
+
 	int limit = 1000;
 
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
@@ -155,11 +382,48 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		this.initialiseWindow();
 	}
 
-	protected void initialiseWindow() {
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		runSearch.setEnabled(textField.getText().length() > 0);
+		try {
+			Pattern.compile(textField.getText());
+			if (textField.getText().length() > 2)
+				search(textField.getText());
+		} catch (PatternSyntaxException ex) {
+			searchResultsLabel.setText(ex.getLocalizedMessage());
+			// silently catching
+		}
+	}
 
-		hilit = documentWindow.textPane.getHighlighter();
-		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+	protected JPanel initialiseStructuredSearchPanel() {
+		JToolBar bar = new JToolBar();
+		bar.setFloatable(false);
+		bar.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_SEARCH_MENTION)));
+		bar.add(new SearchFlaggedMentionsAmbiguous());
+		bar.add(new SearchFlaggedMentionsDifficult());
+		bar.add(new SearchFlaggedMentionsNonNominal());
 
+		JPanel searchPanel = new JPanel();
+		searchPanel.add(bar);
+
+		JList<MentionSearchResult> list = new JList<MentionSearchResult>(struct_lm);
+		list.getSelectionModel().addListSelectionListener(new StructuredSearchResultListSelectionListener());
+		list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setCellRenderer(new SearchResultRenderer());
+		list.setVisibleRowCount(10);
+		list.setDragEnabled(false);
+
+		JScrollPane listScroller = new JScrollPane(list);
+		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
+
+		JPanel textSearchPanel = new JPanel();
+		textSearchPanel.setLayout(new BorderLayout());
+		textSearchPanel.add(searchPanel, BorderLayout.NORTH);
+		textSearchPanel.add(listScroller, BorderLayout.CENTER);
+		return textSearchPanel;
+	}
+
+	protected JPanel initialiseTextSearchPanel() {
 		textField = new JTextField(20);
 		textField.setToolTipText(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
 		textField.getDocument().addDocumentListener(this);
@@ -174,7 +438,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		searchPanel.add(textField);
 		searchPanel.add(bar);
 
-		list = new JList<SearchResult>(lm);
+		list = new JList<SearchResult>(text_lm);
 		list.getSelectionModel().addListSelectionListener(tsl);
 		list.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		list.setCellRenderer(new SearchResultRenderer());
@@ -185,12 +449,29 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		JScrollPane listScroller = new JScrollPane(list);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
+		JPanel textSearchPanel = new JPanel();
+		textSearchPanel.setLayout(new BorderLayout());
+		textSearchPanel.add(searchPanel, BorderLayout.NORTH);
+		textSearchPanel.add(listScroller, BorderLayout.CENTER);
+		return textSearchPanel;
+	}
+
+	protected void initialiseWindow() {
+
+		hilit = documentWindow.textPane.getHighlighter();
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_TEXT), initialiseTextSearchPanel());
+		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_STRUCTURE),
+				initialiseStructuredSearchPanel());
+
 		JPanel statusbar = new JPanel();
 		statusbar.add(searchResultsLabel);
 		statusbar.add(selectedEntityLabel);
+
+		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		getContentPane().add(statusbar, BorderLayout.SOUTH);
-		getContentPane().add(searchPanel, BorderLayout.NORTH);
-		getContentPane().add(listScroller, BorderLayout.CENTER);
 
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
@@ -225,26 +506,13 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		}
 	}
 
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		runSearch.setEnabled(textField.getText().length() > 0);
-		try {
-			Pattern.compile(textField.getText());
-			if (textField.getText().length() > 2)
-				search(textField.getText());
-		} catch (PatternSyntaxException ex) {
-			searchResultsLabel.setText(ex.getLocalizedMessage());
-			// silently catching
-		}
-	}
-
 	public synchronized void search(String s) {
 		list.getSelectionModel().removeListSelectionListener(tsl);
 		list.clearSelection();
 		annotateSelectedFindings.setEnabled(false);
 		annotateSelectedFindingsAsNew.setEnabled(false);
 		searchResultsLabel.setText("");
-		lm.clear();
+		text_lm.clear();
 		for (Object o : highlights) {
 			hilit.removeHighlight(o);
 		}
@@ -256,7 +524,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 			int finding = 0;
 			while (m.find() && finding < limit) {
 				try {
-					lm.addElement(new SearchResult(m.start(), m.end()));
+					text_lm.addElement(new SearchResult(m.start(), m.end()));
 					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
 				} catch (BadLocationException e) {
 					e.printStackTrace();
@@ -268,82 +536,19 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 			searchResultsLabel.setText(
 					(m.find() ? Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS_MORE_THAN) + " " : "")
-							+ lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+							+ text_lm.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
 
 		}
 
 		pack();
 	}
 
-	class SearchResult {
-		Span span;
-
-		public SearchResult(int begin, int end) {
-			super();
-			this.span = new Span(begin, end);
-		}
-
-		public int getBegin() {
-			return span.begin;
-		}
-
-		public int getEnd() {
-			return span.end;
-		}
-
-		@Override
-		public String toString() {
-			return text.substring(Integer.max(span.begin - contexts, 0),
-					Integer.min(span.end + contexts, text.length() - 1));
-		}
-
-		public Span getSpan() {
-			return span;
-		}
-	}
-
-	class SearchResultRenderer implements ListCellRenderer<SearchResult> {
-
-		Font contextFont;
-		Font centerFont;
-
-		public SearchResultRenderer() {
-			contextFont = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
-			centerFont = new Font(Font.SANS_SERIF, Font.BOLD, 13);
-		}
-
-		@Override
-		public Component getListCellRendererComponent(JList<? extends SearchResult> list, SearchResult value, int index,
-				boolean isSelected, boolean cellHasFocus) {
-
-			JPanel panel = new JPanel();
-			if (isSelected) {
-				panel.setBackground(list.getSelectionBackground());
-				panel.setForeground(list.getSelectionForeground());
-			} else {
-				panel.setBackground(list.getBackground());
-				panel.setForeground(list.getForeground());
-			}
-			JLabel left = new JLabel(
-					text.substring(Integer.max(value.getSpan().begin - contexts, 0), value.getSpan().begin));
-			JLabel right = new JLabel(text.substring(value.getSpan().end,
-					Integer.min(value.getSpan().end + contexts, text.length() - 1)));
-			left.setFont(contextFont);
-			right.setFont(contextFont);
-
-			JLabel center = new JLabel(text.substring(value.getSpan().begin, value.getSpan().end));
-			center.setFont(centerFont);
-			panel.add(left);
-			panel.add(center);
-			panel.add(right);
-
-			return panel;
-		}
-
+	@Override
+	public void windowActivated(WindowEvent e) {
 	}
 
 	@Override
-	public void windowOpened(WindowEvent e) {
+	public void windowClosed(WindowEvent e) {
 
 	}
 
@@ -356,8 +561,11 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
+	public void windowDeactivated(WindowEvent e) {
+	}
 
+	@Override
+	public void windowDeiconified(WindowEvent e) {
 	}
 
 	@Override
@@ -366,52 +574,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	}
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
-
-	class TSL extends CATreeSelectionListener implements ListSelectionListener {
-
-		public TSL(JTree tree) {
-			super(tree);
-		}
-
-		boolean treeCondition = false;
-		boolean listCondition = false;
-
-		@Override
-		public void valueChanged(TreeSelectionEvent e) {
-			collectData(e);
-			treeCondition = (isSingle() && isEntity());
-			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
-			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
-			if (treeCondition)
-				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
-						+ ((Entity) featureStructures.get(0)).getLabel());
-			else
-				selectedEntityLabel.setText("");
-		}
-
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			if (!e.getValueIsAdjusting()) {
-				if (list.getSelectedIndices().length == 1) {
-					SearchResult result = lm.getElementAt(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
-					documentWindow.textPane.setCaretPosition(result.getEnd());
-				}
-				listCondition = (list.getSelectedValuesList().size() > 0);
-				annotateSelectedFindings.setEnabled(treeCondition && listCondition);
-				annotateSelectedFindingsAsNew.setEnabled(list.getSelectedValuesList().size() > 0);
-				Annotator.logger.debug("Setting listCondition to {}", listCondition);
-			}
-		}
+	public void windowOpened(WindowEvent e) {
 
 	}
 }
