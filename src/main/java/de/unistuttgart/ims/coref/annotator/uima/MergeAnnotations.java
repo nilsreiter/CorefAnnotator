@@ -7,14 +7,13 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnnotationFactory;
-import org.apache.uima.fit.factory.JCasFactory;
-import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
+import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -32,7 +31,9 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 		getLogger().debug("Processing file " + fileName);
 		try {
-			JCas jcas2 = JCasFactory.createJCas(fileName, TypeSystemDescriptionFactory.createTypeSystemDescription());
+
+			JCas jcas2 = UimaUtil.readJCas(fileName);// JCasFactory.createJCas(fileName,
+														// TypeSystemDescriptionFactory.createTypeSystemDescription());
 
 			MutableMap<Entity, Entity> entityMap = Maps.mutable.empty();
 
@@ -90,7 +91,7 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 				}
 			}
 
-		} catch (UIMAException | IOException e) {
+		} catch (UIMAException | IOException | SAXException e) {
 			throw new AnalysisEngineProcessException(e);
 		}
 	}
