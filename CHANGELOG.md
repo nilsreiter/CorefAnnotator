@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.5.6
+
+- Fixed an issue that prevented merging compressed files #150
+
 ## 1.5.5
 
 - Fixed an issue that resulted in copied mentions #141
