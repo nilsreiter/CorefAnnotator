@@ -15,7 +15,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
 
 @Deprecated
 public class ToggleMentionAmbiguous extends TargetedIkonAction<DocumentWindow> implements CAAction {
@@ -29,8 +29,8 @@ public class ToggleMentionAmbiguous extends TargetedIkonAction<DocumentWindow> i
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
+		getTarget().getDocumentModel()
+				.edit(new ToggleMentionFlag(Constants.MENTION_FLAG_AMBIGUOUS,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}

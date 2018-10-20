@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 
 public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> implements CATreeSelectionListener {
 
@@ -34,8 +34,8 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getCoreferenceModel().edit(
-				new Op.ToggleGenericFlag(flag.getKey(), Lists.immutable.of(getTarget().getTree().getSelectionPaths())
+		getTarget().getDocumentModel()
+				.edit(new ToggleGenericFlag(flag.getKey(), Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 						.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}
 

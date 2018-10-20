@@ -34,6 +34,24 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Segment</name>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<description />
+			<features>
+				<featureDescription>
+					<name>Label</name>
+					<description/>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Flags</name>
+					<description />
+					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
+					<multipleReferencesAllowed>false</multipleReferencesAllowed>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Mention</name>
 			<description>A mention in the text.</description>
 			<supertypeName>uima.tcas.Annotation</supertypeName>

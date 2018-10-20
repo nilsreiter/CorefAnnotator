@@ -15,7 +15,7 @@ import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
 
 @Deprecated
 public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> implements CAAction {
@@ -28,8 +28,8 @@ public class ToggleEntityGeneric extends TargetedIkonAction<DocumentWindow> impl
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getCoreferenceModel()
-				.edit(new Op.ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
+		getTarget().getDocumentModel()
+				.edit(new ToggleEntityFlag(Constants.ENTITY_FLAG_GENERIC,
 						Lists.immutable.of(getTarget().getTree().getSelectionPaths())
 								.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure())));
 	}
