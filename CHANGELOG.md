@@ -14,6 +14,10 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - The search panel now has a second tab that allows searching for 
   mention flags #42
 
+## 1.5.6
+
+- Fixed an issue that prevented merging compressed files #150
+
 ## 1.5.5
 
 - Fixed an issue that resulted in copied mentions #141
