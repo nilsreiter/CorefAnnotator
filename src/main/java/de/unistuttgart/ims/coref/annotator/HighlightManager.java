@@ -92,8 +92,11 @@ class HighlightManager {
 	}
 
 	public void highlight(Annotation a) {
-		highlight(a, new Color(255, 255, 150), false, false,
-				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
+		highlight(a, new Color(255, 255, 150));
+	}
+
+	public void highlight(Annotation a, Color c) {
+		highlight(a, c, false, false, new DefaultHighlighter.DefaultHighlightPainter(c));
 	}
 
 	public void underline(Annotation a) {
