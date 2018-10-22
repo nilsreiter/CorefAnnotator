@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -53,6 +54,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -351,6 +353,8 @@ public class CoreferenceModel implements Model {
 			edit((ToggleMentionFlag) operation);
 		} else if (operation instanceof ToggleEntityFlag) {
 			edit((ToggleEntityFlag) operation);
+		} else if (operation instanceof ToggleGenericFlag) {
+			edit((ToggleGenericFlag) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -445,6 +449,27 @@ public class CoreferenceModel implements Model {
 		operation.setMentions(mentions.toList().toImmutable());
 		// fireEvent(null); // TODO
 		registerEdit(operation);
+	}
+
+	protected void edit(ToggleGenericFlag operation) {
+		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
+		operation.getObjects().forEach(fs -> {
+			Feature feature = fs.getType().getFeatureByBaseName("Flags");
+
+			featureStructures.add(fs);
+
+			if (Util.isX(fs, operation.getFlag())) {
+				fs.setFeatureValue(feature,
+						Util.removeFrom(jcas, (StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+			} else {
+				fs.setFeatureValue(feature,
+						Util.addTo(jcas, (StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+			}
+		});
+		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(this, Event.Type.Update, featureStructures));
+		registerEdit(operation);
+
 	}
 
 	protected void edit(ToggleEntityFlag operation) {
