@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -77,7 +76,6 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -129,22 +127,30 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.action.ViewShowCommentsAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
+import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
-import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
+import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
+import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
+import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -155,7 +161,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractWindow implements CaretListener, TreeModelListener,
+public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
@@ -174,22 +180,15 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	// actions
 	ActionContainer actions = new ActionContainer();
 
-	// controller
-	DocumentModel documentModel;
-	HighlightManager highlightManager;
-
 	// Window components
 	JTree tree;
-	JTextPane textPane;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
-
-	// Sub windows
-	CommentWindow commentsWindow;
+	SegmentedScrollBar<Segment> segmentIndicator;
 
 	// Menu components
 	JMenu documentMenu;
@@ -313,12 +312,18 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		highlightManager = new HighlightManager(textPane);
 
-		leftPanel.add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		// scrollPane.setRowHeaderView(segmentIndicator);
+		leftPanel.add(scrollPane, BorderLayout.CENTER);
+		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
+
+		scrollPane.setVerticalScrollBar(segmentIndicator);
+		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
 		// split pane
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-		splitPane.setVisible(false);
+		splitPane.setVisible(true);
 		splitPane.setDividerLocation(500);
 		getContentPane().add(splitPane);
 
@@ -408,7 +413,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		}
 		viewMenu.add(viewStyleMenu);
-		viewMenu.add(new ViewShowCommentsAction(this));
 		return viewMenu;
 
 	}
@@ -471,7 +475,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		entityMenu.add(new JMenuItem(actions.undoAction));
 		entityMenu.add(new JMenuItem(actions.copyAction));
 		entityMenu.add(new JMenuItem(actions.deleteAction));
-		entityMenu.add(new JMenuItem(actions.commentAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
@@ -621,12 +624,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		}.execute();
 	}
 
-	@Override
-	@Deprecated
-	public JCas getJCas() {
-		return jcas;
-	}
-
 	@Deprecated
 	public Annotator getMainApplication() {
 		return Annotator.app;
@@ -692,53 +689,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	}
 
 	@Override
-	public void entityEvent(FeatureStructureEvent event) {
-		Event.Type eventType = event.getType();
-		Iterator<FeatureStructure> iter = event.iterator(1);
-		switch (eventType) {
-		case Add:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-					highlightManager.underline((Annotation) fs);
-				} else if (fs instanceof CommentAnchor) {
-					highlightManager.highlight((Annotation) fs);
-				}
+	protected void entityEventMove(FeatureStructureEvent event) {
+		for (FeatureStructure fs : event)
+			if (fs instanceof Mention) {
+				highlightManager.unUnderline((Annotation) fs);
+				highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
 			}
-			break;
-		case Remove:
-			while (iter.hasNext()) {
-				FeatureStructure fs = iter.next();
-				if (fs instanceof Mention) {
-					if (((Mention) fs).getDiscontinuous() != null)
-						highlightManager.undraw(((Mention) fs).getDiscontinuous());
-					highlightManager.undraw((Annotation) fs);
-				} else if (fs instanceof Annotation)
-					highlightManager.undraw((Annotation) fs);
-
-			}
-			break;
-		case Move:
-			for (FeatureStructure fs : event)
-				if (fs instanceof Mention) {
-					highlightManager.undraw((Annotation) fs);
-					highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
-				}
-			break;
-		case Update:
-			for (FeatureStructure fs : event) {
-				if (fs instanceof Mention) {
-					if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-						highlightManager.undraw((Annotation) fs);
-					else
-						highlightManager.underline((Annotation) fs);
-				}
-			}
-			break;
-		default:
-			break;
-		}
-
 	}
 
 	public void setDocumentModel(DocumentModel model) {
@@ -746,6 +702,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
 		model.addDocumentStateListener(this);
+		model.getSegmentModel().addListDataListener(segmentIndicator);
+		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
 
 		// UI
@@ -771,7 +729,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		// final
 		setMessage("");
 
-		commentsWindow = new CommentWindow(this, documentModel.getCommentsModel());
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 
@@ -783,6 +740,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
+
+		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
 		im.setCoreferenceModelListener(this);
@@ -938,16 +897,16 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					@SuppressWarnings("unchecked")
 					ImmutableList<Span> paList = (ImmutableList<Span>) info.getTransferable()
 							.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-					Op op = null;
+					Operation operation = null;
 					if (targetFS == null) {
-						op = new Op.AddMentionsToNewEntity(paList);
+						operation = new AddMentionsToNewEntity(paList);
 					} else if (targetFS instanceof Entity) {
-						op = new Op.AddMentionsToEntity((Entity) targetFS, paList);
+						operation = new AddMentionsToEntity((Entity) targetFS, paList);
 					} else if (targetFS instanceof Mention) {
-						op = new Op.AttachPart((Mention) targetFS, paList.getFirst());
+						operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
-					if (op != null) {
-						documentModel.getCoreferenceModel().edit(op);
+					if (operation != null) {
+						documentModel.edit(operation);
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -969,23 +928,22 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		protected boolean handleNodeMoving(ImmutableList<CATreeNode> moved) {
 			Annotator.logger.debug("Moving {} things", moved.size());
-			Op operation = null;
+			Operation operation = null;
 			if (targetFS instanceof Entity) {
 				if (targetFS instanceof EntityGroup) {
-					operation = new Op.AddEntityToEntityGroup((EntityGroup) targetFS,
+					operation = new AddEntityToEntityGroup((EntityGroup) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
 				}
-				documentModel.getCoreferenceModel()
-						.edit(new Op.MoveMentionsToEntity((Entity) targetFS,
-								moved.select(n -> n.getFeatureStructure() instanceof Mention)
-										.collect(n -> n.getFeatureStructure())));
+				documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
+						moved.select(n -> n.getFeatureStructure() instanceof Mention)
+								.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
-				operation = new Op.MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
+				operation = new MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
 				return false;
 			if (operation != null)
-				documentModel.getCoreferenceModel().edit(operation);
+				documentModel.edit(operation);
 			return true;
 		}
 
@@ -1015,6 +973,8 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		public ChangeKeyForEntityAction() {
 			super(Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
+			putValue(Action.ACCELERATOR_KEY,
+					KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		}
 
@@ -1031,7 +991,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 			if (newKey != null)
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					documentModel.getCoreferenceModel().edit(new Op.UpdateEntityKey(newChar, etn.getEntity()));
+					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
@@ -1161,7 +1121,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
+			documentModel.edit(new RemoveMention(m));
 		}
 
 	}
@@ -1171,17 +1131,15 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		public void keyTyped(KeyEvent e) {
 			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(
+				documentModel.edit(new AddMentionsToEntity(
 						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
 			} else if (e.getKeyChar() == ' ') {
-				if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-					Rectangle p;
-					try {
-						p = textPane.modelToView(textPane.getSelectionStart());
-						textPopupMenu.show(e.getComponent(), p.x, p.y);
-					} catch (BadLocationException e1) {
-						Annotator.logger.catching(e1);
-					}
+				Rectangle p;
+				try {
+					p = textPane.modelToView(textPane.getSelectionStart());
+					textPopupMenu.show(e.getComponent(), p.x, p.y + 15);
+				} catch (BadLocationException e1) {
+					Annotator.logger.catching(e1);
 				}
 			}
 		}
@@ -1239,7 +1197,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.getCoreferenceModel().edit(new Op.AddMentionsToEntity(m.getEntity(), spans));
+						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
 
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
@@ -1262,10 +1220,10 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
 			for (Mention m : Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class)))
-				documentModel.getCoreferenceModel().edit(new Op.RemoveMention(m));
+				documentModel.edit(new RemoveMention(m));
 			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
-				documentModel.getCoreferenceModel().edit(new Op.RemoveEntities(e));
-			documentModel.getCoreferenceModel().getHistory().clear();
+				documentModel.edit(new RemoveEntities(e));
+			documentModel.getHistory().clear();
 		}
 
 	}
@@ -1305,7 +1263,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getCoreferenceModel().edit(new Op.MergeEntities(getSelectedEntities()));
+			documentModel.edit(new MergeEntities(getSelectedEntities()));
 
 		}
 
@@ -1400,70 +1358,76 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 	class PopupListener implements PopupMenuListener {
 		@Override
 		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-			int offset = mouseClickedPosition;
+			int offset = mouseClickedPosition != -1 ? mouseClickedPosition : textPane.getSelectionStart();
+			boolean selection = textPane.getSelectionStart() != textPane.getSelectionEnd();
 
-			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-				JMenu exampleExportMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
-				exampleExportMenu.setIcon(FontIcon.of(MaterialDesign.MDI_CODE_TAGS));
-				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
-				exampleExportMenu.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
-				textPopupMenu.add(exampleExportMenu);
+			MutableList<Action> exportActions = Lists.mutable.empty();
+			MutableList<JMenu> mentionActions = Lists.mutable.empty();
+			if (selection) {
+				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
+				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
 			}
 
-			MutableList<Annotation> localAnnotations = Lists.mutable
+			MutableSet<Annotation> localAnnotations = Sets.mutable
 					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
 
-			MutableList<Annotation> mentions = localAnnotations
+			if (selection)
+				for (int i = textPane.getSelectionStart(); i <= textPane.getSelectionEnd(); i++)
+					localAnnotations.addAll(documentModel.getCoreferenceModel().getMentions(i));
+
+			MutableSet<Annotation> mentions = localAnnotations
 					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 
-			JMenu subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES));
 			for (Annotation anno : mentions) {
 				if (anno instanceof Mention)
-					subMenu.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
+					mentionActions.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
 				else if (anno instanceof DetachedMentionPart)
-					subMenu.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+					mentionActions
+							.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
 			}
-			if (subMenu.getMenuComponentCount() > 0)
-				textPopupMenu.add(subMenu);
 
-			MutableList<Annotation> comments = localAnnotations.select(m -> m instanceof CommentAnchor);
-			subMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_COMMENTS));
-			subMenu.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT));
-
-			for (Annotation anno : comments) {
-				if (anno instanceof CommentAnchor)
-					subMenu.add(getCommentItem((CommentAnchor) anno));
-			}
-			if (subMenu.getMenuComponentCount() > 0)
-				textPopupMenu.add(subMenu);
-
-			if (textPane.getSelectionStart() != textPane.getSelectionEnd()) {
-
-				Set<Entity> candidates = Sets.mutable.empty();
+			Set<Entity> candidates = Sets.mutable.empty();
+			if (selection) {
 				for (EntityRankingPlugin erp : new EntityRankingPlugin[] {
 						Annotator.app.getPluginManager().getEntityRankingPlugin(MatchingRanker.class),
 						Annotator.app.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
-				JMenu candMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
-				candMenu.add(actions.newEntityAction);
-				candMenu.addSeparator();
-				candidates.forEach(entity -> {
-					JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							getCoreferenceModel().edit(new Op.AddMentionsToEntity(entity, getSelection()));
-						}
-					});
-					mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
-					candMenu.add(mi);
-				});
-
-				textPopupMenu.add(candMenu);
-
 			}
 
+			if (selection) {
+				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				textPopupMenu.add(actions.newEntityAction);
+				if (!candidates.isEmpty()) {
+					candidates.forEach(entity -> {
+						JMenuItem mi = new JMenuItem(Util.toString(getCoreferenceModel().getLabel(entity)));
+						mi.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
+							}
+						});
+						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
+						textPopupMenu.add(mi);
+					});
+				}
+			}
+			if (!mentionActions.isEmpty()) {
+				if (selection)
+					textPopupMenu.addSeparator();
+				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				mentionActions.forEach(mi -> {
+					textPopupMenu.add(mi);
+				});
+			}
+			if (!exportActions.isEmpty()) {
+				textPopupMenu.addSeparator();
+				textPopupMenu.add(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
+				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
+				exportActions.forEach(ea -> textPopupMenu.add(ea));
+			}
 		}
 
 		@Override
@@ -1475,20 +1439,6 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		@Override
 		public void popupMenuCanceled(PopupMenuEvent e) {
 
-		}
-
-		private JMenu getCommentItem(CommentAnchor anno) {
-			Comment c = documentModel.getCommentsModel().get(anno);
-			StringBuilder b = new StringBuilder();
-			if (c.getAuthor() != null)
-				b.append(c.getAuthor());
-			else
-				b.append("Unknown author");
-			JMenu subMenu = new JMenu(b.toString());
-			subMenu.add("\"" + StringUtils.abbreviateMiddle(c.getValue(), "[...]", 50) + "\"");
-			subMenu.add(commentsWindow.commentList.get(c).editAction);
-			subMenu.add(commentsWindow.commentList.get(c).deleteAction);
-			return subMenu;
 		}
 
 		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
@@ -1543,28 +1493,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
-			else
+			else if (isSingle() && isEntity()) {
+				highlightManager.unHighlight();
+				documentModel.getCoreferenceModel().getMentions(getEntity(0))
+						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
+			} else
 				annotationSelected(null);
-		}
-
-	}
-
-	class CommentAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		Comment comment;
-
-		public CommentAction(Comment c) {
-			super(MaterialDesign.MDI_MESSAGE_PLUS);
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_COMMENT));
-			this.comment = c;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			commentsWindow.setVisible(true);
-			commentsWindow.enterNewComment(textPane.getSelectionStart(), textPane.getSelectionEnd());
 		}
 
 	}
@@ -1641,8 +1575,7 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 					for (TreePath tp : tree.getSelectionPaths()) {
 						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.getCoreferenceModel()
-									.edit(new Op.AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
+							documentModel.edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
 						}
 					}
 					treeSearchField.setText("");
@@ -1710,17 +1643,12 @@ public class DocumentWindow extends AbstractWindow implements CaretListener, Tre
 		this.file = file;
 	}
 
-	public CommentWindow getCommentsWindow() {
-		return commentsWindow;
-	}
-
 	class ActionContainer {
 
 		AbstractAction clearAction = new ClearAction();
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
-		AbstractAction commentAction = new CommentAction(null);
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;

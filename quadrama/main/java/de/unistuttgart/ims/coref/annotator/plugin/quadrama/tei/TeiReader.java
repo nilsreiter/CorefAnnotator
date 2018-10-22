@@ -21,6 +21,7 @@ import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
@@ -120,6 +121,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				}
 				m.setEntity(entity);
 			}
+		});
+
+		gxr.addRule("[type=act]", Segment.class, (s, e) -> {
+			s.setLabel(e.selectFirst("div > desc > title").text());
 		});
 
 		Resource res = nextFile();

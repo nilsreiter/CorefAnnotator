@@ -1,5 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
@@ -9,6 +12,9 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -20,17 +26,19 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  */
 public class DocumentModel {
 
+	CoreferenceModel coreferenceModel;
+
+	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
+
+	Deque<Operation> history = new LinkedList<Operation>();
+
 	JCas jcas;
 
-	CommentsModel commentsModel;
-
-	CoreferenceModel coreferenceModel;
+	SegmentModel segmentModel;
 
 	EntityTreeModel treeModel;
 
 	TypeSystemVersion typeSystemVersion;
-
-	MutableList<DocumentStateListener> documentStateListeners = Lists.mutable.empty();
 
 	boolean unsavedChanges = false;
 
@@ -42,12 +50,14 @@ public class DocumentModel {
 		return documentStateListeners.add(e);
 	}
 
-	protected void fireDocumentChangedEvent() {
-		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
+	public void edit(Operation operation) {
+		if (operation instanceof CoreferenceModelOperation)
+			coreferenceModel.edit(operation);
+		history.push(operation);
 	}
 
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
+	protected void fireDocumentChangedEvent() {
+		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
 	public CoreferenceModel getCoreferenceModel() {
@@ -56,6 +66,10 @@ public class DocumentModel {
 
 	public TypeSystemVersion getFileFormat() {
 		return typeSystemVersion;
+	}
+
+	public Deque<Operation> getHistory() {
+		return history;
 	}
 
 	/**
@@ -71,6 +85,17 @@ public class DocumentModel {
 		return jcas.getDocumentLanguage();
 	}
 
+	public SegmentModel getSegmentModel() {
+		return segmentModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		if (Util.getMeta(jcas) != null && Util.getMeta(jcas).getStylePlugin() != null)
+			return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+		return DefaultStylePlugin.class;
+	}
+
 	public EntityTreeModel getTreeModel() {
 		return treeModel;
 	}
@@ -80,7 +105,7 @@ public class DocumentModel {
 	}
 
 	public boolean isSavable() {
-		return hasUnsavedChanges() || coreferenceModel.getHistory().size() > 0;
+		return hasUnsavedChanges() || getHistory().size() > 0;
 	}
 
 	/**
@@ -105,10 +130,6 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
-	}
-
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
 		this.coreferenceModel = coreferenceModel;
 	}
@@ -126,6 +147,10 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	public void setSegmentModel(SegmentModel segmentModel) {
+		this.segmentModel = segmentModel;
+	}
+
 	public void setTreeModel(EntityTreeModel treeModel) {
 		this.treeModel = treeModel;
 	}
@@ -139,9 +164,17 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+	public void undo() {
+		if (!history.isEmpty()) {
+			undo(history.pop());
+			fireDocumentChangedEvent();
+		}
+	}
+
+	protected void undo(Operation operation) {
+		if (operation instanceof CoreferenceModelOperation) {
+			coreferenceModel.undo(operation);
+		}
 	}
 
 }

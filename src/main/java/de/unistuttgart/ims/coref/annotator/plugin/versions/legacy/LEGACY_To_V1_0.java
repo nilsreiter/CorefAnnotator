@@ -2,12 +2,10 @@ package de.unistuttgart.ims.coref.annotator.plugin.versions.legacy;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.TypeCapability;
-import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.TOP;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
@@ -17,8 +15,6 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -27,13 +23,11 @@ import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
 
 @TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
 		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
-		"de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart",
-		"de.unistuttgart.ims.coref.annotator.api.AnnotationComment" }, outputs = {
+		"de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart" }, outputs = {
 				"de.unistuttgart.ims.coref.annotator.api.v1.Entity",
 				"de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup",
 				"de.unistuttgart.ims.coref.annotator.api.v1.Mention",
-				"de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart",
-				"de.unistuttgart.ims.coref.annotator.api.v1.AnnotationComment" })
+				"de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart" })
 public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.Mention, Mention> mentionMap = Maps.mutable.empty();
@@ -55,36 +49,12 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			getMention(jcas, oldMention);
 		}
 
-		// map comments
-		for (de.unistuttgart.ims.coref.annotator.api.AnnotationComment aComment : JCasUtil.select(jcas,
-				de.unistuttgart.ims.coref.annotator.api.AnnotationComment.class)) {
-			getComment(jcas, aComment);
-		}
-
 		for (TOP fs : toRemove) {
 			fs.removeFromIndexes();
 		}
 
 		Meta meta = Util.getMeta(jcas);
 		meta.setTypeSystemVersion(TypeSystemVersion.v1.name());
-	}
-
-	protected AnnotationComment getComment(JCas jcas,
-			de.unistuttgart.ims.coref.annotator.api.AnnotationComment oldAnnotationComment) {
-		AnnotationComment newAnnotationComment = new AnnotationComment(jcas);
-		newAnnotationComment.addToIndexes();
-		newAnnotationComment.setValue(oldAnnotationComment.getValue());
-		newAnnotationComment.setAuthor(oldAnnotationComment.getAuthor());
-		if (oldAnnotationComment.getAnnotation() != null) {
-			Annotation oldAnchor = oldAnnotationComment.getAnnotation();
-			CommentAnchor newAnchor = AnnotationFactory.createAnnotation(jcas, oldAnchor.getBegin(), oldAnchor.getEnd(),
-					CommentAnchor.class);
-
-			newAnnotationComment.setAnnotation(newAnchor);
-			toRemove.add(oldAnchor);
-		}
-		toRemove.add(oldAnnotationComment);
-		return newAnnotationComment;
 	}
 
 	protected Mention getMention(JCas jcas, de.unistuttgart.ims.coref.annotator.api.Mention oldMention) {

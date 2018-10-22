@@ -67,7 +67,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.xml;
+		return FileFilters.tei;
 	}
 
 	@Override

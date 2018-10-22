@@ -14,9 +14,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
 
 public class RenameEntityAction extends DocumentWindowAction implements CAAction {
 
@@ -38,8 +38,8 @@ public class RenameEntityAction extends DocumentWindowAction implements CAAction
 				Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
 				FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
 		if (newLabel != null) {
-			Op.RenameEntity op = new Op.RenameEntity(selectedEntity, newLabel);
-			getTarget().getCoreferenceModel().edit(op);
+			RenameEntity op = new RenameEntity(selectedEntity, newLabel);
+			getTarget().getDocumentModel().edit(op);
 		}
 	}
 
