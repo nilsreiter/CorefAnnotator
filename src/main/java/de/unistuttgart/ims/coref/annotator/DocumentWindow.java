@@ -1545,7 +1545,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			else if (isSingle() && isEntity()) {
 				highlightManager.unHighlight();
 				documentModel.getCoreferenceModel().getMentions(getEntity(0))
-						.forEach(m -> highlightManager.highlight(m));
+						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
 			} else
 				annotationSelected(null);
 		}
