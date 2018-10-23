@@ -238,13 +238,17 @@ public class CoreferenceModel {
 			edit((RemoveDuplicateMentionsInEntities) operation);
 		} else if (operation instanceof UpdateEntityKey) {
 			UpdateEntityKey op = (UpdateEntityKey) operation;
-			if (keyMap.containsKey(op.getNewKey())) {
+			if (op.getNewKey() != null && keyMap.containsKey(op.getNewKey())) {
 				Entity prev = keyMap.get(op.getNewKey());
 				op.setPreviousOwner(prev);
 				prev.setKey(null);
 			}
-			op.getObjects().getFirst().setKey(op.getNewKey().toString());
-			keyMap.put(op.getNewKey(), op.getEntity());
+			if (op.getNewKey() == null)
+				op.getObjects().getFirst().setKey(null);
+			else {
+				op.getObjects().getFirst().setKey(op.getNewKey().toString());
+				keyMap.put(op.getNewKey(), op.getEntity());
+			}
 			if (op.getPreviousOwner() != null)
 				fireEvent(Event.get(Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
 			else
@@ -354,7 +358,6 @@ public class CoreferenceModel {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		documentModel.fireDocumentChangedEvent();
 	}
 
 	protected void edit(MergeEntities op) {
