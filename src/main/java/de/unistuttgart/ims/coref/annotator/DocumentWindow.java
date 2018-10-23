@@ -150,6 +150,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -257,7 +258,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
-
+		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
 
@@ -812,6 +813,20 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	@Override
 	public void treeNodesChanged(TreeModelEvent e) {
+		CATreeNode node;
+		node = (CATreeNode) (e.getTreePath().getLastPathComponent());
+		try {
+			int index = e.getChildIndices()[0];
+			node = (node.getChildAt(index));
+		} catch (NullPointerException exc) {
+		}
+		String newName = (String) node.getUserObject();
+		FeatureStructure fs = node.getFeatureStructure();
+		if (fs instanceof Entity) {
+			if (!node.getEntity().getLabel().equals(newName)) {
+				getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+			}
+		}
 		tree.repaint(tree.getPathBounds(e.getTreePath()));
 	}
 

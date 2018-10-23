@@ -234,6 +234,7 @@ public class CoreferenceModel {
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getNewLabel());
+			fireEvent(Event.get(Event.Type.Update, op.getEntity()));
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			edit((RemoveDuplicateMentionsInEntities) operation);
 		} else if (operation instanceof UpdateEntityKey) {
@@ -665,6 +666,7 @@ public class CoreferenceModel {
 		if (operation instanceof RenameEntity) {
 			RenameEntity op = (RenameEntity) operation;
 			op.getEntity().setLabel(op.getOldLabel());
+			fireEvent(Event.get(Event.Type.Update, op.getEntity()));
 		} else if (operation instanceof UpdateEntityKey) {
 			UpdateEntityKey op = (UpdateEntityKey) operation;
 			if (op.getPreviousOwner() != null) {
