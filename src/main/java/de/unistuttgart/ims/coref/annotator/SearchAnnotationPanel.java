@@ -65,6 +65,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsAmbiguous extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
@@ -76,6 +77,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsDifficult extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
@@ -87,6 +89,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsNonNominal extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
