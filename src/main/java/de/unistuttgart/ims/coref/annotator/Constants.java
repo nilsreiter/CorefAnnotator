@@ -157,8 +157,11 @@ public class Constants {
 		public static final String DIALOG_CANCEL = "dialog.cancel";
 		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
+		public static final String DIALOG_CHANGE_KEY_CANCEL = "dialog.change_key.cancel";
+		public static final String DIALOG_CHANGE_KEY_CLEAR = "dialog.change_key.clear";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE = "dialog.change_key.invalid_string.message";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
+		public static final String DIALOG_CHANGE_KEY_OK = "dialog.change_key.ok";
 		public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
 		public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
 		public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";

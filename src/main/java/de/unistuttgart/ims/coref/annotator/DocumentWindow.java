@@ -985,10 +985,25 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			String s = "";
 			if (etn.getEntity().getKey() != null)
 				s = etn.getEntity().getKey();
-			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
-					Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, s);
-			if (newKey != null)
+
+			JPanel panel = new JPanel();
+			panel.add(new JLabel(Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT)));
+			JTextField textField = new JTextField(1);
+			textField.setText(s);
+			panel.add(textField);
+
+			int result = JOptionPane.showOptionDialog(DocumentWindow.this, panel, "", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, FontIcon.of(MaterialDesign.MDI_KEYBOARD),
+					new String[] { Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CLEAR),
+							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CANCEL),
+							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_OK) },
+					s);
+			String newKey = textField.getText();
+			switch (result) {
+			case 0:
+				documentModel.edit(new UpdateEntityKey(etn.getEntity()));
+				break;
+			case 2:
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
 					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
@@ -998,6 +1013,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
 							JOptionPane.INFORMATION_MESSAGE);
 				}
+				break;
+			default:
+
+			}
+
 		}
 
 	}
