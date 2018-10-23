@@ -96,7 +96,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		Annotator.logger.entry(aValue, rowIndex, columnIndex);
 		Flag f = flagModel.getFlags().get(rowIndex);
 		switch (columnIndex) {
-		case 1:
+		case 0:
 			f.setIcon(((MaterialDesign) aValue).name());
 			break;
 		case 2:
