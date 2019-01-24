@@ -77,6 +77,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -1037,10 +1038,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
 
+			String visLabel = StringUtils.abbreviate(entity.getLabel(), 40);
+
 			if (entity.getKey() != null) {
-				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(entity.getKey() + ": " + visLabel + " (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
-				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(visLabel + " (" + treeNode.getChildCount() + ")");
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
