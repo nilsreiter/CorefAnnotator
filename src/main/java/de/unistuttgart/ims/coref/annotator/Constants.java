@@ -295,4 +295,6 @@ public class Constants {
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
 	public static final String X_UNSPECIFIED = "x-unspecified";
+
+	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 }

@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.6.1
+
+- Fixed a bug with the export to TEI. XML ids may now include special 
+  characters #157
+
 ## 1.6.0
 
 - Removed commenting system #130

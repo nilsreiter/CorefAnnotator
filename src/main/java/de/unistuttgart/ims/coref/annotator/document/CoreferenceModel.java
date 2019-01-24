@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -12,6 +13,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
@@ -210,6 +212,16 @@ public class CoreferenceModel {
 		return e;
 	}
 
+	protected String createEntityGroupLabel(ImmutableList<Entity> entityList) {
+		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null)
+				.collect(
+						e -> StringUtils.abbreviate(e.getLabel(), "…", (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 4))
+				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
+		if (entityList.size() > 2)
+			s += " + " + String.valueOf(entityList.size() - 2);
+		return s;
+	}
+
 	/**
 	 * Creates a new mention annotation in the document and adds it to the indexes
 	 * 
@@ -336,10 +348,7 @@ public class CoreferenceModel {
 		} else if (operation instanceof GroupEntities) {
 			GroupEntities op = (GroupEntities) operation;
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
-			EntityGroup eg = createEntityGroup(
-					op.getEntities().subList(0, 2).select(e -> e.getLabel() != null).collect(e -> e.getLabel())
-							.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " "),
-					op.getEntities().size());
+			EntityGroup eg = createEntityGroup(createEntityGroupLabel(op.getEntities()), op.getEntities().size());
 			for (int i = 0; i < op.getEntities().size(); i++) {
 				eg.setMembers(i, op.getEntities().get(i));
 				entityEntityGroupMap.put(op.getEntities().get(i), eg);

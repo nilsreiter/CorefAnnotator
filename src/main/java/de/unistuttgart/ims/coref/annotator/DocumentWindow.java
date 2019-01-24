@@ -54,6 +54,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
@@ -76,6 +77,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -135,6 +137,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
+import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -261,6 +264,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+
+		ToolTipManager.sharedInstance().registerComponent(tree);
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
@@ -1069,10 +1074,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
 
+			String visLabel = StringUtils.abbreviate(entity.getLabel(), "…", Constants.UI_MAX_STRING_WIDTH_IN_TREE);
+
 			if (entity.getKey() != null) {
-				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(entity.getKey() + ": " + visLabel + " (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
-				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(visLabel + " (" + treeNode.getChildCount() + ")");
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
@@ -1122,6 +1129,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			JLabel mainLabel = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
 			panel.add(mainLabel);
+			if (treeNode instanceof Tooltipable)
+				panel.setToolTipText(treeNode.getToolTip());
 
 			// depending of node type, do different things
 			if (treeNode.isEntity())
