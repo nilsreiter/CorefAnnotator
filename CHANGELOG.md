@@ -3,6 +3,15 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.7.0
+
+- If a group contains more than two entities, the number of additional 
+  entities is now displayed in the label #156
+- Long entity names are now abbreviated, but tooltips show the full 
+  name
+- Entity names can be edited by double clicking on it in the tree view
+  #152
+
 ## 1.6.1
 
 - Fixed a bug with the export to TEI. XML ids may now include special 
