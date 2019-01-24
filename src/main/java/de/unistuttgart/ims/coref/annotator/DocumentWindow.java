@@ -54,6 +54,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
@@ -260,6 +261,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+
+		ToolTipManager.sharedInstance().registerComponent(tree);
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
