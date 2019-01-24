@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
@@ -212,7 +213,8 @@ public class CoreferenceModel {
 	}
 
 	protected String createEntityGroupLabel(ImmutableList<Entity> entityList) {
-		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null).collect(e -> e.getLabel())
+		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null)
+				.collect(e -> StringUtils.abbreviate(e.getLabel(), (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 2))
 				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
 		if (entityList.size() > 2)
 			s += " + " + String.valueOf(entityList.size() - 2);
