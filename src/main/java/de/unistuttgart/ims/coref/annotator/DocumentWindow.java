@@ -137,6 +137,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
+import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -1093,6 +1094,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			JLabel mainLabel = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
 			panel.add(mainLabel);
+			if (treeNode instanceof Tooltipable)
+				panel.setToolTipText(treeNode.getToolTip());
 
 			// depending of node type, do different things
 			if (treeNode.isEntity())
