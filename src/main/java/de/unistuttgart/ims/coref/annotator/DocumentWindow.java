@@ -1039,7 +1039,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
 
-			String visLabel = StringUtils.abbreviate(entity.getLabel(), Constants.UI_MAX_STRING_WIDTH_IN_TREE);
+			String visLabel = StringUtils.abbreviate(entity.getLabel(), "…", Constants.UI_MAX_STRING_WIDTH_IN_TREE);
 
 			if (entity.getKey() != null) {
 				lab1.setText(entity.getKey() + ": " + visLabel + " (" + treeNode.getChildCount() + ")");

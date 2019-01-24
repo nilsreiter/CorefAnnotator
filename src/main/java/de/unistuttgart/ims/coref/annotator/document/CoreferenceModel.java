@@ -214,7 +214,8 @@ public class CoreferenceModel {
 
 	protected String createEntityGroupLabel(ImmutableList<Entity> entityList) {
 		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null)
-				.collect(e -> StringUtils.abbreviate(e.getLabel(), (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 2))
+				.collect(
+						e -> StringUtils.abbreviate(e.getLabel(), "…", (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 4))
 				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
 		if (entityList.size() > 2)
 			s += " + " + String.valueOf(entityList.size() - 2);
