@@ -16,5 +16,6 @@ deploy:
   on:
     repo: nilsreiter/CorefAnnotator
     tags: true
+    condition: 1 = 0
   draft: true
   name: $TRAVIS_TAG
