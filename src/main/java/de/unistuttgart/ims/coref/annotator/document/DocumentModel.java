@@ -54,6 +54,7 @@ public class DocumentModel {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
 		history.push(operation);
+		fireDocumentChangedEvent();
 	}
 
 	protected void fireDocumentChangedEvent() {
