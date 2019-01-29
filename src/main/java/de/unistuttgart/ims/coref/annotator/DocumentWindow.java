@@ -64,7 +64,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -135,6 +134,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.ExtendedTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
@@ -165,7 +165,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
+public class DocumentWindow extends AbstractTextWindow implements CaretListener, ExtendedTreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
@@ -207,6 +207,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	// sub windows
 	SearchDialog searchPanel;
+
+	// temporary
+	transient MutableSet<CATreeNode> expanded = Sets.mutable.empty();
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -838,6 +841,30 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
 
+	}
+
+	@Override
+	public void treeNodesPreResort(TreeModelEvent e) {
+		// store expansion state
+		for (int i = 0; i < tree.getRowCount(); i++) {
+			if (tree.isExpanded(i)) {
+				TreePath tp = tree.getPathForRow(i);
+				expanded.add(((CATreeNode) tp.getLastPathComponent()));
+			}
+		}
+	}
+
+	@Override
+	public void treeNodesPostResort(TreeModelEvent e) {
+		// store expansion state
+		for (int i = 0; i < tree.getRowCount(); i++) {
+			TreePath tp = tree.getPathForRow(i);
+			CATreeNode node = (CATreeNode) tp.getLastPathComponent();
+			if (expanded.contains(node)) {
+				tree.expandPath(tp);
+			}
+		}
+		expanded.clear();
 	}
 
 	@Override
