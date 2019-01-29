@@ -64,6 +64,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -165,7 +166,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractTextWindow implements CaretListener, ExtendedTreeModelListener,
+public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
 		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
@@ -710,6 +711,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		tree.setModel(model.getTreeModel());
 		model.getTreeModel().addTreeModelListener(this);
+		model.getTreeModel().addTreeModelListener(new ExtendedModelHandler());
 		model.addDocumentStateListener(this);
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
@@ -841,30 +843,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
 
-	}
-
-	@Override
-	public void treeNodesPreResort(TreeModelEvent e) {
-		// store expansion state
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			if (tree.isExpanded(i)) {
-				TreePath tp = tree.getPathForRow(i);
-				expanded.add(((CATreeNode) tp.getLastPathComponent()));
-			}
-		}
-	}
-
-	@Override
-	public void treeNodesPostResort(TreeModelEvent e) {
-		// store expansion state
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			TreePath tp = tree.getPathForRow(i);
-			CATreeNode node = (CATreeNode) tp.getLastPathComponent();
-			if (expanded.contains(node)) {
-				tree.expandPath(tp);
-			}
-		}
-		expanded.clear();
 	}
 
 	@Override
@@ -1755,5 +1733,55 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	public JTextField getTreeSearchField() {
 		return treeSearchField;
+	}
+
+	class ExtendedModelHandler implements ExtendedTreeModelListener {
+		@Override
+		public void treeNodesPreResort(TreeModelEvent e) {
+			// store expansion state
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				if (tree.isExpanded(i)) {
+					TreePath tp = tree.getPathForRow(i);
+					expanded.add(((CATreeNode) tp.getLastPathComponent()));
+				}
+			}
+		}
+
+		@Override
+		public void treeNodesPostResort(TreeModelEvent e) {
+			// store expansion state
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				TreePath tp = tree.getPathForRow(i);
+				CATreeNode node = (CATreeNode) tp.getLastPathComponent();
+				if (expanded.contains(node)) {
+					tree.expandPath(tp);
+				}
+			}
+			expanded.clear();
+		}
+
+		@Override
+		public void treeNodesChanged(TreeModelEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void treeNodesInserted(TreeModelEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void treeNodesRemoved(TreeModelEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void treeStructureChanged(TreeModelEvent e) {
+			// TODO Auto-generated method stub
+
+		}
 	}
 }
