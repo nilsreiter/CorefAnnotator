@@ -11,6 +11,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   name
 - Entity names can be edited by double clicking on it in the tree view
   #152
+- Deleting a mention no longer collapses the entity tree, even if the 
+  tree is automatically sorted by mention count (in this case, the 
+  expanded sub tree may be moved). #155
 
 ## 1.6.1
 
