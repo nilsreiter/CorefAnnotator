@@ -166,8 +166,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
-		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
+public class DocumentWindow extends AbstractTextWindow
+		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -709,9 +709,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	public void setDocumentModel(DocumentModel model) {
 
+		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
+
 		tree.setModel(model.getTreeModel());
-		model.getTreeModel().addTreeModelListener(this);
-		model.getTreeModel().addTreeModelListener(new ExtendedModelHandler());
+		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
+		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.addDocumentStateListener(this);
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
@@ -806,48 +808,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		});
 
-	}
-
-	@Override
-	public void treeNodesInserted(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath().getParentPath());
-
-		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-		// tree.expandPath(e.getTreePath());
-		/*
-		 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
-		 * tree.repaint(r); } catch (NullPointerException ex) {
-		 * Annotator.logger.catching(ex); }
-		 */
-	}
-
-	@Override
-	public void treeNodesChanged(TreeModelEvent e) {
-		CATreeNode node;
-		node = (CATreeNode) (e.getTreePath().getLastPathComponent());
-		try {
-			int index = e.getChildIndices()[0];
-			node = (node.getChildAt(index));
-		} catch (NullPointerException exc) {
-		}
-		String newName = (String) node.getUserObject();
-		FeatureStructure fs = node.getFeatureStructure();
-		if (fs instanceof Entity) {
-			if (!node.getEntity().getLabel().equals(newName)) {
-				getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
-			}
-		}
-		tree.repaint(tree.getPathBounds(e.getTreePath()));
-	}
-
-	@Override
-	public void treeNodesRemoved(TreeModelEvent e) {
-
-	}
-
-	@Override
-	public void treeStructureChanged(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath());
 	}
 
 	public void annotationSelected(Annotation m) {
@@ -1735,7 +1695,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements SortingTreeModelListener {
+	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
@@ -1758,6 +1718,48 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				}
 			}
 			expanded.clear();
+		}
+
+		@Override
+		public void treeNodesInserted(TreeModelEvent e) {
+			tree.expandPath(e.getTreePath().getParentPath());
+
+			// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+			// tree.expandPath(e.getTreePath());
+			/*
+			 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
+			 * tree.repaint(r); } catch (NullPointerException ex) {
+			 * Annotator.logger.catching(ex); }
+			 */
+		}
+
+		@Override
+		public void treeNodesChanged(TreeModelEvent e) {
+			CATreeNode node;
+			node = (CATreeNode) (e.getTreePath().getLastPathComponent());
+			try {
+				int index = e.getChildIndices()[0];
+				node = (node.getChildAt(index));
+			} catch (NullPointerException exc) {
+			}
+			String newName = (String) node.getUserObject();
+			FeatureStructure fs = node.getFeatureStructure();
+			if (fs instanceof Entity) {
+				if (!node.getEntity().getLabel().equals(newName)) {
+					getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+				}
+			}
+			tree.repaint(tree.getPathBounds(e.getTreePath()));
+		}
+
+		@Override
+		public void treeNodesRemoved(TreeModelEvent e) {
+
+		}
+
+		@Override
+		public void treeStructureChanged(TreeModelEvent e) {
+			tree.expandPath(e.getTreePath());
 		}
 	}
 }
