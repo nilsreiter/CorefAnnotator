@@ -26,7 +26,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.comp.ExtendedTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
 	private static final long serialVersionUID = 1L;
@@ -55,8 +55,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	}
 
-	public void addTreeModelListener(ExtendedTreeModelListener l) {
-		listenerList.add(ExtendedTreeModelListener.class, l);
+	public void addTreeModelListener(SortingTreeModelListener l) {
+		listenerList.add(SortingTreeModelListener.class, l);
 	}
 
 	private CATreeNode createNode(FeatureStructure fs) {
@@ -142,11 +142,11 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
 		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == ExtendedTreeModelListener.class) {
+			if (listeners[i] == SortingTreeModelListener.class) {
 				// Lazily create the event:
 				if (e == null)
 					e = new TreeModelEvent(source, path, childIndices, children);
-				((ExtendedTreeModelListener) listeners[i + 1]).treeNodesPreResort(e);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPreResort(e);
 			}
 		}
 	}
@@ -158,11 +158,11 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
 		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == ExtendedTreeModelListener.class) {
+			if (listeners[i] == SortingTreeModelListener.class) {
 				// Lazily create the event:
 				if (e == null)
 					e = new TreeModelEvent(source, path, childIndices, children);
-				((ExtendedTreeModelListener) listeners[i + 1]).treeNodesPostResort(e);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPostResort(e);
 			}
 		}
 	}

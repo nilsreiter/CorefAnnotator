@@ -1,9 +1,10 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+import java.util.EventListener;
 
-public interface ExtendedTreeModelListener extends TreeModelListener {
+import javax.swing.event.TreeModelEvent;
+
+public interface SortingTreeModelListener extends EventListener {
 
 	public void treeNodesPreResort(TreeModelEvent e);
 

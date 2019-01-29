@@ -135,9 +135,9 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
-import de.unistuttgart.ims.coref.annotator.comp.ExtendedTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
+import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
@@ -1735,7 +1735,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements ExtendedTreeModelListener {
+	class ExtendedModelHandler implements SortingTreeModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
@@ -1758,30 +1758,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				}
 			}
 			expanded.clear();
-		}
-
-		@Override
-		public void treeNodesChanged(TreeModelEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void treeNodesInserted(TreeModelEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void treeNodesRemoved(TreeModelEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void treeStructureChanged(TreeModelEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 	}
 }
