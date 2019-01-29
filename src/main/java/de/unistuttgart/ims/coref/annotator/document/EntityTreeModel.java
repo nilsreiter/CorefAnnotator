@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
