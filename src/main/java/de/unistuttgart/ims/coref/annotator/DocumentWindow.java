@@ -236,8 +236,8 @@ public class DocumentWindow extends AbstractTextWindow
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
-		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_mention_flags"), this);
-		entityFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_entity_flags"), this);
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
 
 		// popup
 		treePopupMenu = new JPopupMenu();
@@ -501,8 +501,8 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this);
-		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this);
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
