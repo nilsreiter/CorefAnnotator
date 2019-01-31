@@ -32,6 +32,21 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	}
 
+	@Override
+	public int getContexts() {
+		return contexts;
+	}
+
+	@Override
+	public DocumentWindow getDocumentWindow() {
+		return documentWindow;
+	}
+
+	@Override
+	public String getText() {
+		return text;
+	}
+
 	protected void initialiseWindow() {
 
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -62,6 +77,10 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 
+	}
+
+	public void setContexts(int contexts) {
+		this.contexts = contexts;
 	}
 
 	@Override
@@ -95,25 +114,6 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	@Override
 	public void windowOpened(WindowEvent e) {
 
-	}
-
-	@Override
-	public int getContexts() {
-		return contexts;
-	}
-
-	public void setContexts(int contexts) {
-		this.contexts = contexts;
-	}
-
-	@Override
-	public String getText() {
-		return text;
-	}
-
-	@Override
-	public DocumentWindow getDocumentWindow() {
-		return documentWindow;
 	}
 
 }
