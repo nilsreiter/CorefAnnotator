@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.util.Random;
+
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -297,4 +299,6 @@ public class Constants {
 	public static final String X_UNSPECIFIED = "x-unspecified";
 
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
+
+	public static final Random RANDOM = new Random();
 }
