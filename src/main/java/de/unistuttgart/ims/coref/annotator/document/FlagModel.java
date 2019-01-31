@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.UUID;
 import java.util.prefs.Preferences;
 
 import org.apache.uima.fit.util.JCasUtil;
@@ -63,14 +64,13 @@ public class FlagModel implements Model {
 		addFlag(label, targetClass, null);
 	}
 
-	public void addFlag(String label, Class<? extends TOP> targetClass, Ikon ikon) {
+	public synchronized void addFlag(String label, Class<? extends TOP> targetClass, Ikon ikon) {
 		Flag f = new Flag(documentModel.getJcas());
 		f.addToIndexes();
 		f.setLabel(label);
-		String key = label;
-		int i = 0;
+		String key = UUID.randomUUID().toString();
 		while (keys.contains(key)) {
-			key = label + "-" + i;
+			key = UUID.randomUUID().toString();
 		}
 		f.setKey(key);
 
@@ -78,6 +78,7 @@ public class FlagModel implements Model {
 			f.setIcon(ikon.toString());
 		f.setTargetClass(targetClass.getName());
 		f.addToIndexes();
+		keys.add(key);
 		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
