@@ -1808,10 +1808,12 @@ public class DocumentWindow extends AbstractTextWindow
 			} catch (NullPointerException exc) {
 			}
 			String newName = (String) node.getUserObject();
-			FeatureStructure fs = node.getFeatureStructure();
-			if (fs instanceof Entity) {
-				if (!node.getEntity().getLabel().equals(newName)) {
-					getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+			if (newName != null) {
+				FeatureStructure fs = node.getFeatureStructure();
+				if (fs instanceof Entity) {
+					if (!node.getEntity().getLabel().equals(newName)) {
+						getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+					}
 				}
 			}
 			tree.repaint(tree.getPathBounds(e.getTreePath()));
