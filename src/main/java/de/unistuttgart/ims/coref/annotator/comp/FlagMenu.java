@@ -4,6 +4,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
@@ -19,31 +20,17 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 	private static final long serialVersionUID = 1L;
 	DocumentWindow dw;
 	private MutableMap<Flag, JMenuItem> actionMap = Maps.mutable.empty();
+	Class<? extends FeatureStructure> targetClass = null;
 
 	public FlagMenu(String s, DocumentWindow dw) {
 		super(s);
 		this.dw = dw;
 	}
 
-	@Override
-	public void flagEvent(FeatureStructureEvent event) {
-		Flag f = (Flag) event.getArgument(0);
-		switch (event.getType()) {
-		case Remove:
-			remove(actionMap.get(f));
-			actionMap.remove(f);
-			break;
-		case Update:
-			if (actionMap.containsKey(f))
-				remove(actionMap.get(f));
-			//$FALL-THROUGH$
-		case Add:
-			ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
-			dw.getTreeSelectionListener().addListener(a);
-			add(f, new JCheckBoxMenuItem(a));
-			break;
-		default:
-		}
+	public FlagMenu(String s, DocumentWindow dw, Class<? extends FeatureStructure> tClass) {
+		super(s);
+		this.dw = dw;
+		this.targetClass = tClass;
 	}
 
 	public JMenuItem add(Flag f, JMenuItem mi) {
@@ -51,6 +38,36 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 		actionMap.put(f, mi);
 		return mi;
 
+	}
+
+	@Override
+	public void flagEvent(FeatureStructureEvent event) {
+		Flag f = (Flag) event.getArgument(0);
+		if (targetClass == null || f.getTargetClass().equalsIgnoreCase(targetClass.getName()))
+			switch (event.getType()) {
+			case Remove:
+				remove(actionMap.get(f));
+				actionMap.remove(f);
+				break;
+			case Update:
+				if (actionMap.containsKey(f))
+					remove(actionMap.get(f));
+				//$FALL-THROUGH$
+			case Add:
+				ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
+				dw.getTreeSelectionListener().addListener(a);
+				add(f, new JCheckBoxMenuItem(a));
+				break;
+			default:
+			}
+	}
+
+	public Class<? extends FeatureStructure> getTargetClass() {
+		return targetClass;
+	}
+
+	public void setTargetClass(Class<? extends FeatureStructure> targetClass) {
+		this.targetClass = targetClass;
 	}
 
 }
