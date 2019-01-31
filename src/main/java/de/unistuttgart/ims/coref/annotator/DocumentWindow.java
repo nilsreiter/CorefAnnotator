@@ -54,6 +54,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
@@ -76,6 +77,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -139,6 +141,8 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
+import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
@@ -155,6 +159,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -166,8 +171,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
-public class DocumentWindow extends AbstractTextWindow implements CaretListener, TreeModelListener,
-		CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
+public class DocumentWindow extends AbstractTextWindow
+		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -210,6 +215,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	// sub windows
 	SearchDialog searchPanel;
+
+	// temporary
+	transient MutableSet<CATreeNode> expanded = Sets.mutable.empty();
 
 	public DocumentWindow(Annotator annotator) {
 		super();
@@ -273,12 +281,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.addMouseListener(new TreeMouseListener());
-
+		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
 
 		treeSelectionListener = new MyTreeSelectionListener(tree);
 		tree.addTreeSelectionListener(treeSelectionListener);
+
+		ToolTipManager.sharedInstance().registerComponent(tree);
 
 		treeSearchField = new JTextField();
 		EntityFinder entityFinder = new EntityFinder();
@@ -724,8 +734,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	public void setDocumentModel(DocumentModel model) {
 
+		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
+
 		tree.setModel(model.getTreeModel());
-		model.getTreeModel().addTreeModelListener(this);
+		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
+		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.addDocumentStateListener(this);
 		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
 		model.getFlagModel().addFlagModelListener(entityFlagsInTreePopup);
@@ -844,34 +857,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		});
 
-	}
-
-	@Override
-	public void treeNodesInserted(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath().getParentPath());
-
-		// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-		// tree.expandPath(e.getTreePath());
-		/*
-		 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
-		 * tree.repaint(r); } catch (NullPointerException ex) {
-		 * Annotator.logger.catching(ex); }
-		 */
-	}
-
-	@Override
-	public void treeNodesChanged(TreeModelEvent e) {
-		tree.repaint(tree.getPathBounds(e.getTreePath()));
-	}
-
-	@Override
-	public void treeNodesRemoved(TreeModelEvent e) {
-
-	}
-
-	@Override
-	public void treeStructureChanged(TreeModelEvent e) {
-		tree.expandPath(e.getTreePath());
 	}
 
 	public void annotationSelected(Annotation m) {
@@ -1034,10 +1019,25 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			String s = "";
 			if (etn.getEntity().getKey() != null)
 				s = etn.getEntity().getKey();
-			String newKey = (String) JOptionPane.showInputDialog(DocumentWindow.this,
-					Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-					FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, s);
-			if (newKey != null)
+
+			JPanel panel = new JPanel();
+			panel.add(new JLabel(Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT)));
+			JTextField textField = new JTextField(1);
+			textField.setText(s);
+			panel.add(textField);
+
+			int result = JOptionPane.showOptionDialog(DocumentWindow.this, panel, "", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, FontIcon.of(MaterialDesign.MDI_KEYBOARD),
+					new String[] { Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CLEAR),
+							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CANCEL),
+							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_OK) },
+					s);
+			String newKey = textField.getText();
+			switch (result) {
+			case 0:
+				documentModel.edit(new UpdateEntityKey(etn.getEntity()));
+				break;
+			case 2:
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
 					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
@@ -1047,6 +1047,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
 							JOptionPane.INFORMATION_MESSAGE);
 				}
+				break;
+			default:
+
+			}
+
 		}
 
 	}
@@ -1083,10 +1088,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
 
+			String visLabel = StringUtils.abbreviate(entity.getLabel(), "…", Constants.UI_MAX_STRING_WIDTH_IN_TREE);
+
 			if (entity.getKey() != null) {
-				lab1.setText(entity.getKey() + ": " + entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(entity.getKey() + ": " + visLabel + " (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
-				lab1.setText(entity.getLabel() + " (" + treeNode.getChildCount() + ")");
+				lab1.setText(visLabel + " (" + treeNode.getChildCount() + ")");
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
@@ -1131,6 +1138,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			JLabel mainLabel = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
 					hasFocus);
 			panel.add(mainLabel);
+			if (treeNode instanceof Tooltipable)
+				panel.setToolTipText(treeNode.getToolTip());
 
 			// depending of node type, do different things
 			if (treeNode.isEntity())
@@ -1749,5 +1758,73 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	public JTextField getTreeSearchField() {
 		return treeSearchField;
+	}
+
+	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener {
+		@Override
+		public void treeNodesPreResort(TreeModelEvent e) {
+			// store expansion state
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				if (tree.isExpanded(i)) {
+					TreePath tp = tree.getPathForRow(i);
+					expanded.add(((CATreeNode) tp.getLastPathComponent()));
+				}
+			}
+		}
+
+		@Override
+		public void treeNodesPostResort(TreeModelEvent e) {
+			// store expansion state
+			for (int i = 0; i < tree.getRowCount(); i++) {
+				TreePath tp = tree.getPathForRow(i);
+				CATreeNode node = (CATreeNode) tp.getLastPathComponent();
+				if (expanded.contains(node)) {
+					tree.expandPath(tp);
+				}
+			}
+			expanded.clear();
+		}
+
+		@Override
+		public void treeNodesInserted(TreeModelEvent e) {
+			tree.expandPath(e.getTreePath().getParentPath());
+
+			// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
+			// tree.expandPath(e.getTreePath());
+			/*
+			 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
+			 * tree.repaint(r); } catch (NullPointerException ex) {
+			 * Annotator.logger.catching(ex); }
+			 */
+		}
+
+		@Override
+		public void treeNodesChanged(TreeModelEvent e) {
+			CATreeNode node;
+			node = (CATreeNode) (e.getTreePath().getLastPathComponent());
+			try {
+				int index = e.getChildIndices()[0];
+				node = (node.getChildAt(index));
+			} catch (NullPointerException exc) {
+			}
+			String newName = (String) node.getUserObject();
+			FeatureStructure fs = node.getFeatureStructure();
+			if (fs instanceof Entity) {
+				if (!node.getEntity().getLabel().equals(newName)) {
+					getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+				}
+			}
+			tree.repaint(tree.getPathBounds(e.getTreePath()));
+		}
+
+		@Override
+		public void treeNodesRemoved(TreeModelEvent e) {
+
+		}
+
+		@Override
+		public void treeStructureChanged(TreeModelEvent e) {
+			tree.expandPath(e.getTreePath());
+		}
 	}
 }

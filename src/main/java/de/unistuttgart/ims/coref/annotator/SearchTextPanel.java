@@ -272,10 +272,20 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 	}
 
 	@Override
+	public void windowActivated(WindowEvent e) {
+		textField.grabFocus();
+	}
+
+	@Override
 	public void windowClosing(WindowEvent e) {
 		for (Object o : highlights)
 			hilit.removeHighlight(o);
 
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		textField.grabFocus();
 	}
 
 }

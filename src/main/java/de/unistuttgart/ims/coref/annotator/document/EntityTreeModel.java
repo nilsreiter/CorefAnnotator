@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.uima.cas.FeatureStructure;
@@ -25,6 +26,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model {
 	private static final long serialVersionUID = 1L;
@@ -51,6 +53,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.initialise();
 		this.resort();
 
+	}
+
+	public void addTreeModelListener(SortingTreeModelListener l) {
+		listenerList.add(SortingTreeModelListener.class, l);
 	}
 
 	private CATreeNode createNode(FeatureStructure fs) {
@@ -126,6 +132,38 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			break;
 		default:
 			break;
+		}
+	}
+
+	protected void fireTreeNodesPreResort(Object source, Object[] path, int[] childIndices, Object[] children) {
+		// Guaranteed to return a non-null array
+		Object[] listeners = listenerList.getListenerList();
+		TreeModelEvent e = null;
+		// Process the listeners last to first, notifying
+		// those that are interested in this event
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == SortingTreeModelListener.class) {
+				// Lazily create the event:
+				if (e == null)
+					e = new TreeModelEvent(source, path, childIndices, children);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPreResort(e);
+			}
+		}
+	}
+
+	protected void fireTreeNodesPostResort(Object source, Object[] path, int[] childIndices, Object[] children) {
+		// Guaranteed to return a non-null array
+		Object[] listeners = listenerList.getListenerList();
+		TreeModelEvent e = null;
+		// Process the listeners last to first, notifying
+		// those that are interested in this event
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == SortingTreeModelListener.class) {
+				// Lazily create the event:
+				if (e == null)
+					e = new TreeModelEvent(source, path, childIndices, children);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPostResort(e);
+			}
 		}
 	}
 
@@ -250,7 +288,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	public void resort(Comparator<CATreeNode> comparator) {
 		if (!getRoot().isLeaf()) {
 			getRoot().getChildren().sort(comparator);
+			fireTreeNodesPreResort(this, new CATreeNode[] { getRoot() }, null, null);
 			nodeStructureChanged(getRoot());
+			fireTreeNodesPostResort(this, new CATreeNode[] { getRoot() }, null, null);
 		}
 	}
 
