@@ -1063,6 +1063,18 @@ public class DocumentWindow extends AbstractTextWindow
 
 		CATreeNode treeNode;
 
+		protected void addFlag(JPanel panel, Flag flag, Color color) {
+			JLabel l = new JLabel();
+			if (color != null)
+				l.setForeground(color);
+			if (showText)
+				l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
+			panel.add(Box.createRigidArea(new Dimension(5, 5)));
+			panel.add(l);
+		}
+
+		@Deprecated
 		protected void addFlag(JPanel panel, String textLabel, Icon icon, Color color) {
 			JLabel l = new JLabel();
 			if (color != null)
@@ -1098,21 +1110,22 @@ public class DocumentWindow extends AbstractTextWindow
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
-			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC),
-						FontIcon.of(MaterialDesign.MDI_CLOUD, (isGrey ? Color.GRAY : Color.BLACK)),
-						(isGrey ? Color.GRAY : null));
-			}
+			if (entity.getFlags() != null)
+				for (String flagKey : entity.getFlags()) {
+					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
+				}
 			return panel;
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			FlagModel fm = documentModel.getFlagModel();
 			lab1.setText(m.getCoveredText());
-			for (int i = 0; i < Util.getFlagsAsStringArray(m).length; i++) {
-				Flag f = fm.getFlag(m.getFlags(i));
-				addFlag(panel, Annotator.getString(f.getLabel()), FontIcon.of(fm.getIkon(f)), Color.black);
-			}
+			if (m.getFlags() != null)
+				for (String flagKey : m.getFlags()) {
+					Flag flag = fm.getFlag(flagKey);
+					addFlag(panel, flag, Color.black);
+				}
 
 			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT));
 			return panel;
