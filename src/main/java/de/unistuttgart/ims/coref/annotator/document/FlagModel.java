@@ -82,6 +82,11 @@ public class FlagModel implements Model {
 		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
+	public synchronized void deleteFlag(Flag flag) {
+		flag.removeFromIndexes();
+		fireFlagEvent(Event.get(this, Type.Remove, flag));
+	}
+
 	private void fireFlagEvent(FeatureStructureEvent evt) {
 		listeners.forEach(l -> l.flagEvent(evt));
 	}
