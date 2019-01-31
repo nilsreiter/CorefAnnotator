@@ -126,7 +126,8 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		TableModelEvent tme = null;
 		switch (event.getType()) {
 		case Add:
-			tme = new TableModelEvent(this, getRowCount() - 1);
+			tme = new TableModelEvent(this, getRowCount() - 1, getRowCount() - 1, TableModelEvent.ALL_COLUMNS,
+					TableModelEvent.INSERT);
 			break;
 		case Update:
 			tme = new TableModelEvent(this, flagModel.getFlags().indexOf(event.getArgument(0)));
