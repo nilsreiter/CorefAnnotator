@@ -4,20 +4,26 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -31,6 +37,7 @@ public class FlagEditor extends JFrame {
 	DocumentModel documentModel;
 
 	JTable table;
+	JPanel toolbar;
 
 	public FlagEditor(DocumentModel documentModel) {
 		this.documentModel = documentModel;
@@ -48,6 +55,12 @@ public class FlagEditor extends JFrame {
 		iconBox.setRenderer(new IkonListCellRenderer());
 
 		this.table = new JTable(new FlagTableModel(documentModel.getFlagModel()));
+
+		// Actions
+		AbstractAction addFlagAction = new AddFlagAction(documentModel);
+		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentModel, table);
+
+		// Table
 		this.table.setGridColor(Color.GRAY);
 		this.table.setAutoCreateColumnsFromModel(true);
 		this.table.setAutoCreateRowSorter(true);
@@ -57,8 +70,16 @@ public class FlagEditor extends JFrame {
 		this.table.setDefaultEditor(Class.class, new DefaultCellEditor(combobox));
 		this.table.setDefaultEditor(Ikon.class, new DefaultCellEditor(iconBox));
 		this.table.setCellEditor(new DefaultCellEditor(new JTextField()));
+		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.table.getSelectionModel().addListSelectionListener(deleteFlagAction);
+		this.table.setRowHeight(25);
+
+		this.toolbar = new JPanel();
+		this.toolbar.add(new JButton(addFlagAction));
+		this.toolbar.add(new JButton(deleteFlagAction));
 
 		this.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
+		this.getContentPane().add(toolbar, BorderLayout.NORTH);
 		this.setVisible(true);
 		this.pack();
 	}
