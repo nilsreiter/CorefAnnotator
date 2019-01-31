@@ -77,6 +77,8 @@ public class Constants {
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP = "action.add_findings_to_entity.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
+		public static final String ACTION_ADD_FLAG = "action.add_flag";
+		public static final String ACTION_ADD_FLAG_TOOLTIP = "action.add_flag.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
@@ -92,6 +94,8 @@ public class Constants {
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+		public static final String ACTION_DELETE_FLAG = "action.delete_flag";
+		public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";

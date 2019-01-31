@@ -268,4 +268,9 @@ public class Util {
 			fs.setFeatureValue(feature, arr);
 	}
 
+	public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+		int x = Constants.RANDOM.nextInt(clazz.getEnumConstants().length);
+		return clazz.getEnumConstants()[x];
+	}
+
 }
