@@ -3,8 +3,8 @@ package de.unistuttgart.ims.coref.annotator.document;
 import java.util.UUID;
 import java.util.prefs.Preferences;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
@@ -14,10 +14,14 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -60,11 +64,11 @@ public class FlagModel implements Model {
 		}
 	}
 
-	public void addFlag(String label, Class<? extends TOP> targetClass) {
+	protected void addFlag(String label, Class<? extends FeatureStructure> targetClass) {
 		addFlag(label, targetClass, null);
 	}
 
-	public synchronized void addFlag(String label, Class<? extends TOP> targetClass, Ikon ikon) {
+	protected synchronized void addFlag(String label, Class<? extends FeatureStructure> targetClass, Ikon ikon) {
 		Flag f = new Flag(documentModel.getJcas());
 		f.addToIndexes();
 		f.setLabel(label);
@@ -82,9 +86,32 @@ public class FlagModel implements Model {
 		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
-	public synchronized void deleteFlag(Flag flag) {
+	protected synchronized void deleteFlag(Flag flag) {
+		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
+			return;
 		flag.removeFromIndexes();
 		fireFlagEvent(Event.get(this, Type.Remove, flag));
+	}
+
+	protected void edit(FlagModelOperation fmo) {
+		if (fmo instanceof AddFlag)
+			edit((AddFlag) fmo);
+		else if (fmo instanceof DeleteFlag)
+			edit((DeleteFlag) fmo);
+		else
+			throw new UnsupportedOperationException();
+
+	}
+
+	protected void edit(AddFlag operation) {
+		addFlag("New Flag", operation.getTargetClass(), Util.randomEnum(MaterialDesign.class));
+	}
+
+	protected void edit(DeleteFlag operation) {
+		deleteFlag(operation.getFlag());
 	}
 
 	private void fireFlagEvent(FeatureStructureEvent evt) {

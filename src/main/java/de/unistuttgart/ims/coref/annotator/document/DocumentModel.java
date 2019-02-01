@@ -13,6 +13,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
@@ -54,6 +55,8 @@ public class DocumentModel implements Model {
 	public void edit(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
+		else if (operation instanceof FlagModelOperation)
+			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
 		fireDocumentChangedEvent();
 	}
