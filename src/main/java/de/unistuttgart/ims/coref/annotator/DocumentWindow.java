@@ -720,7 +720,7 @@ public class DocumentWindow extends AbstractTextWindow
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.addDocumentStateListener(this);
 		model.getSegmentModel().addListDataListener(segmentIndicator);
-		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
+		segmentIndicator.setLastCharacterPosition(model.getDocumentText().length());
 		documentModel = model;
 
 		// UI

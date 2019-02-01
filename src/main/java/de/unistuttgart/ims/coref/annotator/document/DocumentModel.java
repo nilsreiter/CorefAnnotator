@@ -65,6 +65,14 @@ public class DocumentModel {
 		return coreferenceModel;
 	}
 
+	public String getDocumentLanguage() {
+		return jcas.getDocumentLanguage();
+	}
+
+	public String getDocumentText() {
+		return jcas.getDocumentText();
+	}
+
 	public TypeSystemVersion getFileFormat() {
 		return typeSystemVersion;
 	}
@@ -78,6 +86,7 @@ public class DocumentModel {
 	 * 
 	 * @return
 	 */
+	@Deprecated
 	public JCas getJcas() {
 		return jcas;
 	}

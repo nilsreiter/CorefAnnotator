@@ -25,10 +25,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	@Override
 	public String getText() {
-		return getJCas().getDocumentText();
+		return documentModel.getDocumentText();
 	}
 
 	@Override
+	@Deprecated
 	public JCas getJCas() {
 		return documentModel.getJcas();
 	}

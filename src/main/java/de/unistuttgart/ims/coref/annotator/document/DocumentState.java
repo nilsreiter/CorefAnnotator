@@ -7,7 +7,7 @@ public class DocumentState {
 
 	public DocumentState(DocumentModel documentModel) {
 		this.historySize = documentModel.getHistory().size();
-		this.language = documentModel.getJcas().getDocumentLanguage();
+		this.language = documentModel.getDocumentLanguage();
 		this.unsavedChanges = documentModel.hasUnsavedChanges();
 	}
 
