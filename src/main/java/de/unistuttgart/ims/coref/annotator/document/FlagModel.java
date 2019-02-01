@@ -3,8 +3,10 @@ package de.unistuttgart.ims.coref.annotator.document;
 import java.util.UUID;
 import java.util.prefs.Preferences;
 
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
@@ -15,6 +17,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -86,16 +89,6 @@ public class FlagModel implements Model {
 		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
-	protected synchronized void deleteFlag(Flag flag) {
-		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
-			return;
-		flag.removeFromIndexes();
-		fireFlagEvent(Event.get(this, Type.Remove, flag));
-	}
-
 	protected void edit(FlagModelOperation fmo) {
 		if (fmo instanceof AddFlag)
 			edit((AddFlag) fmo);
@@ -111,7 +104,35 @@ public class FlagModel implements Model {
 	}
 
 	protected void edit(DeleteFlag operation) {
-		deleteFlag(operation.getFlag());
+		Flag flag = operation.getFlag();
+		fireFlagEvent(Event.get(this, Type.Remove, flag));
+
+		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
+				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
+			return;
+		ImmutableList<FeatureStructure> featureStructures = Lists.immutable.empty();
+		if (flag.getTargetClass().equalsIgnoreCase(Mention.class.getName())) {
+			featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Mention.class));
+		} else if (flag.getTargetClass().equalsIgnoreCase(DetachedMentionPart.class.getName())) {
+			featureStructures = Lists.immutable
+					.ofAll(JCasUtil.select(documentModel.getJcas(), DetachedMentionPart.class));
+		} else if (flag.getTargetClass().equalsIgnoreCase(Entity.class.getName())) {
+			featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
+		} else
+			return;
+		operation.setFeatureStructures(featureStructures);
+
+		featureStructures.select(fs -> Util.isX(fs, flag.getKey())).forEach(fs -> {
+			Feature feature = fs.getType().getFeatureByBaseName("Flags");
+			StringArray nArr = Util.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
+					flag.getKey());
+			((StringArray) fs.getFeatureValue(feature)).removeFromIndexes();
+			fs.setFeatureValue(feature, nArr);
+		});
+
+		flag.removeFromIndexes();
 	}
 
 	private void fireFlagEvent(FeatureStructureEvent evt) {

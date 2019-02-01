@@ -66,7 +66,6 @@ public class Util {
 			else
 				j--;
 		}
-
 		return nArr;
 	}
 
@@ -125,11 +124,8 @@ public class Util {
 	}
 
 	public static boolean isX(FeatureStructure fs, String flag) {
-		if (fs instanceof Entity)
-			return Util.contains(((Entity) fs).getFlags(), flag);
-		if (fs instanceof Mention)
-			return Util.contains(((Mention) fs).getFlags(), flag);
-		return false;
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		return Util.contains((StringArray) fs.getFeatureValue(feature), flag);
 	}
 
 	public static boolean isGeneric(Entity e) {
