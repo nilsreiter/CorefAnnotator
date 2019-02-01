@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +73,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -256,6 +258,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		// initialise panel
 		JPanel rightPanel = new JPanel(new BorderLayout());
+
 		tree = new JTree();
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
@@ -263,6 +266,7 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
+		tree.setCellEditor(new MyTreeCellEditor(tree, (DefaultTreeCellRenderer) tree.getCellRenderer()));
 		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
 		tree.addMouseListener(new TreeMouseListener());
 		tree.setEditable(true);
@@ -1007,6 +1011,31 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
+	class MyTreeCellEditor extends DefaultTreeCellEditor {
+
+		public MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+			super(tree, renderer);
+			editingIcon = FontIcon.of(MaterialDesign.MDI_ACCOUNT);
+		}
+
+		@Override
+		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
+				boolean leaf, int row) {
+			CATreeNode node = (CATreeNode) value;
+			Color color = new Color(node.getEntity().getColor());
+			Component comp = super.getTreeCellEditorComponent(tree, node.getEntity().getLabel(), isSelected, expanded,
+					leaf, row);
+			comp.setForeground(color);
+			return comp;
+		}
+
+		@Override
+		public boolean isCellEditable(EventObject e) {
+			CATreeNode node = (CATreeNode) lastPath.getLastPathComponent();
+			return super.isCellEditable(e) && node.isEntity();
+		}
+	}
+
 	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
@@ -1110,6 +1139,29 @@ public class DocumentWindow extends AbstractTextWindow
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
 			return panel;
+		}
+
+		@Override
+		public Icon getLeafIcon() {
+			return getMentionIcon();
+		}
+
+		@Override
+		public Icon getClosedIcon() {
+			return getEntityIcon();
+		}
+
+		@Override
+		public Icon getOpenIcon() {
+			return getEntityIcon();
+		}
+
+		public Icon getMentionIcon() {
+			return FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT);
+		}
+
+		public Icon getEntityIcon() {
+			return FontIcon.of(MaterialDesign.MDI_ACCOUNT);
 		}
 
 	}
