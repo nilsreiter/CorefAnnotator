@@ -10,7 +10,7 @@
 
 <VBox prefHeight="600.0" prefWidth="348.0" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.unistuttgart.ims.coref.annotator.AnnotatorController">
   <children>
-      <TitledPane animated="false" text="Main">
+      <TitledPane animated="false" collapsible="false" text="Main">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="202.0" prefWidth="346.0">
                <children>
@@ -28,7 +28,7 @@
             </AnchorPane>
         </content>
       </TitledPane>
-      <TitledPane animated="false" prefHeight="233.0" prefWidth="389.0" text="%dialog.splash.recent">
+      <TitledPane animated="false" collapsible="false" prefHeight="233.0" prefWidth="389.0" text="%dialog.splash.recent">
         <content>
           <AnchorPane prefHeight="184.0" prefWidth="387.0">
                <children>
@@ -48,13 +48,11 @@
                </children>
                <padding>
                   <Insets top="1.0" />
-               </padding></AnchorPane>
+               </padding>
+            </AnchorPane>
         </content>
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
       </TitledPane>
-      <TitledPane animated="false" text="%dialog.splash.import">
+      <TitledPane animated="false" collapsible="false" text="%dialog.splash.import">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0">
                <children>
