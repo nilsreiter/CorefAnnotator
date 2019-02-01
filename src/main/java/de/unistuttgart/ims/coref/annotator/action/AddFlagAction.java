@@ -9,9 +9,9 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class AddFlagAction extends TargetedIkonAction<DocumentModel> {
 
@@ -24,7 +24,7 @@ public class AddFlagAction extends TargetedIkonAction<DocumentModel> {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getFlagModel().addFlag("New Flag", Entity.class, Util.randomEnum(MaterialDesign.class));
+		getTarget().edit(new AddFlag(Entity.class));
 	}
 
 }

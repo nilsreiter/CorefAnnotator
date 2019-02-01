@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 
 public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implements ListSelectionListener {
 
@@ -33,7 +34,7 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 		if (row != -1) {
 			String key = (String) table.getModel().getValueAt(row, 1);
 			Flag f = getTarget().getFlagModel().getFlag(key);
-			System.err.println(f);
+			getTarget().edit(new DeleteFlag(f));
 		}
 	}
 
@@ -48,7 +49,7 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting()) {
-			int row = e.getLastIndex();
+			int row = table.getSelectedRow();
 			String key = (String) table.getModel().getValueAt(row, 1);
 			setEnabled(!(key.equals(Constants.ENTITY_FLAG_GENERIC) || key.equals(Constants.ENTITY_FLAG_HIDDEN)
 					|| key.equals(Constants.MENTION_FLAG_AMBIGUOUS) || key.equals(Constants.MENTION_FLAG_DIFFICULT)
