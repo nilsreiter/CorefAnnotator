@@ -243,6 +243,14 @@ public class CoreferenceModel implements Model {
 		return m;
 	}
 
+	protected void edit(MergeEntities op) {
+		MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
+		op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
+		op.setPreviousState(currentState.toImmutable());
+		op.setEntity(merge(op.getEntities()));
+		registerEdit(op);
+	}
+
 	protected synchronized void edit(Operation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof RenameEntity) {
@@ -374,14 +382,6 @@ public class CoreferenceModel implements Model {
 		}
 	}
 
-	protected void edit(MergeEntities op) {
-		MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
-		op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
-		op.setPreviousState(currentState.toImmutable());
-		op.setEntity(merge(op.getEntities()));
-		registerEdit(op);
-	}
-
 	protected void edit(RemoveDuplicateMentionsInEntities op) {
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
@@ -464,6 +464,21 @@ public class CoreferenceModel implements Model {
 		registerEdit(operation);
 	}
 
+	protected void edit(ToggleEntityFlag operation) {
+		MutableSet<Mention> mentions = Sets.mutable.empty();
+		operation.getObjects().forEach(e -> {
+			mentions.addAll(entityMentionMap.get(e));
+			if (Util.contains(e.getFlags(), operation.getFlag())) {
+				e.setFlags(Util.removeFrom(jcas, e.getFlags(), operation.getFlag()));
+			} else
+				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
+		});
+		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
+		fireEvent(Event.get(this, Event.Type.Update, mentions));
+		registerEdit(operation);
+
+	}
+
 	protected void edit(ToggleGenericFlag operation) {
 		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
 		operation.getObjects().forEach(fs -> {
@@ -481,21 +496,6 @@ public class CoreferenceModel implements Model {
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
 		fireEvent(Event.get(this, Event.Type.Update, featureStructures));
-		registerEdit(operation);
-
-	}
-
-	protected void edit(ToggleEntityFlag operation) {
-		MutableSet<Mention> mentions = Sets.mutable.empty();
-		operation.getObjects().forEach(e -> {
-			mentions.addAll(entityMentionMap.get(e));
-			if (Util.contains(e.getFlags(), operation.getFlag())) {
-				e.setFlags(Util.removeFrom(jcas, e.getFlags(), operation.getFlag()));
-			} else
-				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
-		});
-		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(this, Event.Type.Update, mentions));
 		registerEdit(operation);
 
 	}
@@ -631,7 +631,7 @@ public class CoreferenceModel implements Model {
 	private void remove(DetachedMentionPart dmp) {
 		dmp.removeFromIndexes();
 		characterPosition2AnnotationMap.remove(dmp);
-	}
+	};
 
 	/**
 	 * Removes entity and fires events
@@ -655,7 +655,7 @@ public class CoreferenceModel implements Model {
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
 
-	};
+	}
 
 	private void remove(Mention m, boolean autoRemove) {
 		Entity entity = m.getEntity();
