@@ -132,6 +132,10 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		case Update:
 			tme = new TableModelEvent(this, flagModel.getFlags().indexOf(event.getArgument(0)));
 			break;
+		case Remove:
+			int row = flagModel.getFlags().indexOf(event.getArgument(0));
+			tme = new TableModelEvent(this, row, row, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
+			break;
 		default:
 		}
 		Annotator.logger.debug(tme);
