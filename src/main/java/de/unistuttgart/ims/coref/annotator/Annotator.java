@@ -140,7 +140,7 @@ public class Annotator extends Application {
 	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi);
+		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}

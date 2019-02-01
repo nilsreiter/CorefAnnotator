@@ -10,11 +10,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 
-public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode> {
+public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode>, Tooltipable {
 
 	private static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
@@ -128,6 +130,23 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	public void setRank(int rank) {
 		this.rank = rank;
+	}
+
+	@Override
+	public String getToolTip() {
+		if (featureStructure instanceof EntityGroup) {
+			StringBuilder b = new StringBuilder();
+			EntityGroup entityGroup = (EntityGroup) featureStructure;
+			b.append(entityGroup.getMembers(0).getLabel());
+			for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+				b.append(", ");
+				b.append(entityGroup.getMembers(i).getLabel());
+			}
+			return b.toString();
+		} else if (featureStructure instanceof Entity) {
+			return getEntity().getLabel();
+		}
+		return null;
 	}
 
 }

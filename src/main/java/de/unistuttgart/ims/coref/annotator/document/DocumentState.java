@@ -6,7 +6,7 @@ public class DocumentState {
 	boolean unsavedChanges;
 
 	public DocumentState(DocumentModel documentModel) {
-		this.historySize = documentModel.getCoreferenceModel().getHistory().size();
+		this.historySize = documentModel.getHistory().size();
 		this.language = documentModel.getJcas().getDocumentLanguage();
 		this.unsavedChanges = documentModel.hasUnsavedChanges();
 	}

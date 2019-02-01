@@ -5,18 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 
 public class RenameEntityAction extends DocumentWindowAction implements CAAction {
 
@@ -32,15 +29,12 @@ public class RenameEntityAction extends DocumentWindowAction implements CAAction
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Entity selectedEntity = getTarget().getSelectedEntities().getOnly();
-		String l = selectedEntity.getLabel();
-		String newLabel = (String) JOptionPane.showInputDialog(getTarget(),
-				Annotator.getString(Strings.DIALOG_RENAME_ENTITY_PROMPT), "", JOptionPane.PLAIN_MESSAGE,
-				FontIcon.of(MaterialDesign.MDI_KEYBOARD), null, l);
-		if (newLabel != null) {
-			Op.RenameEntity op = new Op.RenameEntity(selectedEntity, newLabel);
-			getTarget().getCoreferenceModel().edit(op);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				getTarget().getTree().startEditingAtPath(getTarget().getTree().getSelectionPath());
+			}
+		});
 	}
 
 	@Override

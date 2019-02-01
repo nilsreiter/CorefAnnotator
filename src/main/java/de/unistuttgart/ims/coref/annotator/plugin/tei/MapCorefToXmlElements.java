@@ -13,8 +13,8 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
@@ -44,12 +44,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
 					XMLElement.class);
 			newElement.setTag("rs");
-			if (idMap.containsKey(xid)) {
-				newElement.setAttributes(" ref=\"#" + xid + "\"");
-			} else {
-				newElement.setAttributes(" xml:id=\"" + xid + "\"");
-				idMap.put(xid, newElement);
-			}
+			newElement.setAttributes(" ref=\"#" + xid + "\"");
 		}
 	}
 
@@ -64,7 +59,8 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 			String baseId;
 			if (entity.getLabel() != null) {
-				baseId = entity.getLabel().toLowerCase().replaceAll("[^a-z]", "-");
+				// TODO: Really check whether this is a legal NCNAME
+				baseId = entity.getLabel().replaceAll("\\s", "-");
 			} else {
 				baseId = "e";
 			}

@@ -12,8 +12,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsInEntities;
 
 public class RemoveDuplicatesAction extends DocumentWindowAction {
 
@@ -28,7 +28,7 @@ public class RemoveDuplicatesAction extends DocumentWindowAction {
 	public void actionPerformed(ActionEvent e) {
 		MutableList<TreePath> paths = Lists.mutable.with(getTarget().getTree().getSelectionPaths());
 
-		getTarget().getDocumentModel().getCoreferenceModel().edit(new Op.RemoveDuplicateMentionsInEntities(paths
+		getTarget().getDocumentModel().edit(new RemoveDuplicateMentionsInEntities(paths
 				.collect(p -> (CATreeNode) p.getLastPathComponent()).collect(n -> (Entity) n.getFeatureStructure())));
 	}
 

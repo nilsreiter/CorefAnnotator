@@ -76,6 +76,7 @@ public class Constants {
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
+		public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
 		public static final String ACTION_COMMENT = "action.comment";
 		public static final String ACTION_COMMENT_DELETE = "action.comment.delete";
@@ -93,6 +94,7 @@ public class Constants {
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
 		public static final String ACTION_ENTITY_STATISTICS_TOOLTIP = "action.entity_statistics.tooltip";
+		public static final String ACTION_EXPORT_EXAMPLE = "action.export_example";
 		public static final String ACTION_FILE_MERGE = "action.merge_files";
 		public static final String ACTION_FILE_MERGE_TOOLTIP = "action.merge_files.tooltip";
 		public static final String ACTION_FLAG_ENTITY_GENERIC = "action.flag_entity_generic";
@@ -115,6 +117,10 @@ public class Constants {
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
 		public static final String ACTION_SEARCH = "action.search";
+		public static final String ACTION_SEARCH_MENTION = "action.search.mention";
+		public static final String ACTION_SEARCH_MENTION_AMBIGUOUS = "action.search.mention.ambiguous";
+		public static final String ACTION_SEARCH_MENTION_DIFFICULT = "action.search.mention.difficult";
+		public static final String ACTION_SEARCH_MENTION_NONNOMINAL = "action.search.mention.nonnominal";
 		public static final String ACTION_SET_ANNOTATOR_NAME = "action.set_annotator_name";
 		public static final String ACTION_SET_COLOR = "action.set_color";
 		public static final String ACTION_SET_COLOR_TOOLTIP = "action.set_color.tooltip";
@@ -135,6 +141,8 @@ public class Constants {
 		public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
 		public static final String ACTION_TOGGLE_FULL_TOKENS = "action.toggle.full_tokens";
 		public static final String ACTION_TOGGLE_FULL_TOKENS_TOOLTIP = "action.toggle.full_tokens.tooltip";
+		public static final String ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING = "action.toggle.ignore_singletons";
+		public static final String ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP = "action.toggle.ignore_singletons.tooltip";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED = "action.toggle.keep_tree_sorted";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP = "action.toggle.keep_tree_sorted.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
@@ -149,8 +157,11 @@ public class Constants {
 		public static final String DIALOG_CANCEL = "dialog.cancel";
 		public static final String DIALOG_CHANGE_ANNOTATOR_NAME_PROMPT = "dialog.change_annotator_name.prompt";
 		public static final String DIALOG_CHANGE_COLOR_PROMPT = "dialog.change_color.prompt";
+		public static final String DIALOG_CHANGE_KEY_CANCEL = "dialog.change_key.cancel";
+		public static final String DIALOG_CHANGE_KEY_CLEAR = "dialog.change_key.clear";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE = "dialog.change_key.invalid_string.message";
 		public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
+		public static final String DIALOG_CHANGE_KEY_OK = "dialog.change_key.ok";
 		public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
 		public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
 		public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
@@ -189,9 +200,12 @@ public class Constants {
 		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
 		public static final String MESSAGE_ENTITY_CREATED = "message.entity_created";
 		public static final String MESSAGE_LOADING = "message.loading";
+		public static final String MESSAGE_LOADING_CONVERTED_TO_1 = "message.loading.converted_to_1";
 		public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
+		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
+		public static final String SEARCH_WINDOW_TAB_STRUCTURE = "search.window.tab.structure";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String STAT_AGR_TITLE = "stat.agr.title";
@@ -231,12 +245,12 @@ public class Constants {
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
 	public static final String CFG_FULL_TOKENS = "full_tokens";
+	public static final String CFG_IGNORE_SINGLETONS_WHEN_COMPARING = "CFG_IGNORE_SINGLETONS_WHEN_COMPARING";
 	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 
-	public static final String CFG_WINDOWTITLE = "Windowtitle";
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 
@@ -272,9 +286,15 @@ public class Constants {
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
+	public static final Setting<Boolean> SETTING_IGNORE_SINGLETONS_WHEN_COMPARING = new Setting<Boolean>(
+			CFG_IGNORE_SINGLETONS_WHEN_COMPARING, Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING,
+			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
+
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru" };
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
 	public static final String X_UNSPECIFIED = "x-unspecified";
+
+	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 }
