@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
@@ -41,6 +43,7 @@ public class FlagEditor extends JFrame {
 
 	public FlagEditor(DocumentModel documentModel) {
 		this.documentModel = documentModel;
+		this.addWindowListener(new FlagEditorWindowListener());
 
 		JComboBox<Class<?>> combobox = new JComboBox<Class<?>>();
 		combobox.addItem(Mention.class);
@@ -142,6 +145,51 @@ public class FlagEditor extends JFrame {
 				setIcon(FontIcon.of((Ikon) value));
 
 			return this;
+		}
+
+	}
+
+	class FlagEditorWindowListener implements WindowListener {
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+
 		}
 
 	}
