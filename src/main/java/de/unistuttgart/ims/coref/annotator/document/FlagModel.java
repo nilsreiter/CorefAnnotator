@@ -67,10 +67,12 @@ public class FlagModel implements Model {
 		}
 	}
 
+	@Deprecated
 	protected void addFlag(String label, Class<? extends FeatureStructure> targetClass) {
 		addFlag(label, targetClass, null);
 	}
 
+	@Deprecated
 	protected synchronized void addFlag(String label, Class<? extends FeatureStructure> targetClass, Ikon ikon) {
 		Flag f = new Flag(documentModel.getJcas());
 		f.addToIndexes();
@@ -100,7 +102,22 @@ public class FlagModel implements Model {
 	}
 
 	protected void edit(AddFlag operation) {
-		addFlag("New Flag", operation.getTargetClass(), Util.randomEnum(MaterialDesign.class));
+		Flag f = new Flag(documentModel.getJcas());
+		f.addToIndexes();
+		f.setLabel("New Flag");
+		String key = UUID.randomUUID().toString();
+		while (keys.contains(key)) {
+			key = UUID.randomUUID().toString();
+		}
+		f.setKey(key);
+		f.setIcon(Util.randomEnum(MaterialDesign.class).toString());
+		f.setTargetClass(operation.getTargetClass().getName());
+		f.addToIndexes();
+		keys.add(key);
+
+		operation.setAddedFlag(f);
+		fireFlagEvent(Event.get(this, Type.Add, f));
+		documentModel.fireDocumentChangedEvent();
 	}
 
 	protected void edit(DeleteFlag operation) {
@@ -214,6 +231,22 @@ public class FlagModel implements Model {
 
 	public boolean removeFlagModelListener(Object o) {
 		return listeners.remove(o);
+	}
+
+	protected void undo(FlagModelOperation fmo) {
+		if (fmo instanceof AddFlag)
+			undo((AddFlag) fmo);
+		else if (fmo instanceof DeleteFlag)
+			undo(fmo);
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	protected void undo(AddFlag fmo) {
+		keys.remove(fmo.getAddedFlag().getKey());
+		fireFlagEvent(Event.get(this, Type.Remove, fmo.getAddedFlag()));
+		fmo.getAddedFlag().removeFromIndexes();
+		fmo.setAddedFlag(null);
 	}
 
 	public void updateFlag(Flag flag) {

@@ -185,6 +185,8 @@ public class DocumentModel implements Model {
 	protected void undo(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.undo(operation);
+		} else if (operation instanceof FlagModelOperation) {
+			flagModel.undo((FlagModelOperation) operation);
 		}
 	}
 
