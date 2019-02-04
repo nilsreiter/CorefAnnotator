@@ -96,20 +96,25 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		Annotator.logger.entry(aValue, rowIndex, columnIndex);
 		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
+		SetFlagProperty.FlagProperty property = null;
+		Object value = null;
 		switch (columnIndex) {
 		case 0:
-			documentModel.edit(
-					new SetFlagProperty(f, SetFlagProperty.FlagProperty.ICON, ((MaterialDesign) (aValue)).name()));
+			property = SetFlagProperty.FlagProperty.ICON;
+			value = ((MaterialDesign) (aValue)).name();
 			break;
 		case 2:
-			documentModel.edit(new SetFlagProperty(f, SetFlagProperty.FlagProperty.LABEL, aValue));
+			property = SetFlagProperty.FlagProperty.LABEL;
+			value = aValue;
 			break;
 		case 3:
-			documentModel.edit(new SetFlagProperty(f, SetFlagProperty.FlagProperty.TARGETCLASS,
-					((Class<?>) aValue).getCanonicalName()));
+			property = SetFlagProperty.FlagProperty.TARGETCLASS;
+			value = ((Class<?>) aValue).getCanonicalName();
 			break;
+		default:
+			return;
 		}
-		documentModel.getFlagModel().updateFlag(f);
+		documentModel.edit(new SetFlagProperty(f, property, value));
 	}
 
 	@Override

@@ -31,6 +31,7 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		int row = table.getSelectedRow();
+		table.clearSelection();
 		if (row != -1) {
 			String key = (String) table.getModel().getValueAt(row, 1);
 			Flag f = getTarget().getFlagModel().getFlag(key);
@@ -50,10 +51,15 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 	public void valueChanged(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting()) {
 			int row = table.getSelectedRow();
-			String key = (String) table.getModel().getValueAt(row, 1);
-			setEnabled(!(key.equals(Constants.ENTITY_FLAG_GENERIC) || key.equals(Constants.ENTITY_FLAG_HIDDEN)
-					|| key.equals(Constants.MENTION_FLAG_AMBIGUOUS) || key.equals(Constants.MENTION_FLAG_DIFFICULT)
-					|| key.equals(Constants.MENTION_FLAG_NON_NOMINAL)));
+			try {
+				String key = (String) table.getModel().getValueAt(row, 1);
+				setEnabled(!(key.equals(Constants.ENTITY_FLAG_GENERIC) || key.equals(Constants.ENTITY_FLAG_HIDDEN)
+						|| key.equals(Constants.MENTION_FLAG_AMBIGUOUS) || key.equals(Constants.MENTION_FLAG_DIFFICULT)
+						|| key.equals(Constants.MENTION_FLAG_NON_NOMINAL)));
+			} catch (IndexOutOfBoundsException ex) {
+				Annotator.logger.catching(ex);
+			}
+
 		}
 
 	}

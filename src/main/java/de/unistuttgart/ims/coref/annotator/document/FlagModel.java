@@ -294,12 +294,14 @@ public class FlagModel implements Model {
 			flag.setTargetClass((String) op.getOldValue());
 			break;
 		}
-		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
+		updateFlag(flag);
 	}
 
 	public void updateFlag(Flag flag) {
 		Annotator.logger.entry(flag);
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
+		documentModel.getCoreferenceModel()
+				.fireEvent(Event.get(this, Event.Type.Update, getFlaggedFeatureStructures(flag)));
 	}
 
 	public Flag getFlag(String key) {

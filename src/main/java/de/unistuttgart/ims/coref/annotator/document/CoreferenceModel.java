@@ -464,6 +464,7 @@ public class CoreferenceModel implements Model {
 		registerEdit(operation);
 	}
 
+	@Deprecated
 	protected void edit(ToggleEntityFlag operation) {
 		MutableSet<Mention> mentions = Sets.mutable.empty();
 		operation.getObjects().forEach(e -> {
@@ -500,6 +501,7 @@ public class CoreferenceModel implements Model {
 
 	}
 
+	@Deprecated
 	protected void edit(ToggleMentionFlag operation) {
 		operation.getObjects().forEach(m -> {
 			if (Util.contains(m.getFlags(), operation.getFlag())) {
@@ -723,6 +725,8 @@ public class CoreferenceModel implements Model {
 			edit((ToggleEntityFlag) operation);
 		} else if (operation instanceof ToggleMentionFlag) {
 			edit((ToggleMentionFlag) operation);
+		} else if (operation instanceof ToggleGenericFlag) {
+			edit((ToggleGenericFlag) operation);
 		} else if (operation instanceof UpdateEntityColor) {
 			UpdateEntityColor op = (UpdateEntityColor) operation;
 			op.getObjects().getFirst().setColor(op.getOldColor());
