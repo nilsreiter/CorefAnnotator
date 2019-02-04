@@ -2,23 +2,27 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.util.prefs.Preferences;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.impl.factory.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
 
 public class TestFlagModel {
 	DocumentModel model;
@@ -57,18 +61,17 @@ public class TestFlagModel {
 
 	@Test
 	public void testAddFlag() throws ClassNotFoundException {
-		AddFlag op = mock(AddFlag.class);
-		doReturn(Entity.class).when(op).getTargetClass();
+		AddFlag op = new AddFlag(Entity.class);
 
-		fmodel.edit(op);
+		model.edit(op);
 		assertEquals(6, fmodel.getFlags().size());
 		Flag flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
 		assertEquals("New Flag", flag.getLabel());
 
-		doReturn(Mention.class).when(op).getTargetClass();
-		fmodel.edit(op);
+		op = new AddFlag(Mention.class);
+		model.edit(op);
 		assertEquals(7, fmodel.getFlags().size());
 		flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
@@ -82,11 +85,17 @@ public class TestFlagModel {
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
 		assertEquals("New Flag", flag.getLabel());
+
+		model.undo();
+		assertEquals(5, fmodel.getFlags().size());
 	}
 
 	@Test
 	public void testDeleteFlag() {
-
+		model.edit(new AddFlag(Mention.class));
+		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
+		Mention m = JCasUtil.select(jcas, Mention.class).iterator().next();
+		model.edit(new ToggleMentionFlag("", Lists.fixedSize.of(m)));
 	}
 
 }
