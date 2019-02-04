@@ -11,20 +11,21 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
 
 public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListener {
 
-	FlagModel flagModel;
+	DocumentModel documentModel;
 	MutableSet<TableModelListener> tableModelListeners = Sets.mutable.empty();
 
-	public FlagTableModel(FlagModel fm) {
-		this.flagModel = fm;
-		this.flagModel.addFlagModelListener(this);
+	public FlagTableModel(DocumentModel dm) {
+		this.documentModel = dm;
+		this.documentModel.getFlagModel().addFlagModelListener(this);
 	}
 
 	@Override
 	public int getRowCount() {
-		return flagModel.getFlags().size();
+		return documentModel.getFlagModel().getFlags().size();
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Flag f = flagModel.getFlags().get(rowIndex);
+		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
 		switch (columnIndex) {
 		case 0:
 			return MaterialDesign.valueOf(f.getIcon());
@@ -94,19 +95,21 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		Annotator.logger.entry(aValue, rowIndex, columnIndex);
-		Flag f = flagModel.getFlags().get(rowIndex);
+		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
 		switch (columnIndex) {
 		case 0:
-			f.setIcon(((MaterialDesign) aValue).name());
+			documentModel.edit(
+					new SetFlagProperty(f, SetFlagProperty.FlagProperty.ICON, ((MaterialDesign) (aValue)).name()));
 			break;
 		case 2:
-			f.setLabel((String) aValue);
+			documentModel.edit(new SetFlagProperty(f, SetFlagProperty.FlagProperty.LABEL, aValue));
 			break;
 		case 3:
-			f.setTargetClass(((Class<?>) aValue).getCanonicalName());
+			documentModel.edit(new SetFlagProperty(f, SetFlagProperty.FlagProperty.TARGETCLASS,
+					((Class<?>) aValue).getCanonicalName()));
 			break;
 		}
-		flagModel.updateFlag(f);
+		documentModel.getFlagModel().updateFlag(f);
 	}
 
 	@Override
@@ -130,10 +133,10 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 					TableModelEvent.INSERT);
 			break;
 		case Update:
-			tme = new TableModelEvent(this, flagModel.getFlags().indexOf(event.getArgument(0)));
+			tme = new TableModelEvent(this, documentModel.getFlagModel().getFlags().indexOf(event.getArgument(0)));
 			break;
 		case Remove:
-			int row = flagModel.getFlags().indexOf(event.getArgument(0));
+			int row = documentModel.getFlagModel().getFlags().indexOf(event.getArgument(0));
 			tme = new TableModelEvent(this, row, row, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
 			break;
 		default:

@@ -25,6 +25,7 @@ import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -96,6 +97,8 @@ public class FlagModel implements Model {
 			edit((AddFlag) fmo);
 		else if (fmo instanceof DeleteFlag)
 			edit((DeleteFlag) fmo);
+		else if (fmo instanceof SetFlagProperty)
+			edit((SetFlagProperty) fmo);
 		else
 			throw new UnsupportedOperationException();
 
@@ -129,16 +132,7 @@ public class FlagModel implements Model {
 				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
 				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
 			return;
-		ImmutableList<FeatureStructure> featureStructures = Lists.immutable.empty();
-		if (flag.getTargetClass().equalsIgnoreCase(Mention.class.getName())) {
-			featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Mention.class));
-		} else if (flag.getTargetClass().equalsIgnoreCase(DetachedMentionPart.class.getName())) {
-			featureStructures = Lists.immutable
-					.ofAll(JCasUtil.select(documentModel.getJcas(), DetachedMentionPart.class));
-		} else if (flag.getTargetClass().equalsIgnoreCase(Entity.class.getName())) {
-			featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
-		} else
-			return;
+		ImmutableList<FeatureStructure> featureStructures = this.getFlaggedFeatureStructures(flag);
 		operation.setFeatureStructures(featureStructures);
 
 		featureStructures.select(fs -> Util.isX(fs, flag.getKey())).forEach(fs -> {
@@ -152,12 +146,50 @@ public class FlagModel implements Model {
 		flag.removeFromIndexes();
 	}
 
+	protected void edit(SetFlagProperty op) {
+		Flag flag = op.getFlag();
+		switch (op.getFlagProperty()) {
+		case LABEL:
+			op.setOldValue(flag.getLabel());
+			flag.setLabel((String) op.getNewValue());
+			break;
+		case ICON:
+			op.setOldValue(flag.getIcon());
+			flag.setIcon((String) op.getNewValue());
+			break;
+		case TARGETCLASS:
+			op.setOldValue(flag.getTargetClass());
+			flag.setTargetClass((String) op.getNewValue());
+			break;
+		}
+		Annotator.logger.entry(op);
+		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
+	}
+
 	private void fireFlagEvent(FeatureStructureEvent evt) {
 		listeners.forEach(l -> l.flagEvent(evt));
 	}
 
 	public ImmutableList<Flag> getFlags() {
 		return Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class));
+	}
+
+	protected ImmutableList<FeatureStructure> getFlaggedFeatureStructures(Flag flag) {
+		ImmutableList<FeatureStructure> featureStructures = Lists.immutable.empty();
+		try {
+			if (getTargetClass(flag) == Mention.class) {
+				featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Mention.class));
+			} else if (getTargetClass(flag) == DetachedMentionPart.class) {
+				featureStructures = Lists.immutable
+						.ofAll(JCasUtil.select(documentModel.getJcas(), DetachedMentionPart.class));
+			} else if (getTargetClass(flag) == Entity.class) {
+				featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return featureStructures.select(fs -> Util.isX(fs, flag.getKey()));
 	}
 
 	protected void initialiseDefaultFlags() {
@@ -238,15 +270,31 @@ public class FlagModel implements Model {
 			undo((AddFlag) fmo);
 		else if (fmo instanceof DeleteFlag)
 			undo(fmo);
+		else if (fmo instanceof SetFlagProperty)
+			undo((SetFlagProperty) fmo);
 		else
 			throw new UnsupportedOperationException();
 	}
 
 	protected void undo(AddFlag fmo) {
-		keys.remove(fmo.getAddedFlag().getKey());
-		fireFlagEvent(Event.get(this, Type.Remove, fmo.getAddedFlag()));
-		fmo.getAddedFlag().removeFromIndexes();
+		edit(new DeleteFlag(fmo.getAddedFlag()));
 		fmo.setAddedFlag(null);
+	}
+
+	protected void undo(SetFlagProperty op) {
+		Flag flag = op.getFlag();
+		switch (op.getFlagProperty()) {
+		case LABEL:
+			flag.setLabel((String) op.getOldValue());
+			break;
+		case ICON:
+			flag.setIcon((String) op.getOldValue());
+			break;
+		case TARGETCLASS:
+			flag.setTargetClass((String) op.getOldValue());
+			break;
+		}
+		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 
 	public void updateFlag(Flag flag) {

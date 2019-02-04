@@ -57,7 +57,7 @@ public class FlagEditor extends JFrame {
 		}
 		iconBox.setRenderer(new IkonListCellRenderer());
 
-		this.table = new JTable(new FlagTableModel(documentModel.getFlagModel()));
+		this.table = new JTable(new FlagTableModel(documentModel));
 
 		// Actions
 		AbstractAction addFlagAction = new AddFlagAction(documentModel);
