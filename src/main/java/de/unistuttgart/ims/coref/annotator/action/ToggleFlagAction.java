@@ -24,7 +24,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 	FlagModel flagModel;
 
 	public ToggleFlagAction(DocumentWindow dw, FlagModel flagModel, Flag flag) {
-		super(dw, flag.getLabel(), flagModel.getIkon(flag));
+		super(dw, flag.getLabel(), false, flagModel.getIkon(flag));
 		this.flag = flag;
 		this.flagModel = flagModel;
 		// putValue(Action.SHORT_DESCRIPTION,
