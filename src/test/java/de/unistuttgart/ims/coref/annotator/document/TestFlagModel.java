@@ -68,7 +68,7 @@ public class TestFlagModel {
 		Flag flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
-		assertEquals("New Flag", flag.getLabel());
+		assertEquals("New flag", flag.getLabel());
 
 		op = new AddFlag(Mention.class);
 		model.edit(op);
@@ -76,7 +76,7 @@ public class TestFlagModel {
 		flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Mention.class, fmodel.getTargetClass(flag));
-		assertEquals("New Flag", flag.getLabel());
+		assertEquals("New flag", flag.getLabel());
 
 		model.undo();
 
@@ -84,7 +84,7 @@ public class TestFlagModel {
 		flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
-		assertEquals("New Flag", flag.getLabel());
+		assertEquals("New flag", flag.getLabel());
 
 		model.undo();
 		assertEquals(5, fmodel.getFlags().size());
