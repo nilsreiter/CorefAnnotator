@@ -43,23 +43,26 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
 		Flag f = (Flag) event.getArgument(0);
-		if (targetClass == null || f.getTargetClass().equalsIgnoreCase(targetClass.getName()))
-			switch (event.getType()) {
-			case Remove:
+		switch (event.getType()) {
+		case Remove:
+			remove(actionMap.get(f));
+			actionMap.remove(f);
+			break;
+		case Update:
+			if (actionMap.containsKey(f))
 				remove(actionMap.get(f));
-				actionMap.remove(f);
-				break;
-			case Update:
-				if (actionMap.containsKey(f))
-					remove(actionMap.get(f));
-				//$FALL-THROUGH$
-			case Add:
+			//$FALL-THROUGH$
+		case Add:
+			if (f.getTargetClass().equalsIgnoreCase(targetClass.getName())) {
 				ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
 				dw.getTreeSelectionListener().addListener(a);
 				add(f, new JCheckBoxMenuItem(a));
-				break;
-			default:
 			}
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	public Class<? extends FeatureStructure> getTargetClass() {
