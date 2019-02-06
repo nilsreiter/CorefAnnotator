@@ -10,6 +10,7 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
 
@@ -37,13 +38,13 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return "flagmodel.icon";
+			return Annotator.getString(Constants.Strings.FLAG_EDITOR_ICON);
 		case 1:
-			return "flagmodel.key";
+			return Annotator.getString(Constants.Strings.FLAG_EDITOR_KEY);
 		case 2:
-			return "flagmodel.label";
+			return Annotator.getString(Constants.Strings.FLAG_EDITOR_LABEL);
 		case 3:
-			return "flagmodel.targetclass";
+			return Annotator.getString(Constants.Strings.FLAG_EDITOR_TARGETCLASS);
 		default:
 			return null;
 		}
@@ -151,4 +152,5 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 			for (TableModelListener l : tableModelListeners)
 				l.tableChanged(tme);
 	}
+
 }

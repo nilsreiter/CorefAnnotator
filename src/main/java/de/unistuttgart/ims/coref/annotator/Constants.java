@@ -186,6 +186,7 @@ public class Constants {
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
 		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
+		public static final String MENU_FLAGS = "menu.flags";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
@@ -242,6 +243,14 @@ public class Constants {
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
+		public static final String FLAG_EDITOR_ICON = "flag_editor.icon";
+		public static final String FLAG_EDITOR_ICON_TOOLTIP = "flag_editor.icon.tooltip";
+		public static final String FLAG_EDITOR_KEY = "flag_editor.key";
+		public static final String FLAG_EDITOR_KEY_TOOLTIP = "flag_editor.key.tooltip";
+		public static final String FLAG_EDITOR_LABEL = "flag_editor.label";
+		public static final String FLAG_EDITOR_LABEL_TOOLTIP = "flag_editor.label.tooltip";
+		public static final String FLAG_EDITOR_TARGETCLASS = "flag_editor.targetclass";
+		public static final String FLAG_EDITOR_TARGETCLASS_TOOLTIP = "flag_editor.targetclass.tooltip";
 
 	}
 

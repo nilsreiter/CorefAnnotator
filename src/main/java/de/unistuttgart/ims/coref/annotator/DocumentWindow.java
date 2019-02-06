@@ -236,8 +236,8 @@ public class DocumentWindow extends AbstractTextWindow
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
-		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
-		entityFlagsInTreePopup = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
 
 		// popup
 		treePopupMenu = new JPopupMenu();

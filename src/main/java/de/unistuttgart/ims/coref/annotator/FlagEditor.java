@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -19,6 +20,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -29,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
 
@@ -78,6 +82,43 @@ public class FlagEditor extends JFrame {
 		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.table.getSelectionModel().addListSelectionListener(deleteFlagAction);
 		this.table.setRowHeight(25);
+
+		this.table.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText() {
+				return Annotator.getString(Constants.Strings.FLAG_EDITOR_ICON_TOOLTIP);
+			}
+		});
+		this.table.getColumnModel().getColumn(1).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText() {
+				return Annotator.getString(Constants.Strings.FLAG_EDITOR_KEY_TOOLTIP);
+			}
+		});
+		this.table.getColumnModel().getColumn(2).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText() {
+				return Annotator.getString(Constants.Strings.FLAG_EDITOR_LABEL_TOOLTIP);
+			}
+		});
+		this.table.getColumnModel().getColumn(3).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText() {
+				return Annotator.getString(Constants.Strings.FLAG_EDITOR_TARGETCLASS_TOOLTIP);
+			}
+		});
 
 		this.toolbar = new JPanel();
 		this.toolbar.add(new JButton(addFlagAction));
@@ -151,6 +192,25 @@ public class FlagEditor extends JFrame {
 
 	}
 
+	class MyTableHeader extends JTableHeader {
+
+		private static final long serialVersionUID = 1L;
+		String[] tooltips;
+
+		MyTableHeader(TableColumnModel columnModel, String[] columnTooltips) {
+			super(columnModel);// do everything a normal JTableHeader does
+			this.tooltips = columnTooltips;// plus extra data
+		}
+
+		@Override
+		public String getToolTipText(MouseEvent e) {
+			java.awt.Point p = e.getPoint();
+			int index = columnModel.getColumnIndexAtX(p.x);
+			int realIndex = columnModel.getColumn(index).getModelIndex();
+			return this.tooltips[realIndex];
+		}
+	}
+
 	class FlagEditorWindowListener implements WindowListener {
 
 		@Override
@@ -193,6 +253,12 @@ public class FlagEditor extends JFrame {
 			// TODO Auto-generated method stub
 
 		}
+
+	}
+
+	class MyHeaderRenderer extends DefaultTableHeaderCellRenderer {
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
