@@ -251,6 +251,7 @@ public class Constants {
 		public static final String FLAG_EDITOR_LABEL_TOOLTIP = "flag_editor.label.tooltip";
 		public static final String FLAG_EDITOR_TARGETCLASS = "flag_editor.targetclass";
 		public static final String FLAG_EDITOR_TARGETCLASS_TOOLTIP = "flag_editor.targetclass.tooltip";
+		public static final String FLAGMODEL_NEW_FLAG = "flagmodel.new_flag";
 
 	}
 

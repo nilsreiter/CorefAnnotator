@@ -26,6 +26,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -107,7 +108,7 @@ public class FlagModel implements Model {
 	protected void edit(AddFlag operation) {
 		Flag f = new Flag(documentModel.getJcas());
 		f.addToIndexes();
-		f.setLabel("New Flag");
+		f.setLabel(Annotator.getString(Constants.Strings.FLAGMODEL_NEW_FLAG));
 		String key = UUID.randomUUID().toString();
 		while (keys.contains(key)) {
 			key = UUID.randomUUID().toString();
@@ -269,7 +270,7 @@ public class FlagModel implements Model {
 		if (fmo instanceof AddFlag)
 			undo((AddFlag) fmo);
 		else if (fmo instanceof DeleteFlag)
-			undo(fmo);
+			undo((DeleteFlag) fmo);
 		else if (fmo instanceof SetFlagProperty)
 			undo((SetFlagProperty) fmo);
 		else
@@ -279,6 +280,16 @@ public class FlagModel implements Model {
 	protected void undo(AddFlag fmo) {
 		edit(new DeleteFlag(fmo.getAddedFlag()));
 		fmo.setAddedFlag(null);
+	}
+
+	protected void undo(DeleteFlag fmo) {
+		fmo.getFlag().addToIndexes();
+		documentModel.getCoreferenceModel()
+				.edit(new ToggleGenericFlag(fmo.getFlag().getKey(), fmo.getFeatureStructures()));
+
+		fireFlagEvent(Event.get(this, Type.Add, fmo.getFlag()));
+		documentModel.getCoreferenceModel().fireEvent(Event.get(this, Event.Type.Update, fmo.getFeatureStructures()));
+
 	}
 
 	protected void undo(SetFlagProperty op) {
