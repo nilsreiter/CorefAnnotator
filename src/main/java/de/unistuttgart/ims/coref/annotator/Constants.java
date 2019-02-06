@@ -241,6 +241,7 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
 
 	}
 

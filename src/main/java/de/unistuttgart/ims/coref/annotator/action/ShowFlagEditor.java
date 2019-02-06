@@ -17,7 +17,7 @@ public class ShowFlagEditor extends TargetedIkonAction<DocumentWindow> {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		FlagEditor fe = new FlagEditor(getTarget().getDocumentModel());
+		FlagEditor fe = new FlagEditor(getTarget().getDocumentModel(), getTarget());
 	}
 
 }

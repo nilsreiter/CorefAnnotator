@@ -37,12 +37,14 @@ public class FlagEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	DocumentModel documentModel;
+	DocumentWindow documentWindow;
 
 	JTable table;
 	JPanel toolbar;
 
-	public FlagEditor(DocumentModel documentModel) {
+	public FlagEditor(DocumentModel documentModel, DocumentWindow documentWindow) {
 		this.documentModel = documentModel;
+		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
 		JComboBox<Class<?>> combobox = new JComboBox<Class<?>>();
