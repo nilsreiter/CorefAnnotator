@@ -4,15 +4,15 @@ import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-public abstract class UpdateOp<T extends FeatureStructure> implements Operation {
+public abstract class UpdateOperation<T extends FeatureStructure> implements Operation {
 	ImmutableList<T> objects;
 
 	@SafeVarargs
-	public UpdateOp(T... objects) {
+	public UpdateOperation(T... objects) {
 		this.objects = Lists.immutable.of(objects);
 	}
 
-	public UpdateOp(Iterable<T> objects) {
+	public UpdateOperation(Iterable<T> objects) {
 		this.objects = Lists.immutable.withAll(objects);
 	}
 

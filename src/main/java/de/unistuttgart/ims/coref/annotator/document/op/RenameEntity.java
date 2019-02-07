@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 
-public class RenameEntity extends UpdateOp<Entity> implements CoreferenceModelOperation {
+public class RenameEntity extends UpdateOperation<Entity> implements CoreferenceModelOperation {
 
 	String newLabel;
 	String oldLabel;
