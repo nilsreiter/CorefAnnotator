@@ -162,6 +162,14 @@ public class FlagModel implements Model {
 			op.setOldValue(flag.getTargetClass());
 			flag.setTargetClass((String) op.getNewValue());
 			break;
+		case KEY:
+			op.setOldValue(flag.getKey());
+			getFlaggedFeatureStructures(flag).forEach(fs -> {
+				Util.removeFlagKey(fs, (String) op.getOldValue());
+				Util.addFlagKey(fs, (String) op.getNewValue());
+			});
+			flag.setKey((String) op.getNewValue());
+			break;
 		}
 		Annotator.logger.entry(op);
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
@@ -303,6 +311,13 @@ public class FlagModel implements Model {
 			break;
 		case TARGETCLASS:
 			flag.setTargetClass((String) op.getOldValue());
+			break;
+		case KEY:
+			getFlaggedFeatureStructures(flag).forEach(fs -> {
+				Util.removeFlagKey(fs, (String) op.getNewValue());
+				Util.addFlagKey(fs, (String) op.getOldValue());
+			});
+			flag.setKey((String) op.getOldValue());
 			break;
 		}
 		updateFlag(flag);

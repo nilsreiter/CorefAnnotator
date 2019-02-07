@@ -6,6 +6,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
@@ -53,6 +54,27 @@ public class Util {
 			if (array.get(i).equals(s))
 				return true;
 		return false;
+	}
+
+	public static void addFlagKey(FeatureStructure fs, String flagKey) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		try {
+			StringArray arr = addTo(fs.getCAS().getJCas(), (StringArray) fs.getFeatureValue(feature), flagKey);
+			fs.setFeatureValue(feature, arr);
+		} catch (CASRuntimeException | CASException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void removeFlagKey(FeatureStructure fs, String flagKey) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		try {
+			StringArray arr = removeFrom(fs.getCAS().getJCas(), (StringArray) fs.getFeatureValue(feature), flagKey);
+			fs.setFeatureValue(feature, arr);
+		} catch (CASRuntimeException | CASException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public static StringArray removeFrom(JCas jcas, StringArray arr, String fs) {

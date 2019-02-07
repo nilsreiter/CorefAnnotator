@@ -4,7 +4,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 
 public class SetFlagProperty implements FlagModelOperation {
 	public enum FlagProperty {
-		LABEL, ICON, TARGETCLASS;
+		LABEL, ICON, TARGETCLASS, KEY;
 	};
 
 	Flag flag;
