@@ -13,7 +13,6 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
-@Deprecated
 public class AddFlagAction extends TargetedIkonAction<DocumentModel> {
 
 	private static final long serialVersionUID = 1L;
