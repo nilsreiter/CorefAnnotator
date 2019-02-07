@@ -75,7 +75,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -1060,7 +1059,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer, PreferenceChangeListener {
+	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements PreferenceChangeListener {
 
 		private static final long serialVersionUID = 1L;
 		boolean showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
