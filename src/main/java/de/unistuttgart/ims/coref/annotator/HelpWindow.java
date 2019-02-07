@@ -33,6 +33,7 @@ public class HelpWindow extends JFrame {
 		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto")));
 		tabbedPane.addTab("Compare annotations", new JScrollPane(load("docs/compare")));
 		tabbedPane.addTab("Automatic processing", new JScrollPane(load("docs/processing")));
+		tabbedPane.addTab("Flag editing", new JScrollPane(load("docs/flags")));
 		tabbedPane.addTab("Input/Output", new JScrollPane(loadIOPlugins()));
 
 		this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
