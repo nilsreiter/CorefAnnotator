@@ -54,7 +54,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
-import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -251,8 +251,8 @@ public class CoreferenceModel implements Model {
 
 	protected synchronized void edit(Operation operation) {
 		Annotator.logger.entry(operation);
-		if (operation instanceof RenameEntity) {
-			RenameEntity op = (RenameEntity) operation;
+		if (operation instanceof UpdateEntityName) {
+			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getNewLabel());
 			fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
@@ -664,8 +664,8 @@ public class CoreferenceModel implements Model {
 
 	protected void undo(Operation operation) {
 		Annotator.logger.entry(operation);
-		if (operation instanceof RenameEntity) {
-			RenameEntity op = (RenameEntity) operation;
+		if (operation instanceof UpdateEntityName) {
+			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getOldLabel());
 			fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
 		} else if (operation instanceof UpdateEntityKey) {

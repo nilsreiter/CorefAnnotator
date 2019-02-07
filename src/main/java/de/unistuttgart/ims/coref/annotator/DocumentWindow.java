@@ -158,7 +158,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
@@ -1867,7 +1867,7 @@ public class DocumentWindow extends AbstractTextWindow
 				FeatureStructure fs = node.getFeatureStructure();
 				if (fs instanceof Entity) {
 					if (!node.getEntity().getLabel().equals(newName)) {
-						getDocumentModel().edit(new RenameEntity(node.getEntity(), newName));
+						getDocumentModel().edit(new UpdateEntityName(node.getEntity(), newName));
 					}
 				}
 			}
