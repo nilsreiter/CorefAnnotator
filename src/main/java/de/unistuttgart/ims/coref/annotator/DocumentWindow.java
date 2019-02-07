@@ -150,6 +150,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -740,13 +741,20 @@ public class DocumentWindow extends AbstractTextWindow
 		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
 
 		tree.setModel(model.getTreeModel());
+		model.addDocumentStateListener(this);
+
+		// listeners to the tree model
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
-		model.addDocumentStateListener(this);
+
+		// listeners to the flag model
 		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
 		model.getFlagModel().addFlagModelListener(entityFlagsInTreePopup);
 		model.getFlagModel().addFlagModelListener(mentionFlagsInMenuBar);
 		model.getFlagModel().addFlagModelListener(mentionFlagsInTreePopup);
+		model.getFlagModel().addFlagModelListener(modelHandler);
+
+		// listeners to the segment model
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
@@ -1782,7 +1790,7 @@ public class DocumentWindow extends AbstractTextWindow
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener {
+	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
@@ -1849,6 +1857,11 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void treeStructureChanged(TreeModelEvent e) {
 			tree.expandPath(e.getTreePath());
+		}
+
+		@Override
+		public void flagEvent(FeatureStructureEvent event) {
+			tree.repaint();
 		}
 	}
 }
