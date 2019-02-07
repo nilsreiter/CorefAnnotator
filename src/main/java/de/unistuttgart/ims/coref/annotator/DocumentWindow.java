@@ -121,13 +121,8 @@ import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
-import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
@@ -372,9 +367,6 @@ public class DocumentWindow extends AbstractTextWindow
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
 		this.actions.deleteAction = new DeleteAction(this);
-		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
-		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
-		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
 		this.actions.fileSaveAction = new FileSaveAction(this);
@@ -392,10 +384,6 @@ public class DocumentWindow extends AbstractTextWindow
 		actions.deleteAction.setEnabled(false);
 		actions.formGroupAction.setEnabled(false);
 		actions.mergeSelectedEntitiesAction.setEnabled(false);
-		actions.toggleMentionDifficult.setEnabled(false);
-		actions.toggleMentionAmbiguous.setEnabled(false);
-		actions.toggleEntityGeneric.setEnabled(false);
-		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
 		actions.entityStatisticsAction.setEnabled(false);
 
@@ -1561,16 +1549,10 @@ public class DocumentWindow extends AbstractTextWindow
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
 
-			actions.toggleEntityGeneric.setEnabled(this);
 			actions.deleteAction.setEnabled(this);
 			actions.formGroupAction.setEnabled(this);
 
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
-
-			actions.toggleMentionDifficult.setEnabled(this);
-			actions.toggleMentionAmbiguous.setEnabled(this);
-			actions.toggleMentionNonNominal.setEnabled(this);
-			actions.toggleEntityDisplayed.setEnabled(this);
 
 			actions.removeDuplicatesAction.setEnabled(isEntity());
 
@@ -1747,16 +1729,6 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
-		@Deprecated
-		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
-		@Deprecated
-		ToggleEntityGeneric toggleEntityGeneric;
-		@Deprecated
-		ToggleMentionAmbiguous toggleMentionAmbiguous;
-		@Deprecated
-		ToggleMentionDifficult toggleMentionDifficult;
-		@Deprecated
-		ToggleMentionNonNominal toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
