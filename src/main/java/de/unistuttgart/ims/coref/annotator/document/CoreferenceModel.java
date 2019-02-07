@@ -55,9 +55,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.document.op.RenameEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
-import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
@@ -371,10 +369,6 @@ public class CoreferenceModel implements Model {
 			edit((RemoveSingletons) operation);
 		} else if (operation instanceof MergeEntities) {
 			edit((MergeEntities) operation);
-		} else if (operation instanceof ToggleMentionFlag) {
-			edit((ToggleMentionFlag) operation);
-		} else if (operation instanceof ToggleEntityFlag) {
-			edit((ToggleEntityFlag) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
 		} else {
@@ -464,22 +458,6 @@ public class CoreferenceModel implements Model {
 		registerEdit(operation);
 	}
 
-	@Deprecated
-	protected void edit(ToggleEntityFlag operation) {
-		MutableSet<Mention> mentions = Sets.mutable.empty();
-		operation.getObjects().forEach(e -> {
-			mentions.addAll(entityMentionMap.get(e));
-			if (Util.contains(e.getFlags(), operation.getFlag())) {
-				e.setFlags(Util.removeFrom(jcas, e.getFlags(), operation.getFlag()));
-			} else
-				e.setFlags(Util.addTo(jcas, e.getFlags(), operation.getFlag()));
-		});
-		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(this, Event.Type.Update, mentions));
-		registerEdit(operation);
-
-	}
-
 	protected void edit(ToggleGenericFlag operation) {
 		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
 		operation.getObjects().forEach(fs -> {
@@ -497,19 +475,6 @@ public class CoreferenceModel implements Model {
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
 		fireEvent(Event.get(this, Event.Type.Update, featureStructures));
-		registerEdit(operation);
-
-	}
-
-	@Deprecated
-	protected void edit(ToggleMentionFlag operation) {
-		operation.getObjects().forEach(m -> {
-			if (Util.contains(m.getFlags(), operation.getFlag())) {
-				m.setFlags(Util.removeFrom(jcas, m.getFlags(), operation.getFlag()));
-			} else
-				m.setFlags(Util.addTo(jcas, m.getFlags(), operation.getFlag()));
-		});
-		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
 		registerEdit(operation);
 
 	}
@@ -721,10 +686,6 @@ public class CoreferenceModel implements Model {
 				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst(), op.getPreviousOwner()));
 			else
 				fireEvent(Event.get(this, Event.Type.Update, op.getObjects().getFirst()));
-		} else if (operation instanceof ToggleEntityFlag) {
-			edit((ToggleEntityFlag) operation);
-		} else if (operation instanceof ToggleMentionFlag) {
-			edit((ToggleMentionFlag) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
 		} else if (operation instanceof UpdateEntityColor) {

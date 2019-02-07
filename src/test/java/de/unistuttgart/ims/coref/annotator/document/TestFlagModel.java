@@ -22,7 +22,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.ToggleMentionFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 
 public class TestFlagModel {
 	DocumentModel model;
@@ -95,7 +95,7 @@ public class TestFlagModel {
 		model.edit(new AddFlag(Mention.class));
 		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
 		Mention m = JCasUtil.select(jcas, Mention.class).iterator().next();
-		model.edit(new ToggleMentionFlag("", Lists.fixedSize.of(m)));
+		model.edit(new ToggleGenericFlag("", Lists.fixedSize.of(m)));
 	}
 
 }

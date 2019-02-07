@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -75,7 +77,6 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -122,13 +123,8 @@ import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
-import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
-import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
@@ -151,6 +147,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -290,6 +287,8 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
 
+		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
+
 		treeSelectionListener = new MyTreeSelectionListener(tree);
 		tree.addTreeSelectionListener(treeSelectionListener);
 
@@ -373,9 +372,6 @@ public class DocumentWindow extends AbstractTextWindow
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
 		this.actions.deleteAction = new DeleteAction(this);
-		this.actions.toggleMentionDifficult = new ToggleMentionDifficult(this);
-		this.actions.toggleMentionAmbiguous = new ToggleMentionAmbiguous(this);
-		this.actions.toggleEntityGeneric = new ToggleEntityGeneric(this);
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
 		this.actions.fileSaveAction = new FileSaveAction(this);
@@ -393,10 +389,6 @@ public class DocumentWindow extends AbstractTextWindow
 		actions.deleteAction.setEnabled(false);
 		actions.formGroupAction.setEnabled(false);
 		actions.mergeSelectedEntitiesAction.setEnabled(false);
-		actions.toggleMentionDifficult.setEnabled(false);
-		actions.toggleMentionAmbiguous.setEnabled(false);
-		actions.toggleEntityGeneric.setEnabled(false);
-		actions.toggleEntityDisplayed.setEnabled(false);
 		actions.undoAction.setEnabled(false);
 		actions.entityStatisticsAction.setEnabled(false);
 
@@ -742,13 +734,20 @@ public class DocumentWindow extends AbstractTextWindow
 		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
 
 		tree.setModel(model.getTreeModel());
+		model.addDocumentStateListener(this);
+
+		// listeners to the tree model
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
-		model.addDocumentStateListener(this);
+
+		// listeners to the flag model
 		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
 		model.getFlagModel().addFlagModelListener(entityFlagsInTreePopup);
 		model.getFlagModel().addFlagModelListener(mentionFlagsInMenuBar);
 		model.getFlagModel().addFlagModelListener(mentionFlagsInTreePopup);
+		model.getFlagModel().addFlagModelListener(modelHandler);
+
+		// listeners to the segment model
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
@@ -1086,7 +1085,7 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements PreferenceChangeListener {
 
 		private static final long serialVersionUID = 1L;
 		boolean showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
@@ -1144,7 +1143,7 @@ public class DocumentWindow extends AbstractTextWindow
 				for (String flagKey : entity.getFlags()) {
 					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
-				}
+			}
 			return panel;
 		}
 
@@ -1197,6 +1196,12 @@ public class DocumentWindow extends AbstractTextWindow
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
 			return panel;
+		}
+
+		@Override
+		public void preferenceChange(PreferenceChangeEvent evt) {
+			showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			tree.repaint();
 		}
 
 		@Override
@@ -1597,16 +1602,10 @@ public class DocumentWindow extends AbstractTextWindow
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
 			actions.changeColorAction.setEnabled(isSingle() && isEntity());
 
-			actions.toggleEntityGeneric.setEnabled(this);
 			actions.deleteAction.setEnabled(this);
 			actions.formGroupAction.setEnabled(this);
 
 			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
-
-			actions.toggleMentionDifficult.setEnabled(this);
-			actions.toggleMentionAmbiguous.setEnabled(this);
-			actions.toggleMentionNonNominal.setEnabled(this);
-			actions.toggleEntityDisplayed.setEnabled(this);
 
 			actions.removeDuplicatesAction.setEnabled(isEntity());
 
@@ -1783,16 +1782,6 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
-		@Deprecated
-		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
-		@Deprecated
-		ToggleEntityGeneric toggleEntityGeneric;
-		@Deprecated
-		ToggleMentionAmbiguous toggleMentionAmbiguous;
-		@Deprecated
-		ToggleMentionDifficult toggleMentionDifficult;
-		@Deprecated
-		ToggleMentionNonNominal toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
@@ -1826,7 +1815,7 @@ public class DocumentWindow extends AbstractTextWindow
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener {
+	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
@@ -1893,6 +1882,11 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void treeStructureChanged(TreeModelEvent e) {
 			tree.expandPath(e.getTreePath());
+		}
+
+		@Override
+		public void flagEvent(FeatureStructureEvent event) {
+			tree.repaint();
 		}
 	}
 }

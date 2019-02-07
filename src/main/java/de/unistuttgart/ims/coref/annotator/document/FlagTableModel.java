@@ -67,8 +67,8 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		if (columnIndex == 1)
-			return false;
+		// if (columnIndex == 1)
+		// return false;
 		return true;
 	}
 
@@ -103,6 +103,10 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		case 0:
 			property = SetFlagProperty.FlagProperty.ICON;
 			value = ((MaterialDesign) (aValue)).name();
+			break;
+		case 1:
+			property = SetFlagProperty.FlagProperty.KEY;
+			value = aValue;
 			break;
 		case 2:
 			property = SetFlagProperty.FlagProperty.LABEL;

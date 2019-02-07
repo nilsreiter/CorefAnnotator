@@ -15,9 +15,10 @@ public class ShowFlagEditor extends TargetedIkonAction<DocumentWindow> {
 		super(dw, "action.edit_flags", MaterialDesign.MDI_FLAG);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		FlagEditor fe = new FlagEditor(getTarget().getDocumentModel(), getTarget());
+		new FlagEditor(getTarget().getDocumentModel(), getTarget());
 	}
 
 }
