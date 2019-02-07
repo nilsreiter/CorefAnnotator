@@ -118,12 +118,14 @@ import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityGeneric;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntityVisible;
+import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionAmbiguous;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionDifficult;
 import de.unistuttgart.ims.coref.annotator.action.ToggleMentionNonNominal;
@@ -135,8 +137,10 @@ import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
@@ -146,6 +150,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -194,6 +199,7 @@ public class DocumentWindow extends AbstractTextWindow
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	TreeKeyListener treeKeyListener = new TreeKeyListener();
+	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
 
@@ -204,6 +210,7 @@ public class DocumentWindow extends AbstractTextWindow
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
 	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
+	FlagMenu mentionFlagsInTreePopup, entityFlagsInTreePopup, mentionFlagsInMenuBar, entityFlagsInMenuBar;
 
 	// Settings
 	StylePlugin currentStyle;
@@ -231,15 +238,23 @@ public class DocumentWindow extends AbstractTextWindow
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
+
 		// popup
 		treePopupMenu = new JPopupMenu();
 		// treePopupMenu.add(this.commentAction);
 		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
+		treePopupMenu.add(mentionFlagsInTreePopup);
+
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
+		// treePopupMenu.add(new
+		// JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -249,8 +264,10 @@ public class DocumentWindow extends AbstractTextWindow
 		treePopupMenu.add(this.actions.mergeSelectedEntitiesAction);
 		treePopupMenu.add(this.actions.formGroupAction);
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
-		treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
+		treePopupMenu.add(entityFlagsInTreePopup);
+
+		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
+		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
@@ -272,6 +289,9 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+
+		treeSelectionListener = new MyTreeSelectionListener(tree);
+		tree.addTreeSelectionListener(treeSelectionListener);
 
 		ToolTipManager.sharedInstance().registerComponent(tree);
 
@@ -447,6 +467,7 @@ public class DocumentWindow extends AbstractTextWindow
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
+		toolsMenu.add(new ShowFlagEditor(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(Annotator.app));
@@ -485,15 +506,19 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
+
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
 		entityMenu.add(new JMenuItem(actions.copyAction));
 		entityMenu.add(new JMenuItem(actions.deleteAction));
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		entityMenu.add(mentionFlagsInMenuBar);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(actions.newEntityAction));
@@ -502,8 +527,9 @@ public class DocumentWindow extends AbstractTextWindow
 		entityMenu.add(new JMenuItem(actions.changeKeyAction));
 		entityMenu.add(new JMenuItem(actions.formGroupAction));
 		entityMenu.add(new JMenuItem(new RemoveSingletons(this)));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
-		entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
+		entityMenu.add(entityFlagsInMenuBar);
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityGeneric));
+		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 		entityMenu.add(actions.entityStatisticsAction);
 
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
@@ -719,9 +745,33 @@ public class DocumentWindow extends AbstractTextWindow
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.addDocumentStateListener(this);
+		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
+		model.getFlagModel().addFlagModelListener(entityFlagsInTreePopup);
+		model.getFlagModel().addFlagModelListener(mentionFlagsInMenuBar);
+		model.getFlagModel().addFlagModelListener(mentionFlagsInTreePopup);
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		documentModel = model;
+
+		for (Flag f : model.getFlagModel().getFlags()) {
+			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
+			treeSelectionListener.addListener(a);
+			try {
+				if (model.getFlagModel().getTargetClass(f).equals(Mention.class)) {
+					mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+					mentionFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+				} else {
+					entityFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+					entityFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+				}
+			} catch (ClassNotFoundException e) {
+				mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+				mentionFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+				entityFlagsInMenuBar.add(f, new JCheckBoxMenuItem(a));
+				entityFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
+			}
+
+		}
 
 		// UI
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
@@ -1043,6 +1093,18 @@ public class DocumentWindow extends AbstractTextWindow
 
 		CATreeNode treeNode;
 
+		protected void addFlag(JPanel panel, Flag flag, Color color) {
+			JLabel l = new JLabel();
+			if (color != null)
+				l.setForeground(color);
+			if (showText)
+				l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
+			panel.add(Box.createRigidArea(new Dimension(5, 5)));
+			panel.add(l);
+		}
+
+		@Deprecated
 		protected void addFlag(JPanel panel, String textLabel, Icon icon, Color color) {
 			JLabel l = new JLabel();
 			if (color != null)
@@ -1078,27 +1140,23 @@ public class DocumentWindow extends AbstractTextWindow
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
-			if (Util.contains(entity.getFlags(), Constants.ENTITY_FLAG_GENERIC)) {
-				addFlag(panel, Annotator.getString(Strings.ENTITY_FLAG_GENERIC),
-						FontIcon.of(MaterialDesign.MDI_CLOUD, (isGrey ? Color.GRAY : Color.BLACK)),
-						(isGrey ? Color.GRAY : null));
-			}
+			if (entity.getFlags() != null)
+				for (String flagKey : entity.getFlags()) {
+					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
+				}
 			return panel;
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
+			FlagModel fm = documentModel.getFlagModel();
 			lab1.setText(m.getCoveredText());
-			if (Util.isNonNominal(m))
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_NON_NOMINAL),
-						FontIcon.of(MaterialDesign.MDI_FLAG), null);
-			if (Util.isDifficult(m)) {
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_DIFFICULT),
-						FontIcon.of(MaterialDesign.MDI_ALERT_BOX), null);
-			}
-			if (Util.isAmbiguous(m)) {
-				addFlag(panel, Annotator.getString(Strings.MENTION_FLAG_AMBIGUOUS),
-						FontIcon.of(MaterialDesign.MDI_SHARE_VARIANT), null);
-			}
+			if (m.getFlags() != null)
+				for (String flagKey : m.getFlags()) {
+					Flag flag = fm.getFlag(flagKey);
+					addFlag(panel, flag, Color.black);
+				}
+
 			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT));
 			return panel;
 		}
@@ -1524,7 +1582,9 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	class MyTreeSelectionListener extends CATreeSelectionListener {
+	public class MyTreeSelectionListener extends CATreeSelectionEvent {
+
+		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 
 		public MyTreeSelectionListener(JTree tree) {
 			super(tree);
@@ -1552,6 +1612,9 @@ public class DocumentWindow extends AbstractTextWindow
 
 			actions.entityStatisticsAction.setEnabled(isEntity());
 
+			// inform all listeners
+			listeners.forEach(l -> l.valueChanged(this));
+
 			if (isSingle() && (isMention() || isDetachedMentionPart()))
 				annotationSelected(getAnnotation(0));
 			else if (isSingle() && isEntity()) {
@@ -1562,6 +1625,13 @@ public class DocumentWindow extends AbstractTextWindow
 				annotationSelected(null);
 		}
 
+		public void addListener(CATreeSelectionListener l) {
+			this.listeners.add(l);
+		}
+
+		public void removeListener(CATreeSelectionListener l) {
+			this.listeners.remove(l);
+		}
 	}
 
 	/**
@@ -1713,10 +1783,15 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		FileSaveAction fileSaveAction;
+		@Deprecated
 		ToggleEntityVisible toggleEntityDisplayed = new ToggleEntityVisible(DocumentWindow.this);
+		@Deprecated
 		ToggleEntityGeneric toggleEntityGeneric;
+		@Deprecated
 		ToggleMentionAmbiguous toggleMentionAmbiguous;
+		@Deprecated
 		ToggleMentionDifficult toggleMentionDifficult;
+		@Deprecated
 		ToggleMentionNonNominal toggleMentionNonNominal = new ToggleMentionNonNominal(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
@@ -1741,6 +1816,10 @@ public class DocumentWindow extends AbstractTextWindow
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
 		}
 		return Sets.immutable.of(entities);
+	}
+
+	public MyTreeSelectionListener getTreeSelectionListener() {
+		return treeSelectionListener;
 	}
 
 	public JTextField getTreeSearchField() {

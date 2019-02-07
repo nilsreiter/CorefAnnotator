@@ -8,13 +8,14 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
+import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleEntityFlag;
 
+@Deprecated
 public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> implements CAAction {
 	private static final long serialVersionUID = 1L;
 
@@ -31,7 +32,7 @@ public class ToggleEntityVisible extends TargetedIkonAction<DocumentWindow> impl
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionListener l) {
+	public void setEnabled(CATreeSelectionEvent l) {
 		boolean en = l.isEntity();
 		setEnabled(en);
 		putValue(Action.SELECTED_KEY, en && l.getFeatureStructures().allSatisfy(fs -> ((Entity) fs).getHidden()));

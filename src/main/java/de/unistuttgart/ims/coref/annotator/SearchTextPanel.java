@@ -32,7 +32,6 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
@@ -113,7 +112,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 	}
 
-	class TSL extends CATreeSelectionListener implements ListSelectionListener {
+	class TSL extends CATreeSelectionEvent implements ListSelectionListener {
 
 		boolean treeCondition = false;
 
@@ -140,13 +139,12 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			collectData(e);
 			treeCondition = (isSingle() && isEntity());
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
 				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
-						+ ((Entity) featureStructures.get(0)).getLabel());
+						+ getEntity(0).getLabel());
 			else
 				selectedEntityLabel.setText("");
 		}
@@ -274,10 +272,20 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 	}
 
 	@Override
+	public void windowActivated(WindowEvent e) {
+		textField.grabFocus();
+	}
+
+	@Override
 	public void windowClosing(WindowEvent e) {
 		for (Object o : highlights)
 			hilit.removeHighlight(o);
 
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		textField.grabFocus();
 	}
 
 }

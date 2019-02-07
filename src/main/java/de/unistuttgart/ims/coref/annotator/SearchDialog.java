@@ -2,16 +2,26 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class SearchDialog extends JDialog implements DocumentListener, WindowListener, SearchContainer {
+
+	private static final String ACTION_CLOSE = "close";
 
 	private static final long serialVersionUID = 1L;
 	DocumentWindow documentWindow;
@@ -24,12 +34,41 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		text = xdw.textPane.getText();
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
 
+		// this allows closing by hitting command-w
+		InputMap inputMap = ((JPanel) this.getContentPane()).getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				ACTION_CLOSE);
+		ActionMap actionMap = ((JPanel) this.getContentPane()).getActionMap();
+		actionMap.put(ACTION_CLOSE, new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SearchDialog.this.dispose();
+			}
+		});
 		this.initialiseWindow();
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 
+	}
+
+	@Override
+	public int getContexts() {
+		return contexts;
+	}
+
+	@Override
+	public DocumentWindow getDocumentWindow() {
+		return documentWindow;
+	}
+
+	@Override
+	public String getText() {
+		return text;
 	}
 
 	protected void initialiseWindow() {
@@ -64,6 +103,10 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	}
 
+	public void setContexts(int contexts) {
+		this.contexts = contexts;
+	}
+
 	@Override
 	public void windowActivated(WindowEvent e) {
 	}
@@ -95,25 +138,6 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 	@Override
 	public void windowOpened(WindowEvent e) {
 
-	}
-
-	@Override
-	public int getContexts() {
-		return contexts;
-	}
-
-	public void setContexts(int contexts) {
-		this.contexts = contexts;
-	}
-
-	@Override
-	public String getText() {
-		return text;
-	}
-
-	@Override
-	public DocumentWindow getDocumentWindow() {
-		return documentWindow;
 	}
 
 }
