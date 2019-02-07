@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -284,6 +286,8 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+
+		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
 
 		treeSelectionListener = new MyTreeSelectionListener(tree);
 		tree.addTreeSelectionListener(treeSelectionListener);
@@ -1056,7 +1060,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+	class MyTreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer, PreferenceChangeListener {
 
 		private static final long serialVersionUID = 1L;
 		boolean showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
@@ -1167,6 +1171,12 @@ public class DocumentWindow extends AbstractTextWindow
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
 			return panel;
+		}
+
+		@Override
+		public void preferenceChange(PreferenceChangeEvent evt) {
+			showText = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
+			tree.repaint();
 		}
 
 	}
