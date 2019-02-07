@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 
-public class SetFlagProperty extends UpdateOp<Flag> implements FlagModelOperation {
+public class UpdateFlagProperty extends UpdateOp<Flag> implements FlagModelOperation {
 	public enum FlagProperty {
 		LABEL, ICON, TARGETCLASS, KEY;
 	};
@@ -11,7 +11,7 @@ public class SetFlagProperty extends UpdateOp<Flag> implements FlagModelOperatio
 	Object newValue;
 	Object oldValue;
 
-	public SetFlagProperty(Flag flag, FlagProperty property, Object value) {
+	public UpdateFlagProperty(Flag flag, FlagProperty property, Object value) {
 		super(flag);
 		this.flagProperty = property;
 		this.newValue = value;
