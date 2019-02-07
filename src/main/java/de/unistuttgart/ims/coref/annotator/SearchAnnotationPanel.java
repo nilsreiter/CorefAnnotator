@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -20,10 +21,13 @@ import javax.swing.tree.TreePath;
 
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> implements WindowListener {
@@ -61,6 +65,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsAmbiguous extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
@@ -72,6 +77,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsDifficult extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
@@ -83,6 +89,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
+	@Deprecated
 	class SearchFlaggedMentionsNonNominal extends SearchFlaggedMentions {
 
 		private static final long serialVersionUID = 1L;
@@ -123,26 +130,26 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 	JList<SearchResultMention> text_list;
 	JLabel selectedEntityLabel = new JLabel();
 	int limit = 1000;
-	JToggleButton b1;
-	JToggleButton b2;
-	JToggleButton b3;
+	MutableList<JToggleButton> toggleButtons = Lists.mutable.empty();
 
 	public SearchAnnotationPanel(SearchContainer sd) {
 		super(sd);
 
 		JPanel bar = new JPanel();
 		// bar.setFloatable(false);
-
-		b1 = new JToggleButton(new SearchFlaggedMentionsAmbiguous());
-		b2 = new JToggleButton(new SearchFlaggedMentionsDifficult());
-		b3 = new JToggleButton(new SearchFlaggedMentionsNonNominal());
 		ButtonGroup bg = new ButtonGroup();
-		bg.add(b1);
-		bg.add(b2);
-		bg.add(b3);
-		bar.add(b1);
-		bar.add(b2);
-		bar.add(b3);
+
+		for (Flag flag : sd.getDocumentWindow().getDocumentModel().getFlagModel().getFlags()) {
+			if (flag.getTargetClass().equalsIgnoreCase(Mention.class.getName())) {
+				AbstractAction action = new SearchFlaggedMentions(flag.getKey(), flag.getLabel(),
+						MaterialDesign.valueOf(flag.getIcon()));
+				JToggleButton b = new JToggleButton(action);
+				bg.add(b);
+				bar.add(b);
+				toggleButtons.add(b);
+			}
+		}
+
 		bar.add(new JButton(clearFindings));
 
 		JPanel searchPanel = new JPanel();
@@ -166,9 +173,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	@Override
 	public void clearEvent() {
-		b1.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
-		b2.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
-		b3.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE);
+		toggleButtons.forEach(tb -> tb.getAction().putValue(Action.SELECTED_KEY, Boolean.FALSE));
 	}
 
 }

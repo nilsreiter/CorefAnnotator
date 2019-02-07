@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.util.Random;
+
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -75,6 +77,8 @@ public class Constants {
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP = "action.add_findings_to_entity.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
+		public static final String ACTION_ADD_FLAG = "action.add_flag";
+		public static final String ACTION_ADD_FLAG_TOOLTIP = "action.add_flag.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
@@ -90,6 +94,8 @@ public class Constants {
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+		public static final String ACTION_DELETE_FLAG = "action.delete_flag";
+		public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
@@ -180,6 +186,7 @@ public class Constants {
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
 		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
+		public static final String MENU_FLAGS = "menu.flags";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
@@ -235,6 +242,16 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
+		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
+		public static final String FLAG_EDITOR_ICON = "flag_editor.icon";
+		public static final String FLAG_EDITOR_ICON_TOOLTIP = "flag_editor.icon.tooltip";
+		public static final String FLAG_EDITOR_KEY = "flag_editor.key";
+		public static final String FLAG_EDITOR_KEY_TOOLTIP = "flag_editor.key.tooltip";
+		public static final String FLAG_EDITOR_LABEL = "flag_editor.label";
+		public static final String FLAG_EDITOR_LABEL_TOOLTIP = "flag_editor.label.tooltip";
+		public static final String FLAG_EDITOR_TARGETCLASS = "flag_editor.targetclass";
+		public static final String FLAG_EDITOR_TARGETCLASS_TOOLTIP = "flag_editor.targetclass.tooltip";
+		public static final String FLAGMODEL_NEW_FLAG = "flagmodel.new_flag";
 
 	}
 
@@ -297,4 +314,6 @@ public class Constants {
 	public static final String X_UNSPECIFIED = "x-unspecified";
 
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
+
+	public static final Random RANDOM = new Random();
 }

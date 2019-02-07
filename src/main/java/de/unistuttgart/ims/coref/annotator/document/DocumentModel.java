@@ -13,8 +13,8 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -24,7 +24,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  * directly).
  *
  */
-public class DocumentModel {
+public class DocumentModel implements Model {
 
 	CoreferenceModel coreferenceModel;
 
@@ -37,6 +37,8 @@ public class DocumentModel {
 	SegmentModel segmentModel;
 
 	EntityTreeModel treeModel;
+
+	FlagModel flagModel;
 
 	TypeSystemVersion typeSystemVersion;
 
@@ -53,6 +55,8 @@ public class DocumentModel {
 	public void edit(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
+		else if (operation instanceof FlagModelOperation)
+			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
 		fireDocumentChangedEvent();
 	}
@@ -88,13 +92,6 @@ public class DocumentModel {
 
 	public SegmentModel getSegmentModel() {
 		return segmentModel;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		if (Util.getMeta(jcas) != null && Util.getMeta(jcas).getStylePlugin() != null)
-			return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
-		return DefaultStylePlugin.class;
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -165,6 +162,19 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	public FlagModel getFlagModel() {
+		return flagModel;
+	}
+
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+	}
+
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
@@ -175,6 +185,8 @@ public class DocumentModel {
 	protected void undo(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.undo(operation);
+		} else if (operation instanceof FlagModelOperation) {
+			flagModel.undo((FlagModelOperation) operation);
 		}
 	}
 

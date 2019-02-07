@@ -15,7 +15,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
+import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -91,7 +91,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionListener l) {
+	public void setEnabled(CATreeSelectionEvent l) {
 		setEnabled(l.isDetachedMentionPart() || l.isMention() || (l.isEntityGroup() && l.isLeaf())
 				|| (l.isEntity() && l.isLeaf()));
 

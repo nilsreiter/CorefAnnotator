@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 
-public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
+public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model {
 	private static final long serialVersionUID = 1L;
 
 	CoreferenceModel coreferenceModel;
@@ -201,14 +201,14 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
-			entityEvent(Event.get(Event.Type.Add, null, e));
+			entityEvent(Event.get(this, Event.Type.Add, null, e));
 		});
 		Annotator.logger.debug("Added all entities");
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
-			entityEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 			if (m.getDiscontinuous() != null)
-				entityEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous()));
+				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}

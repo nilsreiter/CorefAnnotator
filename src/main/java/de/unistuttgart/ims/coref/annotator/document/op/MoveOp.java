@@ -51,10 +51,10 @@ public abstract class MoveOp<M extends FeatureStructure, C extends FeatureStruct
 	}
 
 	public FeatureStructureEvent toEvent() {
-		return Event.get(Event.Type.Move, getSource(), getTarget(), getObjects());
+		return Event.get(null, Event.Type.Move, getSource(), getTarget(), getObjects());
 	}
 
 	public FeatureStructureEvent toReversedEvent() {
-		return Event.get(Event.Type.Move, getTarget(), getSource(), getObjects());
+		return Event.get(null, Event.Type.Move, getTarget(), getSource(), getObjects());
 	}
 }
