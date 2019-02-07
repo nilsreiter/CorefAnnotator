@@ -7,6 +7,33 @@
 	<vendor>Nils Reiter</vendor>
 	<types>
 		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.Flag</name>
+			<description>A flag template</description>
+			<supertypeName>uima.cas.TOP</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Label</name>
+					<description>The UI label</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>Key</name>
+					<description>The internally used key</description>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
+					<name>TargetClass</name>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+					<description>The class this flag can be applied to</description>
+				</featureDescription>
+				<featureDescription>
+					<name>Icon</name>
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+					<description/>
+				</featureDescription>
+			</features>
+		</typeDescription>
+		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Segment</name>
 			<supertypeName>uima.tcas.Annotation</supertypeName>
 			<description />

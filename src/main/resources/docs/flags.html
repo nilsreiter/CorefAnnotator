@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>CorefAnnotator Help</title>
+</head>
+<body style="font-family:sans-serif;font-size:12pt;">
+<h1>Flags</h1>
+
+<p>Since version 1.8, it is possible to add custom flags that can 
+be attached to mentions, entities and detached mention parts. Flags are 
+stored in the document.</p>
+
+<h2>Flag Editor</h2>
+
+<p>The flag editor can be opened via the <strong>tools</strong> menu. The 
+editor shows a table with four columns, each row representing one flag. 
+A flag is defined by four features (shown in the table from left to right):
+</p>
+
+<ol>
+<li>Icon: Each flag is associated with an icon to help annotators to 
+recognize it. The icon can be selected from the selection shown on 
+<a href="http://aalmiray.github.io/ikonli/cheat-sheet-materialdesign.html">this
+page</a>. It's recommended to search for a useful icon on the page, as 
+it is much easier to compare and see.</li>
+<li>Key: The key is used internally to link to the flags. Each 
+annotation that is flagged stores this key. Initially, the key will be 
+universally unique identifier (UUID), and it can remain this way. For 
+merging and comparing, it is recommended to harmonize the keys in 
+different files. If the key is changed, please note that it should still 
+be <strong>unique</strong> within the document.</li>
+<li>Label: The label is displayed in the menus and user interface. This 
+is what the annotators see.</li>
+<li>Target class: Flags can be associated with types of annotations. 
+I.e., each flag can only be assigned to annotations of the kind 
+specified here. There is currently no way of having flags applicable on
+different annotation types, but it is not a problem to have multiple 
+flags with the same label/icon and different target classes.</li>
+</ol>
+
+
+</body>
+</html>

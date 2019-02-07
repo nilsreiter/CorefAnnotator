@@ -315,6 +315,14 @@ public class Annotator {
 		return rbundle.getString(key);
 	}
 
+	public static String getString(String key, String defaultValue) {
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			return defaultValue;
+		}
+	}
+
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}

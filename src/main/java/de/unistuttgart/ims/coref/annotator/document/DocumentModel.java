@@ -13,6 +13,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -24,10 +25,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  * directly).
  *
  */
-public class DocumentModel {
-
-	@Deprecated
-	CommentsModel commentsModel;
+public class DocumentModel implements Model {
 
 	CoreferenceModel coreferenceModel;
 
@@ -41,6 +39,8 @@ public class DocumentModel {
 	SegmentModel segmentModel;
 
 	EntityTreeModel treeModel;
+
+	FlagModel flagModel;
 
 	TypeSystemVersion typeSystemVersion;
 
@@ -58,17 +58,15 @@ public class DocumentModel {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
 		else if (operation instanceof RelationModelOperation)
-			relationModel.edit(operation);
+			relationModel.edit((RelationModelOperation)operation);
+		else if (operation instanceof FlagModelOperation)
+			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
+		fireDocumentChangedEvent();
 	}
 
 	protected void fireDocumentChangedEvent() {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
-	}
-
-	@Deprecated
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
 	}
 
 	public CoreferenceModel getCoreferenceModel() {
@@ -104,11 +102,6 @@ public class DocumentModel {
 		return segmentModel;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
-	}
-
 	public EntityTreeModel getTreeModel() {
 		return treeModel;
 	}
@@ -141,11 +134,6 @@ public class DocumentModel {
 
 		unsavedChanges = true;
 		fireDocumentChangedEvent();
-	}
-
-	@Deprecated
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
 	}
 
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
@@ -186,6 +174,19 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
+	public FlagModel getFlagModel() {
+		return flagModel;
+	}
+
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+	}
+
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
@@ -198,6 +199,8 @@ public class DocumentModel {
 			coreferenceModel.undo(operation);
 		} else if (operation instanceof RelationModelOperation) {
 			relationModel.undo((RelationModelOperation) operation);
+		} else if (operation instanceof FlagModelOperation) {
+			flagModel.undo((FlagModelOperation) operation);
 		}
 	}
 
