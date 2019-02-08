@@ -668,6 +668,7 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	public void setDocumentModel(DocumentModel model) {
+		documentModel = model;
 
 		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
 
@@ -691,7 +692,6 @@ public class DocumentWindow extends AbstractTextWindow
 		// listeners to the segment model
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
-		documentModel = model;
 
 		for (Flag f : model.getFlagModel().getFlags()) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
