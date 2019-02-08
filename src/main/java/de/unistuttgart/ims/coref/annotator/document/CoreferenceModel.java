@@ -54,10 +54,10 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -94,17 +94,15 @@ public class CoreferenceModel implements Model {
 	/**
 	 * The document
 	 */
+	@Deprecated
 	JCas jcas;
-
-	Preferences preferences;
 
 	boolean initialised = false;
 
 	DocumentModel documentModel;
 
-	public CoreferenceModel(DocumentModel documentModel, Preferences preferences) {
+	public CoreferenceModel(DocumentModel documentModel) {
 		this.jcas = documentModel.getJcas();
-		this.preferences = preferences;
 		this.documentModel = documentModel;
 	}
 
@@ -187,7 +185,7 @@ public class CoreferenceModel implements Model {
 
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
 		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(jcas, b, e, DetachedMentionPart.class);
-		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
+		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			dmp = AnnotationUtil.trim(dmp);
 		registerAnnotation(dmp);
 		return dmp;
@@ -233,9 +231,9 @@ public class CoreferenceModel implements Model {
 	 */
 	protected Mention createMention(int b, int e) {
 		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
-		if (preferences.getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
+		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			m = AnnotationUtil.trim(m);
-		if (preferences.getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
+		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
 			m = Util.extend(m);
 		registerAnnotation(m);
 		return m;
@@ -488,7 +486,7 @@ public class CoreferenceModel implements Model {
 	}
 
 	public JCas getJCas() {
-		return jcas;
+		return documentModel.getJcas();
 	}
 
 	public Map<Character, Entity> getKeyMap() {
@@ -518,7 +516,7 @@ public class CoreferenceModel implements Model {
 	}
 
 	public Preferences getPreferences() {
-		return preferences;
+		return documentModel.getPreferences();
 	}
 
 	public void initialPainting() {
@@ -629,8 +627,8 @@ public class CoreferenceModel implements Model {
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(entity, m);
 		m.removeFromIndexes();
-		if (autoRemove && entityMentionMap.get(entity).isEmpty()
-				&& preferences.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+		if (autoRemove && entityMentionMap.get(entity).isEmpty() && getPreferences()
+				.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
 			remove(entity);
 		}
 

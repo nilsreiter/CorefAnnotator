@@ -45,8 +45,18 @@ public class DocumentModel implements Model {
 
 	boolean unsavedChanges = false;
 
+	Preferences preferences;
+
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
+		this.preferences = preferences;
+	}
+
+	public void initialize() {
+		coreferenceModel = new CoreferenceModel(this);
+		treeModel = new EntityTreeModel(coreferenceModel);
+		flagModel = new FlagModel(this, preferences);
+		segmentModel = new SegmentModel(this);
 	}
 
 	public boolean addDocumentStateListener(DocumentStateListener e) {
@@ -189,6 +199,14 @@ public class DocumentModel implements Model {
 		if (operation instanceof FlagModelOperation)
 			flagModel.undo((FlagModelOperation) operation);
 
+	}
+
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 }

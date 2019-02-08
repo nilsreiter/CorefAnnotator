@@ -45,7 +45,7 @@ public class TestFlagModel {
 		model = new DocumentModel(jcas, preferences);
 		fmodel = new FlagModel(model, preferences);
 		fmodel.addFlagModelListener(listener);
-		cmodel = new CoreferenceModel(model, preferences);
+		cmodel = new CoreferenceModel(model);
 		model.setCoreferenceModel(cmodel);
 		model.setFlagModel(fmodel);
 

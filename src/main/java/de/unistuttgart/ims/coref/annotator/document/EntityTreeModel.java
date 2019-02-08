@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 
-public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model {
+public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
 
 	CoreferenceModel coreferenceModel;
@@ -50,7 +50,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.coreferenceModel = docMod;
 		this.coreferenceModel.addCoreferenceModelListener(this);
 
-		this.initialise();
+		// this.initialise();
 		this.resort();
 
 	}
