@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.7.2
+
+- Fixed a bug that prevented loading files when run on OpenJDK #166
+
 ## 1.7.1
 
 - Fixed a bug that changed the entity name to null if its' properties
