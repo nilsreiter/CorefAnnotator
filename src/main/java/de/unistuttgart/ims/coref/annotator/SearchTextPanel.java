@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.regex.Matcher;
@@ -174,8 +176,15 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		textField.setToolTipText(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
 		textField.getDocument().addDocumentListener(this);
 
-		restrictToMentions = new JCheckBox(Annotator.getString("search.restrict.mentions"));
+		restrictToMentions = new JCheckBox(Annotator.getString(Constants.Strings.SEARCH_WINDOW_RESTRICT_TO_MENTIONS));
+		restrictToMentions.addItemListener(new ItemListener() {
 
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				search(textField.getText());
+			}
+
+		});
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
