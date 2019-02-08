@@ -158,8 +158,8 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -195,7 +195,6 @@ public class DocumentWindow extends AbstractTextWindow
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
 	JTextField treeSearchField;
-	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
@@ -1143,7 +1142,7 @@ public class DocumentWindow extends AbstractTextWindow
 				for (String flagKey : entity.getFlags()) {
 					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
-			}
+				}
 			return panel;
 		}
 
@@ -1389,28 +1388,6 @@ public class DocumentWindow extends AbstractTextWindow
 		public void actionPerformed(ActionEvent e) {
 			documentModel.edit(new MergeEntities(getSelectedEntities()));
 
-		}
-
-	}
-
-	@Deprecated
-	class ToggleShowTextInTreeLabels extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleShowTextInTreeLabels() {
-			super(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
-			putValue(Action.SELECTED_KEY,
-					Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			boolean old = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
-			Annotator.app.getPreferences().putBoolean(Constants.CFG_SHOW_TEXT_LABELS, !old);
-			putValue(Action.SELECTED_KEY, !old);
-			tree.repaint();
 		}
 
 	}
@@ -1676,55 +1653,6 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void keyReleased(KeyEvent e) {
 
-		}
-
-	}
-
-	@Deprecated
-	class TreeKeyListener implements KeyListener {
-
-		boolean ignoreNext = false;
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyReleased(KeyEvent ev) {
-			if (ignoreNext)
-				ignoreNext = false;
-			else if (tree.hasFocus() && ev.getKeyCode() == KeyEvent.VK_ENTER) {
-				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
-				if (b != e) {
-					for (TreePath tp : tree.getSelectionPaths()) {
-						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
-							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
-						}
-					}
-					treeSearchField.setText("");
-					textPane.grabFocus();
-				}
-			} else if (ev.getKeyCode() == KeyEvent.VK_UP) {
-				if (tree.getLeadSelectionRow() == 0)
-					treeSearchField.grabFocus();
-
-			}
-
-		}
-
-		public boolean isIgnoreNext() {
-			return ignoreNext;
-		}
-
-		public void setIgnoreNext(boolean ignoreNext) {
-			this.ignoreNext = ignoreNext;
 		}
 
 	}
