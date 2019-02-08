@@ -65,7 +65,7 @@ public class DocumentModel implements Model {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
 		if (operation instanceof RelationModelOperation)
-			relationModel.edit(operation);
+			relationModel.edit((RelationModelOperation) operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);

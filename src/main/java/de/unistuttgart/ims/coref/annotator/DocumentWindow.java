@@ -126,6 +126,7 @@ import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowRelationEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
 import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
@@ -182,6 +183,7 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 public class DocumentWindow extends AbstractTextWindow
 		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
 
+	@Deprecated
 	public class RelationListRenderer extends JPanel implements ListCellRenderer<EntityRelation> {
 
 		private static final long serialVersionUID = 1L;
@@ -544,6 +546,7 @@ public class DocumentWindow extends AbstractTextWindow
 		toolsMenu.add(actions.clearAction);
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.add(new ShowFlagEditor(this));
+		toolsMenu.add(new ShowRelationEditor(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(Annotator.app));
