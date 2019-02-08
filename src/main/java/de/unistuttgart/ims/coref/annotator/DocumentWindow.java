@@ -490,8 +490,8 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
-		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
