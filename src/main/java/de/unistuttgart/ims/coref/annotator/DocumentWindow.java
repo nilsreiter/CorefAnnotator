@@ -674,6 +674,9 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
 
+		// listeners to the coref model
+		model.getCoreferenceModel().addCoreferenceModelListener(this);
+
 		// listeners to the tree model
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
@@ -747,7 +750,6 @@ public class DocumentWindow extends AbstractTextWindow
 		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
-		im.setCoreferenceModelListener(this);
 		im.execute();
 	}
 

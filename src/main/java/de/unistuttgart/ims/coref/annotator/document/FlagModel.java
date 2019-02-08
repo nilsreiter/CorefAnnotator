@@ -25,8 +25,8 @@ import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -267,6 +267,7 @@ public class FlagModel implements Model {
 	}
 
 	public boolean addFlagModelListener(FlagModelListener e) {
+		e.flagEvent(Event.get(this, Event.Type.Init));
 		return listeners.add(e);
 	}
 

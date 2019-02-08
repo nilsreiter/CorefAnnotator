@@ -132,6 +132,7 @@ public class CoreferenceModel implements Model {
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
+		e.entityEvent(Event.get(this, Event.Type.Init));
 		return crModelListeners.add(e);
 	}
 
@@ -500,6 +501,10 @@ public class CoreferenceModel implements Model {
 		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
 	}
 
+	public ImmutableSet<Mention> getMentions() {
+		return Sets.immutable.withAll(JCasUtil.select(getJCas(), Mention.class));
+	}
+
 	public ImmutableSet<Mention> getMentions(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
 	}
@@ -519,6 +524,7 @@ public class CoreferenceModel implements Model {
 		return documentModel.getPreferences();
 	}
 
+	@Deprecated
 	public void initialPainting() {
 		if (initialised)
 			return;
