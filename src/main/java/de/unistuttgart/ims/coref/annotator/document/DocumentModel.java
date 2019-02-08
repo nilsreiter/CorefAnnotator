@@ -4,6 +4,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.prefs.Preferences;
 
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
@@ -11,6 +12,8 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
+import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
@@ -71,6 +74,18 @@ public class DocumentModel implements Model {
 
 	public CoreferenceModel getCoreferenceModel() {
 		return coreferenceModel;
+	}
+
+	public String getDocumentTitle() {
+		String documentTitle = "Untitled document";
+		try {
+			if (JCasUtil.exists(getJcas(), DocumentMetaData.class)
+					&& DocumentMetaData.get(getJcas()).getDocumentTitle() != null)
+				documentTitle = DocumentMetaData.get(getJcas()).getDocumentTitle();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+		}
+		return documentTitle;
 	}
 
 	public TypeSystemVersion getFileFormat() {

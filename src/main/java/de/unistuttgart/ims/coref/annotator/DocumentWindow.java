@@ -95,7 +95,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
@@ -647,15 +646,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
-		String documentTitle = "Untitled document";
-		try {
-			if (JCasUtil.exists(documentModel.getJcas(), DocumentMetaData.class)
-					&& DocumentMetaData.get(documentModel.getJcas()).getDocumentTitle() != null)
-				documentTitle = DocumentMetaData.get(documentModel.getJcas()).getDocumentTitle();
-		} catch (Exception e) {
-			Annotator.logger.catching(e);
-		}
-		setTitle(documentTitle + " (" + fileName + ")"
+
+		setTitle(documentModel.getDocumentTitle() + " (" + fileName + ")"
 				+ (documentModel.isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
 	}
 
