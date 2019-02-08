@@ -42,10 +42,10 @@ public class TestFlagModel {
 	public void setUp() throws UIMAException {
 		listener = mock(FlagModelListener.class);
 		jcas = JCasFactory.createText("the dog barks.");
-		model = new DocumentModel(jcas);
+		model = new DocumentModel(jcas, preferences);
 		fmodel = new FlagModel(model, preferences);
 		fmodel.addFlagModelListener(listener);
-		cmodel = new CoreferenceModel(model, preferences);
+		cmodel = new CoreferenceModel(model);
 		model.setCoreferenceModel(cmodel);
 		model.setFlagModel(fmodel);
 

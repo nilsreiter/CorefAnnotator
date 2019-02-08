@@ -2,7 +2,9 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.prefs.Preferences;
 
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
@@ -10,6 +12,8 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
+import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
@@ -44,8 +48,11 @@ public class DocumentModel implements Model {
 
 	boolean unsavedChanges = false;
 
-	public DocumentModel(JCas jcas) {
+	Preferences preferences;
+
+	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
+		this.preferences = preferences;
 	}
 
 	public boolean addDocumentStateListener(DocumentStateListener e) {
@@ -55,7 +62,7 @@ public class DocumentModel implements Model {
 	public void edit(Operation operation) {
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
-		else if (operation instanceof FlagModelOperation)
+		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
 		fireDocumentChangedEvent();
@@ -69,8 +76,24 @@ public class DocumentModel implements Model {
 		return coreferenceModel;
 	}
 
+	public String getDocumentTitle() {
+		String documentTitle = "Untitled document";
+		try {
+			if (JCasUtil.exists(getJcas(), DocumentMetaData.class)
+					&& DocumentMetaData.get(getJcas()).getDocumentTitle() != null)
+				documentTitle = DocumentMetaData.get(getJcas()).getDocumentTitle();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+		}
+		return documentTitle;
+	}
+
 	public TypeSystemVersion getFileFormat() {
 		return typeSystemVersion;
+	}
+
+	public FlagModel getFlagModel() {
+		return flagModel;
 	}
 
 	public Deque<Operation> getHistory() {
@@ -90,8 +113,17 @@ public class DocumentModel implements Model {
 		return jcas.getDocumentLanguage();
 	}
 
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
 	public SegmentModel getSegmentModel() {
 		return segmentModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -100,6 +132,13 @@ public class DocumentModel implements Model {
 
 	public boolean hasUnsavedChanges() {
 		return unsavedChanges;
+	}
+
+	public void initialize() {
+		coreferenceModel = new CoreferenceModel(this);
+		treeModel = new EntityTreeModel(coreferenceModel);
+		flagModel = new FlagModel(this, preferences);
+		segmentModel = new SegmentModel(this);
 	}
 
 	public boolean isSavable() {
@@ -136,6 +175,10 @@ public class DocumentModel implements Model {
 		this.typeSystemVersion = typeSystemVersion;
 	}
 
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
+	}
+
 	public void setJcas(JCas jcas) {
 		this.jcas = jcas;
 	}
@@ -143,6 +186,10 @@ public class DocumentModel implements Model {
 	public void setLanguage(String l) {
 		jcas.setDocumentLanguage(l);
 		fireDocumentChangedEvent();
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 	public void setSegmentModel(SegmentModel segmentModel) {
@@ -162,19 +209,6 @@ public class DocumentModel implements Model {
 		fireDocumentChangedEvent();
 	}
 
-	public FlagModel getFlagModel() {
-		return flagModel;
-	}
-
-	public void setFlagModel(FlagModel flagModel) {
-		this.flagModel = flagModel;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
-	}
-
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
@@ -183,11 +217,11 @@ public class DocumentModel implements Model {
 	}
 
 	protected void undo(Operation operation) {
-		if (operation instanceof CoreferenceModelOperation) {
+		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.undo(operation);
-		} else if (operation instanceof FlagModelOperation) {
+		if (operation instanceof FlagModelOperation)
 			flagModel.undo((FlagModelOperation) operation);
-		}
+
 	}
 
 }

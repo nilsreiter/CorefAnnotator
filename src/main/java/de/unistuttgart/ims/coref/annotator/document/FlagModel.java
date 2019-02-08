@@ -25,8 +25,8 @@ import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
-import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -98,8 +98,8 @@ public class FlagModel implements Model {
 			edit((AddFlag) fmo);
 		else if (fmo instanceof DeleteFlag)
 			edit((DeleteFlag) fmo);
-		else if (fmo instanceof SetFlagProperty)
-			edit((SetFlagProperty) fmo);
+		else if (fmo instanceof UpdateFlag)
+			edit((UpdateFlag) fmo);
 		else
 			throw new UnsupportedOperationException();
 
@@ -147,7 +147,7 @@ public class FlagModel implements Model {
 		flag.removeFromIndexes();
 	}
 
-	protected void edit(SetFlagProperty op) {
+	protected void edit(UpdateFlag op) {
 		Flag flag = op.getFlag();
 		switch (op.getFlagProperty()) {
 		case LABEL:
@@ -267,6 +267,7 @@ public class FlagModel implements Model {
 	}
 
 	public boolean addFlagModelListener(FlagModelListener e) {
+		e.flagEvent(Event.get(this, Event.Type.Init));
 		return listeners.add(e);
 	}
 
@@ -279,8 +280,8 @@ public class FlagModel implements Model {
 			undo((AddFlag) fmo);
 		else if (fmo instanceof DeleteFlag)
 			undo((DeleteFlag) fmo);
-		else if (fmo instanceof SetFlagProperty)
-			undo((SetFlagProperty) fmo);
+		else if (fmo instanceof UpdateFlag)
+			undo((UpdateFlag) fmo);
 		else
 			throw new UnsupportedOperationException();
 	}
@@ -300,7 +301,7 @@ public class FlagModel implements Model {
 
 	}
 
-	protected void undo(SetFlagProperty op) {
+	protected void undo(UpdateFlag op) {
 		Flag flag = op.getFlag();
 		switch (op.getFlagProperty()) {
 		case LABEL:

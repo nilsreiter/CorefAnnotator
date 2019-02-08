@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 
-public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model {
+public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
 
 	CoreferenceModel coreferenceModel;
@@ -50,7 +50,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.coreferenceModel = docMod;
 		this.coreferenceModel.addCoreferenceModelListener(this);
 
-		this.initialise();
+		// this.initialise();
 		this.resort();
 
 	}
@@ -74,9 +74,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
-		CATreeNode arg0 = get(event.getArgument(0));
 		switch (eventType) {
 		case Add:
+			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
 				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
 					CATreeNode tn = createNode(fs);
@@ -129,6 +129,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				insertNodeInto(node, newParent, ind);
 			}
 			optResort();
+			break;
+		case Init:
+			initialise();
 			break;
 		default:
 			break;
@@ -199,7 +202,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		return (CATreeNode) root;
 	}
 
-	public void initialise() {
+	private void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
 			entityEvent(Event.get(this, Event.Type.Add, null, e));
 		});

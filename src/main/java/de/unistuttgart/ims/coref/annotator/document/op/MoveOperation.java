@@ -7,20 +7,20 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 
-public abstract class MoveOp<M extends FeatureStructure, C extends FeatureStructure>
+public abstract class MoveOperation<M extends FeatureStructure, C extends FeatureStructure>
 		implements CoreferenceModelOperation {
 	ImmutableList<M> objects;
 	C source;
 	C target;
 
-	public MoveOp(C source, C target, Iterable<M> mention) {
+	public MoveOperation(C source, C target, Iterable<M> mention) {
 		this.objects = Lists.immutable.withAll(mention);
 		this.source = source;
 		this.target = target;
 	}
 
 	@SafeVarargs
-	public MoveOp(C source, C target, M... mention) {
+	public MoveOperation(C source, C target, M... mention) {
 		this.objects = Lists.immutable.of(mention);
 		this.source = source;
 		this.target = target;

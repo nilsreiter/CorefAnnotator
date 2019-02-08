@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import org.apache.uima.cas.FeatureStructure;
 
-public abstract class ToggleFlag<T extends FeatureStructure> extends UpdateOp<T> {
+public abstract class ToggleFlag<T extends FeatureStructure> extends UpdateOperation<T> {
 
 	String flag;
 

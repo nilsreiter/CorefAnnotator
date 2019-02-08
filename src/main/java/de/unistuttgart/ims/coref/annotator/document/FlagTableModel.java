@@ -12,7 +12,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.document.op.SetFlagProperty;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
 public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListener {
 
@@ -97,29 +97,29 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		Annotator.logger.entry(aValue, rowIndex, columnIndex);
 		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
-		SetFlagProperty.FlagProperty property = null;
+		UpdateFlag.FlagProperty property = null;
 		Object value = null;
 		switch (columnIndex) {
 		case 0:
-			property = SetFlagProperty.FlagProperty.ICON;
+			property = UpdateFlag.FlagProperty.ICON;
 			value = ((MaterialDesign) (aValue)).name();
 			break;
 		case 1:
-			property = SetFlagProperty.FlagProperty.KEY;
+			property = UpdateFlag.FlagProperty.KEY;
 			value = aValue;
 			break;
 		case 2:
-			property = SetFlagProperty.FlagProperty.LABEL;
+			property = UpdateFlag.FlagProperty.LABEL;
 			value = aValue;
 			break;
 		case 3:
-			property = SetFlagProperty.FlagProperty.TARGETCLASS;
+			property = UpdateFlag.FlagProperty.TARGETCLASS;
 			value = ((Class<?>) aValue).getCanonicalName();
 			break;
 		default:
 			return;
 		}
-		documentModel.edit(new SetFlagProperty(f, property, value));
+		documentModel.edit(new UpdateFlag(f, property, value));
 	}
 
 	@Override

@@ -42,17 +42,22 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
-		Flag f = (Flag) event.getArgument(0);
+		Flag f;
 		switch (event.getType()) {
 		case Remove:
-			remove(actionMap.get(f));
-			actionMap.remove(f);
+			f = (Flag) event.getArgument(0);
+			if (actionMap.containsKey(f)) {
+				remove(actionMap.get(f));
+				actionMap.remove(f);
+			}
 			break;
 		case Update:
+			f = (Flag) event.getArgument(0);
 			if (actionMap.containsKey(f))
 				remove(actionMap.get(f));
 			//$FALL-THROUGH$
 		case Add:
+			f = (Flag) event.getArgument(0);
 			if (f.getTargetClass().equalsIgnoreCase(targetClass.getName())) {
 				ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
 				dw.getTreeSelectionListener().addListener(a);
