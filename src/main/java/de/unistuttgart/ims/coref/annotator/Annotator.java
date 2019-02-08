@@ -53,6 +53,8 @@ import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 
 public class Annotator {
 
@@ -284,20 +286,25 @@ public class Annotator {
 	}
 
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
-		openDialog.setFileFilter(flavor.getFileFilter());
-		openDialog.setCurrentDirectory(getCurrentDirectory());
-		int r = openDialog.showOpenDialog(parent);
-		switch (r) {
-		case JFileChooser.APPROVE_OPTION:
-			for (File f : openDialog.getSelectedFiles()) {
-				setCurrentDirectory(f.getParentFile());
-				open(f, flavor, Constants.X_UNSPECIFIED);
+		new JFXPanel();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+				fileChooser.setInitialDirectory(getCurrentDirectory());
+				fileChooser.getExtensionFilters().clear();
+				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
+				File file = fileChooser.showOpenDialog(null);
+				if (file != null)
+					open(file, flavor, Constants.X_UNSPECIFIED);
+				else
+					showOpening();
+
 			}
-			break;
-		default:
-			showOpening();
-		}
+
+		});
+
 	}
 
 	public static String getString(String key) {
