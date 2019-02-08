@@ -123,6 +123,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
@@ -1331,12 +1332,12 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	class ClearAction extends IkonAction {
+	class ClearAction extends TargetedIkonAction<DocumentWindow> {
 
 		private static final long serialVersionUID = 1L;
 
-		public ClearAction() {
-			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+		public ClearAction(DocumentWindow dm) {
+			super(dm, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
@@ -1703,7 +1704,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	class ActionContainer {
 
-		AbstractAction clearAction = new ClearAction();
+		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
