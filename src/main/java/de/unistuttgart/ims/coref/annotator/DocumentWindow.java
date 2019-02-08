@@ -56,7 +56,6 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
@@ -82,7 +81,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
@@ -176,8 +174,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	private static final long serialVersionUID = 1L;
 
-	@Deprecated
-	JCas jcas;
 	File file;
 
 	String segmentAnnotation = null;
@@ -610,54 +606,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	@Deprecated
-	public synchronized void saveCurrentFile() {
-		if (file != null)
-			saveToFile(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), false);
-	}
-
-	@Deprecated
-	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
-		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
-		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
-
-		if (f.exists() && ask) {
-			int answer = JOptionPane.showConfirmDialog(this,
-					Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
-			if (answer != JOptionPane.YES_OPTION) {
-				setMessage("");
-				return;
-			}
-		}
-		getProgressBar().setVisible(true);
-		getProgressBar().setIndeterminate(true);
-
-		new SwingWorker<Object, Object>() {
-
-			@Override
-			protected Object doInBackground() throws Exception {
-				SimplePipeline.runPipeline(jcas, plugin.getExporter(), plugin.getWriter(f));
-				return new Object();
-			}
-
-			@Override
-			protected void done() {
-				progressBar.setVisible(false);
-				setMessage("");
-				if (plugin == Annotator.app.getPluginManager().getDefaultIOPlugin()) {
-					file = f;
-					setWindowTitle();
-				}
-			}
-
-		}.execute();
-	}
-
-	@Deprecated
-	public Annotator getMainApplication() {
-		return Annotator.app;
-	}
-
 	class SortTreeByAlpha extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -701,8 +649,9 @@ public class DocumentWindow extends AbstractTextWindow
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 		String documentTitle = "Untitled document";
 		try {
-			if (JCasUtil.exists(jcas, DocumentMetaData.class) && DocumentMetaData.get(jcas).getDocumentTitle() != null)
-				documentTitle = DocumentMetaData.get(jcas).getDocumentTitle();
+			if (JCasUtil.exists(documentModel.getJcas(), DocumentMetaData.class)
+					&& DocumentMetaData.get(documentModel.getJcas()).getDocumentTitle() != null)
+				documentTitle = DocumentMetaData.get(documentModel.getJcas()).getDocumentTitle();
 		} catch (Exception e) {
 			Annotator.logger.catching(e);
 		}
@@ -799,7 +748,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void setJCas(JCas jcas) {
 
-		this.jcas = jcas;
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
@@ -838,15 +786,16 @@ public class DocumentWindow extends AbstractTextWindow
 
 				getProgressBar().setValue(20);
 
-				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
-						styleContext, baseStyle);
+				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
+						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
-						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,
+								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+				Util.getMeta(documentModel.getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -1340,9 +1289,9 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
-			for (Mention m : Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class)))
+			for (Mention m : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Mention.class)))
 				documentModel.edit(new RemoveMention(m));
-			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
+			for (Entity e : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)))
 				documentModel.edit(new RemoveEntities(e));
 			documentModel.getHistory().clear();
 		}
