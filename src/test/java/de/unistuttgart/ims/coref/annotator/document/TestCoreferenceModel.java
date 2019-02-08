@@ -80,8 +80,8 @@ public class TestCoreferenceModel {
 		assertNotNull(m.getEntity().getColor());
 		assertNotNull(m.getEntity().getFlags());
 
-		assertEquals(2, listener.events.size());
-		assertEquals(Lists.immutable.of(Type.Add, Type.Add), listener.events.collect(ev -> ev.eventType));
+		assertEquals(3, listener.events.size());
+		assertEquals(Lists.immutable.of(Type.Init, Type.Add, Type.Add), listener.events.collect(ev -> ev.eventType));
 
 		model.undo();
 
@@ -91,7 +91,7 @@ public class TestCoreferenceModel {
 		assertTrue(cmodel.getMentions(2).isEmpty());
 		assertTrue(cmodel.getMentions(3).isEmpty());
 
-		assertEquals(Lists.immutable.of(Type.Add, Type.Add, Type.Remove, Type.Remove),
+		assertEquals(Lists.immutable.of(Type.Init, Type.Add, Type.Add, Type.Remove, Type.Remove),
 				listener.events.collect(ev -> ev.eventType));
 
 	}
@@ -116,8 +116,8 @@ public class TestCoreferenceModel {
 		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
 		assertEquals(e, m.getEntity());
 
-		assertEquals(1, listener.events.size());
-		assertEquals(Lists.immutable.of(Event.Type.Add), listener.events.collect(ev -> ev.eventType));
+		assertEquals(2, listener.events.size());
+		assertEquals(Lists.immutable.of(Event.Type.Init, Event.Type.Add), listener.events.collect(ev -> ev.eventType));
 
 		model.undo();
 
@@ -128,9 +128,8 @@ public class TestCoreferenceModel {
 		assertTrue(cmodel.getMentions(2).isEmpty());
 		assertTrue(cmodel.getMentions(3).isEmpty());
 
-		assertEquals(2, listener.events.size());
-		assertEquals(Lists.immutable.of(Event.Type.Add, Event.Type.Remove),
-				listener.events.collect(ev -> ev.eventType));
+		assertEquals(3, listener.events.size());
+		assertEquals(Lists.immutable.of(Type.Init, Type.Add, Type.Remove), listener.events.collect(ev -> ev.eventType));
 
 	}
 
@@ -152,7 +151,7 @@ public class TestCoreferenceModel {
 		assertTrue(cmodel.getMentions(5).isEmpty());
 		assertTrue(cmodel.getMentions(6).isEmpty());
 
-		assertEquals(Lists.immutable.of(Type.Add), listener.events.collect(ev -> ev.eventType));
+		assertEquals(Lists.immutable.of(Type.Init, Type.Add), listener.events.collect(ev -> ev.eventType));
 
 		model.undo();
 
@@ -169,7 +168,7 @@ public class TestCoreferenceModel {
 		assertTrue(cmodel.getMentions(5).isEmpty());
 		assertTrue(cmodel.getMentions(6).isEmpty());
 
-		assertEquals(Lists.immutable.of(Type.Add, Type.Remove), listener.events.collect(ev -> ev.eventType));
+		assertEquals(Lists.immutable.of(Type.Init, Type.Add, Type.Remove), listener.events.collect(ev -> ev.eventType));
 
 	}
 
@@ -225,7 +224,8 @@ public class TestCoreferenceModel {
 
 		model.edit(new RemoveMention(m));
 
-		assertEquals(Lists.immutable.of(Type.Remove, Type.Remove), listener.events.collect(ev -> ev.eventType));
+		assertEquals(Lists.immutable.of(Type.Init, Type.Remove, Type.Remove),
+				listener.events.collect(ev -> ev.eventType));
 
 		assertFalse(JCasUtil.exists(jcas, Mention.class));
 		assertFalse(JCasUtil.exists(jcas, DetachedMentionPart.class));
