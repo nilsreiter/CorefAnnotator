@@ -70,6 +70,7 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
+	@Deprecated
 	JFileChooser openDialog;
 
 	JFrame opening;
@@ -108,8 +109,10 @@ public class Annotator {
 		});
 	}
 
+	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
 		logger.trace("Application startup");
+		new JFXPanel();
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -293,7 +296,7 @@ public class Annotator {
 				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
 				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
 				fileChooser.setInitialDirectory(getCurrentDirectory());
-				fileChooser.getExtensionFilters().clear();
+				// fileChooser.getExtensionFilters().clear();
 				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
 				File file = fileChooser.showOpenDialog(null);
 				if (file != null)
