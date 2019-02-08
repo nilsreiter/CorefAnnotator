@@ -74,9 +74,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
-		CATreeNode arg0 = get(event.getArgument(0));
 		switch (eventType) {
 		case Add:
+			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
 				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
 					CATreeNode tn = createNode(fs);
@@ -129,6 +129,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				insertNodeInto(node, newParent, ind);
 			}
 			optResort();
+			break;
+		case Init:
+			initialise();
 			break;
 		default:
 			break;
@@ -199,7 +202,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		return (CATreeNode) root;
 	}
 
-	public void initialise() {
+	private void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
 			entityEvent(Event.get(this, Event.Type.Add, null, e));
 		});

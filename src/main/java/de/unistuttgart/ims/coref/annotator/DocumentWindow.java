@@ -585,8 +585,8 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_mention_flags"), this, Mention.class);
-		entityFlagsInMenuBar = new FlagMenu(Annotator.getString("menu_entity_flags"), this, Entity.class);
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
@@ -763,11 +763,15 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	public void setDocumentModel(DocumentModel model) {
+		documentModel = model;
 
 		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
 
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
+
+		// listeners to the coref model
+		model.getCoreferenceModel().addCoreferenceModelListener(this);
 
 		// listeners to the tree model
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
@@ -783,7 +787,6 @@ public class DocumentWindow extends AbstractTextWindow
 		// listeners to the segment model
 		model.getSegmentModel().addListDataListener(segmentIndicator);
 		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
-		documentModel = model;
 
 		relationsList.setModel(model.getRelationModel());
 
@@ -844,7 +847,6 @@ public class DocumentWindow extends AbstractTextWindow
 		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
-		im.setCoreferenceModelListener(this);
 		im.execute();
 	}
 

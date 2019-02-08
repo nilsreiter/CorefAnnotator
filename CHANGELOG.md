@@ -3,6 +3,18 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.7.2
+
+- Fixed a bug that prevented loading files when run on OpenJDK #166
+
+## 1.7.1
+
+- Fixed a bug that changed the entity name to null if its' properties
+  are changed #163
+- Fixed a bug that showed a wrong icon when editing the entity name 
+  #164
+- It's no longer possible to rename mentions 
+
 ## 1.7.0
 
 - If a group contains more than two entities, the number of additional 

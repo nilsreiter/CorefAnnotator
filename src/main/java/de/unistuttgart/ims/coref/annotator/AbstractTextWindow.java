@@ -11,6 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
@@ -55,6 +56,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		case Op:
 			entityEventOp(event);
 			break;
+		case Init:
+			entityEventInit(event);
 		default:
 		}
 	}
@@ -105,5 +108,14 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	protected void entityEventOp(FeatureStructureEvent event) {
 
+	}
+
+	protected void entityEventInit(FeatureStructureEvent event) {
+		CoreferenceModel cm = (CoreferenceModel) event.getSource();
+		for (Mention m : cm.getMentions()) {
+			highlightManager.underline(m);
+			if (m.getDiscontinuous() != null)
+				highlightManager.underline(m.getDiscontinuous());
+		}
 	}
 }

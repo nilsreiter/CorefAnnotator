@@ -183,11 +183,6 @@ public class FlagModel implements Model {
 		return Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class));
 	}
 
-	public ImmutableList<Flag> getFlags(Class<? extends FeatureStructure> targetClass) {
-		return Lists.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class))
-				.select(f -> f.getTargetClass().equalsIgnoreCase(targetClass.getName())).toImmutable();
-	}
-
 	protected ImmutableList<FeatureStructure> getFlaggedFeatureStructures(Flag flag) {
 		ImmutableList<FeatureStructure> featureStructures = Lists.immutable.empty();
 		try {
@@ -272,7 +267,7 @@ public class FlagModel implements Model {
 	}
 
 	public boolean addFlagModelListener(FlagModelListener e) {
-		fireFlagEvent(Event.get(this, Event.Type.Init));
+		e.flagEvent(Event.get(this, Event.Type.Init));
 		return listeners.add(e);
 	}
 

@@ -25,7 +25,8 @@ public class Plugin implements IOPlugin {
 		try {
 			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
 		} catch (Exception e) {
-			e.printStackTrace();
+			// TODO: find out why this doesn't work
+			// e.printStackTrace();
 		}
 		return "";
 	}
