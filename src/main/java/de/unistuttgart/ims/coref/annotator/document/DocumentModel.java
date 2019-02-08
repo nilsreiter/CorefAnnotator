@@ -52,13 +52,6 @@ public class DocumentModel implements Model {
 		this.preferences = preferences;
 	}
 
-	public void initialize() {
-		coreferenceModel = new CoreferenceModel(this);
-		treeModel = new EntityTreeModel(coreferenceModel);
-		flagModel = new FlagModel(this, preferences);
-		segmentModel = new SegmentModel(this);
-	}
-
 	public boolean addDocumentStateListener(DocumentStateListener e) {
 		return documentStateListeners.add(e);
 	}
@@ -84,6 +77,10 @@ public class DocumentModel implements Model {
 		return typeSystemVersion;
 	}
 
+	public FlagModel getFlagModel() {
+		return flagModel;
+	}
+
 	public Deque<Operation> getHistory() {
 		return history;
 	}
@@ -101,8 +98,17 @@ public class DocumentModel implements Model {
 		return jcas.getDocumentLanguage();
 	}
 
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
 	public SegmentModel getSegmentModel() {
 		return segmentModel;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -111,6 +117,13 @@ public class DocumentModel implements Model {
 
 	public boolean hasUnsavedChanges() {
 		return unsavedChanges;
+	}
+
+	public void initialize() {
+		coreferenceModel = new CoreferenceModel(this);
+		treeModel = new EntityTreeModel(coreferenceModel);
+		flagModel = new FlagModel(this, preferences);
+		segmentModel = new SegmentModel(this);
 	}
 
 	public boolean isSavable() {
@@ -147,6 +160,10 @@ public class DocumentModel implements Model {
 		this.typeSystemVersion = typeSystemVersion;
 	}
 
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
+	}
+
 	public void setJcas(JCas jcas) {
 		this.jcas = jcas;
 	}
@@ -154,6 +171,10 @@ public class DocumentModel implements Model {
 	public void setLanguage(String l) {
 		jcas.setDocumentLanguage(l);
 		fireDocumentChangedEvent();
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 	public void setSegmentModel(SegmentModel segmentModel) {
@@ -173,19 +194,6 @@ public class DocumentModel implements Model {
 		fireDocumentChangedEvent();
 	}
 
-	public FlagModel getFlagModel() {
-		return flagModel;
-	}
-
-	public void setFlagModel(FlagModel flagModel) {
-		this.flagModel = flagModel;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
-	}
-
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
@@ -199,14 +207,6 @@ public class DocumentModel implements Model {
 		if (operation instanceof FlagModelOperation)
 			flagModel.undo((FlagModelOperation) operation);
 
-	}
-
-	public Preferences getPreferences() {
-		return preferences;
-	}
-
-	public void setPreferences(Preferences preferences) {
-		this.preferences = preferences;
 	}
 
 }
