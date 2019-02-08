@@ -30,8 +30,8 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.EntityComboBoxModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagComboBoxModel;
 
 public class RelationEditor extends JFrame {
@@ -49,16 +49,16 @@ public class RelationEditor extends JFrame {
 		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
-		JComboBox<Entity> combobox = new JComboBox<Entity>();
-		for (Entity entity : documentModel.getCoreferenceModel().getEntities(EntitySorter.LABEL)) {
-			combobox.addItem(entity);
-		}
-		combobox.setRenderer(new EntityListCellRenderer());
+		EntityComboBoxModel entityComboBoxModel = new EntityComboBoxModel();
+		documentModel.getCoreferenceModel().addCoreferenceModelListener(entityComboBoxModel);
 
 		FlagComboBoxModel flagComboBoxModel = new FlagComboBoxModel(DirectedEntityRelation.class);
 		documentModel.getFlagModel().addFlagModelListener(flagComboBoxModel);
-		JComboBox<Flag> flagCombobox = new JComboBox<Flag>(flagComboBoxModel);
 
+		JComboBox<Entity> entityCombobox = new JComboBox<Entity>(entityComboBoxModel);
+		entityCombobox.setRenderer(new EntityListCellRenderer());
+
+		JComboBox<Flag> flagCombobox = new JComboBox<Flag>(flagComboBoxModel);
 		flagCombobox.setRenderer(new FlagListCellRenderer());
 
 		this.table = new JTable(documentModel.getRelationModel().getTableModel());
@@ -73,7 +73,7 @@ public class RelationEditor extends JFrame {
 		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		this.table.setDefaultRenderer(Entity.class, new EntityTableCellRenderer());
 		this.table.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
-		this.table.setDefaultEditor(Entity.class, new DefaultCellEditor(combobox));
+		this.table.setDefaultEditor(Entity.class, new DefaultCellEditor(entityCombobox));
 		this.table.setDefaultEditor(Flag.class, new DefaultCellEditor(flagCombobox));
 		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.table.setRowHeight(25);
@@ -171,10 +171,10 @@ public class RelationEditor extends JFrame {
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			if (value != null) {
-				setText(((Flag) value).getLabel());
-				setIcon(FontIcon.of(MaterialDesign.valueOf(((Flag) value).getIcon())));
-
+			Flag flag = (Flag) value;
+			if (flag != null) {
+				setText(flag.getLabel());
+				setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon())));
 			}
 			return this;
 		}

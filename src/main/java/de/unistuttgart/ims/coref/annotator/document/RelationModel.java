@@ -205,7 +205,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 			case 1:
 				return Entity.class;
 			case 2:
-				return EntityRelationType.class;
+				return Flag.class;
 			}
 			return null;
 		}
@@ -227,7 +227,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 				case 1:
 					return der.getTarget();
 				case 2:
-					return der.getRelationType();
+					return der.getFlag();
 				}
 				return null;
 			}

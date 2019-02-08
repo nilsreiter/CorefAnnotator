@@ -1,44 +1,27 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
-
-import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 
-public class EntityComboBoxModel extends AbstractListModel<Entity>
-		implements ModelAdapter, ComboBoxModel<Entity>, CoreferenceModelListener {
+public class EntityComboBoxModel extends AbstractComboBoxModel<Entity> implements CoreferenceModelListener {
 
 	private static final long serialVersionUID = 1L;
-	MutableList<Entity> entityList;
-	Entity selectedItem;
-
-	@Override
-	public int getSize() {
-		return entityList.size();
-	}
-
-	@Override
-	public Entity getElementAt(int index) {
-		return entityList.get(index);
-	}
 
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		switch (event.getType()) {
 		case Add:
-			int startInterval = entityList.size();
-			for (int i = 0; i < event.getArity(); i++) {
-				if (event.getArgument(i) instanceof Entity)
+			for (int i = 1; i < event.getArity(); i++) {
+				if (event.getArgument(i) instanceof Entity) {
 					entityList.add((Entity) event.getArgument(i));
+					fireIntervalAdded(this, entityList.size() + i, entityList.size() + i);
+				}
 			}
-			fireIntervalAdded(this, startInterval, startInterval + event.getArity());
 			break;
 		case Merge:
-			break;
-		case Op:
 			break;
 		case Remove:
 			for (int i = 0; i < event.getArity(); i++) {
@@ -50,20 +33,15 @@ public class EntityComboBoxModel extends AbstractListModel<Entity>
 			break;
 		case Update:
 			break;
+		case Init:
+			entityList = Lists.mutable
+					.withAll(((CoreferenceModel) event.getSource()).getEntities(EntitySorter.CHILDREN));
+			selectedItem = null;
+			break;
 		default:
 			break;
 
 		}
-	}
-
-	@Override
-	public void setSelectedItem(Object anItem) {
-		selectedItem = (Entity) anItem;
-	}
-
-	@Override
-	public Object getSelectedItem() {
-		return selectedItem;
 	}
 
 }

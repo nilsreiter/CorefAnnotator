@@ -184,8 +184,9 @@ public class FlagModel implements Model {
 	}
 
 	public ImmutableList<Flag> getFlags(Class<? extends FeatureStructure> target) {
-		return Lists.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class))
-				.select(f -> f.getTargetClass().equalsIgnoreCase(target.getName())).toImmutable();
+		return Lists.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class)).select(f -> {
+			return getTargetClass0(f).isAssignableFrom(target);
+		}).toImmutable();
 	}
 
 	protected ImmutableList<FeatureStructure> getFlaggedFeatureStructures(Flag flag) {
@@ -257,6 +258,15 @@ public class FlagModel implements Model {
 
 	public Class<?> getTargetClass(Flag f) throws ClassNotFoundException {
 		return Class.forName(f.getTargetClass());
+	}
+
+	private Class<?> getTargetClass0(Flag f) {
+		try {
+			return Class.forName(f.getTargetClass());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return Object.class;
+		}
 	}
 
 	public String getLocalizedLabel(Flag f) {
