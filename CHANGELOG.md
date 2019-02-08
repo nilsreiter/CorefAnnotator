@@ -3,6 +3,15 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.8.0
+
+- It's now possible to create new flags that can be assigned to entities, 
+  mentions, and detached mention parts. The flags can be created with
+  the flag editor (in the tools menu). #126
+- The text field in the search dialog is now automatically in focus when
+  the window is opened #159
+- The text field now maintains previous searches #161
+
 ## 1.7.2
 
 - Fixed a bug that prevented loading files when run on OpenJDK #166
