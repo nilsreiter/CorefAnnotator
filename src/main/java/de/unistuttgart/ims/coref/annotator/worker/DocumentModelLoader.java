@@ -38,7 +38,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
-		DocumentModel documentModel = new DocumentModel(jcas);
+		DocumentModel documentModel = new DocumentModel(jcas, preferences);
 
 		CoreferenceModel cModel = new CoreferenceModel(documentModel, preferences);
 		if (getCoreferenceModelListener() != null)
@@ -50,7 +50,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 		FlagModel fm = new FlagModel(documentModel, preferences);
 
 		SegmentModel sModel = new SegmentModel(documentModel);
-        documentModel.setFlagModel(fm);
+		documentModel.setFlagModel(fm);
 		documentModel.setSegmentModel(sModel);
 		documentModel.setCoreferenceModel(cModel);
 		documentModel.setTreeModel(etm);

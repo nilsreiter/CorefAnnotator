@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.prefs.Preferences;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
@@ -44,7 +45,7 @@ public class DocumentModel implements Model {
 
 	boolean unsavedChanges = false;
 
-	public DocumentModel(JCas jcas) {
+	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 	}
 
