@@ -137,12 +137,20 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 		if (featureStructure instanceof EntityGroup) {
 			StringBuilder b = new StringBuilder();
 			EntityGroup entityGroup = (EntityGroup) featureStructure;
-			b.append(entityGroup.getMembers(0).getLabel());
-			for (int i = 1; i < entityGroup.getMembers().size(); i++) {
-				b.append(", ");
-				b.append(entityGroup.getMembers(i).getLabel());
+			if (entityGroup.getMembers().size() > 0) {
+				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+					b.append(entityGroup.getMembers(0).getLabel());
+				else {
+					System.out.println();
+				}
+				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+					b.append(", ");
+					b.append(entityGroup.getMembers(i).getLabel());
+				}
+				return b.toString();
+			} else {
+				return null;
 			}
-			return b.toString();
 		} else if (featureStructure instanceof Entity) {
 			return getEntity().getLabel();
 		}
