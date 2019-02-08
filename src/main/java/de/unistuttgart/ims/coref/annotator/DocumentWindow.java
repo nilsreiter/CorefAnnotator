@@ -179,8 +179,6 @@ public class DocumentWindow extends AbstractTextWindow
 	@Deprecated
 	JCas jcas;
 	File file;
-	@Deprecated
-	Annotator mainApplication;
 
 	String segmentAnnotation = null;
 
@@ -218,9 +216,8 @@ public class DocumentWindow extends AbstractTextWindow
 	// temporary
 	transient MutableSet<CATreeNode> expanded = Sets.mutable.empty();
 
-	public DocumentWindow(Annotator annotator) {
+	public DocumentWindow() {
 		super();
-		this.mainApplication = annotator;
 		this.initialiseActions();
 		this.initialiseMenu();
 		this.initialiseWindow();

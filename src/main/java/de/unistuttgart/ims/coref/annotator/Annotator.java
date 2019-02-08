@@ -243,7 +243,7 @@ public class Annotator {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				DocumentWindow v = new DocumentWindow(Annotator.this);
+				DocumentWindow v = new DocumentWindow();
 				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
