@@ -208,6 +208,11 @@
 			<supertypeName>uima.cas.TOP</supertypeName>
 			<features>
 				<featureDescription>
+					<name>Flag</name>
+					<description></description>
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Flag</rangeTypeName>
+				</featureDescription>
+				<featureDescription>
 					<name>RelationType</name>
 					<description />
 					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType

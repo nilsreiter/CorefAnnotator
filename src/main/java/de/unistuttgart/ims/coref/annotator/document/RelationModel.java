@@ -18,6 +18,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.AddDirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
@@ -104,7 +105,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 			break;
 		case TYPE:
 			op.setOldValue(der.getRelationType());
-			der.setRelationType((EntityRelationType) op.getNewValue());
+			der.setFlag((Flag) op.getNewValue());
 			break;
 		default:
 			break;
@@ -123,6 +124,10 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 
 	public ImmutableList<EntityRelationType> getRelationTypes() {
 		return Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), EntityRelationType.class));
+	}
+
+	public ImmutableList<Flag> getRelationFlags(Class<? extends EntityRelation> cl) {
+		return documentModel.getFlagModel().getFlags(cl);
 	}
 
 	public boolean removeRelationModelListener(Object o) {

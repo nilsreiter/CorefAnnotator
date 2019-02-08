@@ -26,11 +26,13 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.AddDirectedRelationAction;
+import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
+import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagComboBoxModel;
 
 public class RelationEditor extends JFrame {
 
@@ -53,11 +55,11 @@ public class RelationEditor extends JFrame {
 		}
 		combobox.setRenderer(new EntityListCellRenderer());
 
-		JComboBox<EntityRelationType> combobox_EntityRelationType = new JComboBox<EntityRelationType>();
-		for (EntityRelationType entity : documentModel.getRelationModel().getRelationTypes()) {
-			combobox_EntityRelationType.addItem(entity);
-		}
-		combobox_EntityRelationType.setRenderer(new EntityRelationTypeListCellRenderer());
+		FlagComboBoxModel flagComboBoxModel = new FlagComboBoxModel(DirectedEntityRelation.class);
+		documentModel.getFlagModel().addFlagModelListener(flagComboBoxModel);
+		JComboBox<Flag> flagCombobox = new JComboBox<Flag>(flagComboBoxModel);
+
+		flagCombobox.setRenderer(new FlagListCellRenderer());
 
 		this.table = new JTable(documentModel.getRelationModel().getTableModel());
 
@@ -70,9 +72,9 @@ public class RelationEditor extends JFrame {
 		this.table.setAutoCreateRowSorter(true);
 		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		this.table.setDefaultRenderer(Entity.class, new EntityTableCellRenderer());
-		this.table.setDefaultRenderer(EntityRelationType.class, new EntityRelationTypeTableCellRenderer());
+		this.table.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
 		this.table.setDefaultEditor(Entity.class, new DefaultCellEditor(combobox));
-		this.table.setDefaultEditor(EntityRelationType.class, new DefaultCellEditor(combobox_EntityRelationType));
+		this.table.setDefaultEditor(Flag.class, new DefaultCellEditor(flagCombobox));
 		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.table.setRowHeight(25);
 
@@ -145,7 +147,7 @@ public class RelationEditor extends JFrame {
 		}
 	}
 
-	class EntityRelationTypeListCellRenderer extends DefaultListCellRenderer {
+	class FlagListCellRenderer extends DefaultListCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
@@ -154,13 +156,14 @@ public class RelationEditor extends JFrame {
 				boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value != null) {
-				setText(((EntityRelationType) value).getLabel());
+				setText(((Flag) value).getLabel());
+				setIcon(FontIcon.of(MaterialDesign.valueOf(((Flag) value).getIcon())));
 			}
 			return this;
 		}
 	}
 
-	class EntityRelationTypeTableCellRenderer extends DefaultTableCellRenderer {
+	class FlagTableCellRenderer extends DefaultTableCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
@@ -169,7 +172,9 @@ public class RelationEditor extends JFrame {
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			if (value != null) {
-				setText(((EntityRelationType) value).getLabel());
+				setText(((Flag) value).getLabel());
+				setIcon(FontIcon.of(MaterialDesign.valueOf(((Flag) value).getIcon())));
+
 			}
 			return this;
 		}

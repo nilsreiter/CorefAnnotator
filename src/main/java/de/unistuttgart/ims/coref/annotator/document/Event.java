@@ -31,7 +31,7 @@ public interface Event extends Iterable<FeatureStructure> {
 		 * This describes moving arg3 to argn from arg1 to arg2. Arg2 becomes the new
 		 * parent, arg1 is the old one.
 		 */
-		Move, Merge, Op
+		Move, Merge, Op, Init
 	};
 
 	Type getType();
