@@ -11,12 +11,7 @@ import org.apache.uima.jcas.JCas;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.EntityTreeModel;
-import de.unistuttgart.ims.coref.annotator.document.RelationModel;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
-import de.unistuttgart.ims.coref.annotator.document.SegmentModel;
 
 public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
@@ -39,25 +34,13 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
-		DocumentModel documentModel = new DocumentModel(jcas);
+		DocumentModel documentModel = new DocumentModel(jcas, preferences);
 
-		CoreferenceModel cModel = new CoreferenceModel(documentModel, preferences);
+		documentModel.initialize();
+
 		if (getCoreferenceModelListener() != null)
-			cModel.addCoreferenceModelListener(getCoreferenceModelListener());
-		cModel.initialPainting();
-
-		EntityTreeModel etm = new EntityTreeModel(cModel);
-
-		RelationModel relationModel = new RelationModel(documentModel);
-		FlagModel fm = new FlagModel(documentModel, preferences);
-
-		SegmentModel sModel = new SegmentModel(documentModel);
-
-		documentModel.setRelationModel(relationModel);
-        documentModel.setFlagModel(fm);
-		documentModel.setSegmentModel(sModel);
-		documentModel.setCoreferenceModel(cModel);
-		documentModel.setTreeModel(etm);
+			documentModel.getCoreferenceModel().addCoreferenceModelListener(getCoreferenceModelListener());
+		documentModel.getCoreferenceModel().initialPainting();
 
 		return documentModel;
 	}

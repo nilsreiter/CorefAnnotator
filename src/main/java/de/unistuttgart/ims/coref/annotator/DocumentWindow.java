@@ -61,7 +61,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
@@ -88,7 +87,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
@@ -103,7 +101,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
@@ -130,6 +127,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
@@ -169,8 +167,8 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -259,11 +257,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	private static final long serialVersionUID = 1L;
 
-	@Deprecated
-	JCas jcas;
 	File file;
-	@Deprecated
-	Annotator mainApplication;
 
 	String segmentAnnotation = null;
 
@@ -279,7 +273,6 @@ public class DocumentWindow extends AbstractTextWindow
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
 	JTextField treeSearchField;
-	TreeKeyListener treeKeyListener = new TreeKeyListener();
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	JList<EntityRelation> relationsList = new JList<EntityRelation>();
@@ -303,9 +296,8 @@ public class DocumentWindow extends AbstractTextWindow
 	// temporary
 	transient MutableSet<CATreeNode> expanded = Sets.mutable.empty();
 
-	public DocumentWindow(Annotator annotator) {
+	public DocumentWindow() {
 		super();
-		this.mainApplication = annotator;
 		this.initialiseActions();
 		this.initialiseMenu();
 		this.initialiseWindow();
@@ -705,54 +697,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	@Deprecated
-	public synchronized void saveCurrentFile() {
-		if (file != null)
-			saveToFile(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), false);
-	}
-
-	@Deprecated
-	public synchronized void saveToFile(File f, IOPlugin plugin, boolean ask) {
-		Annotator.logger.info("Exporting into file {} using plugin {}", f, plugin.getName());
-		setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
-
-		if (f.exists() && ask) {
-			int answer = JOptionPane.showConfirmDialog(this,
-					Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
-			if (answer != JOptionPane.YES_OPTION) {
-				setMessage("");
-				return;
-			}
-		}
-		getProgressBar().setVisible(true);
-		getProgressBar().setIndeterminate(true);
-
-		new SwingWorker<Object, Object>() {
-
-			@Override
-			protected Object doInBackground() throws Exception {
-				SimplePipeline.runPipeline(jcas, plugin.getExporter(), plugin.getWriter(f));
-				return new Object();
-			}
-
-			@Override
-			protected void done() {
-				progressBar.setVisible(false);
-				setMessage("");
-				if (plugin == Annotator.app.getPluginManager().getDefaultIOPlugin()) {
-					file = f;
-					setWindowTitle();
-				}
-			}
-
-		}.execute();
-	}
-
-	@Deprecated
-	public Annotator getMainApplication() {
-		return Annotator.app;
-	}
-
 	class SortTreeByAlpha extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -794,14 +738,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
-		String documentTitle = "Untitled document";
-		try {
-			if (JCasUtil.exists(jcas, DocumentMetaData.class) && DocumentMetaData.get(jcas).getDocumentTitle() != null)
-				documentTitle = DocumentMetaData.get(jcas).getDocumentTitle();
-		} catch (Exception e) {
-			Annotator.logger.catching(e);
-		}
-		setTitle(documentTitle + " (" + fileName + ")"
+
+		setTitle(documentModel.getDocumentTitle() + " (" + fileName + ")"
 				+ (documentModel.isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
 	}
 
@@ -896,7 +834,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void setJCas(JCas jcas) {
 
-		this.jcas = jcas;
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
 		textPane.setText(jcas.getDocumentText().replaceAll("\r", " "));
@@ -935,15 +872,16 @@ public class DocumentWindow extends AbstractTextWindow
 
 				getProgressBar().setValue(20);
 
-				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv.getSpanStyles(jcas.getTypeSystem(),
-						styleContext, baseStyle);
+				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
+						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
-						StyleManager.style(jcas, textPane.getStyledDocument(), style, styles.get(style));
+						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,
+								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(jcas).setStylePlugin(sv.getClass().getName());
+				Util.getMeta(documentModel.getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -1237,7 +1175,7 @@ public class DocumentWindow extends AbstractTextWindow
 				for (String flagKey : entity.getFlags()) {
 					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
-			}
+				}
 			return panel;
 		}
 
@@ -1426,20 +1364,20 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	class ClearAction extends IkonAction {
+	class ClearAction extends TargetedIkonAction<DocumentWindow> {
 
 		private static final long serialVersionUID = 1L;
 
-		public ClearAction() {
-			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+		public ClearAction(DocumentWindow dm) {
+			super(dm, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
-			for (Mention m : Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class)))
+			for (Mention m : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Mention.class)))
 				documentModel.edit(new RemoveMention(m));
-			for (Entity e : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class)))
+			for (Entity e : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)))
 				documentModel.edit(new RemoveEntities(e));
 			documentModel.getHistory().clear();
 		}
@@ -1483,28 +1421,6 @@ public class DocumentWindow extends AbstractTextWindow
 		public void actionPerformed(ActionEvent e) {
 			documentModel.edit(new MergeEntities(getSelectedEntities()));
 
-		}
-
-	}
-
-	@Deprecated
-	class ToggleShowTextInTreeLabels extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ToggleShowTextInTreeLabels() {
-			super(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, MaterialDesign.MDI_FORMAT_TEXT);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP));
-			putValue(Action.SELECTED_KEY,
-					Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			boolean old = Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, true);
-			Annotator.app.getPreferences().putBoolean(Constants.CFG_SHOW_TEXT_LABELS, !old);
-			putValue(Action.SELECTED_KEY, !old);
-			tree.repaint();
 		}
 
 	}
@@ -1774,55 +1690,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	@Deprecated
-	class TreeKeyListener implements KeyListener {
-
-		boolean ignoreNext = false;
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyReleased(KeyEvent ev) {
-			if (ignoreNext)
-				ignoreNext = false;
-			else if (tree.hasFocus() && ev.getKeyCode() == KeyEvent.VK_ENTER) {
-				int b = textPane.getSelectionStart(), e = textPane.getSelectionEnd();
-				if (b != e) {
-					for (TreePath tp : tree.getSelectionPaths()) {
-						if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
-							CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-							documentModel.edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
-						}
-					}
-					treeSearchField.setText("");
-					textPane.grabFocus();
-				}
-			} else if (ev.getKeyCode() == KeyEvent.VK_UP) {
-				if (tree.getLeadSelectionRow() == 0)
-					treeSearchField.grabFocus();
-
-			}
-
-		}
-
-		public boolean isIgnoreNext() {
-			return ignoreNext;
-		}
-
-		public void setIgnoreNext(boolean ignoreNext) {
-			this.ignoreNext = ignoreNext;
-		}
-
-	}
-
 	@Override
 	public JTree getTree() {
 		return tree;
@@ -1869,7 +1736,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	class ActionContainer {
 
-		AbstractAction clearAction = new ClearAction();
+		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
