@@ -35,7 +35,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
+import de.unistuttgart.ims.coref.annotator.document.adapter.FlagTableModel;
 
 public class FlagEditor extends JFrame {
 

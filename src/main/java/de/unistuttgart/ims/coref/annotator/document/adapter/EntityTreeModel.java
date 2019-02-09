@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.document;
+package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -27,6 +27,10 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.Event;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.Model;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
@@ -100,7 +104,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
 						.collect(n -> n.getFeatureStructure());
 				for (int i = members.size() - 1; i >= 0; i--) {
-					if (event.arguments.contains(members.get(i)))
+					if (event.getArguments().contains(members.get(i)))
 						removeNodeFromParent(gn.getChildAt(i));
 				}
 			} else

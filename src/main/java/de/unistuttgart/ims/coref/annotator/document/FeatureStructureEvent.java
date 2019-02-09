@@ -52,6 +52,10 @@ public class FeatureStructureEvent implements Event {
 		return this.arguments.get(i);
 	}
 
+	public ImmutableList<FeatureStructure> getArguments() {
+		return this.arguments;
+	}
+
 	@Override
 	public int getArity() {
 		return arguments.size();

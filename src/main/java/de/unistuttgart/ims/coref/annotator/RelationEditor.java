@@ -34,8 +34,8 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.document.EntityComboBoxModel;
-import de.unistuttgart.ims.coref.annotator.document.FlagComboBoxModel;
+import de.unistuttgart.ims.coref.annotator.document.adapter.EntityComboBoxModel;
+import de.unistuttgart.ims.coref.annotator.document.adapter.FlagComboBoxModel;
 
 public class RelationEditor extends JFrame {
 

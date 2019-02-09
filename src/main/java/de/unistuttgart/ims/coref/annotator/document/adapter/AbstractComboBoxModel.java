@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.document;
+package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;

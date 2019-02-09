@@ -16,6 +16,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.document.adapter.EntityTreeModel;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;

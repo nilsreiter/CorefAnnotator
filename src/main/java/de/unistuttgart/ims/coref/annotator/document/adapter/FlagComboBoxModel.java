@@ -1,10 +1,13 @@
-package de.unistuttgart.ims.coref.annotator.document;
+package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 
 public class FlagComboBoxModel extends AbstractComboBoxModel<Flag> implements FlagModelListener {
 
