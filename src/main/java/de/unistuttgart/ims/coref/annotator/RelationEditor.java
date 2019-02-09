@@ -70,7 +70,8 @@ public class RelationEditor extends JFrame {
 
 		this.tableWithDirectedRelations = new JTable(documentModel.getRelationModel().getDirectedRelationsTableModel());
 
-		this.tableWithUndirectedRelations = new JTable();
+		this.tableWithUndirectedRelations = new JTable(
+				documentModel.getRelationModel().getUndirectedRelationsTableModel());
 
 		// Actions
 		AbstractAction addDirectedRelationAction = new AddDirectedRelationAction(documentModel);
