@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.document;
+package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -11,9 +11,12 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.RelationModel;
+import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateUndirectedEntityRelation;
 
-class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
+public class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
 	/**
 	 * 
@@ -23,7 +26,7 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 	/**
 	 * @param relationModel
 	 */
-	UndirectedRelationsTableModel(RelationModel relationModel) {
+	public UndirectedRelationsTableModel(RelationModel relationModel) {
 		this.relationModel = relationModel;
 	}
 
@@ -31,8 +34,8 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 
 	@Override
 	public int getRowCount() {
-		return this.relationModel.documentModel.getRelationModel().getRelations().select(r -> r instanceof SymmetricEntityRelation)
-				.size();
+		return this.relationModel.getDocumentModel().getRelationModel().getRelations()
+				.select(r -> r instanceof SymmetricEntityRelation).size();
 	}
 
 	@Override
@@ -70,7 +73,7 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		EntityRelation er = this.relationModel.list.get(rowIndex);
+		EntityRelation er = this.relationModel.getRelations().get(rowIndex);
 
 		if (er instanceof SymmetricEntityRelation) {
 			SymmetricEntityRelation der = (SymmetricEntityRelation) er;
@@ -87,7 +90,7 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		SymmetricEntityRelation erel = (SymmetricEntityRelation) this.relationModel.list.get(rowIndex);
+		SymmetricEntityRelation erel = (SymmetricEntityRelation) this.relationModel.getRelations().get(rowIndex);
 		UpdateUndirectedEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
@@ -97,7 +100,7 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 			property = UpdateUndirectedEntityRelation.EntityRelationProperty.ENTITIES;
 			break;
 		}
-		this.relationModel.documentModel.edit(new UpdateUndirectedEntityRelation(erel, property, aValue));
+		this.relationModel.getDocumentModel().edit(new UpdateUndirectedEntityRelation(erel, property, aValue));
 	}
 
 	@Override
@@ -118,7 +121,7 @@ class UndirectedRelationsTableModel extends DefaultTableModel implements TableMo
 		case Remove:
 			break;
 		case Update:
-			tme = new TableModelEvent(this, this.relationModel.list.indexOf(event.getArgument(0)));
+			tme = new TableModelEvent(this, this.relationModel.getRelations().indexOf(event.getArgument(0)));
 			break;
 		default:
 			break;

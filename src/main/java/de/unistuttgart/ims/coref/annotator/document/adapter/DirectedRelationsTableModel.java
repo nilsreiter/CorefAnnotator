@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.document;
+package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -10,9 +10,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.RelationModel;
+import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelation;
 
-class DirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
+public class DirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
 	/**
 	 * 
@@ -22,7 +25,7 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 	/**
 	 * @param relationModel
 	 */
-	DirectedRelationsTableModel(RelationModel relationModel) {
+	public DirectedRelationsTableModel(RelationModel relationModel) {
 		this.relationModel = relationModel;
 	}
 
@@ -30,8 +33,8 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 
 	@Override
 	public int getRowCount() {
-		return this.relationModel.documentModel.getRelationModel().getRelations().select(r -> r instanceof DirectedEntityRelation)
-				.size();
+		return this.relationModel.getDocumentModel().getRelationModel().getRelations()
+				.select(r -> r instanceof DirectedEntityRelation).size();
 	}
 
 	@Override
@@ -72,7 +75,7 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		EntityRelation er = this.relationModel.list.get(rowIndex);
+		EntityRelation er = this.relationModel.getRelations().get(rowIndex);
 
 		if (er instanceof DirectedEntityRelation) {
 			DirectedEntityRelation der = (DirectedEntityRelation) er;
@@ -91,7 +94,7 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		DirectedEntityRelation erel = (DirectedEntityRelation) this.relationModel.list.get(rowIndex);
+		DirectedEntityRelation erel = (DirectedEntityRelation) this.relationModel.getRelations().get(rowIndex);
 		UpdateDirectedEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
@@ -104,7 +107,7 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 			property = UpdateDirectedEntityRelation.EntityRelationProperty.TYPE;
 			break;
 		}
-		this.relationModel.documentModel.edit(new UpdateDirectedEntityRelation(erel, property, aValue));
+		this.relationModel.getDocumentModel().edit(new UpdateDirectedEntityRelation(erel, property, aValue));
 	}
 
 	@Override
@@ -125,7 +128,7 @@ class DirectedRelationsTableModel extends DefaultTableModel implements TableMode
 		case Remove:
 			break;
 		case Update:
-			tme = new TableModelEvent(this, this.relationModel.list.indexOf(event.getArgument(0)));
+			tme = new TableModelEvent(this, this.relationModel.getRelations().indexOf(event.getArgument(0)));
 			break;
 		default:
 			break;

@@ -17,6 +17,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.adapter.DirectedRelationsTableModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddDirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.AddUndirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
@@ -185,5 +186,9 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 			addRelationModelListener(undirectedRelationsTableModel);
 		}
 		return undirectedRelationsTableModel;
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
 	}
 }
