@@ -1,17 +1,19 @@
 package de.unistuttgart.ims.coref.annotator.document.op;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
+import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 
-public class UpdateEntityRelation extends UpdateOperation<DirectedEntityRelation> implements RelationModelOperation {
+public class UpdateUndirectedEntityRelation extends UpdateOperation<SymmetricEntityRelation>
+		implements RelationModelOperation {
 
 	public enum EntityRelationProperty {
-		TYPE, SOURCE, TARGET;
+		TYPE, ENTITIES;
 	};
 
 	Object oldValue, newValue;
 	EntityRelationProperty entityRelationProperty;
 
-	public UpdateEntityRelation(DirectedEntityRelation relation, EntityRelationProperty property, Object newValue) {
+	public UpdateUndirectedEntityRelation(SymmetricEntityRelation relation, EntityRelationProperty property,
+			Object newValue) {
 		super(relation);
 		this.entityRelationProperty = property;
 		this.newValue = newValue;

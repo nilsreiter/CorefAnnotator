@@ -11,7 +11,7 @@ public class RelationTable extends JTable {
 	private static final long serialVersionUID = 1L;
 
 	public RelationTable(DocumentModel documentModel) {
-		this.setModel(documentModel.getRelationModel().getTableModel());
+		this.setModel(documentModel.getRelationModel().getDirectedRelationsTableModel());
 
 		this.setGridColor(Color.GRAY);
 		this.setAutoCreateColumnsFromModel(true);
