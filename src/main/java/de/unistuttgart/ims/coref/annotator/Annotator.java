@@ -289,7 +289,6 @@ public class Annotator {
 	}
 
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		new JFXPanel();
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
