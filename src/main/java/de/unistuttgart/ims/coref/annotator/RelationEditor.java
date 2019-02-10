@@ -10,6 +10,7 @@ import java.awt.event.WindowListener;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -56,31 +57,77 @@ public class RelationEditor extends JFrame {
 		this.setTitle(Annotator.getString(Constants.Strings.RELATION_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
-		EntityComboBoxModel entityComboBoxModel = new EntityComboBoxModel();
-		documentModel.getCoreferenceModel().addCoreferenceModelListener(entityComboBoxModel);
-
-		FlagComboBoxModel flagDirectedComboBoxModel = new FlagComboBoxModel(DirectedEntityRelation.class);
-		FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
-		documentModel.getFlagModel().addFlagModelListener(flagDirectedComboBoxModel);
-		documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
-
-		JComboBox<Entity> entityCombobox = new JComboBox<Entity>(entityComboBoxModel);
-		entityCombobox.setRenderer(new EntityListCellRenderer());
-
-		JComboBox<Flag> directedflagCombobox = new JComboBox<Flag>(flagDirectedComboBoxModel);
-		JComboBox<Flag> undirectedflagCombobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
-		directedflagCombobox.setRenderer(new FlagListCellRenderer());
-		undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
-
-		this.tableWithDirectedRelations = new JTable(new DirectedRelationsTableModel(documentModel.getRelationModel()));
-
-		this.tableWithUndirectedRelations = new JTable(
-				new UndirectedRelationsTableModel(documentModel.getRelationModel()));
 		// Actions
 		AbstractAction addDirectedRelationAction = new AddDirectedRelationAction(documentModel);
 		AbstractAction addUndirectedRelationAction = new AddUndirectedRelationAction(documentModel);
 
 		// Table
+		initDirected();
+		initUndirected();
+
+		this.toolbar = new JPanel();
+		this.toolbar.add(new JButton(addDirectedRelationAction));
+		this.toolbar.add(new JButton(addUndirectedRelationAction));
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tableWithDirectedRelations),
+				new JScrollPane(tableWithUndirectedRelations));
+
+		this.getContentPane().add(splitPane, BorderLayout.CENTER);
+		this.getContentPane().add(toolbar, BorderLayout.NORTH);
+		this.setVisible(true);
+		this.pack();
+	}
+
+	private void initUndirected() {
+		EntityComboBoxModel entityComboBoxModel = new EntityComboBoxModel();
+		documentModel.getCoreferenceModel().addCoreferenceModelListener(entityComboBoxModel);
+
+		FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
+		documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
+
+		JComboBox<Entity> entityCombobox = new JComboBox<Entity>(entityComboBoxModel);
+		entityCombobox.setRenderer(new EntityListCellRenderer());
+
+		JComboBox<Flag> undirectedflagCombobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
+		undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
+
+		UndirectedRelationsTableModel tableModel = new UndirectedRelationsTableModel(documentModel.getRelationModel());
+		this.tableWithUndirectedRelations = new JTable(tableModel);
+
+		this.tableWithUndirectedRelations.setGridColor(Color.GRAY);
+		this.tableWithUndirectedRelations.setAutoCreateColumnsFromModel(true);
+		this.tableWithUndirectedRelations.setAutoCreateRowSorter(true);
+		this.tableWithUndirectedRelations.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.tableWithUndirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.tableWithUndirectedRelations.setRowHeight(25);
+		this.tableWithUndirectedRelations.setDropMode(DropMode.ON);
+		this.tableWithUndirectedRelations.setTransferHandler(tableModel.getTransferHandler());
+		this.tableWithUndirectedRelations.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
+		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class,
+				new FSArrayTableCellRenderer(documentModel));
+		this.tableWithUndirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(undirectedflagCombobox));
+		this.tableWithUndirectedRelations.getColumnModel().getColumn(0).setPreferredWidth(50);
+		this.tableWithUndirectedRelations.getColumnModel().getColumn(1).setPreferredWidth(150);
+		this.tableWithUndirectedRelations.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+	}
+
+	private void initDirected() {
+		EntityComboBoxModel entityComboBoxModel = new EntityComboBoxModel();
+		documentModel.getCoreferenceModel().addCoreferenceModelListener(entityComboBoxModel);
+
+		FlagComboBoxModel flagDirectedComboBoxModel = new FlagComboBoxModel(DirectedEntityRelation.class);
+		documentModel.getFlagModel().addFlagModelListener(flagDirectedComboBoxModel);
+
+		JComboBox<Entity> entityCombobox = new JComboBox<Entity>(entityComboBoxModel);
+		entityCombobox.setRenderer(new EntityListCellRenderer());
+
+		JComboBox<Flag> directedflagCombobox = new JComboBox<Flag>(flagDirectedComboBoxModel);
+		directedflagCombobox.setRenderer(new FlagListCellRenderer());
+
+		DirectedRelationsTableModel directedRelationsTableModel = new DirectedRelationsTableModel(
+				documentModel.getRelationModel());
+
+		this.tableWithDirectedRelations = new JTable(directedRelationsTableModel);
 		this.tableWithDirectedRelations.setGridColor(Color.GRAY);
 		this.tableWithDirectedRelations.setAutoCreateColumnsFromModel(true);
 		this.tableWithDirectedRelations.setAutoCreateRowSorter(true);
@@ -90,6 +137,9 @@ public class RelationEditor extends JFrame {
 		this.tableWithDirectedRelations.setDefaultEditor(Entity.class, new DefaultCellEditor(entityCombobox));
 		this.tableWithDirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(directedflagCombobox));
 		this.tableWithDirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.tableWithDirectedRelations.setDropMode(DropMode.ON);
+		this.tableWithDirectedRelations.setDragEnabled(true);
+		this.tableWithDirectedRelations.setTransferHandler(directedRelationsTableModel.getTransferHandler());
 		this.tableWithDirectedRelations.setRowHeight(25);
 
 		this.tableWithDirectedRelations.getColumnModel().getColumn(0)
@@ -122,29 +172,6 @@ public class RelationEditor extends JFrame {
 						return Annotator.getString(Constants.Strings.FLAG_EDITOR_LABEL_TOOLTIP);
 					}
 				});
-
-		this.tableWithUndirectedRelations.setGridColor(Color.GRAY);
-		this.tableWithUndirectedRelations.setAutoCreateColumnsFromModel(true);
-		this.tableWithUndirectedRelations.setAutoCreateRowSorter(true);
-		this.tableWithUndirectedRelations.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.tableWithUndirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.tableWithUndirectedRelations.setRowHeight(25);
-		this.tableWithUndirectedRelations.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
-		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class,
-				new FSArrayTableCellRenderer(documentModel));
-		this.tableWithUndirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(undirectedflagCombobox));
-
-		this.toolbar = new JPanel();
-		this.toolbar.add(new JButton(addDirectedRelationAction));
-		this.toolbar.add(new JButton(addUndirectedRelationAction));
-
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tableWithDirectedRelations),
-				new JScrollPane(tableWithUndirectedRelations));
-
-		this.getContentPane().add(splitPane, BorderLayout.CENTER);
-		this.getContentPane().add(toolbar, BorderLayout.NORTH);
-		this.setVisible(true);
-		this.pack();
 	}
 
 	class EntityListCellRenderer extends DefaultListCellRenderer {

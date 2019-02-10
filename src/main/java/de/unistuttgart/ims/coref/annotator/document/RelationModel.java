@@ -11,6 +11,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
@@ -130,6 +131,11 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 			SymmetricEntityRelation ser = (SymmetricEntityRelation) reln;
 			switch (op.getEntityRelationProperty()) {
 			case ADD_ENTITY:
+				if (Util.contains(ser.getEntities(), (Entity) op.getNewValue()))
+					return;
+				op.setOldValue(ser.getEntities());
+				FSArray newArray = Util.addTo(documentModel.getJcas(), ser.getEntities(), (Entity) op.getNewValue());
+				ser.setEntities(newArray);
 				break;
 			case REMOVE_ENTITY:
 				break;

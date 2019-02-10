@@ -57,6 +57,15 @@ public class Util {
 		return false;
 	}
 
+	public static boolean contains(FSArray array, FeatureStructure s) {
+		if (array == null)
+			return false;
+		for (int i = 0; i < array.size(); i++)
+			if (array.get(i) == s)
+				return true;
+		return false;
+	}
+
 	public static void addFlagKey(FeatureStructure fs, String flagKey) {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		try {
@@ -262,6 +271,7 @@ public class Util {
 		arr.addToIndexes();
 		return arr;
 	}
+
 	public static StringArray getFlags(FeatureStructure fs) throws CASException {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		if (feature == null)

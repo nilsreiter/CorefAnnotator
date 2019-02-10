@@ -1,13 +1,20 @@
 package de.unistuttgart.ims.coref.annotator.document.adapter;
 
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.apache.uima.jcas.cas.FSArray;
+import org.eclipse.collections.api.list.ImmutableList;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.CATreeNode;
+import de.unistuttgart.ims.coref.annotator.NodeListTransferable;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
@@ -15,6 +22,7 @@ import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.RelationModel;
 import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation.EntityRelationProperty;
 
 public class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
@@ -107,8 +115,14 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 		this.relationModel.getDocumentModel().edit(new UpdateEntityRelation(erel, property, aValue));
 	}
 
+	protected ImmutableList<EntityRelation> getRelations() {
+		return this.relationModel.getRelations().select(r -> r instanceof SymmetricEntityRelation);
+	}
+
 	@Override
 	public void relationEvent(FeatureStructureEvent event) {
+		if (!(event.getArgument1() instanceof SymmetricEntityRelation))
+			return;
 		TableModelEvent tme = null;
 
 		switch (event.getType()) {
@@ -125,7 +139,7 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 		case Remove:
 			break;
 		case Update:
-			tme = new TableModelEvent(this, this.relationModel.getRelations().indexOf(event.getArgument(0)));
+			tme = new TableModelEvent(this, getRelations().indexOf(event.getArgument(0)));
 			break;
 		default:
 			break;
@@ -136,6 +150,61 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 			for (TableModelListener l : this.getTableModelListeners())
 				l.tableChanged(tme);
 
+	}
+
+	public TransferHandler getTransferHandler() {
+		return new TransferHandler();
+	}
+
+	class TransferHandler extends javax.swing.TransferHandler {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean canImport(TransferHandler.TransferSupport info) {
+			if (!info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
+				return false;
+			}
+			JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
+			if (dl.getColumn() != 1)
+				return false;
+			return true;
+		}
+
+		@Override
+		public boolean importData(TransferHandler.TransferSupport info) {
+			if (!info.isDrop()) {
+				return false;
+			}
+
+			// Check for flavor
+			if (!info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
+				return false;
+			}
+
+			JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
+			SymmetricEntityRelation erel = (SymmetricEntityRelation) getRelations().get(dl.getRow());
+			UpdateEntityRelation.EntityRelationProperty property = null;
+			switch (dl.getColumn()) {
+			case 1:
+				property = EntityRelationProperty.ADD_ENTITY;
+				break;
+			default:
+				return false;
+			}
+			try {
+				@SuppressWarnings("unchecked")
+				ImmutableList<CATreeNode> treeNodes = (ImmutableList<CATreeNode>) info.getTransferable()
+						.getTransferData(NodeListTransferable.dataFlavor);
+				relationModel.getDocumentModel().edit(
+						new UpdateEntityRelation(erel, property, treeNodes.collect(tn -> tn.getEntity()).getFirst()));
+				return true;
+			} catch (UnsupportedFlavorException | IOException e) {
+				Annotator.logger.catching(e);
+			}
+
+			return false;
+		}
 	}
 
 }

@@ -8,7 +8,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.cas.FSArray;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -27,6 +26,7 @@ public class FSArrayTableCellRenderer extends JPanel implements TableCellRendere
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 			int row, int column) {
+		this.removeAll();
 		JLabel label = (JLabel) defCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
 				column);
 		this.setBackground(label.getBackground());
@@ -34,9 +34,9 @@ public class FSArrayTableCellRenderer extends JPanel implements TableCellRendere
 		this.setBorder(label.getBorder());
 		if (value != null) {
 			FSArray arr = (FSArray) value;
-			for (FeatureStructure fs : arr) {
-				if (fs instanceof Entity) {
-					this.add(new EntityPanel(documentModel, (Entity) fs));
+			for (int i = 0; i < arr.size(); i++) {
+				if (arr.get(i) instanceof Entity) {
+					this.add(new EntityPanel(documentModel, (Entity) arr.get(i)));
 				}
 			}
 		}
