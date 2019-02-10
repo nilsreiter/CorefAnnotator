@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.RelationModel;
 import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateUndirectedEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelation;
 
 public class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
@@ -28,14 +28,16 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 	 */
 	public UndirectedRelationsTableModel(RelationModel relationModel) {
 		this.relationModel = relationModel;
+		this.relationModel.addRelationModelListener(this);
 	}
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int getRowCount() {
-		return this.relationModel.getDocumentModel().getRelationModel().getRelations()
-				.select(r -> r instanceof SymmetricEntityRelation).size();
+		if (this.relationModel == null)
+			return 0;
+		return this.relationModel.getRelations().select(r -> r instanceof SymmetricEntityRelation).size();
 	}
 
 	@Override
@@ -73,7 +75,8 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		EntityRelation er = this.relationModel.getRelations().get(rowIndex);
+		EntityRelation er = this.relationModel.getRelations().select(r -> r instanceof SymmetricEntityRelation)
+				.get(rowIndex);
 
 		if (er instanceof SymmetricEntityRelation) {
 			SymmetricEntityRelation der = (SymmetricEntityRelation) er;
@@ -90,17 +93,18 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		SymmetricEntityRelation erel = (SymmetricEntityRelation) this.relationModel.getRelations().get(rowIndex);
-		UpdateUndirectedEntityRelation.EntityRelationProperty property = null;
+		SymmetricEntityRelation erel = (SymmetricEntityRelation) this.relationModel.getRelations()
+				.select(r -> r instanceof SymmetricEntityRelation).get(rowIndex);
+		UpdateDirectedEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
-			property = UpdateUndirectedEntityRelation.EntityRelationProperty.TYPE;
+			property = UpdateDirectedEntityRelation.EntityRelationProperty.TYPE;
 			break;
 		case 1:
-			property = UpdateUndirectedEntityRelation.EntityRelationProperty.ENTITIES;
+			// property = UpdateUndirectedEntityRelation.EntityRelationProperty.ENTITIES;
 			break;
 		}
-		this.relationModel.getDocumentModel().edit(new UpdateUndirectedEntityRelation(erel, property, aValue));
+		this.relationModel.getDocumentModel().edit(new UpdateDirectedEntityRelation(erel, property, aValue));
 	}
 
 	@Override

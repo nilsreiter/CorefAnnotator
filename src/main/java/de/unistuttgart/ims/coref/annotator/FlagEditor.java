@@ -33,6 +33,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.FlagTableModel;
@@ -57,6 +58,7 @@ public class FlagEditor extends JFrame {
 		combobox.addItem(Entity.class);
 		combobox.addItem(DetachedMentionPart.class);
 		combobox.addItem(DirectedEntityRelation.class);
+		combobox.addItem(SymmetricEntityRelation.class);
 		combobox.setRenderer(new TargetClassListCellRenderer());
 
 		JComboBox<Ikon> iconBox = new JComboBox<Ikon>();

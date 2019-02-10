@@ -23,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.uima.jcas.cas.FSArray;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -33,9 +34,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
+import de.unistuttgart.ims.coref.annotator.comp.FSArrayTableCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.adapter.DirectedRelationsTableModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.EntityComboBoxModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.FlagComboBoxModel;
+import de.unistuttgart.ims.coref.annotator.document.adapter.UndirectedRelationsTableModel;
 
 public class RelationEditor extends JFrame {
 
@@ -68,11 +72,10 @@ public class RelationEditor extends JFrame {
 		directedflagCombobox.setRenderer(new FlagListCellRenderer());
 		undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
 
-		this.tableWithDirectedRelations = new JTable(documentModel.getRelationModel().getDirectedRelationsTableModel());
+		this.tableWithDirectedRelations = new JTable(new DirectedRelationsTableModel(documentModel.getRelationModel()));
 
 		this.tableWithUndirectedRelations = new JTable(
-				documentModel.getRelationModel().getUndirectedRelationsTableModel());
-
+				new UndirectedRelationsTableModel(documentModel.getRelationModel()));
 		// Actions
 		AbstractAction addDirectedRelationAction = new AddDirectedRelationAction(documentModel);
 		AbstractAction addUndirectedRelationAction = new AddUndirectedRelationAction(documentModel);
@@ -127,6 +130,7 @@ public class RelationEditor extends JFrame {
 		this.tableWithUndirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.tableWithUndirectedRelations.setRowHeight(25);
 		this.tableWithUndirectedRelations.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
+		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class, new FSArrayTableCellRenderer());
 		this.tableWithUndirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(undirectedflagCombobox));
 
 		this.toolbar = new JPanel();

@@ -25,6 +25,7 @@ import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 
+@Deprecated
 public class NewRelation extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;

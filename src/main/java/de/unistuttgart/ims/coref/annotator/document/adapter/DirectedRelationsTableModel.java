@@ -17,9 +17,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelat
 
 public class DirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
-	/**
-	 * 
-	 */
 	private RelationModel relationModel;
 
 	/**
@@ -27,14 +24,16 @@ public class DirectedRelationsTableModel extends DefaultTableModel implements Ta
 	 */
 	public DirectedRelationsTableModel(RelationModel relationModel) {
 		this.relationModel = relationModel;
+		this.relationModel.addRelationModelListener(this);
 	}
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int getRowCount() {
-		return this.relationModel.getDocumentModel().getRelationModel().getRelations()
-				.select(r -> r instanceof DirectedEntityRelation).size();
+		if (this.relationModel == null)
+			return 0;
+		return this.relationModel.getRelations().select(r -> r instanceof DirectedEntityRelation).size();
 	}
 
 	@Override
@@ -75,7 +74,8 @@ public class DirectedRelationsTableModel extends DefaultTableModel implements Ta
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		EntityRelation er = this.relationModel.getRelations().get(rowIndex);
+		EntityRelation er = this.relationModel.getRelations().select(r -> r instanceof DirectedEntityRelation)
+				.get(rowIndex);
 
 		if (er instanceof DirectedEntityRelation) {
 			DirectedEntityRelation der = (DirectedEntityRelation) er;
@@ -94,7 +94,8 @@ public class DirectedRelationsTableModel extends DefaultTableModel implements Ta
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		DirectedEntityRelation erel = (DirectedEntityRelation) this.relationModel.getRelations().get(rowIndex);
+		DirectedEntityRelation erel = (DirectedEntityRelation) this.relationModel.getRelations()
+				.select(r -> r instanceof DirectedEntityRelation).get(rowIndex);
 		UpdateDirectedEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
