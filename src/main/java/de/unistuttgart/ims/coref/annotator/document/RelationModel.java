@@ -23,8 +23,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddDirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.AddUndirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelation;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateUndirectedEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 import de.unistuttgart.ims.uima.io.xml.ArrayUtil;
 
 public class RelationModel implements Model, ListModel<EntityRelation> {
@@ -60,10 +59,8 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 			edit((AddDirectedRelation) op);
 		else if (op instanceof AddUndirectedRelation)
 			edit((AddUndirectedRelation) op);
-		else if (op instanceof UpdateDirectedEntityRelation)
-			edit((UpdateDirectedEntityRelation) op);
-		else if (op instanceof UpdateUndirectedEntityRelation)
-			edit(op);
+		else if (op instanceof UpdateEntityRelation)
+			edit((UpdateEntityRelation) op);
 		else
 			throw new UnsupportedOperationException();
 	}
@@ -108,7 +105,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 		listDataListeners.forEach(l -> l.intervalAdded(lde));
 	}
 
-	protected void edit(UpdateDirectedEntityRelation op) {
+	protected void edit(UpdateEntityRelation op) {
 		EntityRelation reln = op.getObjects().getFirst();
 		if (reln instanceof DirectedEntityRelation) {
 			DirectedEntityRelation der = (DirectedEntityRelation) reln;

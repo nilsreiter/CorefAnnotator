@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.RelationModel;
 import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 
 public class DirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
@@ -96,19 +96,19 @@ public class DirectedRelationsTableModel extends DefaultTableModel implements Ta
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		DirectedEntityRelation erel = (DirectedEntityRelation) this.relationModel.getRelations()
 				.select(r -> r instanceof DirectedEntityRelation).get(rowIndex);
-		UpdateDirectedEntityRelation.EntityRelationProperty property = null;
+		UpdateEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
-			property = UpdateDirectedEntityRelation.EntityRelationProperty.SOURCE;
+			property = UpdateEntityRelation.EntityRelationProperty.SOURCE;
 			break;
 		case 1:
-			property = UpdateDirectedEntityRelation.EntityRelationProperty.TARGET;
+			property = UpdateEntityRelation.EntityRelationProperty.TARGET;
 			break;
 		case 2:
-			property = UpdateDirectedEntityRelation.EntityRelationProperty.TYPE;
+			property = UpdateEntityRelation.EntityRelationProperty.TYPE;
 			break;
 		}
-		this.relationModel.getDocumentModel().edit(new UpdateDirectedEntityRelation(erel, property, aValue));
+		this.relationModel.getDocumentModel().edit(new UpdateEntityRelation(erel, property, aValue));
 	}
 
 	@Override

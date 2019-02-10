@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.RelationModel;
 import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateDirectedEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 
 public class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
@@ -95,16 +95,16 @@ public class UndirectedRelationsTableModel extends DefaultTableModel implements 
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		SymmetricEntityRelation erel = (SymmetricEntityRelation) this.relationModel.getRelations()
 				.select(r -> r instanceof SymmetricEntityRelation).get(rowIndex);
-		UpdateDirectedEntityRelation.EntityRelationProperty property = null;
+		UpdateEntityRelation.EntityRelationProperty property = null;
 		switch (columnIndex) {
 		case 0:
-			property = UpdateDirectedEntityRelation.EntityRelationProperty.TYPE;
+			property = UpdateEntityRelation.EntityRelationProperty.TYPE;
 			break;
 		case 1:
 			// property = UpdateUndirectedEntityRelation.EntityRelationProperty.ENTITIES;
 			break;
 		}
-		this.relationModel.getDocumentModel().edit(new UpdateDirectedEntityRelation(erel, property, aValue));
+		this.relationModel.getDocumentModel().edit(new UpdateEntityRelation(erel, property, aValue));
 	}
 
 	@Override
