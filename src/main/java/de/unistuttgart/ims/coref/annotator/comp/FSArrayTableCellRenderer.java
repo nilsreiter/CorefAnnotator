@@ -12,13 +12,16 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.cas.FSArray;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public class FSArrayTableCellRenderer extends JPanel implements TableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 	DefaultTableCellRenderer defCellRenderer = new DefaultTableCellRenderer();
+	DocumentModel documentModel;
 
-	public FSArrayTableCellRenderer() {
+	public FSArrayTableCellRenderer(DocumentModel documentModel) {
+		this.documentModel = documentModel;
 	}
 
 	@Override
@@ -33,7 +36,7 @@ public class FSArrayTableCellRenderer extends JPanel implements TableCellRendere
 			FSArray arr = (FSArray) value;
 			for (FeatureStructure fs : arr) {
 				if (fs instanceof Entity) {
-					this.add(new EntityLabel((Entity) fs));
+					this.add(new EntityPanel(documentModel, (Entity) fs));
 				}
 			}
 		}

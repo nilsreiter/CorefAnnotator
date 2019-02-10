@@ -130,7 +130,8 @@ public class RelationEditor extends JFrame {
 		this.tableWithUndirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.tableWithUndirectedRelations.setRowHeight(25);
 		this.tableWithUndirectedRelations.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
-		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class, new FSArrayTableCellRenderer());
+		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class,
+				new FSArrayTableCellRenderer(documentModel));
 		this.tableWithUndirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(undirectedflagCombobox));
 
 		this.toolbar = new JPanel();
