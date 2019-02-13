@@ -217,8 +217,4 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 		return undirectedRelationsTableModel;
 	}
 
-	@Override
-	public DocumentModel getDocumentModel() {
-		return documentModel;
-	}
 }

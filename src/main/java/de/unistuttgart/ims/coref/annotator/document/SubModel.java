@@ -9,7 +9,7 @@ public abstract class SubModel implements Model {
 		this.documentModel = documentModel;
 	}
 
-	protected DocumentModel getDocumentModel() {
+	public DocumentModel getDocumentModel() {
 		return documentModel;
 	}
 
