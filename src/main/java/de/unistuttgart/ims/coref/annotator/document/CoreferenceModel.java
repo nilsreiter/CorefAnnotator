@@ -97,8 +97,6 @@ public class CoreferenceModel extends SubModel implements Model {
 	@Deprecated
 	JCas jcas;
 
-	boolean initialised = false;
-
 	DocumentModel documentModel;
 
 	public CoreferenceModel(DocumentModel documentModel) {
