@@ -149,6 +149,10 @@ public class DocumentModel implements Model {
 		flagModel = new FlagModel(this, preferences);
 		segmentModel = new SegmentModel(this);
 		relationModel = new RelationModel(this);
+
+		coreferenceModel.initialize();
+		segmentModel.initialize();
+		flagModel.initialize();
 	}
 
 	public boolean isSavable() {

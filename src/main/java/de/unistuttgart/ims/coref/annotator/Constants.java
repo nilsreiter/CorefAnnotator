@@ -226,6 +226,8 @@ public class Constants {
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
 		public static final String RELATION_EDITOR = "relation.editor";
+		public static final String SEARCH_WINDOW_RESTRICT_TO_MENTIONS = "search.window.restrict_to_mentions";
+		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
 		public static final String SEARCH_WINDOW_TAB_STRUCTURE = "search.window.tab.structure";
 		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";

@@ -107,7 +107,7 @@ public class Annotator {
 	}
 
 	public Annotator() throws ResourceInitializationException {
-		logger.trace("Application startup");
+		logger.trace("Application startup. Version " + Version.get().toString());
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 

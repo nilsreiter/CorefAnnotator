@@ -67,7 +67,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel implements Model {
+public class CoreferenceModel extends SubModel implements Model {
 
 	public static enum EntitySorter {
 		LABEL, CHILDREN, COLOR
@@ -102,13 +102,9 @@ public class CoreferenceModel implements Model {
 	@Deprecated
 	JCas jcas;
 
-	boolean initialised = false;
-
-	DocumentModel documentModel;
-
 	public CoreferenceModel(DocumentModel documentModel) {
+		super(documentModel);
 		this.jcas = documentModel.getJcas();
-		this.documentModel = documentModel;
 	}
 
 	/**
@@ -549,9 +545,25 @@ public class CoreferenceModel implements Model {
 		return documentModel.getPreferences();
 	}
 
+	@Override
+	protected void initializeOnce() {
+		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+			if (entity.getKey() != null)
+				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
+		}
+		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
+			entityMentionMap.put(mention.getEntity(), mention);
+			mention.getEntity().addToIndexes();
+			registerAnnotation(mention);
+			if (mention.getDiscontinuous() != null) {
+				registerAnnotation(mention.getDiscontinuous());
+			}
+		}
+	}
+
 	@Deprecated
 	public void initialPainting() {
-		if (initialised)
+		if (initialized)
 			return;
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
 			fireEvent(Event.get(this, Event.Type.Add, null, entity));
@@ -568,7 +580,7 @@ public class CoreferenceModel implements Model {
 				fireEvent(Event.get(this, Event.Type.Add, mention, mention.getDiscontinuous()));
 			}
 		}
-		initialised = true;
+		initialized = true;
 	}
 
 	private Entity merge(Iterable<Entity> nodes) {
