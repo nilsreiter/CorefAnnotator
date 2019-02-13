@@ -66,7 +66,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel implements Model {
+public class CoreferenceModel extends SubModel implements Model {
 
 	/**
 	 * A mapping from character positions to annotations
