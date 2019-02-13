@@ -16,17 +16,18 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
-public class SegmentModel implements ListModel<Segment> {
+public class SegmentModel extends SubModel implements ListModel<Segment> {
 	DocumentModel documentModel;
 	ImmutableList<Segment> topLevelSegments = null;
 	MutableList<ListDataListener> listeners = Lists.mutable.empty();
 
 	public SegmentModel(DocumentModel documentModel) {
-		this.documentModel = documentModel;
-		this.loadJCas(documentModel.getJcas());
+		super(documentModel);
 	}
 
-	protected void loadJCas(JCas jcas) {
+	@Override
+	protected void initializeOnce() {
+		JCas jcas = getDocumentModel().getJcas();
 		Map<Segment, Collection<Segment>> index = JCasUtil.indexCovering(jcas, Segment.class, Segment.class);
 
 		topLevelSegments = Lists.mutable.withAll(JCasUtil.select(jcas, Segment.class)).reject(s -> index.containsKey(s))

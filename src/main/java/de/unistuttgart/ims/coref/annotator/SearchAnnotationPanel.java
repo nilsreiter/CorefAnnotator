@@ -65,42 +65,6 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 	}
 
-	@Deprecated
-	class SearchFlaggedMentionsAmbiguous extends SearchFlaggedMentions {
-
-		private static final long serialVersionUID = 1L;
-
-		public SearchFlaggedMentionsAmbiguous() {
-			super(Constants.MENTION_FLAG_AMBIGUOUS, Constants.Strings.ACTION_SEARCH_MENTION_AMBIGUOUS,
-					MaterialDesign.MDI_SHARE_VARIANT);
-		}
-
-	}
-
-	@Deprecated
-	class SearchFlaggedMentionsDifficult extends SearchFlaggedMentions {
-
-		private static final long serialVersionUID = 1L;
-
-		public SearchFlaggedMentionsDifficult() {
-			super(Constants.MENTION_FLAG_DIFFICULT, Constants.Strings.ACTION_SEARCH_MENTION_DIFFICULT,
-					MaterialDesign.MDI_ALERT_BOX);
-		}
-
-	}
-
-	@Deprecated
-	class SearchFlaggedMentionsNonNominal extends SearchFlaggedMentions {
-
-		private static final long serialVersionUID = 1L;
-
-		public SearchFlaggedMentionsNonNominal() {
-			super(Constants.MENTION_FLAG_NON_NOMINAL, Constants.Strings.ACTION_SEARCH_MENTION_NONNOMINAL,
-					MaterialDesign.MDI_FLAG);
-		}
-
-	}
-
 	class StructuredSearchResultListSelectionListener implements ListSelectionListener {
 
 		@Override

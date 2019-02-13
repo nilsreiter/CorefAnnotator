@@ -139,6 +139,10 @@ public class DocumentModel implements Model {
 		treeModel = new EntityTreeModel(coreferenceModel);
 		flagModel = new FlagModel(this, preferences);
 		segmentModel = new SegmentModel(this);
+
+		coreferenceModel.initialize();
+		segmentModel.initialize();
+		flagModel.initialize();
 	}
 
 	public boolean isSavable() {
