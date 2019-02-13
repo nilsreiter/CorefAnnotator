@@ -524,6 +524,24 @@ public class CoreferenceModel implements Model {
 		return documentModel.getPreferences();
 	}
 
+	protected void initialize() {
+		if (initialised)
+			return;
+		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+			if (entity.getKey() != null)
+				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
+		}
+		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
+			entityMentionMap.put(mention.getEntity(), mention);
+			mention.getEntity().addToIndexes();
+			registerAnnotation(mention);
+			if (mention.getDiscontinuous() != null) {
+				registerAnnotation(mention.getDiscontinuous());
+			}
+		}
+		initialised = true;
+	}
+
 	@Deprecated
 	public void initialPainting() {
 		if (initialised)
