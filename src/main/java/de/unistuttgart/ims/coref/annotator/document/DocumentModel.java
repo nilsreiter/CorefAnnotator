@@ -141,6 +141,8 @@ public class DocumentModel implements Model {
 		segmentModel = new SegmentModel(this);
 
 		coreferenceModel.initialize();
+		segmentModel.initialize();
+		flagModel.initialize();
 	}
 
 	public boolean isSavable() {

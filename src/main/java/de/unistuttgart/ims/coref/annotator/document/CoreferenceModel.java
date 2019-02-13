@@ -97,11 +97,9 @@ public class CoreferenceModel extends SubModel implements Model {
 	@Deprecated
 	JCas jcas;
 
-	DocumentModel documentModel;
-
 	public CoreferenceModel(DocumentModel documentModel) {
+		super(documentModel);
 		this.jcas = documentModel.getJcas();
-		this.documentModel = documentModel;
 	}
 
 	/**
@@ -522,9 +520,8 @@ public class CoreferenceModel extends SubModel implements Model {
 		return documentModel.getPreferences();
 	}
 
-	protected void initialize() {
-		if (initialised)
-			return;
+	@Override
+	protected void initializeOnce() {
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
 			if (entity.getKey() != null)
 				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
@@ -537,12 +534,11 @@ public class CoreferenceModel extends SubModel implements Model {
 				registerAnnotation(mention.getDiscontinuous());
 			}
 		}
-		initialised = true;
 	}
 
 	@Deprecated
 	public void initialPainting() {
-		if (initialised)
+		if (initialized)
 			return;
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
 			fireEvent(Event.get(this, Event.Type.Add, null, entity));
@@ -559,7 +555,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				fireEvent(Event.get(this, Event.Type.Add, mention, mention.getDiscontinuous()));
 			}
 		}
-		initialised = true;
+		initialized = true;
 	}
 
 	private Entity merge(Iterable<Entity> nodes) {
