@@ -56,13 +56,12 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
  * @author reiterns
  *
  */
-public class FlagModel implements Model {
-	DocumentModel documentModel;
+public class FlagModel extends SubModel implements Model {
 	private MutableSet<String> keys = Sets.mutable.empty();
 	MutableSet<FlagModelListener> listeners = Sets.mutable.empty();
 
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
-		this.documentModel = documentModel;
+		super(documentModel);
 
 		if (!JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
 			initialiseDefaultFlags();
