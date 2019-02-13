@@ -27,8 +27,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 import de.unistuttgart.ims.uima.io.xml.ArrayUtil;
 
-public class RelationModel implements Model, ListModel<EntityRelation> {
-	DocumentModel documentModel;
+public class RelationModel extends SubModel implements Model, ListModel<EntityRelation> {
 
 	DirectedRelationsTableModel directedRelationsTableModel = null, undirectedRelationsTableModel = null;
 
@@ -38,7 +37,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 	MutableList<ListDataListener> listDataListeners = Lists.mutable.empty();
 
 	public RelationModel(DocumentModel documentModel) {
-		this.documentModel = documentModel;
+		super(documentModel);
 		list.addAll(JCasUtil.select(documentModel.getJcas(), EntityRelation.class));
 
 		if (!JCasUtil.exists(documentModel.getJcas(), EntityRelationType.class)) {
@@ -218,6 +217,7 @@ public class RelationModel implements Model, ListModel<EntityRelation> {
 		return undirectedRelationsTableModel;
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
 	}
