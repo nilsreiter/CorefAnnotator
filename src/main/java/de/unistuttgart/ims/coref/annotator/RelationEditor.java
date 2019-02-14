@@ -141,6 +141,7 @@ public class RelationEditor extends JFrame {
 		this.tableWithDirectedRelations.setDragEnabled(true);
 		this.tableWithDirectedRelations.setTransferHandler(directedRelationsTableModel.getTransferHandler());
 		this.tableWithDirectedRelations.setRowHeight(25);
+		this.tableWithDirectedRelations.setToolTipText("x");
 
 		this.tableWithDirectedRelations.getColumnModel().getColumn(0)
 				.setHeaderRenderer(new DefaultTableHeaderCellRenderer() {

@@ -27,6 +27,7 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener {
 	public EntityPanel(DocumentModel documentModel, Entity entity) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.setOpaque(false);
+		this.setToolTipText(documentModel.getCoreferenceModel().getToolTipText(entity));
 
 		JLabel mainLabel = new EntityLabel(entity);
 

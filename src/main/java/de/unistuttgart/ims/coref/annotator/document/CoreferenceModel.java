@@ -545,6 +545,27 @@ public class CoreferenceModel extends SubModel implements Model {
 		return documentModel.getPreferences();
 	}
 
+	public String getToolTipText(FeatureStructure featureStructure) {
+		if (featureStructure instanceof EntityGroup) {
+			StringBuilder b = new StringBuilder();
+			EntityGroup entityGroup = (EntityGroup) featureStructure;
+			if (entityGroup.getMembers().size() > 0) {
+				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+					b.append(entityGroup.getMembers(0).getLabel());
+				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+					b.append(", ");
+					b.append(entityGroup.getMembers(i).getLabel());
+				}
+				return b.toString();
+			} else {
+				return null;
+			}
+		} else if (featureStructure instanceof Entity) {
+			return ((Entity) featureStructure).getLabel();
+		}
+		return null;
+	}
+
 	@Override
 	protected void initializeOnce() {
 		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
