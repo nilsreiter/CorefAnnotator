@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -46,8 +47,11 @@ public class FlagEditor extends JFrame {
 	JTable table;
 	JPanel toolbar;
 
-	public FlagEditor(DocumentModel documentModel, DocumentWindow documentWindow) {
+	public FlagEditor(DocumentWindow documentWindow, DocumentModel documentModel) {
 		this.documentModel = documentModel;
+		this.documentWindow = documentWindow;
+
+		documentWindow.addWindowListener(new DocumentWindowWindowListener());
 		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
@@ -215,43 +219,66 @@ public class FlagEditor extends JFrame {
 
 		@Override
 		public void windowOpened(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowClosing(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowClosed(WindowEvent e) {
-
 		}
 
 		@Override
 		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowActivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
+		}
 
+	}
+
+	class DocumentWindowWindowListener implements WindowListener {
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			FlagEditor.this.setVisible(false);
+			FlagEditor.this.dispose();
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+			FlagEditor.this.setState(Frame.ICONIFIED);
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+			FlagEditor.this.setState(Frame.NORMAL);
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
 		}
 
 	}
