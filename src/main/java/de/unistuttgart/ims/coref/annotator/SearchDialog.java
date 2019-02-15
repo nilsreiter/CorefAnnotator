@@ -34,6 +34,8 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		text = xdw.textPane.getText();
 		contexts = configuration.getInt(Constants.CFG_SEARCH_RESULTS_CONTEXT, Defaults.CFG_SEARCH_RESULTS_CONTEXT);
 
+		documentWindow.addWindowListener(new DocumentWindowWindowListener());
+
 		// this allows closing by hitting command-w
 		InputMap inputMap = ((JPanel) this.getContentPane()).getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
@@ -137,6 +139,42 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 
 	@Override
 	public void windowOpened(WindowEvent e) {
+
+	}
+
+	class DocumentWindowWindowListener implements WindowListener {
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			SearchDialog.this.setVisible(false);
+			SearchDialog.this.dispose();
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+			SearchDialog.this.setVisible(false);
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+			SearchDialog.this.setVisible(true);
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+		}
 
 	}
 
