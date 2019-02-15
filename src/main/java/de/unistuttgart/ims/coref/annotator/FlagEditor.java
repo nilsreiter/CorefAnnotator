@@ -13,8 +13,9 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -28,8 +29,11 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
+import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
+import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -37,7 +41,7 @@ import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
 
-public class FlagEditor extends JFrame {
+public class FlagEditor extends AbstractWindow {
 
 	private static final long serialVersionUID = 1L;
 
@@ -50,6 +54,14 @@ public class FlagEditor extends JFrame {
 	public FlagEditor(DocumentWindow documentWindow, DocumentModel documentModel) {
 		this.documentModel = documentModel;
 		this.documentWindow = documentWindow;
+
+		this.initializeWindow();
+	}
+
+	@Override
+	protected void initializeWindow() {
+		super.initializeWindow();
+		progressBar.setVisible(false);
 
 		documentWindow.addWindowListener(new DocumentWindowWindowListener());
 		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
@@ -72,6 +84,25 @@ public class FlagEditor extends JFrame {
 		// Actions
 		AbstractAction addFlagAction = new AddFlagAction(documentModel);
 		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentModel, table);
+		AbstractAction undoAction = new UndoAction(documentWindow);
+
+		// Menu
+		JMenu fileMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_FILE));
+		fileMenu.add(new JMenuItem(addFlagAction));
+		fileMenu.add(new JMenuItem(deleteFlagAction));
+		fileMenu.addSeparator();
+		fileMenu.add(new CloseAction());
+
+		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(undoAction));
+
+		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
+		helpMenu.add(Annotator.app.helpAction);
+
+		menuBar.add(fileMenu);
+		menuBar.add(entityMenu);
+		menuBar.add(helpMenu);
+		setJMenuBar(menuBar);
 
 		// Table
 		this.table.setGridColor(Color.GRAY);
