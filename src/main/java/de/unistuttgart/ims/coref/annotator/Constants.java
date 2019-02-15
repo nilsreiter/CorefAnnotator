@@ -5,6 +5,10 @@ import java.util.Random;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
+
 public class Constants {
 	public static class Setting<T> {
 
@@ -93,9 +97,9 @@ public class Constants {
 		public static final String ACTION_COMPARE_TOOLTIP = "action.compare.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
-		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
 		public static final String ACTION_DELETE_FLAG = "action.delete_flag";
 		public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
+		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
 		public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 		public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 		public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
@@ -180,13 +184,26 @@ public class Constants {
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
 		public static final String ENTITY_GROUP_AND = "entity.group.and";
+		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_1 = "flag_editor.flag_collection.1";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP = "flag_editor.flag_collection.1.tooltip";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_2 = "flag_editor.flag_collection.2";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP = "flag_editor.flag_collection.2.tooltip";
+		public static final String FLAG_EDITOR_ICON = "flag_editor.icon";
+		public static final String FLAG_EDITOR_ICON_TOOLTIP = "flag_editor.icon.tooltip";
+		public static final String FLAG_EDITOR_KEY = "flag_editor.key";
+		public static final String FLAG_EDITOR_KEY_TOOLTIP = "flag_editor.key.tooltip";
+		public static final String FLAG_EDITOR_LABEL = "flag_editor.label";
+		public static final String FLAG_EDITOR_LABEL_TOOLTIP = "flag_editor.label.tooltip";
+		public static final String FLAG_EDITOR_TARGETCLASS = "flag_editor.targetclass";
+		public static final String FLAG_EDITOR_TARGETCLASS_TOOLTIP = "flag_editor.targetclass.tooltip";
+		public static final String FLAGMODEL_NEW_FLAG = "flagmodel.new_flag";
 		public static final String LANGUAGE = "language";
 		public static final String MENTION_FLAG_AMBIGUOUS = "mention.flag.ambiguous";
 		public static final String MENTION_FLAG_DIFFICULT = "mention.flag.difficult";
 		public static final String MENTION_FLAG_NON_NOMINAL = "mention.flag.non_nominal";
 		public static final String MENU_COMMENTS = "menu.comments";
 		public static final String MENU_EDIT = "menu.edit";
-		public static final String MENU_FLAGS = "menu.flags";
 		public static final String MENU_EDIT_ENTITIES = "menu.edit.entities";
 		public static final String MENU_EDIT_ENTITIES_SORT = "menu.edit.entities.sort";
 		public static final String MENU_EDIT_MENTIONS = "menu.edit.mentions";
@@ -195,6 +212,7 @@ public class Constants {
 		public static final String MENU_FILE = "menu.file";
 		public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 		public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
+		public static final String MENU_FLAGS = "menu.flags";
 		public static final String MENU_HELP = "menu.help";
 		public static final String MENU_SETTINGS = "menu.settings";
 		public static final String MENU_TOOLS = "menu.tools";
@@ -212,8 +230,8 @@ public class Constants {
 		public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 		public static final String MESSAGE_SAVING = "message.saving";
 		public static final String SEARCH_WINDOW_RESTRICT_TO_MENTIONS = "search.window.restrict_to_mentions";
-		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
 		public static final String SEARCH_WINDOW_TAB_STRUCTURE = "search.window.tab.structure";
+		public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";
 		public static final String SEARCH_WINDOW_TEXT_TOOLTIP = "search.window.text.tooltip";
 		public static final String SEARCH_WINDOW_TITLE = "search.window.title";
 		public static final String STAT_AGR_TITLE = "stat.agr.title";
@@ -243,16 +261,6 @@ public class Constants {
 		public static final String STATUS_STYLE = "status.style";
 		public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 		public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
-		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
-		public static final String FLAG_EDITOR_ICON = "flag_editor.icon";
-		public static final String FLAG_EDITOR_ICON_TOOLTIP = "flag_editor.icon.tooltip";
-		public static final String FLAG_EDITOR_KEY = "flag_editor.key";
-		public static final String FLAG_EDITOR_KEY_TOOLTIP = "flag_editor.key.tooltip";
-		public static final String FLAG_EDITOR_LABEL = "flag_editor.label";
-		public static final String FLAG_EDITOR_LABEL_TOOLTIP = "flag_editor.label.tooltip";
-		public static final String FLAG_EDITOR_TARGETCLASS = "flag_editor.targetclass";
-		public static final String FLAG_EDITOR_TARGETCLASS_TOOLTIP = "flag_editor.targetclass.tooltip";
-		public static final String FLAGMODEL_NEW_FLAG = "flagmodel.new_flag";
 
 	}
 
@@ -272,12 +280,26 @@ public class Constants {
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 
+	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
+			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
+			new AddFlag("male", "Male", MaterialDesign.MDI_GENDER_MALE, Entity.class),
+			new AddFlag("male-female", "Male/Female", MaterialDesign.MDI_GENDER_MALE_FEMALE, Entity.class),
+			new AddFlag("transgender", "Transgender", MaterialDesign.MDI_GENDER_TRANSGENDER, Entity.class) };
+
+	public static final AddFlag[] FLAG_COLLECTION_2 = new AddFlag[] {
+			new AddFlag("predicate", "Predicate", MaterialDesign.MDI_GAVEL, Mention.class),
+			new AddFlag("pronoun", "Pronoun", MaterialDesign.MDI_ARROW_TOP_LEFT, Mention.class),
+			new AddFlag("name", "Proper name", MaterialDesign.MDI_TAG, Mention.class) };
+
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
+
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
+
+	public static final Random RANDOM = new Random();
 
 	public static final Setting<Boolean> SETTING_ASK_BEFORE_FILE_OVERWRITE = new Setting<Boolean>(
 			CFG_ASK_BEFORE_FILE_OVERWRITE, Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE,
@@ -292,6 +314,10 @@ public class Constants {
 			Strings.ACTION_TOGGLE_FULL_TOKENS, Strings.ACTION_TOGGLE_FULL_TOKENS_TOOLTIP, true,
 			MaterialDesign.MDI_VIEW_WEEK);
 
+	public static final Setting<Boolean> SETTING_IGNORE_SINGLETONS_WHEN_COMPARING = new Setting<Boolean>(
+			CFG_IGNORE_SINGLETONS_WHEN_COMPARING, Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING,
+			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
+
 	public static final Setting<Boolean> SETTING_KEEP_TREE_SORTED = new Setting<Boolean>(CFG_KEEP_TREE_SORTED,
 			Strings.ACTION_TOGGLE_KEEP_TREE_SORTED, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_SORT_VARIANT);
@@ -299,22 +325,16 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
 			Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP, false,
 			MaterialDesign.MDI_FORMAT_TEXT);
-
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
-	public static final Setting<Boolean> SETTING_IGNORE_SINGLETONS_WHEN_COMPARING = new Setting<Boolean>(
-			CFG_IGNORE_SINGLETONS_WHEN_COMPARING, Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING,
-			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
-
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru" };
-	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
-
-	public static final String X_UNSPECIFIED = "x-unspecified";
 
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 
-	public static final Random RANDOM = new Random();
+	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
+
+	public static final String X_UNSPECIFIED = "x-unspecified";
 }

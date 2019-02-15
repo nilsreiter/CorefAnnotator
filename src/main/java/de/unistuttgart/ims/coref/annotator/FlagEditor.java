@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -16,10 +17,10 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -40,6 +41,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class FlagEditor extends AbstractWindow {
 
@@ -49,7 +51,7 @@ public class FlagEditor extends AbstractWindow {
 	DocumentWindow documentWindow;
 
 	JTable table;
-	JPanel toolbar;
+	JToolBar toolbar;
 
 	public FlagEditor(DocumentWindow documentWindow, DocumentModel documentModel) {
 		this.documentModel = documentModel;
@@ -86,22 +88,52 @@ public class FlagEditor extends AbstractWindow {
 		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentModel, table);
 		AbstractAction undoAction = new UndoAction(documentWindow);
 
+		deleteFlagAction.setEnabled(false);
+
 		// Menu
 		JMenu fileMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_FILE));
-		fileMenu.add(new JMenuItem(addFlagAction));
-		fileMenu.add(new JMenuItem(deleteFlagAction));
-		fileMenu.addSeparator();
 		fileMenu.add(new CloseAction());
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(undoAction));
+
+		JMenu flagMenu = new JMenu(Annotator.getString(Strings.MENU_FLAGS));
+		flagMenu.add(new JMenuItem(addFlagAction));
+		flagMenu.add(new JMenuItem(deleteFlagAction));
+		flagMenu.addSeparator();
+		flagMenu.add(new JMenuItem(
+				new AbstractAction(Strings.FLAG_EDITOR_FLAG_COLLECTION_1, FontIcon.of(MaterialDesign.MDI_FOLDER)) {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						for (AddFlag af : Constants.FLAG_COLLECTION_1) {
+							documentModel.edit(af);
+						}
+					}
+				}));
+		flagMenu.add(new JMenuItem(
+				new AbstractAction(Strings.FLAG_EDITOR_FLAG_COLLECTION_2, FontIcon.of(MaterialDesign.MDI_FOLDER)) {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						for (AddFlag af : Constants.FLAG_COLLECTION_2) {
+							documentModel.edit(af);
+						}
+					}
+				}));
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
 		helpMenu.add(Annotator.app.helpAction);
 
 		menuBar.add(fileMenu);
 		menuBar.add(entityMenu);
+		menuBar.add(flagMenu);
 		menuBar.add(helpMenu);
+
 		setJMenuBar(menuBar);
 
 		// Table
@@ -155,7 +187,7 @@ public class FlagEditor extends AbstractWindow {
 			}
 		});
 
-		this.toolbar = new JPanel();
+		this.toolbar = new JToolBar();
 		this.toolbar.add(new JButton(addFlagAction));
 		this.toolbar.add(new JButton(deleteFlagAction));
 

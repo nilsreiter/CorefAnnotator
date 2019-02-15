@@ -57,7 +57,7 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 						|| key.equals(Constants.MENTION_FLAG_AMBIGUOUS) || key.equals(Constants.MENTION_FLAG_DIFFICULT)
 						|| key.equals(Constants.MENTION_FLAG_NON_NOMINAL)));
 			} catch (IndexOutOfBoundsException ex) {
-				Annotator.logger.catching(ex);
+				setEnabled(false);
 			}
 
 		}
