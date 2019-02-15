@@ -19,7 +19,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class SearchDialog extends JDialog implements DocumentListener, WindowListener, SearchContainer {
+public class SearchDialog extends JDialog implements DocumentListener, SearchContainer {
 
 	private static final String ACTION_CLOSE = "close";
 
@@ -91,7 +91,7 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
 		setLocationRelativeTo(documentWindow);
-		addWindowListener(this);
+		addWindowListener(new SearchDialogWindowListener());
 		pack();
 	}
 
@@ -109,37 +109,35 @@ public class SearchDialog extends JDialog implements DocumentListener, WindowLis
 		this.contexts = contexts;
 	}
 
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
+	class SearchDialogWindowListener implements WindowListener {
+		@Override
+		public void windowActivated(WindowEvent e) {
+		}
 
-	@Override
-	public void windowClosed(WindowEvent e) {
+		@Override
+		public void windowClosed(WindowEvent e) {
+		}
 
-	}
+		@Override
+		public void windowClosing(WindowEvent e) {
+			dispose();
+		}
 
-	@Override
-	public void windowClosing(WindowEvent e) {
-		dispose();
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+		}
 
-	}
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+		}
 
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
+		@Override
+		public void windowIconified(WindowEvent e) {
+		}
 
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-
+		@Override
+		public void windowOpened(WindowEvent e) {
+		}
 	}
 
 	class DocumentWindowWindowListener implements WindowListener {
