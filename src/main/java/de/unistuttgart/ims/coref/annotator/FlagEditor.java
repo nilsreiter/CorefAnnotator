@@ -6,8 +6,8 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -261,47 +261,11 @@ public class FlagEditor extends AbstractWindow {
 		}
 	}
 
-	class FlagEditorWindowListener implements WindowListener {
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-		}
-
-		@Override
-		public void windowClosed(WindowEvent e) {
-		}
-
-		@Override
-		public void windowIconified(WindowEvent e) {
-		}
-
-		@Override
-		public void windowDeiconified(WindowEvent e) {
-		}
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-		}
+	class FlagEditorWindowListener extends WindowAdapter {
 
 	}
 
-	class DocumentWindowWindowListener implements WindowListener {
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-		}
+	class DocumentWindowWindowListener extends WindowAdapter {
 
 		@Override
 		public void windowClosed(WindowEvent e) {
@@ -318,15 +282,6 @@ public class FlagEditor extends AbstractWindow {
 		public void windowDeiconified(WindowEvent e) {
 			FlagEditor.this.setState(Frame.NORMAL);
 		}
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-		}
-
 	}
 
 	class MyHeaderRenderer extends DefaultTableHeaderCellRenderer {
