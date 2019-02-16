@@ -157,7 +157,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -1712,35 +1711,10 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void treeNodesInserted(TreeModelEvent e) {
 			tree.expandPath(e.getTreePath().getParentPath());
-
-			// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-			// tree.expandPath(e.getTreePath());
-			/*
-			 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
-			 * tree.repaint(r); } catch (NullPointerException ex) {
-			 * Annotator.logger.catching(ex); }
-			 */
 		}
 
 		@Override
 		public void treeNodesChanged(TreeModelEvent e) {
-			CATreeNode node;
-			node = (CATreeNode) (e.getTreePath().getLastPathComponent());
-			try {
-				int index = e.getChildIndices()[0];
-				node = (node.getChildAt(index));
-			} catch (NullPointerException exc) {
-			}
-			String newName = (String) node.getUserObject();
-			if (newName != null) {
-				FeatureStructure fs = node.getFeatureStructure();
-				if (fs instanceof Entity) {
-					if (!node.getEntity().getLabel().equals(newName)) {
-						getDocumentModel().edit(new UpdateEntityName(node.getEntity(), newName));
-					}
-				}
-			}
-			tree.repaint(tree.getPathBounds(e.getTreePath()));
 		}
 
 		@Override
