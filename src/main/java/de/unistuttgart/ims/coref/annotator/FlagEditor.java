@@ -85,7 +85,8 @@ public class FlagEditor extends AbstractWindow {
 		this.table = new JTable(new FlagTableModel(documentModel));
 
 		// Actions
-		AbstractAction addFlagAction = new AddFlagAction(documentModel);
+		AbstractAction addEntityFlagAction = AddFlagAction.getAddEntityFlagAction(documentModel);
+		AbstractAction addMentionFlagAction = AddFlagAction.getAddMentionFlagAction(documentModel);
 		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentModel, table);
 		AbstractAction undoAction = new UndoAction(documentWindow);
 
@@ -99,7 +100,8 @@ public class FlagEditor extends AbstractWindow {
 		entityMenu.add(new JMenuItem(undoAction));
 
 		JMenu flagMenu = new JMenu(Annotator.getString(Strings.MENU_FLAGS));
-		flagMenu.add(new JMenuItem(addFlagAction));
+		flagMenu.add(new JMenuItem(addEntityFlagAction));
+		flagMenu.add(new JMenuItem(addMentionFlagAction));
 		flagMenu.add(new JMenuItem(deleteFlagAction));
 		flagMenu.addSeparator();
 		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
@@ -171,7 +173,8 @@ public class FlagEditor extends AbstractWindow {
 		});
 
 		this.toolbar = new JToolBar();
-		this.toolbar.add(new JButton(addFlagAction));
+		this.toolbar.add(new JButton(addEntityFlagAction));
+		this.toolbar.add(new JButton(addMentionFlagAction));
 		this.toolbar.add(new JButton(deleteFlagAction));
 
 		this.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);

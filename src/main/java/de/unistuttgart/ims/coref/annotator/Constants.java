@@ -77,12 +77,16 @@ public class Constants {
 
 	public static class Strings {
 
+		public static final String ACTION_ADD_ENTITY_FLAG = "action.add_entity_flag";
+		public static final String ACTION_ADD_ENTITY_FLAG_TOOLTIP = "action.add_entity_flag.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY = "action.add_findings_to_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP = "action.add_findings_to_entity.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
 		public static final String ACTION_ADD_FLAG = "action.add_flag";
 		public static final String ACTION_ADD_FLAG_TOOLTIP = "action.add_flag.tooltip";
+		public static final String ACTION_ADD_MENTION_FLAG = "action.add_mention_flag";
+		public static final String ACTION_ADD_MENTION_FLAG_TOOLTIP = "action.add_mention_flag.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
 		public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 		public static final String ACTION_CLOSE = "action.close";
