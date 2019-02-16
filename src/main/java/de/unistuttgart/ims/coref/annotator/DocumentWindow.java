@@ -98,6 +98,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
+import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
@@ -157,7 +158,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -940,62 +940,6 @@ public class DocumentWindow extends AbstractTextWindow
 			if (nodes.isEmpty())
 				return null;
 			return new NodeListTransferable(nodes);
-		}
-
-	}
-
-	public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow> {
-
-		private static final long serialVersionUID = 1L;
-
-		public ChangeKeyForEntityAction(DocumentWindow documentWindow) {
-			super(documentWindow, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			Entity entity = getSelectedEntities().getOnly();
-			String s = "";
-			if (entity.getKey() != null)
-				s = entity.getKey();
-
-			JPanel panel = new JPanel();
-			panel.add(new JLabel(Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT)));
-			JTextField textField = new JTextField(1);
-			textField.setText(s);
-			panel.add(textField);
-
-			int result = JOptionPane.showOptionDialog(DocumentWindow.this, panel, "", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE, FontIcon.of(MaterialDesign.MDI_KEYBOARD),
-					new String[] { Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CLEAR),
-							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CANCEL),
-							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_OK) },
-					s);
-			String newKey = textField.getText();
-			switch (result) {
-			case 2:
-				// for setting a new key
-				if (newKey.length() == 1) {
-					Character newChar = newKey.charAt(0);
-					getTarget().getDocumentModel().edit(new UpdateEntityKey(newChar, entity));
-				} else {
-					JOptionPane.showMessageDialog(DocumentWindow.this,
-							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
-							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
-							JOptionPane.INFORMATION_MESSAGE);
-				}
-				break;
-			default:
-				// for clearing the key
-				getTarget().getDocumentModel().edit(new UpdateEntityKey(entity));
-				break;
-			}
-
 		}
 
 	}
