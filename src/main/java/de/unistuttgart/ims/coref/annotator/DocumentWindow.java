@@ -1184,7 +1184,7 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			documentModel.edit(new RemoveMention(m));
+			getTarget().getDocumentModel().edit(new RemoveMention(m));
 		}
 
 	}
