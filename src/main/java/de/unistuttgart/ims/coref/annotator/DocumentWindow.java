@@ -1168,14 +1168,14 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class RemoveMentionAction extends IkonAction {
+	class RemoveMentionAction extends TargetedIkonAction<DocumentWindow> {
 
 		private static final long serialVersionUID = 1L;
 
 		Mention m;
 
-		public RemoveMentionAction(Mention m) {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+		public RemoveMentionAction(DocumentWindow documentWindow, Mention m) {
+			super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 			this.m = m;
 
@@ -1498,7 +1498,7 @@ public class DocumentWindow extends AbstractTextWindow
 			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
-			mentionMenu.add(new RemoveMentionAction(m));
+			mentionMenu.add(new RemoveMentionAction(DocumentWindow.this, m));
 
 			return mentionMenu;
 		}
