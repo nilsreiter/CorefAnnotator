@@ -1504,7 +1504,7 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	public class MyTreeSelectionListener extends CATreeSelectionEvent {
+	public class MyTreeSelectionListener extends CAAbstractTreeSelectionListener {
 
 		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 

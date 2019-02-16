@@ -117,7 +117,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 	}
 
-	class TSL extends CATreeSelectionEvent implements ListSelectionListener {
+	class TSL extends CAAbstractTreeSelectionListener implements ListSelectionListener {
 
 		boolean treeCondition = false;
 
