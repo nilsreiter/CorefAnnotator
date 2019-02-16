@@ -17,8 +17,10 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -60,12 +62,29 @@ public class DocumentModel implements Model {
 	}
 
 	public void edit(Operation operation) {
+		Annotator.logger.trace(operation);
+		if (operation instanceof DocumentModelOperation)
+			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
 		fireDocumentChangedEvent();
+	}
+
+	protected void edit(DocumentModelOperation operation) {
+		if (operation instanceof UpdateDocumentProperty)
+			edit((UpdateDocumentProperty) operation);
+	}
+
+	protected void edit(UpdateDocumentProperty operation) {
+		switch (operation.getDocumentProperty()) {
+		case LANGUAGE:
+			operation.setOldValue(jcas.getDocumentLanguage());
+			jcas.setDocumentLanguage((String) operation.getNewValue());
+			break;
+		}
 	}
 
 	protected void fireDocumentChangedEvent() {
@@ -221,11 +240,28 @@ public class DocumentModel implements Model {
 	}
 
 	protected void undo(Operation operation) {
+		Annotator.logger.trace(operation);
+
+		if (operation instanceof DocumentModelOperation)
+			undo((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.undo(operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.undo((FlagModelOperation) operation);
 
+	}
+
+	protected void undo(DocumentModelOperation operation) {
+		if (operation instanceof UpdateDocumentProperty)
+			undo((UpdateDocumentProperty) operation);
+	}
+
+	protected void undo(UpdateDocumentProperty operation) {
+		switch (operation.getDocumentProperty()) {
+		case LANGUAGE:
+			jcas.setDocumentLanguage((String) operation.getOldValue());
+			break;
+		}
 	}
 
 }

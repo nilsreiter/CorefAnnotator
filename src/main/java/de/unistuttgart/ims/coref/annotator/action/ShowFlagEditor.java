@@ -18,7 +18,7 @@ public class ShowFlagEditor extends TargetedIkonAction<DocumentWindow> {
 	@SuppressWarnings("unused")
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		new FlagEditor(getTarget().getDocumentModel(), getTarget());
+		new FlagEditor(getTarget(), getTarget().getDocumentModel());
 	}
 
 }

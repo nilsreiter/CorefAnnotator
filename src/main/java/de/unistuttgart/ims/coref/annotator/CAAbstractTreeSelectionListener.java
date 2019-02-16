@@ -17,7 +17,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
-public abstract class CATreeSelectionEvent implements TreeSelectionListener {
+public abstract class CAAbstractTreeSelectionListener implements TreeSelectionListener {
 	TreeSelectionEvent currentEvent = null;
 	int num;
 	JTree tree;
@@ -27,7 +27,7 @@ public abstract class CATreeSelectionEvent implements TreeSelectionListener {
 	MutableList<CATreeNode> nodes;
 	MutableList<FeatureStructure> featureStructures;
 
-	public CATreeSelectionEvent(JTree tree) {
+	public CAAbstractTreeSelectionListener(JTree tree) {
 		this.tree = tree;
 	}
 

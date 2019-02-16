@@ -14,8 +14,8 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -32,39 +32,58 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 
 	private static final long serialVersionUID = 1L;
 
+	FeatureStructure featureStructure = null;
+
 	public DeleteAction(DocumentWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	}
 
+	public DeleteAction(DocumentWindow documentWindow, FeatureStructure featureStructure) {
+		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
+		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
+		putValue(Action.ACCELERATOR_KEY,
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		MutableList<TreePath> selection = Lists.mutable.of(getTarget().getTree().getSelectionPaths());
-		CATreeNode node = (CATreeNode) getTarget().getTree().getSelectionPath().getLastPathComponent();
-		FeatureStructure fs = node.getFeatureStructure();
+		FeatureStructure fs = featureStructure;
 		Operation operation = null;
-		if (fs instanceof Entity) {
-			FeatureStructure parentFs = node.getParent().getFeatureStructure();
-			if (parentFs instanceof EntityGroup) {
-				operation = new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
-			} else if (node.isLeaf()) {
-				operation = new RemoveEntities(getTarget().getSelectedEntities());
-			}
-		} else if (fs instanceof Mention) {
-			operation = new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-					.collect(tn -> (Mention) tn.getFeatureStructure()));
-		} else if (fs instanceof DetachedMentionPart) {
-			operation = new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
-		}
+		if (fs == null) {
+			MutableList<TreePath> selection = Lists.mutable.of(getTarget().getTree().getSelectionPaths());
+			CATreeNode node = (CATreeNode) getTarget().getTree().getSelectionPath().getLastPathComponent();
+			fs = node.getFeatureStructure();
 
+			if (fs instanceof Entity) {
+				FeatureStructure parentFs = node.getParent().getFeatureStructure();
+				if (parentFs instanceof EntityGroup) {
+					operation = new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
+				} else if (node.isLeaf()) {
+					operation = new RemoveEntities(getTarget().getSelectedEntities());
+				}
+			} else if (fs instanceof Mention) {
+				operation = new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
+						.collect(tn -> (Mention) tn.getFeatureStructure()));
+			} else if (fs instanceof DetachedMentionPart) {
+				operation = new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
+			}
+		} else if (featureStructure instanceof Mention) {
+			operation = new RemoveMention((Mention) featureStructure);
+		} else if (featureStructure instanceof Entity) {
+			operation = new RemoveEntities((Entity) featureStructure);
+		} else if (featureStructure instanceof DetachedMentionPart) {
+			DetachedMentionPart dmp = (DetachedMentionPart) featureStructure;
+			operation = new RemovePart(dmp.getMention(), dmp);
+		}
 		if (operation != null)
 			this.getTarget().getDocumentModel().edit(operation);
 		else
 			for (TreePath tp : getTarget().getTree().getSelectionPaths())
 				deleteSingle((CATreeNode) tp.getLastPathComponent());
+
 	}
 
 	private void deleteSingle(CATreeNode tn) {
@@ -91,7 +110,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionEvent l) {
+	public void setEnabled(CAAbstractTreeSelectionListener l) {
 		setEnabled(l.isDetachedMentionPart() || l.isMention() || (l.isEntityGroup() && l.isLeaf())
 				|| (l.isEntity() && l.isLeaf()));
 

@@ -74,8 +74,10 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -98,6 +100,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
+import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
@@ -156,8 +159,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
-import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -167,6 +168,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
+import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class DocumentWindow extends AbstractTextWindow
 		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
@@ -213,16 +215,20 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public DocumentWindow() {
 		super();
-		this.initialiseActions();
-		this.initialiseMenu();
-		this.initialiseWindow();
-		this.setVisible(true);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new DocumentWindowWindowListener());
 
 	}
 
 	/*
 	 * Initialisation
 	 */
+	public void initialise() {
+		this.initialiseActions();
+		this.initialiseMenu();
+		this.initialiseWindow();
+		this.setVisible(true);
+	}
 
 	protected void initialiseWindow() {
 		super.initializeWindow();
@@ -230,20 +236,12 @@ public class DocumentWindow extends AbstractTextWindow
 		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
 		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
 
-		// popup
+		// tree popup
 		treePopupMenu = new JPopupMenu();
-		// treePopupMenu.add(this.commentAction);
 		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(mentionFlagsInTreePopup);
-
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -254,9 +252,6 @@ public class DocumentWindow extends AbstractTextWindow
 		treePopupMenu.add(this.actions.formGroupAction);
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(entityFlagsInTreePopup);
-
-		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
-		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
@@ -265,7 +260,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// initialise panel
 		JPanel rightPanel = new JPanel(new BorderLayout());
 
-		tree = new JTree();
+		tree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null, false)));
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
 		tree.setLargeModel(true);
@@ -362,7 +357,7 @@ public class DocumentWindow extends AbstractTextWindow
 		this.actions.renameAction = new RenameEntityAction(this);
 		this.actions.newEntityAction = new NewEntityAction(this);
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
-		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
+		this.actions.changeKeyAction = new ChangeKeyForEntityAction(this);
 		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
@@ -383,6 +378,7 @@ public class DocumentWindow extends AbstractTextWindow
 		actions.mergeSelectedEntitiesAction.setEnabled(false);
 		actions.undoAction.setEnabled(false);
 		actions.entityStatisticsAction.setEnabled(false);
+		actions.fileSaveAction.setEnabled(false);
 
 		//
 		documentStateListeners.add(actions.undoAction);
@@ -549,15 +545,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 		setJMenuBar(menuBar);
 
-		// window events
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				actions.closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-			}
-		});
-
 		Annotator.logger.info("Initialised menus");
 	}
 
@@ -576,15 +563,11 @@ public class DocumentWindow extends AbstractTextWindow
 	public void loadFile(File file, IOPlugin flavor, String language) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
-		else
-			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
 		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 		setIndeterminateProgress();
 		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
-			setVisible(false);
-			dispose();
 			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
 					Annotator.getString("message.wrong_file_version.help") };
 			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
@@ -599,6 +582,8 @@ public class DocumentWindow extends AbstractTextWindow
 						}
 						return true;
 					} });
+			setVisible(false);
+			dispose();
 
 		});
 		lai.execute();
@@ -670,7 +655,7 @@ public class DocumentWindow extends AbstractTextWindow
 	public void setDocumentModel(DocumentModel model) {
 		documentModel = model;
 
-		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
+		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
@@ -944,62 +929,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class ChangeKeyForEntityAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ChangeKeyForEntityAction() {
-			super(Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
-			String s = "";
-			if (etn.getEntity().getKey() != null)
-				s = etn.getEntity().getKey();
-
-			JPanel panel = new JPanel();
-			panel.add(new JLabel(Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT)));
-			JTextField textField = new JTextField(1);
-			textField.setText(s);
-			panel.add(textField);
-
-			int result = JOptionPane.showOptionDialog(DocumentWindow.this, panel, "", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE, FontIcon.of(MaterialDesign.MDI_KEYBOARD),
-					new String[] { Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CLEAR),
-							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CANCEL),
-							Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_OK) },
-					s);
-			String newKey = textField.getText();
-			switch (result) {
-			case 0:
-				documentModel.edit(new UpdateEntityKey(etn.getEntity()));
-				break;
-			case 2:
-				if (newKey.length() == 1) {
-					Character newChar = newKey.charAt(0);
-					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
-				} else {
-					JOptionPane.showMessageDialog(DocumentWindow.this,
-							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
-							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_TITLE),
-							JOptionPane.INFORMATION_MESSAGE);
-				}
-				break;
-			default:
-
-			}
-
-		}
-
-	}
-
 	class MyTreeCellEditor extends DefaultTreeCellEditor {
 
 		public MyTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
@@ -1106,7 +1035,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// we only handle instances of CATreeNode
 			if (!(value instanceof CATreeNode))
-				return new JLabel("tree node");
+				return new JLabel();
 
 			// get the current tree node
 			treeNode = (CATreeNode) value;
@@ -1165,27 +1094,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 		public Icon getEntityIcon() {
 			return FontIcon.of(MaterialDesign.MDI_ACCOUNT);
-		}
-
-	}
-
-	class DeleteMentionAction extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		Mention m;
-
-		public DeleteMentionAction(Mention m) {
-			super(Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-			this.m = m;
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			documentModel.edit(new RemoveMention(m));
 		}
 
 	}
@@ -1288,30 +1196,6 @@ public class DocumentWindow extends AbstractTextWindow
 			for (Entity e : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)))
 				documentModel.edit(new RemoveEntities(e));
 			documentModel.getHistory().clear();
-		}
-
-	}
-
-	class CloseAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public CloseAction() {
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_CLOSE));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (documentModel.isSavable()) {
-				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
-						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
-						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
-				if (r == JOptionPane.OK_OPTION)
-					closeWindow(false);
-			} else
-				closeWindow(false);
 		}
 
 	}
@@ -1499,13 +1383,13 @@ public class DocumentWindow extends AbstractTextWindow
 			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
-			mentionMenu.add(new DeleteMentionAction(m));
+			mentionMenu.add(new DeleteAction(DocumentWindow.this, m));
 
 			return mentionMenu;
 		}
 	}
 
-	public class MyTreeSelectionListener extends CATreeSelectionEvent {
+	public class MyTreeSelectionListener extends CAAbstractTreeSelectionListener {
 
 		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 
@@ -1645,7 +1529,7 @@ public class DocumentWindow extends AbstractTextWindow
 	class ActionContainer {
 
 		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
-		AbstractAction closeAction = new CloseAction();
+		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
 		AbstractAction copyAction;
@@ -1684,7 +1568,7 @@ public class DocumentWindow extends AbstractTextWindow
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
+	class MyTreeModelListener implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
@@ -1712,35 +1596,10 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void treeNodesInserted(TreeModelEvent e) {
 			tree.expandPath(e.getTreePath().getParentPath());
-
-			// if (e.getTreePath().getLastPathComponent() instanceof EntityGroup)
-			// tree.expandPath(e.getTreePath());
-			/*
-			 * try { TreePath tp = e.getTreePath(); Rectangle r = tree.getPathBounds(tp);
-			 * tree.repaint(r); } catch (NullPointerException ex) {
-			 * Annotator.logger.catching(ex); }
-			 */
 		}
 
 		@Override
 		public void treeNodesChanged(TreeModelEvent e) {
-			CATreeNode node;
-			node = (CATreeNode) (e.getTreePath().getLastPathComponent());
-			try {
-				int index = e.getChildIndices()[0];
-				node = (node.getChildAt(index));
-			} catch (NullPointerException exc) {
-			}
-			String newName = (String) node.getUserObject();
-			if (newName != null) {
-				FeatureStructure fs = node.getFeatureStructure();
-				if (fs instanceof Entity) {
-					if (!node.getEntity().getLabel().equals(newName)) {
-						getDocumentModel().edit(new UpdateEntityName(node.getEntity(), newName));
-					}
-				}
-			}
-			tree.repaint(tree.getPathBounds(e.getTreePath()));
 		}
 
 		@Override
@@ -1757,5 +1616,48 @@ public class DocumentWindow extends AbstractTextWindow
 		public void flagEvent(FeatureStructureEvent event) {
 			tree.repaint();
 		}
+	}
+
+	class DocumentWindowWindowListener extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent ev) {
+			if (documentModel.isSavable()) {
+				Object[] options = new String[] { Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_SAVE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL) };
+				int r = JOptionPane.showOptionDialog(DocumentWindow.this,
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE, FontIcon.of(MaterialDesign.MDI_CONTENT_SAVE), options,
+						options[1]);
+				switch (r) {
+				case 1:
+					// first save, then close the window
+					setIndeterminateProgress();
+					SaveJCasWorker worker = new SaveJCasWorker(getFile(), getDocumentModel().getJcas(),
+							(file, jcas) -> {
+								getDocumentModel().getHistory().clear();
+								setWindowTitle();
+								stopIndeterminateProgress();
+								closeWindow(false);
+							});
+					worker.execute();
+					break;
+				case 0:
+					closeWindow(false);
+					break;
+				default:
+					break;
+				}
+			} else
+				closeWindow(false);
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			setVisible(false);
+			dispose();
+		}
+
 	}
 }

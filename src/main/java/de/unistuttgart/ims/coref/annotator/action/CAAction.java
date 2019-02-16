@@ -2,8 +2,8 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import javax.swing.Action;
 
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
+import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 
 public interface CAAction extends Action {
-	void setEnabled(CATreeSelectionEvent l);
+	void setEnabled(CAAbstractTreeSelectionListener l);
 }

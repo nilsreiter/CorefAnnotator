@@ -22,8 +22,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	private static final long serialVersionUID = 1L;
 
-	transient FeatureStructure featureStructure = null;
-
 	int featureStructureHash;
 
 	String label;
@@ -32,7 +30,7 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
-			this.featureStructure = featureStructure;
+			this.userObject = featureStructure;
 			this.featureStructureHash = featureStructure.hashCode();
 			mentionCache.put(featureStructure.hashCode(), featureStructure);
 		}
@@ -49,9 +47,9 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	@SuppressWarnings("unchecked")
 	public <T extends FeatureStructure> T getFeatureStructure() {
-		if (featureStructure == null)
-			featureStructure = mentionCache.get(featureStructureHash);
-		return (T) featureStructure;
+		if (userObject == null)
+			userObject = mentionCache.get(featureStructureHash);
+		return (T) userObject;
 	}
 
 	@Override
@@ -86,15 +84,15 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 	}
 
 	public boolean isEntity() {
-		return featureStructure instanceof Entity;
+		return userObject instanceof Entity;
 	}
 
 	public boolean isMention() {
-		return featureStructure instanceof Mention;
+		return userObject instanceof Mention;
 	}
 
 	public boolean isMentionPart() {
-		return featureStructure instanceof DetachedMentionPart;
+		return userObject instanceof DetachedMentionPart;
 	}
 
 	@Override
@@ -134,9 +132,9 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	@Override
 	public String getToolTip() {
-		if (featureStructure instanceof EntityGroup) {
+		if (getUserObject() instanceof EntityGroup) {
 			StringBuilder b = new StringBuilder();
-			EntityGroup entityGroup = (EntityGroup) featureStructure;
+			EntityGroup entityGroup = (EntityGroup) getUserObject();
 			if (entityGroup.getMembers().size() > 0) {
 				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
 					b.append(entityGroup.getMembers(0).getLabel());
@@ -151,7 +149,7 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 			} else {
 				return null;
 			}
-		} else if (featureStructure instanceof Entity) {
+		} else if (getUserObject() instanceof Entity) {
 			return getEntity().getLabel();
 		}
 		return null;

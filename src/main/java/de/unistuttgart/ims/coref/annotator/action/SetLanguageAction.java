@@ -12,6 +12,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 
 public class SetLanguageAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
@@ -28,7 +29,9 @@ public class SetLanguageAction extends DocumentWindowAction {
 				Util.getLanguageName(getTarget().getDocumentModel().getLanguage()));
 		if (lang != null) {
 			Annotator.logger.info("Setting document language to {}.", Util.getLanguage(lang));
-			getTarget().getDocumentModel().setLanguage(Util.getLanguage(lang));
+			UpdateDocumentProperty udo = new UpdateDocumentProperty(UpdateDocumentProperty.DocumentProperty.LANGUAGE,
+					Util.getLanguage(lang));
+			getTarget().getDocumentModel().edit(udo);
 		}
 	}
 

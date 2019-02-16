@@ -482,6 +482,10 @@ public class CoreferenceModel extends SubModel implements Model {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
 	public JCas getJCas() {
 		return documentModel.getJcas();
 	}
