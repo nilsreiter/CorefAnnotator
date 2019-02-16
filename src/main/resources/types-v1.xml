@@ -52,6 +52,11 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionExtent</name>
+			<description>A mention in the text.</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+		</typeDescription>
+		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Mention</name>
 			<description>A mention in the text.</description>
 			<supertypeName>uima.tcas.Annotation</supertypeName>
@@ -77,7 +82,7 @@
 					<name>AdditionalExtent</name>
 					<description />
 					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
-					<elementType>uima.tcas.Annotation</elementType>
+					<elementType>de.unistuttgart.ims.coref.annotator.api.v1.MentionExtent</elementType>
 				</featureDescription>
 			</features>
 		</typeDescription>
