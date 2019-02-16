@@ -1168,7 +1168,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class RemoveMentionAction extends TargetedIkonAction<DocumentWindow> {
+	public class RemoveMentionAction extends TargetedIkonAction<DocumentWindow> {
 
 		private static final long serialVersionUID = 1L;
 
