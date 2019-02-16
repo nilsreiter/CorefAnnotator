@@ -362,7 +362,7 @@ public class DocumentWindow extends AbstractTextWindow
 		this.actions.renameAction = new RenameEntityAction(this);
 		this.actions.newEntityAction = new NewEntityAction(this);
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
-		this.actions.changeKeyAction = new ChangeKeyForEntityAction();
+		this.actions.changeKeyAction = new ChangeKeyForEntityAction(this);
 		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.sortByAlpha = new SortTreeByAlpha();
 		this.actions.sortByMentions = new SortTreeByMentions();
@@ -944,12 +944,12 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class ChangeKeyForEntityAction extends IkonAction {
+	public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow> {
 
 		private static final long serialVersionUID = 1L;
 
-		public ChangeKeyForEntityAction() {
-			super(Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
+		public ChangeKeyForEntityAction(DocumentWindow documentWindow) {
+			super(documentWindow, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 			putValue(Action.ACCELERATOR_KEY,
 					KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -959,10 +959,10 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			CATreeNode etn = (CATreeNode) tree.getLastSelectedPathComponent();
+			Entity entity = getSelectedEntities().getOnly();
 			String s = "";
-			if (etn.getEntity().getKey() != null)
-				s = etn.getEntity().getKey();
+			if (entity.getKey() != null)
+				s = entity.getKey();
 
 			JPanel panel = new JPanel();
 			panel.add(new JLabel(Annotator.getString(Strings.DIALOG_CHANGE_KEY_PROMPT)));
@@ -978,13 +978,11 @@ public class DocumentWindow extends AbstractTextWindow
 					s);
 			String newKey = textField.getText();
 			switch (result) {
-			case 0:
-				documentModel.edit(new UpdateEntityKey(etn.getEntity()));
-				break;
 			case 2:
+				// for setting a new key
 				if (newKey.length() == 1) {
 					Character newChar = newKey.charAt(0);
-					documentModel.edit(new UpdateEntityKey(newChar, etn.getEntity()));
+					getTarget().getDocumentModel().edit(new UpdateEntityKey(newChar, entity));
 				} else {
 					JOptionPane.showMessageDialog(DocumentWindow.this,
 							Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
@@ -993,7 +991,9 @@ public class DocumentWindow extends AbstractTextWindow
 				}
 				break;
 			default:
-
+				// for clearing the key
+				getTarget().getDocumentModel().edit(new UpdateEntityKey(entity));
+				break;
 			}
 
 		}
