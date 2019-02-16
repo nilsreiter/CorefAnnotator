@@ -62,6 +62,7 @@ public class DocumentModel implements Model {
 	}
 
 	public void edit(Operation operation) {
+		Annotator.logger.trace(operation);
 		if (operation instanceof DocumentModelOperation)
 			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
@@ -239,6 +240,8 @@ public class DocumentModel implements Model {
 	}
 
 	protected void undo(Operation operation) {
+		Annotator.logger.trace(operation);
+
 		if (operation instanceof DocumentModelOperation)
 			undo((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
