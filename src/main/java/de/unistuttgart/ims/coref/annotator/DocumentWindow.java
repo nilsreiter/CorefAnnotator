@@ -213,6 +213,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public DocumentWindow() {
 		super();
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new DocumentWindowWindowListener());
 		this.initialiseActions();
 		this.initialiseMenu();
 		this.initialiseWindow();
@@ -1215,6 +1217,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
+	@Deprecated
 	class CloseAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -1568,7 +1571,7 @@ public class DocumentWindow extends AbstractTextWindow
 	class ActionContainer {
 
 		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
-		AbstractAction closeAction = new CloseAction();
+		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();
 		AbstractAction changeColorAction;
 		AbstractAction changeKeyAction;
 		AbstractAction copyAction;
@@ -1655,5 +1658,26 @@ public class DocumentWindow extends AbstractTextWindow
 		public void flagEvent(FeatureStructureEvent event) {
 			tree.repaint();
 		}
+	}
+
+	class DocumentWindowWindowListener extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent ev) {
+			if (documentModel.isSavable()) {
+				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
+				if (r == JOptionPane.OK_OPTION)
+					closeWindow(false);
+			} else
+				closeWindow(false);
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			setVisible(false);
+			dispose();
+		}
+
 	}
 }
