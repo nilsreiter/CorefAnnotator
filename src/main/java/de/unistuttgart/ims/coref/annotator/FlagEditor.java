@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -101,30 +102,12 @@ public class FlagEditor extends AbstractWindow {
 		flagMenu.add(new JMenuItem(addFlagAction));
 		flagMenu.add(new JMenuItem(deleteFlagAction));
 		flagMenu.addSeparator();
-		flagMenu.add(new JMenuItem(
-				new AbstractAction(Strings.FLAG_EDITOR_FLAG_COLLECTION_1, FontIcon.of(MaterialDesign.MDI_FOLDER)) {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						for (AddFlag af : Constants.FLAG_COLLECTION_1) {
-							documentModel.edit(af);
-						}
-					}
-				}));
-		flagMenu.add(new JMenuItem(
-				new AbstractAction(Strings.FLAG_EDITOR_FLAG_COLLECTION_2, FontIcon.of(MaterialDesign.MDI_FOLDER)) {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						for (AddFlag af : Constants.FLAG_COLLECTION_2) {
-							documentModel.edit(af);
-						}
-					}
-				}));
+		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
+				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP))));
+		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_2,
+				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP))));
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
 		helpMenu.add(Annotator.app.helpAction);
@@ -352,4 +335,23 @@ public class FlagEditor extends AbstractWindow {
 
 	}
 
+	class CreateFlagsFromCollections extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		AddFlag[] flagCollection;
+
+		public CreateFlagsFromCollections(AddFlag[] flagCollection, String label, String tooltip) {
+			super(label, FontIcon.of(MaterialDesign.MDI_FOLDER));
+			this.flagCollection = flagCollection;
+			putValue(Action.SHORT_DESCRIPTION, tooltip);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (AddFlag af : flagCollection) {
+				documentModel.edit(af);
+			}
+		}
+
+	}
 }
