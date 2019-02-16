@@ -11,6 +11,12 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - The text field in the search dialog is now automatically in focus when
   the window is opened #159
 - The text field now maintains previous searches #161
+- The search can now be restricted to mentions only #162
+
+## 1.7.3
+
+- Renamed an entity is now properly undoable #167
+- Setting the language now actually works #168
 
 ## 1.7.2
 
