@@ -669,7 +669,7 @@ public class DocumentWindow extends AbstractTextWindow
 	public void setDocumentModel(DocumentModel model) {
 		documentModel = model;
 
-		ExtendedModelHandler modelHandler = new ExtendedModelHandler();
+		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
@@ -1683,7 +1683,7 @@ public class DocumentWindow extends AbstractTextWindow
 		return treeSearchField;
 	}
 
-	class ExtendedModelHandler implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
+	class MyTreeModelListener implements SortingTreeModelListener, TreeModelListener, FlagModelListener {
 		@Override
 		public void treeNodesPreResort(TreeModelEvent e) {
 			// store expansion state
