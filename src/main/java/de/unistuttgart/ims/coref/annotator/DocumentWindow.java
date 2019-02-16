@@ -113,6 +113,7 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
+import de.unistuttgart.ims.coref.annotator.action.RemoveMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
@@ -1164,27 +1165,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 		public Icon getEntityIcon() {
 			return FontIcon.of(MaterialDesign.MDI_ACCOUNT);
-		}
-
-	}
-
-	public class RemoveMentionAction extends TargetedIkonAction<DocumentWindow> {
-
-		private static final long serialVersionUID = 1L;
-
-		Mention m;
-
-		public RemoveMentionAction(DocumentWindow documentWindow, Mention m) {
-			super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-			this.m = m;
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			getTarget().getDocumentModel().edit(new RemoveMention(m));
 		}
 
 	}
