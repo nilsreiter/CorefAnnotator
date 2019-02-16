@@ -216,16 +216,19 @@ public class DocumentWindow extends AbstractTextWindow
 		super();
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new DocumentWindowWindowListener());
-		this.initialiseActions();
-		this.initialiseMenu();
-		this.initialiseWindow();
-		this.setVisible(true);
 
 	}
 
 	/*
 	 * Initialisation
 	 */
+
+	public void initialise() {
+		this.initialiseActions();
+		this.initialiseMenu();
+		this.initialiseWindow();
+		this.setVisible(true);
+	}
 
 	protected void initialiseWindow() {
 		super.initializeWindow();
@@ -577,8 +580,6 @@ public class DocumentWindow extends AbstractTextWindow
 		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 		setIndeterminateProgress();
 		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
-			setVisible(false);
-			dispose();
 			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
 					Annotator.getString("message.wrong_file_version.help") };
 			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
@@ -593,6 +594,8 @@ public class DocumentWindow extends AbstractTextWindow
 						}
 						return true;
 					} });
+			setVisible(false);
+			dispose();
 
 		});
 		lai.execute();
