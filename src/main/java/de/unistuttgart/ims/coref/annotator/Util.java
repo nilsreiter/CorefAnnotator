@@ -234,8 +234,8 @@ public class Util {
 
 	public static String getLanguage(String languageName) {
 		getSupportedLanguageNames();
-		for (int i = 0; i < languageNames.length; i++)
-			if (languageName == languageNames[i])
+		for (int i = 0; i < Constants.SUPPORTED_LANGUAGES.length; i++)
+			if (languageName == getLanguageName(Constants.SUPPORTED_LANGUAGES[i]))
 				return Constants.SUPPORTED_LANGUAGES[i];
 
 		return null;
