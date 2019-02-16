@@ -495,6 +495,10 @@ public class CoreferenceModel {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
 	public JCas getJCas() {
 		return jcas;
 	}
