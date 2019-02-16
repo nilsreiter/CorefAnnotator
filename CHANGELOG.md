@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.7.3
+
+- Renamed an entity is now properly undoable #167
+- Setting the language now actually works #168
+
 ## 1.7.2
 
 - Fixed a bug that prevented loading files when run on OpenJDK #166
