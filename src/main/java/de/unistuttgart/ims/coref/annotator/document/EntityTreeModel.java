@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
@@ -25,8 +27,10 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 
-public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener {
+public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
 
 	CoreferenceModel coreferenceModel;
@@ -48,9 +52,13 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.coreferenceModel = docMod;
 		this.coreferenceModel.addCoreferenceModelListener(this);
 
-		this.initialise();
+		// this.initialise();
 		this.resort();
 
+	}
+
+	public void addTreeModelListener(SortingTreeModelListener l) {
+		listenerList.add(SortingTreeModelListener.class, l);
 	}
 
 	private CATreeNode createNode(FeatureStructure fs) {
@@ -68,9 +76,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
-		CATreeNode arg0 = get(event.getArgument(0));
 		switch (eventType) {
 		case Add:
+			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
 				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
 					CATreeNode tn = createNode(fs);
@@ -124,8 +132,43 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			}
 			optResort();
 			break;
+		case Init:
+			initialise();
+			break;
 		default:
 			break;
+		}
+	}
+
+	protected void fireTreeNodesPreResort(Object source, Object[] path, int[] childIndices, Object[] children) {
+		// Guaranteed to return a non-null array
+		Object[] listeners = listenerList.getListenerList();
+		TreeModelEvent e = null;
+		// Process the listeners last to first, notifying
+		// those that are interested in this event
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == SortingTreeModelListener.class) {
+				// Lazily create the event:
+				if (e == null)
+					e = new TreeModelEvent(source, path, childIndices, children);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPreResort(e);
+			}
+		}
+	}
+
+	protected void fireTreeNodesPostResort(Object source, Object[] path, int[] childIndices, Object[] children) {
+		// Guaranteed to return a non-null array
+		Object[] listeners = listenerList.getListenerList();
+		TreeModelEvent e = null;
+		// Process the listeners last to first, notifying
+		// those that are interested in this event
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == SortingTreeModelListener.class) {
+				// Lazily create the event:
+				if (e == null)
+					e = new TreeModelEvent(source, path, childIndices, children);
+				((SortingTreeModelListener) listeners[i + 1]).treeNodesPostResort(e);
+			}
 		}
 	}
 
@@ -161,16 +204,16 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		return (CATreeNode) root;
 	}
 
-	public void initialise() {
+	private void initialise() {
 		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
-			entityEvent(Event.get(Event.Type.Add, null, e));
+			entityEvent(Event.get(this, Event.Type.Add, null, e));
 		});
 		Annotator.logger.debug("Added all entities");
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
-			entityEvent(Event.get(Event.Type.Add, m.getEntity(), m));
+			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 			if (m.getDiscontinuous() != null)
-				entityEvent(Event.get(Event.Type.Add, m, m.getDiscontinuous()));
+				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}
@@ -250,7 +293,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	public void resort(Comparator<CATreeNode> comparator) {
 		if (!getRoot().isLeaf()) {
 			getRoot().getChildren().sort(comparator);
+			fireTreeNodesPreResort(this, new CATreeNode[] { getRoot() }, null, null);
 			nodeStructureChanged(getRoot());
+			fireTreeNodesPostResort(this, new CATreeNode[] { getRoot() }, null, null);
 		}
 	}
 
@@ -258,4 +303,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.entitySortOrder = entitySortOrder;
 	}
 
+	@Override
+	public void valueForPathChanged(TreePath path, Object newValue) {
+		coreferenceModel.getDocumentModel()
+				.edit(new UpdateEntityName(((CATreeNode) path.getLastPathComponent()).getEntity(), (String) newValue));
+	}
 }

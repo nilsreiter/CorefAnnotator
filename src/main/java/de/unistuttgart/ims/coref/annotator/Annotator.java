@@ -107,7 +107,7 @@ public class Annotator {
 	}
 
 	public Annotator() throws ResourceInitializationException {
-		logger.trace("Application startup");
+		logger.trace("Application startup. Version " + Version.get().toString());
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -239,21 +239,23 @@ public class Annotator {
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
+		DocumentWindow v = new DocumentWindow();
+		v.loadFile(file, flavor, language);
 
-		Runnable runnable = new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
+
 			@Override
 			public void run() {
-				DocumentWindow v = new DocumentWindow(Annotator.this);
-				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
 					recentFiles.add(0, file);
+				v.initialise();
 
 			}
-		};
+		});
 
-		SwingUtilities.invokeLater(runnable);
 		return null;
+
 	}
 
 	public void close(DocumentWindow viewer) {
@@ -313,6 +315,14 @@ public class Annotator {
 		if (rbundle == null)
 			rbundle = ResourceBundle.getBundle("locales/strings", locale);
 		return rbundle.getString(key);
+	}
+
+	public static String getString(String key, String defaultValue) {
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			return defaultValue;
+		}
 	}
 
 	public PluginManager getPluginManager() {

@@ -2,7 +2,9 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.prefs.Preferences;
 
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
@@ -10,11 +12,15 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
+import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 /**
@@ -24,10 +30,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
  * directly).
  *
  */
-public class DocumentModel {
-
-	@Deprecated
-	CommentsModel commentsModel;
+public class DocumentModel implements Model {
 
 	CoreferenceModel coreferenceModel;
 
@@ -41,12 +44,17 @@ public class DocumentModel {
 
 	EntityTreeModel treeModel;
 
+	FlagModel flagModel;
+
 	TypeSystemVersion typeSystemVersion;
 
 	boolean unsavedChanges = false;
 
-	public DocumentModel(JCas jcas) {
+	Preferences preferences;
+
+	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
+		this.preferences = preferences;
 	}
 
 	public boolean addDocumentStateListener(DocumentStateListener e) {
@@ -54,26 +62,57 @@ public class DocumentModel {
 	}
 
 	public void edit(Operation operation) {
+		Annotator.logger.trace(operation);
+		if (operation instanceof DocumentModelOperation)
+			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit(operation);
+		if (operation instanceof FlagModelOperation)
+			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
+		fireDocumentChangedEvent();
+	}
+
+	protected void edit(DocumentModelOperation operation) {
+		if (operation instanceof UpdateDocumentProperty)
+			edit((UpdateDocumentProperty) operation);
+	}
+
+	protected void edit(UpdateDocumentProperty operation) {
+		switch (operation.getDocumentProperty()) {
+		case LANGUAGE:
+			operation.setOldValue(jcas.getDocumentLanguage());
+			jcas.setDocumentLanguage((String) operation.getNewValue());
+			break;
+		}
 	}
 
 	protected void fireDocumentChangedEvent() {
 		documentStateListeners.forEach(l -> l.documentStateEvent(new DocumentState(this)));
 	}
 
-	@Deprecated
-	public CommentsModel getCommentsModel() {
-		return commentsModel;
-	}
-
 	public CoreferenceModel getCoreferenceModel() {
 		return coreferenceModel;
 	}
 
+	public String getDocumentTitle() {
+		String documentTitle = "Untitled document";
+		try {
+			if (JCasUtil.exists(getJcas(), DocumentMetaData.class)
+					&& DocumentMetaData.get(getJcas()).getDocumentTitle() != null)
+				documentTitle = DocumentMetaData.get(getJcas()).getDocumentTitle();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+		}
+		return documentTitle;
+	}
+
 	public TypeSystemVersion getFileFormat() {
 		return typeSystemVersion;
+	}
+
+	public FlagModel getFlagModel() {
+		return flagModel;
 	}
 
 	public Deque<Operation> getHistory() {
@@ -93,15 +132,17 @@ public class DocumentModel {
 		return jcas.getDocumentLanguage();
 	}
 
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
 	public SegmentModel getSegmentModel() {
 		return segmentModel;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		if (Util.getMeta(jcas) != null && Util.getMeta(jcas).getStylePlugin() != null)
-			return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
-		return DefaultStylePlugin.class;
+		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -110,6 +151,17 @@ public class DocumentModel {
 
 	public boolean hasUnsavedChanges() {
 		return unsavedChanges;
+	}
+
+	public void initialize() {
+		coreferenceModel = new CoreferenceModel(this);
+		treeModel = new EntityTreeModel(coreferenceModel);
+		flagModel = new FlagModel(this, preferences);
+		segmentModel = new SegmentModel(this);
+
+		coreferenceModel.initialize();
+		segmentModel.initialize();
+		flagModel.initialize();
 	}
 
 	public boolean isSavable() {
@@ -138,17 +190,16 @@ public class DocumentModel {
 		fireDocumentChangedEvent();
 	}
 
-	@Deprecated
-	public void setCommentsModel(CommentsModel commentsModel) {
-		this.commentsModel = commentsModel;
-	}
-
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
 		this.coreferenceModel = coreferenceModel;
 	}
 
 	protected void setFileFormat(TypeSystemVersion typeSystemVersion) {
 		this.typeSystemVersion = typeSystemVersion;
+	}
+
+	public void setFlagModel(FlagModel flagModel) {
+		this.flagModel = flagModel;
 	}
 
 	public void setJcas(JCas jcas) {
@@ -158,6 +209,10 @@ public class DocumentModel {
 	public void setLanguage(String l) {
 		jcas.setDocumentLanguage(l);
 		fireDocumentChangedEvent();
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 	public void setSegmentModel(SegmentModel segmentModel) {
@@ -185,8 +240,27 @@ public class DocumentModel {
 	}
 
 	protected void undo(Operation operation) {
-		if (operation instanceof CoreferenceModelOperation) {
+		Annotator.logger.trace(operation);
+
+		if (operation instanceof DocumentModelOperation)
+			undo((DocumentModelOperation) operation);
+		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.undo(operation);
+		if (operation instanceof FlagModelOperation)
+			flagModel.undo((FlagModelOperation) operation);
+
+	}
+
+	protected void undo(DocumentModelOperation operation) {
+		if (operation instanceof UpdateDocumentProperty)
+			undo((UpdateDocumentProperty) operation);
+	}
+
+	protected void undo(UpdateDocumentProperty operation) {
+		switch (operation.getDocumentProperty()) {
+		case LANGUAGE:
+			jcas.setDocumentLanguage((String) operation.getOldValue());
+			break;
 		}
 	}
 
