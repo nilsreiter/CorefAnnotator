@@ -1209,31 +1209,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	@Deprecated
-	class CloseAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public CloseAction() {
-			putValue(Action.NAME, Annotator.getString(Strings.ACTION_CLOSE));
-			putValue(Action.ACCELERATOR_KEY,
-					KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (documentModel.isSavable()) {
-				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
-						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
-						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
-				if (r == JOptionPane.OK_OPTION)
-					closeWindow(false);
-			} else
-				closeWindow(false);
-		}
-
-	}
-
 	class MergeSelectedEntities extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
