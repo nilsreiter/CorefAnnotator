@@ -116,7 +116,6 @@ import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
-import de.unistuttgart.ims.coref.annotator.action.RemoveMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
@@ -224,7 +223,6 @@ public class DocumentWindow extends AbstractTextWindow
 	/*
 	 * Initialisation
 	 */
-
 	public void initialise() {
 		this.initialiseActions();
 		this.initialiseMenu();
@@ -238,20 +236,12 @@ public class DocumentWindow extends AbstractTextWindow
 		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
 		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
 
-		// popup
+		// tree popup
 		treePopupMenu = new JPopupMenu();
-		// treePopupMenu.add(this.commentAction);
 		treePopupMenu.add(this.actions.deleteAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(mentionFlagsInTreePopup);
-
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionAmbiguous));
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionDifficult));
-		// treePopupMenu.add(new
-		// JCheckBoxMenuItem(this.actions.toggleMentionNonNominal));
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -262,9 +252,6 @@ public class DocumentWindow extends AbstractTextWindow
 		treePopupMenu.add(this.actions.formGroupAction);
 		treePopupMenu.add(this.actions.removeDuplicatesAction);
 		treePopupMenu.add(entityFlagsInTreePopup);
-
-		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityGeneric));
-		// treePopupMenu.add(new JCheckBoxMenuItem(this.actions.toggleEntityDisplayed));
 		treePopupMenu.add(this.actions.entityStatisticsAction);
 
 		textPopupMenu = new JPopupMenu();
@@ -1397,7 +1384,7 @@ public class DocumentWindow extends AbstractTextWindow
 			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
-			mentionMenu.add(new RemoveMentionAction(DocumentWindow.this, m));
+			mentionMenu.add(new DeleteAction(DocumentWindow.this, m));
 
 			return mentionMenu;
 		}
