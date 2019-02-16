@@ -74,8 +74,10 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleContext;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -271,7 +273,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// initialise panel
 		JPanel rightPanel = new JPanel(new BorderLayout());
 
-		tree = new JTree();
+		tree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null, false)));
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
 		tree.setLargeModel(true);
@@ -1047,7 +1049,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// we only handle instances of CATreeNode
 			if (!(value instanceof CATreeNode))
-				return new JLabel("tree node");
+				return new JLabel();
 
 			// get the current tree node
 			treeNode = (CATreeNode) value;
