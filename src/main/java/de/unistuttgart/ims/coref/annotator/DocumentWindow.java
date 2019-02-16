@@ -167,6 +167,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
+import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class DocumentWindow extends AbstractTextWindow
 		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
@@ -550,15 +551,6 @@ public class DocumentWindow extends AbstractTextWindow
 		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
-
-		// window events
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				actions.closeAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-			}
-		});
 
 		Annotator.logger.info("Initialised menus");
 	}
@@ -1664,11 +1656,33 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public void windowClosing(WindowEvent ev) {
 			if (documentModel.isSavable()) {
-				int r = JOptionPane.showConfirmDialog(DocumentWindow.this,
+				Object[] options = new String[] { Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_SAVE),
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL) };
+				int r = JOptionPane.showOptionDialog(DocumentWindow.this,
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE),
-						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.OK_CANCEL_OPTION);
-				if (r == JOptionPane.OK_OPTION)
+						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_TITLE), JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE, FontIcon.of(MaterialDesign.MDI_CONTENT_SAVE), options,
+						options[1]);
+				switch (r) {
+				case 1:
+					// first save, then close the window
+					setIndeterminateProgress();
+					SaveJCasWorker worker = new SaveJCasWorker(getFile(), getDocumentModel().getJcas(),
+							(file, jcas) -> {
+								getDocumentModel().getHistory().clear();
+								setWindowTitle();
+								stopIndeterminateProgress();
+								closeWindow(false);
+							});
+					worker.execute();
+					break;
+				case 0:
 					closeWindow(false);
+					break;
+				default:
+					break;
+				}
 			} else
 				closeWindow(false);
 		}
