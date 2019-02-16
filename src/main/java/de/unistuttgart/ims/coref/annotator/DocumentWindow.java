@@ -378,6 +378,7 @@ public class DocumentWindow extends AbstractTextWindow
 		actions.mergeSelectedEntitiesAction.setEnabled(false);
 		actions.undoAction.setEnabled(false);
 		actions.entityStatisticsAction.setEnabled(false);
+		actions.fileSaveAction.setEnabled(false);
 
 		//
 		documentStateListeners.add(actions.undoAction);
@@ -562,8 +563,6 @@ public class DocumentWindow extends AbstractTextWindow
 	public void loadFile(File file, IOPlugin flavor, String language) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
-		else
-			this.actions.fileSaveAction.setEnabled(false);
 
 		JCasLoader lai;
 		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
