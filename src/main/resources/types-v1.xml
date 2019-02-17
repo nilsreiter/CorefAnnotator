@@ -55,6 +55,14 @@
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.MentionExtent</name>
 			<description>A mention in the text.</description>
 			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>Mention</name>
+					<description>A pointer to the mention this detached part belongs to</description>
+					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v1.Mention
+					</rangeTypeName>
+				</featureDescription>
+			</features>
 		</typeDescription>
 		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Mention</name>

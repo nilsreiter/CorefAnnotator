@@ -38,8 +38,10 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.MentionExtent;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionExtent;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
@@ -236,6 +238,22 @@ public class CoreferenceModel extends SubModel implements Model {
 		return m;
 	}
 
+	protected void edit(AddMentionExtent op) {
+		op.setMentionExtent(op.getSpans().collect(span -> {
+			MentionExtent mex = AnnotationFactory.createAnnotation(this.getDocumentModel().getJcas(), span.begin,
+					span.end, MentionExtent.class);
+			mex.setMention(op.getMention());
+			if (op.getMention().getAdditionalExtent() == null) {
+				op.getMention().setAdditionalExtent(new FSArray(getJCas(), 0));
+				op.getMention().getAdditionalExtent().addToIndexes();
+			}
+			op.getMention().setAdditionalExtent(Util.addTo(getJCas(), op.getMention().getAdditionalExtent(), mex));
+			registerAnnotation(mex);
+			fireEvent(Event.get(this, Event.Type.Update, op.getMention()));
+			return mex;
+		}));
+	}
+
 	protected void edit(MergeEntities op) {
 		MutableSetMultimap<Entity, Mention> currentState = Multimaps.mutable.set.empty();
 		op.getEntities().forEach(e -> currentState.putAll(e, entityMentionMap.get(e)));
@@ -366,6 +384,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			edit((MergeEntities) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
+		} else if (operation instanceof AddMentionExtent) {
+			edit((AddMentionExtent) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -482,6 +502,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
 	}

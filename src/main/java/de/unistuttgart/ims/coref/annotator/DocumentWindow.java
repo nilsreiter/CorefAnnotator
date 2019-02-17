@@ -150,6 +150,7 @@ import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionExtent;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
@@ -819,13 +820,20 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// new mention created in text view
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
-				if (targetFS instanceof Mention)
+				if (targetFS instanceof Mention) {
 					setMessage(Annotator.getString(Strings.MESSAGE_CREATES_MENTION_PART));
-				else if (targetFS instanceof Entity)
+					// info.setDropAction(info.getUserDropAction());
+					return true;
+				} else if (targetFS instanceof Entity)
 					setMessage(Annotator.getString(Strings.MESSAGE_CREATES_MENTION));
 				else if (targetFS == null)
 					setMessage(Annotator.getString(Strings.MESSAGE_CREATES_ENTITY));
-				return true;
+				boolean moveSupported = (MOVE & info.getSourceDropActions()) == MOVE;
+				if (moveSupported) {
+					info.setDropAction(MOVE);
+					return true;
+				}
+				return false;
 			}
 			// move existing node
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
@@ -833,7 +841,7 @@ public class DocumentWindow extends AbstractTextWindow
 					return false;
 			}
 
-			return true;
+			return false;
 		}
 
 		@Override
@@ -866,10 +874,17 @@ public class DocumentWindow extends AbstractTextWindow
 					} else if (targetFS instanceof Entity) {
 						operation = new AddMentionsToEntity((Entity) targetFS, paList);
 					} else if (targetFS instanceof Mention) {
-						operation = new AttachPart((Mention) targetFS, paList.getFirst());
+						if (info.getDropAction() == COPY)
+							operation = new AddMentionExtent((Mention) targetFS, paList.getFirst());
+						else
+							operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
 					if (operation != null) {
-						documentModel.edit(operation);
+						try {
+							documentModel.edit(operation);
+						} catch (Throwable t) {
+							t.printStackTrace();
+						}
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -1018,7 +1033,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			FlagModel fm = documentModel.getFlagModel();
-			lab1.setText(m.getCoveredText());
+			lab1.setText(Util.getCoveredText(m));
 			if (m.getFlags() != null)
 				for (String flagKey : m.getFlags()) {
 					Flag flag = fm.getFlag(flagKey);
@@ -1133,7 +1148,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public int getSourceActions(JComponent comp) {
-			return TransferHandler.LINK;
+			return TransferHandler.COPY | TransferHandler.LINK | TransferHandler.MOVE;
 		}
 
 		@Override
@@ -1169,7 +1184,12 @@ public class DocumentWindow extends AbstractTextWindow
 						ImmutableList<Span> spans = (ImmutableList<Span>) pat
 								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
+
+						if (info.getDropAction() == COPY) {
+							documentModel.edit(new AddMentionExtent(m, spans));
+
+						} else
+							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
 
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);

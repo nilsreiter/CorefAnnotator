@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
@@ -16,11 +17,14 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
 public class Util {
 	private static String[] languageNames = null;
@@ -252,15 +256,57 @@ public class Util {
 		return list;
 	}
 
+	public static <T extends FeatureStructure> Iterable<T> toIterable(FSArray array) {
+		return new Iterable<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return new Iterator<T>() {
+					int i = 0;
+
+					@Override
+					public boolean hasNext() {
+						return i < array.size();
+					}
+
+					@SuppressWarnings("unchecked")
+					@Override
+					public T next() {
+						return (T) array.get(i++);
+					}
+
+				};
+			}
+		};
+	}
+
 	public static <T extends Annotation> String getCoveredText(T a) {
-		return a.getCoveredText();
+		if (a instanceof Mention) {
+			Mention mention = (Mention) a;
+			if (mention.getAdditionalExtent() == null || mention.getAdditionalExtent().size() == 0)
+				return mention.getCoveredText();
+			MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), mention);
+			annotations.addAllIterable(toIterable(mention.getAdditionalExtent()));
+			return annotations.makeString("…");
+		} else
+			return a.getCoveredText();
 	}
 
 	public static int getBegin(Annotation a) {
+		if (a instanceof Mention) {
+			Mention mention = (Mention) a;
+			if (mention.getAdditionalExtent() == null || mention.getAdditionalExtent().size() == 0)
+				return mention.getBegin();
+			MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), mention);
+			annotations.addAllIterable(toIterable(mention.getAdditionalExtent()));
+			return annotations.iterator().next().getBegin();
+
+		}
 		return a.getBegin();
 	}
 
 	public static int getEnd(Annotation a) {
+		// TODO: implement
 		return a.getEnd();
 	}
 
