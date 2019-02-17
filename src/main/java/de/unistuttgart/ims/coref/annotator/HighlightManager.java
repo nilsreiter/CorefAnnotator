@@ -13,9 +13,13 @@ import javax.swing.text.LayeredHighlighter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.sorted.MutableSortedSet;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
 class HighlightManager {
 	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
@@ -117,6 +121,14 @@ class HighlightManager {
 		underline(m, new Color(m.getEntity().getColor()), false, true);
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
+		if (m.getAdditionalExtent() != null) {
+			MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), m);
+			annotations.addAllIterable(Util.toIterable(m.getAdditionalExtent()));
+			MutableList<Annotation> list = annotations.toList();
+			for (int i = 1; i < list.size(); i++) {
+				// TODO: draw between annotations
+			}
+		}
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
