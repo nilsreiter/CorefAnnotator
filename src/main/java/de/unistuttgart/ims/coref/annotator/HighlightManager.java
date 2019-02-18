@@ -15,14 +15,17 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.SortedSets;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
 class HighlightManager {
-	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
+	Map<Object, Object> underlineMap = Maps.mutable.empty();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
@@ -50,7 +53,7 @@ class HighlightManager {
 		textComponent.repaint();
 	}
 
-	protected void underline(Annotation a, Color c, boolean dotted, boolean repaint) {
+	protected int underline(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Span span = new Span(a);
 
 		try {
@@ -66,8 +69,52 @@ class HighlightManager {
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
 				textComponent.repaint();
+			return n;
 		} catch (BadLocationException e) {
 			Annotator.logger.catching(e);
+			return -1;
+		}
+	}
+
+	protected int underline(Annotation a, Color c, boolean dotted, boolean repaint, int n) {
+		Span span = new Span(a);
+		try {
+			if (underlineMap.containsKey(a)) {
+				Object hi = underlineMap.get(a);
+				spanCounter.subtract(span, hi);
+				hilit.removeHighlight(hi);
+			}
+			Object hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+			spanCounter.add(span, hi, n);
+			underlineMap.put(a, hi);
+			// TODO: this is overkill, but didn't work otherwise
+			if (repaint)
+				textComponent.repaint();
+			return n;
+		} catch (BadLocationException e) {
+			Annotator.logger.catching(e);
+			return -1;
+		}
+	}
+
+	protected int underline(Pair<Annotation, Annotation> pair, Color c, boolean dotted, boolean repaint, int n) {
+		Span span = new Span(pair.getOne().getEnd(), pair.getTwo().getBegin());
+		try {
+			if (underlineMap.containsKey(pair)) {
+				Object hi = underlineMap.get(pair);
+				spanCounter.subtract(span, hi);
+				hilit.removeHighlight(hi);
+			}
+			Object hi = hilit.addHighlight(span.begin, span.end, new UnderlinePainter(c, n * 3, dotted, 1));
+			spanCounter.add(span, hi, n);
+			underlineMap.put(pair, hi);
+			// TODO: this is overkill, but didn't work otherwise
+			if (repaint)
+				textComponent.repaint();
+			return n;
+		} catch (BadLocationException e) {
+			Annotator.logger.catching(e);
+			return -1;
 		}
 	}
 
@@ -118,17 +165,26 @@ class HighlightManager {
 
 	public void underline(Mention m) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, new Color(m.getEntity().getColor()), false, true);
+
+		if (underlineMap.containsKey(m)) {
+			Object hi = underlineMap.get(m);
+			spanCounter.subtract(new Span(m), hi);
+			hilit.removeHighlight(hi);
+		}
+		MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), m);
+		if (m.getAdditionalExtent() != null)
+			annotations.addAllIterable(Util.toIterable(m.getAdditionalExtent()));
+		MutableList<Annotation> list = annotations.toList();
+		int minLevel = list.collect(a -> spanCounter.getNextLevel(new Span(a))).min();
+		Color color = new Color(m.getEntity().getColor());
+		for (int i = 0; i < list.size(); i++) {
+			underline(list.get(i), color, false, true, minLevel);
+			if (i > 0)
+				underline(Tuples.pair(list.get(i - 1), list.get(i)), color, false, true, minLevel);
+		}
+
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
-		if (m.getAdditionalExtent() != null) {
-			MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), m);
-			annotations.addAllIterable(Util.toIterable(m.getAdditionalExtent()));
-			MutableList<Annotation> list = annotations.toList();
-			for (int i = 1; i < list.size(); i++) {
-				// TODO: draw between annotations
-			}
-		}
 		hilit.setDrawsLayeredHighlights(false);
 	}
 

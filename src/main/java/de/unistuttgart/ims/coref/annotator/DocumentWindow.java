@@ -1391,7 +1391,7 @@ public class DocumentWindow extends AbstractTextWindow
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
-			String surf = m.getCoveredText();
+			String surf = Util.getCoveredText(m);
 
 			if (dmp != null)
 				surf += " [,] " + dmp.getCoveredText();

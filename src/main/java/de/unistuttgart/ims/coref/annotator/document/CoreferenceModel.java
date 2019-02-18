@@ -248,7 +248,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				op.getMention().getAdditionalExtent().addToIndexes();
 			}
 			op.getMention().setAdditionalExtent(Util.addTo(getJCas(), op.getMention().getAdditionalExtent(), mex));
-			registerAnnotation(mex);
+			registerAnnotation(new Span(mex), op.getMention());
 			fireEvent(Event.get(this, Event.Type.Update, op.getMention()));
 			return mex;
 		}));
@@ -623,8 +623,12 @@ public class CoreferenceModel extends SubModel implements Model {
 		}
 	}
 
-	public void registerAnnotation(Annotation a) {
+	protected void registerAnnotation(Annotation a) {
 		characterPosition2AnnotationMap.add(a);
+	}
+
+	protected void registerAnnotation(Span span, Annotation a) {
+		characterPosition2AnnotationMap.put(span, a);
 	}
 
 	private void registerEdit(Operation operation) {

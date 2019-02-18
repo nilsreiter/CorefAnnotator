@@ -287,7 +287,7 @@ public class Util {
 				return mention.getCoveredText();
 			MutableSortedSet<Annotation> annotations = SortedSets.mutable.of(new AnnotationComparator(), mention);
 			annotations.addAllIterable(toIterable(mention.getAdditionalExtent()));
-			return annotations.makeString("…");
+			return annotations.collect(anno -> anno.getCoveredText()).makeString("…");
 		} else
 			return a.getCoveredText();
 	}

@@ -30,6 +30,13 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 		this.dotted = dotted;
 	}
 
+	public UnderlinePainter(Color color, int distance, boolean dotted, int lineWidth) {
+		super(color);
+		this.downDistance = distance;
+		this.dotted = dotted;
+		this.lineWidth = lineWidth;
+	}
+
 	/**
 	 * Paints a portion of a highlight.
 	 *
@@ -40,8 +47,8 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 	 * @param offs1
 	 *            the ending model offset >= offs1
 	 * @param bounds
-	 *            the bounding box of the view, which is not necessarily the
-	 *            region to paint.
+	 *            the bounding box of the view, which is not necessarily the region
+	 *            to paint.
 	 * @param c
 	 *            the editor
 	 * @param view
