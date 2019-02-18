@@ -239,21 +239,23 @@ public class Annotator {
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
+		DocumentWindow v = new DocumentWindow();
+		v.loadFile(file, flavor, language);
 
-		Runnable runnable = new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
+
 			@Override
 			public void run() {
-				DocumentWindow v = new DocumentWindow();
-				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
 					recentFiles.add(0, file);
+				v.initialise();
 
 			}
-		};
+		});
 
-		SwingUtilities.invokeLater(runnable);
 		return null;
+
 	}
 
 	public void close(DocumentWindow viewer) {

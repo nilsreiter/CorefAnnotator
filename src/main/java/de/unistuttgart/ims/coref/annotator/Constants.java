@@ -5,6 +5,10 @@ import java.util.Random;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
+
 public class Constants {
 	public static class Setting<T> {
 
@@ -75,12 +79,16 @@ public class Constants {
 
 		public static final String ACTION_ADD_DIRECTED_RELATION = "action.add_directed_relation";
 		public static final String ACTION_ADD_DIRECTED_RELATION_TOOLTIP = "action.add_directed_relation.tooltip";
+		public static final String ACTION_ADD_ENTITY_FLAG = "action.add_entity_flag";
+		public static final String ACTION_ADD_ENTITY_FLAG_TOOLTIP = "action.add_entity_flag.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY = "action.add_findings_to_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP = "action.add_findings_to_entity.tooltip";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY = "action.add_findings_to_new_entity";
 		public static final String ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP = "action.add_findings_to_new_entity.tooltip";
 		public static final String ACTION_ADD_FLAG = "action.add_flag";
 		public static final String ACTION_ADD_FLAG_TOOLTIP = "action.add_flag.tooltip";
+		public static final String ACTION_ADD_MENTION_FLAG = "action.add_mention_flag";
+		public static final String ACTION_ADD_MENTION_FLAG_TOOLTIP = "action.add_mention_flag.tooltip";
 		public static final String ACTION_ADD_UNDIRECTED_RELATION = "action.add_undirected_relation";
 		public static final String ACTION_ADD_UNDIRECTED_RELATION_TOOLTIP = "action.add_undirected_relation.tooltip";
 		public static final String ACTION_CLEAR = "action.clear";
@@ -181,10 +189,17 @@ public class Constants {
 		public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
 		public static final String DIALOG_SELECT_FILE = "dialog.select_file";
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
+		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL = "dialog.unsaved_changes.message.cancel";
+		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE = "dialog.unsaved_changes.message.dont_save";
+		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_SAVE = "dialog.unsaved_changes.message.save";
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
 		public static final String ENTITY_GROUP_AND = "entity.group.and";
 		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_1 = "flag_editor.flag_collection.1";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP = "flag_editor.flag_collection.1.tooltip";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_2 = "flag_editor.flag_collection.2";
+		public static final String FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP = "flag_editor.flag_collection.2.tooltip";
 		public static final String FLAG_EDITOR_ICON = "flag_editor.icon";
 		public static final String FLAG_EDITOR_ICON_TOOLTIP = "flag_editor.icon.tooltip";
 		public static final String FLAG_EDITOR_KEY = "flag_editor.key";
@@ -277,7 +292,19 @@ public class Constants {
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 
+	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
+			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
+			new AddFlag("male", "Male", MaterialDesign.MDI_GENDER_MALE, Entity.class),
+			new AddFlag("male-female", "Male/Female", MaterialDesign.MDI_GENDER_MALE_FEMALE, Entity.class),
+			new AddFlag("transgender", "Transgender", MaterialDesign.MDI_GENDER_TRANSGENDER, Entity.class) };
+
+	public static final AddFlag[] FLAG_COLLECTION_2 = new AddFlag[] {
+			new AddFlag("predicate", "Predicate", MaterialDesign.MDI_GAVEL, Mention.class),
+			new AddFlag("pronoun", "Pronoun", MaterialDesign.MDI_ARROW_TOP_LEFT, Mention.class),
+			new AddFlag("name", "Proper name", MaterialDesign.MDI_TAG, Mention.class) };
+
 	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
+
 	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
 
 	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
@@ -310,10 +337,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
 			Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP, false,
 			MaterialDesign.MDI_FORMAT_TEXT);
-
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
+
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru" };
 

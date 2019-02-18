@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.apache.uima.UIMAException;
@@ -147,13 +146,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 			this.success.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					failConsumer.accept(e);
-				}
-
-			});
+			failConsumer.accept(e);
 		}
 	}
 

@@ -8,7 +8,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionEvent;
+import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
@@ -40,7 +40,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 	}
 
 	@Override
-	public void valueChanged(CATreeSelectionEvent l) {
+	public void valueChanged(CAAbstractTreeSelectionListener l) {
 		boolean en;
 		try {
 			en = l.isClass(flagModel.getTargetClass(flag));

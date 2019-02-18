@@ -3,21 +3,25 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -27,8 +31,11 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
+import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
+import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -37,8 +44,9 @@ import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.FlagTableModel;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
-public class FlagEditor extends JFrame {
+public class FlagEditor extends AbstractWindow {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,10 +54,21 @@ public class FlagEditor extends JFrame {
 	DocumentWindow documentWindow;
 
 	JTable table;
-	JPanel toolbar;
+	JToolBar toolbar;
 
-	public FlagEditor(DocumentModel documentModel, DocumentWindow documentWindow) {
+	public FlagEditor(DocumentWindow documentWindow, DocumentModel documentModel) {
 		this.documentModel = documentModel;
+		this.documentWindow = documentWindow;
+
+		this.initializeWindow();
+	}
+
+	@Override
+	protected void initializeWindow() {
+		super.initializeWindow();
+		progressBar.setVisible(false);
+
+		documentWindow.addWindowListener(new DocumentWindowWindowListener());
 		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
@@ -70,8 +89,41 @@ public class FlagEditor extends JFrame {
 		this.table = new JTable(new FlagTableModel(documentModel));
 
 		// Actions
-		AbstractAction addFlagAction = new AddFlagAction(documentModel);
+		AbstractAction addEntityFlagAction = AddFlagAction.getAddEntityFlagAction(documentModel);
+		AbstractAction addMentionFlagAction = AddFlagAction.getAddMentionFlagAction(documentModel);
 		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentModel, table);
+		AbstractAction undoAction = new UndoAction(documentWindow);
+
+		deleteFlagAction.setEnabled(false);
+
+		// Menu
+		JMenu fileMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_FILE));
+		fileMenu.add(new CloseAction());
+
+		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
+		entityMenu.add(new JMenuItem(undoAction));
+
+		JMenu flagMenu = new JMenu(Annotator.getString(Strings.MENU_FLAGS));
+		flagMenu.add(new JMenuItem(addEntityFlagAction));
+		flagMenu.add(new JMenuItem(addMentionFlagAction));
+		flagMenu.add(new JMenuItem(deleteFlagAction));
+		flagMenu.addSeparator();
+		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
+				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP))));
+		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_2,
+				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP))));
+
+		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
+		helpMenu.add(Annotator.app.helpAction);
+
+		menuBar.add(fileMenu);
+		menuBar.add(entityMenu);
+		menuBar.add(flagMenu);
+		menuBar.add(helpMenu);
+
+		setJMenuBar(menuBar);
 
 		// Table
 		this.table.setGridColor(Color.GRAY);
@@ -124,8 +176,9 @@ public class FlagEditor extends JFrame {
 			}
 		});
 
-		this.toolbar = new JPanel();
-		this.toolbar.add(new JButton(addFlagAction));
+		this.toolbar = new JToolBar();
+		this.toolbar.add(new JButton(addEntityFlagAction));
+		this.toolbar.add(new JButton(addMentionFlagAction));
 		this.toolbar.add(new JButton(deleteFlagAction));
 
 		this.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
@@ -215,49 +268,27 @@ public class FlagEditor extends JFrame {
 		}
 	}
 
-	class FlagEditorWindowListener implements WindowListener {
+	class FlagEditorWindowListener extends WindowAdapter {
 
-		@Override
-		public void windowOpened(WindowEvent e) {
-			// TODO Auto-generated method stub
+	}
 
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-			// TODO Auto-generated method stub
-
-		}
+	class DocumentWindowWindowListener extends WindowAdapter {
 
 		@Override
 		public void windowClosed(WindowEvent e) {
-
+			FlagEditor.this.setVisible(false);
+			FlagEditor.this.dispose();
 		}
 
 		@Override
 		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
+			FlagEditor.this.setState(Frame.ICONIFIED);
 		}
 
 		@Override
 		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-
+			FlagEditor.this.setState(Frame.NORMAL);
 		}
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 
 	class MyHeaderRenderer extends DefaultTableHeaderCellRenderer {
@@ -266,4 +297,23 @@ public class FlagEditor extends JFrame {
 
 	}
 
+	class CreateFlagsFromCollections extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		AddFlag[] flagCollection;
+
+		public CreateFlagsFromCollections(AddFlag[] flagCollection, String label, String tooltip) {
+			super(label, FontIcon.of(MaterialDesign.MDI_FOLDER));
+			this.flagCollection = flagCollection;
+			putValue(Action.SHORT_DESCRIPTION, tooltip);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (AddFlag af : flagCollection) {
+				documentModel.edit(af);
+			}
+		}
+
+	}
 }

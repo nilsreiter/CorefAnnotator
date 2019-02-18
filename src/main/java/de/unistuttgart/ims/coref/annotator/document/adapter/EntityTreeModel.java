@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
@@ -31,6 +32,7 @@ import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.Model;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
@@ -305,4 +307,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		this.entitySortOrder = entitySortOrder;
 	}
 
+	@Override
+	public void valueForPathChanged(TreePath path, Object newValue) {
+		coreferenceModel.getDocumentModel()
+				.edit(new UpdateEntityName(((CATreeNode) path.getLastPathComponent()).getEntity(), (String) newValue));
+	}
 }

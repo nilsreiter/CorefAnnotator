@@ -107,14 +107,30 @@ public class FlagModel extends SubModel implements Model {
 	protected void edit(AddFlag operation) {
 		Flag f = new Flag(documentModel.getJcas());
 		f.addToIndexes();
-		f.setLabel(Annotator.getString(Constants.Strings.FLAGMODEL_NEW_FLAG));
+
+		if (operation.getLabel() != null)
+			f.setLabel(operation.getLabel());
+		else
+			f.setLabel(Annotator.getString(Constants.Strings.FLAGMODEL_NEW_FLAG));
+
 		String key = UUID.randomUUID().toString();
+		if (operation.getKey() != null)
+			key = operation.getKey();
 		while (keys.contains(key)) {
 			key = UUID.randomUUID().toString();
 		}
 		f.setKey(key);
-		f.setIcon(Util.randomEnum(MaterialDesign.class).toString());
-		f.setTargetClass(operation.getTargetClass().getName());
+
+		if (operation.getIcon() != null)
+			f.setIcon(operation.getIcon().toString());
+		else
+			f.setIcon(Util.randomEnum(MaterialDesign.class).toString());
+
+		if (operation.getTargetClass() != null)
+			f.setTargetClass(operation.getTargetClass().getName());
+		else
+			f.setTargetClass(Entity.class.getName());
+
 		f.addToIndexes();
 		keys.add(key);
 

@@ -487,6 +487,10 @@ public class CoreferenceModel extends SubModel implements Model {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
 
 		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
