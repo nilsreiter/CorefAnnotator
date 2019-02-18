@@ -46,6 +46,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		this.featureStructure = featureStructure;
 	}
 
 	@Override
