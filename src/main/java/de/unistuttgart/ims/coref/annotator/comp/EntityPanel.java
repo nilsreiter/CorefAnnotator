@@ -24,6 +24,8 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
+	Boolean showText = null;
+
 	public EntityPanel(DocumentModel documentModel, Entity entity) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.setOpaque(false);
@@ -45,17 +47,32 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener {
 		JLabel l = new JLabel();
 		if (color != null)
 			l.setForeground(color);
-		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS, Defaults.CFG_SHOW_TEXT_LABELS))
+		if (isShowText())
 			l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
 		l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
 		panel.add(Box.createRigidArea(new Dimension(5, 5)));
 		panel.add(l);
 	}
 
+	public Boolean getShowText() {
+		return showText;
+	}
+
+	protected boolean isShowText() {
+		if (showText == null)
+			return Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TEXT_LABELS,
+					Defaults.CFG_SHOW_TEXT_LABELS);
+		return showText;
+	}
+
 	@Override
 	public void preferenceChange(PreferenceChangeEvent evt) {
 		if (evt.getKey().equals(Constants.CFG_SHOW_TEXT_LABELS))
 			repaint();
+	}
+
+	public void setShowText(Boolean showText) {
+		this.showText = showText;
 	}
 
 }

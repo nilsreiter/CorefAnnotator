@@ -81,9 +81,9 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		}
 		if (operation != null)
 			this.getTarget().getDocumentModel().edit(operation);
-		else
-			for (TreePath tp : getTarget().getTree().getSelectionPaths())
-				deleteSingle((CATreeNode) tp.getLastPathComponent());
+		// else
+		// for (TreePath tp : getTarget().getTree().getSelectionPaths())
+		// deleteSingle((CATreeNode) tp.getLastPathComponent());
 
 	}
 

@@ -3,6 +3,9 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -16,31 +19,40 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import org.apache.uima.jcas.cas.FSArray;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.AddDirectedRelationAction;
 import de.unistuttgart.ims.coref.annotator.action.AddUndirectedRelationAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
-import de.unistuttgart.ims.coref.annotator.comp.FSArrayTableCellRenderer;
+import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
 import de.unistuttgart.ims.coref.annotator.document.adapter.DirectedRelationsTableModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.EntityComboBoxModel;
 import de.unistuttgart.ims.coref.annotator.document.adapter.FlagComboBoxModel;
-import de.unistuttgart.ims.coref.annotator.document.adapter.UndirectedRelationsTableModel;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation.EntityRelationProperty;
 
 public class RelationEditor extends JFrame {
 
@@ -49,11 +61,13 @@ public class RelationEditor extends JFrame {
 	DocumentModel documentModel;
 	DocumentWindow documentWindow;
 
-	JTable tableWithDirectedRelations, tableWithUndirectedRelations;
+	JTable tableWithDirectedRelations;
+	Component tableWithUndirectedRelations;
 	JPanel toolbar;
 
 	public RelationEditor(DocumentModel documentModel, DocumentWindow documentWindow) {
 		this.documentModel = documentModel;
+		this.documentWindow = documentWindow;
 		this.setTitle(Annotator.getString(Constants.Strings.RELATION_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
@@ -63,7 +77,7 @@ public class RelationEditor extends JFrame {
 
 		// Table
 		initDirected();
-		initUndirected();
+		tableWithUndirectedRelations = initUndirected();
 
 		this.toolbar = new JPanel();
 		this.toolbar.add(new JButton(addDirectedRelationAction));
@@ -78,37 +92,12 @@ public class RelationEditor extends JFrame {
 		this.pack();
 	}
 
-	private void initUndirected() {
-		EntityComboBoxModel entityComboBoxModel = new EntityComboBoxModel();
-		documentModel.getCoreferenceModel().addCoreferenceModelListener(entityComboBoxModel);
+	private Component initUndirected() {
 
-		FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
-		documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
+		JPanel panel = new GridLayoutTable(documentModel);
 
-		JComboBox<Entity> entityCombobox = new JComboBox<Entity>(entityComboBoxModel);
-		entityCombobox.setRenderer(new EntityListCellRenderer());
+		return panel;
 
-		JComboBox<Flag> undirectedflagCombobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
-		undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
-
-		UndirectedRelationsTableModel tableModel = new UndirectedRelationsTableModel(documentModel.getRelationModel());
-		this.tableWithUndirectedRelations = new JTable(tableModel);
-
-		this.tableWithUndirectedRelations.setGridColor(Color.GRAY);
-		this.tableWithUndirectedRelations.setAutoCreateColumnsFromModel(true);
-		this.tableWithUndirectedRelations.setAutoCreateRowSorter(true);
-		this.tableWithUndirectedRelations.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.tableWithUndirectedRelations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.tableWithUndirectedRelations.setRowHeight(25);
-		this.tableWithUndirectedRelations.setDropMode(DropMode.ON);
-		this.tableWithUndirectedRelations.setTransferHandler(tableModel.getTransferHandler());
-		this.tableWithUndirectedRelations.setDefaultRenderer(Flag.class, new FlagTableCellRenderer());
-		this.tableWithUndirectedRelations.setDefaultRenderer(FSArray.class,
-				new FSArrayTableCellRenderer(documentModel));
-		this.tableWithUndirectedRelations.setDefaultEditor(Flag.class, new DefaultCellEditor(undirectedflagCombobox));
-		this.tableWithUndirectedRelations.getColumnModel().getColumn(0).setPreferredWidth(50);
-		this.tableWithUndirectedRelations.getColumnModel().getColumn(1).setPreferredWidth(150);
-		this.tableWithUndirectedRelations.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 	}
 
 	private void initDirected() {
@@ -141,7 +130,6 @@ public class RelationEditor extends JFrame {
 		this.tableWithDirectedRelations.setDragEnabled(true);
 		this.tableWithDirectedRelations.setTransferHandler(directedRelationsTableModel.getTransferHandler());
 		this.tableWithDirectedRelations.setRowHeight(25);
-		this.tableWithDirectedRelations.setToolTipText("x");
 
 		this.tableWithDirectedRelations.getColumnModel().getColumn(0)
 				.setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
@@ -195,15 +183,23 @@ public class RelationEditor extends JFrame {
 
 		private static final long serialVersionUID = 1L;
 
+		String tooltipText;
+
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			if (value != null) {
 				setText(((Entity) value).getLabel());
+				tooltipText = ((Entity) value).getLabel();
 				setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(((Entity) value).getColor())));
 			}
 			return this;
+		}
+
+		@Override
+		public String getToolTipText() {
+			return tooltipText;
 		}
 	}
 
@@ -308,6 +304,105 @@ public class RelationEditor extends JFrame {
 
 		private static final long serialVersionUID = 1L;
 
+	}
+
+	class GridLayoutTable extends JPanel implements RelationModelListener {
+
+		private static final long serialVersionUID = 1L;
+
+		MutableMap<EntityRelation, Integer> componentMap = Maps.mutable.empty();
+		GridLayout layout = new GridLayout(0, 1);
+
+		public GridLayoutTable(DocumentModel documentModel) {
+			setLayout(layout);
+			documentModel.getRelationModel().addRelationModelListener(this);
+		}
+
+		protected void addRow(SymmetricEntityRelation relation) {
+			JPanel rowPanel = new JPanel();
+			FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
+			documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
+
+			JComboBox<Flag> undirectedflagCombobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
+			undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
+
+			rowPanel.add(new JButton(new DeleteAction(getDocumentWindow(), relation)));
+			rowPanel.add(undirectedflagCombobox);
+			rowPanel.add(addFSArray(relation, relation.getEntities()));
+
+			layout.setRows(layout.getRows() + 1);
+			int idx = -1;
+			if (componentMap.containsKey(relation)) {
+				idx = componentMap.get(relation);
+				remove(idx);
+			} else
+				idx = getComponentCount();
+			add(rowPanel, idx);
+			componentMap.put(relation, idx);
+
+			validate();
+		}
+
+		protected Component addFSArray(SymmetricEntityRelation relation, FSArray arr) {
+			JPanel panel = new JPanel();
+			for (int i = 0; i < arr.size(); i++) {
+				Entity entity = (Entity) arr.get(i);
+				EntityPanel el = new EntityPanel(documentModel, entity);
+				el.setShowText(false);
+				el.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseReleased(MouseEvent e) {
+						if (SwingUtilities.isRightMouseButton(e)) {
+							JPopupMenu menu = new JPopupMenu();
+							menu.add(new AbstractAction("delete") {
+
+								private static final long serialVersionUID = 1L;
+
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									documentModel.edit(new UpdateEntityRelation(relation,
+											EntityRelationProperty.REMOVE_ENTITY, entity));
+								}
+
+							});
+							menu.show(el, e.getX(), e.getY());
+						}
+					}
+
+				});
+				panel.add(el);
+			}
+			return panel;
+		}
+
+		@Override
+		public void relationEvent(FeatureStructureEvent event) {
+			switch (event.getType()) {
+			case Update:
+			case Add:
+				if (event.getArgument1() instanceof SymmetricEntityRelation) {
+					addRow((SymmetricEntityRelation) event.getArgument1());
+				}
+				break;
+			case Init:
+				break;
+			case Merge:
+				break;
+			case Move:
+				break;
+			case Op:
+				break;
+			case Remove:
+				break;
+			default:
+				break;
+			}
+		}
+
+	}
+
+	public DocumentWindow getDocumentWindow() {
+		return documentWindow;
 	}
 
 }

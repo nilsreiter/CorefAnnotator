@@ -1,10 +1,13 @@
 package de.unistuttgart.ims.coref.annotator.comp;
 
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -36,7 +39,20 @@ public class FSArrayTableCellRenderer extends JPanel implements TableCellRendere
 			FSArray arr = (FSArray) value;
 			for (int i = 0; i < arr.size(); i++) {
 				if (arr.get(i) instanceof Entity) {
-					this.add(new EntityPanel(documentModel, (Entity) arr.get(i)));
+					Entity entity = (Entity) arr.get(i);
+					EntityPanel ep = new EntityPanel(documentModel, entity);
+					ep.addMouseListener(new MouseAdapter() {
+
+						@Override
+						public void mouseReleased(MouseEvent e) {
+							if (SwingUtilities.isRightMouseButton(e)) {
+								System.err.println("clicked on " + entity);
+							}
+						}
+
+					});
+					ep.setShowText(false);
+					this.add(ep);
 				}
 			}
 		}

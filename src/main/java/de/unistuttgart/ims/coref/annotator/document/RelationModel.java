@@ -127,16 +127,20 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 
 			}
 		} else if (reln instanceof SymmetricEntityRelation) {
+			FSArray newArray;
 			SymmetricEntityRelation ser = (SymmetricEntityRelation) reln;
 			switch (op.getEntityRelationProperty()) {
 			case ADD_ENTITY:
 				if (Util.contains(ser.getEntities(), (Entity) op.getNewValue()))
 					return;
 				op.setOldValue(ser.getEntities());
-				FSArray newArray = Util.addTo(documentModel.getJcas(), ser.getEntities(), (Entity) op.getNewValue());
+				newArray = Util.addTo(documentModel.getJcas(), ser.getEntities(), (Entity) op.getNewValue());
 				ser.setEntities(newArray);
 				break;
 			case REMOVE_ENTITY:
+				op.setOldValue(ser.getEntities());
+				newArray = Util.removeFrom(documentModel.getJcas(), ser.getEntities(), (Entity) op.getNewValue());
+				ser.setEntities(newArray);
 				break;
 			case TYPE:
 				op.setOldValue(ser.getRelationType());

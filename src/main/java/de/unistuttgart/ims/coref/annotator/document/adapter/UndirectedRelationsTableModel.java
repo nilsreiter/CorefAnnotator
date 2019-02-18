@@ -24,6 +24,7 @@ import de.unistuttgart.ims.coref.annotator.document.RelationModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation.EntityRelationProperty;
 
+@Deprecated
 public class UndirectedRelationsTableModel extends DefaultTableModel implements TableModel, RelationModelListener {
 
 	/**
