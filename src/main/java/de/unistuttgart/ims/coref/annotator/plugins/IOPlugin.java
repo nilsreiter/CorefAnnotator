@@ -8,6 +8,8 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import javafx.stage.FileChooser.ExtensionFilter;
+
 public interface IOPlugin extends Plugin {
 
 	AnalysisEngineDescription getImporter() throws ResourceInitializationException;
@@ -21,6 +23,8 @@ public interface IOPlugin extends Plugin {
 	Class<? extends StylePlugin> getStylePlugin();
 
 	FileFilter getFileFilter();
+
+	ExtensionFilter getExtensionFilter();
 
 	String getSuffix();
 

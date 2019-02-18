@@ -13,14 +13,21 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiWriter;
+import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public abstract class AbstractXmiPlugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
 		return FileFilters.xmi;
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return ExtensionFilters.xmi;
 	}
 
 	@Override
@@ -48,5 +55,5 @@ public abstract class AbstractXmiPlugin implements IOPlugin {
 	@Override
 	public String[] getSupportedLanguages() {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
-}
+	}
 }
