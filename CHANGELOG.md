@@ -12,6 +12,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   the window is opened #159
 - The text field now maintains previous searches #161
 - The search can now be restricted to mentions only #162
+- We now use a JavaFX-based file dialog, which should look more native 
+  to the OS (no issue)
 
 ## 1.7.3
 
