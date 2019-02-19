@@ -18,12 +18,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.adapter.DirectedRelationsTableModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddDirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.AddUndirectedRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.RelateEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RelationModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityRelation;
 import de.unistuttgart.ims.uima.io.xml.ArrayUtil;
 
@@ -31,6 +31,7 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 
 	DirectedRelationsTableModel directedRelationsTableModel = null, undirectedRelationsTableModel = null;
 
+	@Deprecated
 	MutableList<EntityRelation> list = Lists.mutable.empty();
 
 	MutableList<RelationModelListener> listeners = Lists.mutable.empty();
@@ -61,6 +62,8 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 			edit((AddUndirectedRelation) op);
 		else if (op instanceof UpdateEntityRelation)
 			edit((UpdateEntityRelation) op);
+		else if (op instanceof RemoveEntityRelation)
+			edit((RemoveEntityRelation) op);
 		else
 			throw new UnsupportedOperationException();
 	}
@@ -75,15 +78,14 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 
 	protected void edit(AddUndirectedRelation op) {
 		SymmetricEntityRelation erel = new SymmetricEntityRelation(documentModel.getJcas());
-		erel.setEntities(new FSArray(documentModel.getJcas(), 2));
-		erel.setEntities(0, documentModel.getCoreferenceModel().getEntities(EntitySorter.COLOR).getFirst());
-		erel.setEntities(1, documentModel.getCoreferenceModel().getEntities(EntitySorter.COLOR).getLast());
+		erel.setEntities(new FSArray(documentModel.getJcas(), 0));
 		op.setEntityRelation(erel);
 		erel.addToIndexes();
 		list.add(erel);
 		fireRelationEvent(Event.get(this, Event.Type.Add, erel));
 	}
 
+	@Deprecated
 	protected void edit(RelateEntities op) {
 		EntityRelation erel;
 		if (op.getRelationType().getDirected()) {
@@ -103,6 +105,11 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 
 		ListDataEvent lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, list.size() - 1, list.size());
 		listDataListeners.forEach(l -> l.intervalAdded(lde));
+	}
+
+	protected void edit(RemoveEntityRelation op) {
+		op.getFeatureStructures().forEach(fs -> fs.removeFromIndexes());
+		fireRelationEvent(Event.get(getDocumentModel(), Event.Type.Remove, op.getFeatureStructures()));
 	}
 
 	protected void edit(UpdateEntityRelation op) {
@@ -159,7 +166,7 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 	}
 
 	public ImmutableList<EntityRelation> getRelations() {
-		return list.toImmutable();
+		return Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), EntityRelation.class));
 	}
 
 	@Deprecated
@@ -175,12 +182,76 @@ public class RelationModel extends SubModel implements Model, ListModel<EntityRe
 		return listeners.remove(o);
 	}
 
-	protected void undo(RelationModelOperation op) {
-
+	protected void undo(AddDirectedRelation op) {
+		op.getEntityRelation().removeFromIndexes();
+		fireRelationEvent(Event.get(this, Event.Type.Remove, op.getEntityRelation()));
 	}
 
+	protected void undo(AddUndirectedRelation op) {
+		op.getEntityRelation().removeFromIndexes();
+		fireRelationEvent(Event.get(this, Event.Type.Remove, op.getEntityRelation()));
+	}
+
+	protected void undo(RelationModelOperation op) {
+		if (op instanceof RelateEntities)
+			undo((RelateEntities) op);
+		else if (op instanceof AddDirectedRelation)
+			undo((AddDirectedRelation) op);
+		else if (op instanceof AddUndirectedRelation)
+			undo((AddUndirectedRelation) op);
+		else if (op instanceof UpdateEntityRelation)
+			undo((UpdateEntityRelation) op);
+		else if (op instanceof RemoveEntityRelation)
+			undo((RemoveEntityRelation) op);
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	@Deprecated
 	protected void undo(RelateEntities op) {
 		op.getRelation().removeFromIndexes();
+	}
+
+	protected void undo(RemoveEntityRelation op) {
+		op.getFeatureStructures().forEach(fs -> fs.addToIndexes());
+		fireRelationEvent(Event.get(getDocumentModel(), Event.Type.Add, op.getFeatureStructures()));
+	}
+
+	protected void undo(UpdateEntityRelation op) {
+		EntityRelation reln = op.getObjects().getFirst();
+		if (reln instanceof DirectedEntityRelation) {
+			DirectedEntityRelation der = (DirectedEntityRelation) reln;
+			switch (op.getEntityRelationProperty()) {
+			case SOURCE:
+				der.setSource((Entity) op.getOldValue());
+				break;
+			case TARGET:
+				der.setTarget((Entity) op.getOldValue());
+				break;
+			case TYPE:
+				der.setRelationType((EntityRelationType) op.getOldValue());
+				break;
+			default:
+				break;
+
+			}
+		} else if (reln instanceof SymmetricEntityRelation) {
+			SymmetricEntityRelation ser = (SymmetricEntityRelation) reln;
+			switch (op.getEntityRelationProperty()) {
+			case ADD_ENTITY:
+			case REMOVE_ENTITY:
+				ser.setEntities((FSArray) op.getOldValue());
+				ser.getEntities().addToIndexes();
+				break;
+			case TYPE:
+				ser.setRelationType((EntityRelationType) op.getOldValue());
+				break;
+			default:
+				break;
+
+			}
+		}
+		fireRelationEvent(Event.get(this, Event.Type.Update, reln));
 	}
 
 	@Override

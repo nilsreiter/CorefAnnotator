@@ -21,10 +21,12 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntityRelation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 
@@ -78,6 +80,8 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		} else if (featureStructure instanceof DetachedMentionPart) {
 			DetachedMentionPart dmp = (DetachedMentionPart) featureStructure;
 			operation = new RemovePart(dmp.getMention(), dmp);
+		} else if (featureStructure instanceof EntityRelation) {
+			operation = new RemoveEntityRelation((EntityRelation) featureStructure);
 		}
 		if (operation != null)
 			this.getTarget().getDocumentModel().edit(operation);

@@ -7,6 +7,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelationType;
 
+@Deprecated
 public class RelateEntities implements RelationModelOperation {
 	EntityRelationType relationType;
 	ImmutableList<Entity> entities;

@@ -3,33 +3,47 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.jcas.cas.FSArray;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -95,7 +109,7 @@ public class RelationEditor extends JFrame {
 	private Component initUndirected() {
 
 		JPanel panel = new GridLayoutTable(documentModel);
-
+		panel.setBorder(BorderFactory.createTitledBorder("undirected relations"));
 		return panel;
 
 	}
@@ -207,12 +221,21 @@ public class RelationEditor extends JFrame {
 
 		private static final long serialVersionUID = 1L;
 
+		int maxLength = 20;
+
+		public FlagListCellRenderer() {
+		}
+
+		public FlagListCellRenderer(int maxLength) {
+			this.maxLength = maxLength;
+		}
+
 		@Override
 		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value != null) {
-				setText(((Flag) value).getLabel());
+				setText(StringUtils.abbreviate(((Flag) value).getLabel(), maxLength));
 				setIcon(FontIcon.of(MaterialDesign.valueOf(((Flag) value).getIcon())));
 			}
 			return this;
@@ -319,16 +342,7 @@ public class RelationEditor extends JFrame {
 		}
 
 		protected void addRow(SymmetricEntityRelation relation) {
-			JPanel rowPanel = new JPanel();
-			FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
-			documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
-
-			JComboBox<Flag> undirectedflagCombobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
-			undirectedflagCombobox.setRenderer(new FlagListCellRenderer());
-
-			rowPanel.add(new JButton(new DeleteAction(getDocumentWindow(), relation)));
-			rowPanel.add(undirectedflagCombobox);
-			rowPanel.add(addFSArray(relation, relation.getEntities()));
+			JPanel rowPanel = new Row(relation);
 
 			layout.setRows(layout.getRows() + 1);
 			int idx = -1;
@@ -339,40 +353,14 @@ public class RelationEditor extends JFrame {
 				idx = getComponentCount();
 			add(rowPanel, idx);
 			componentMap.put(relation, idx);
-
-			validate();
 		}
 
-		protected Component addFSArray(SymmetricEntityRelation relation, FSArray arr) {
-			JPanel panel = new JPanel();
-			for (int i = 0; i < arr.size(); i++) {
-				Entity entity = (Entity) arr.get(i);
-				EntityPanel el = new EntityPanel(documentModel, entity);
-				el.setShowText(false);
-				el.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseReleased(MouseEvent e) {
-						if (SwingUtilities.isRightMouseButton(e)) {
-							JPopupMenu menu = new JPopupMenu();
-							menu.add(new AbstractAction("delete") {
-
-								private static final long serialVersionUID = 1L;
-
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									documentModel.edit(new UpdateEntityRelation(relation,
-											EntityRelationProperty.REMOVE_ENTITY, entity));
-								}
-
-							});
-							menu.show(el, e.getX(), e.getY());
-						}
-					}
-
-				});
-				panel.add(el);
+		protected void updateRowColor() {
+			for (int i = 0; i < getComponentCount(); i++) {
+				Component c = getComponent(i);
+				if (i % 2 == 0)
+					c.setBackground(Color.WHITE);
 			}
-			return panel;
 		}
 
 		@Override
@@ -383,6 +371,9 @@ public class RelationEditor extends JFrame {
 				if (event.getArgument1() instanceof SymmetricEntityRelation) {
 					addRow((SymmetricEntityRelation) event.getArgument1());
 				}
+				updateRowColor();
+				validate();
+				repaint();
 				break;
 			case Init:
 				break;
@@ -393,10 +384,110 @@ public class RelationEditor extends JFrame {
 			case Op:
 				break;
 			case Remove:
+				int cIndex = componentMap.get(event.getArgument1());
+				remove(cIndex);
+				updateRowColor();
+				validate();
+				repaint();
 				break;
 			default:
 				break;
 			}
+		}
+
+		class Row extends JPanel {
+			private static final long serialVersionUID = 1L;
+			SymmetricEntityRelation relation;
+
+			public Row(SymmetricEntityRelation relation) {
+				this.relation = relation;
+
+				@SuppressWarnings("unused")
+				DropTargetListener dropTargetListener = new DropTargetListener();
+				FlagComboBoxModel flagUndirectedComboBoxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
+				documentModel.getFlagModel().addFlagModelListener(flagUndirectedComboBoxModel);
+
+				Dimension combobox_dimension = new Dimension(150, 30);
+				JComboBox<Flag> combobox = new JComboBox<Flag>(flagUndirectedComboBoxModel);
+				combobox.setRenderer(new FlagListCellRenderer(20));
+				combobox.setMaximumSize(combobox_dimension);
+				combobox.setMinimumSize(combobox_dimension);
+				combobox.setPreferredSize(combobox_dimension);
+				if (relation.getFlag() != null)
+					combobox.setSelectedItem(relation.getFlag());
+
+				JToolBar toolBar = new JToolBar();
+				toolBar.setFloatable(false);
+				toolBar.add(new DeleteAction(getDocumentWindow(), relation));
+				add(combobox);
+				add(toolBar);
+				add(addFSArray(relation, relation.getEntities()));
+
+				setBorder(BorderFactory.createLineBorder(Color.gray));
+				pack();
+			}
+
+			protected Component addFSArray(SymmetricEntityRelation relation, FSArray arr) {
+				JPanel panel = new JPanel();
+				panel.setBorder(BorderFactory.createTitledBorder("Relation members"));
+				if (arr.size() > 0)
+					for (int i = 0; i < arr.size(); i++) {
+						Entity entity = (Entity) arr.get(i);
+						EntityPanel el = new EntityPanel(documentModel, entity);
+						el.setShowText(false);
+						el.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseReleased(MouseEvent e) {
+								if (SwingUtilities.isRightMouseButton(e)) {
+									JPopupMenu menu = new JPopupMenu();
+									menu.add(new AbstractAction("delete") {
+
+										private static final long serialVersionUID = 1L;
+
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											documentModel.edit(new UpdateEntityRelation(relation,
+													EntityRelationProperty.REMOVE_ENTITY, entity));
+										}
+
+									});
+									menu.show(el, e.getX(), e.getY());
+								}
+							}
+
+						});
+						panel.add(el);
+					}
+				else {
+					panel.add(new JLabel("drop zone"));
+				}
+				return panel;
+			}
+
+			class DropTargetListener extends DropTargetAdapter {
+
+				public DropTargetListener() {
+					@SuppressWarnings("unused")
+					DropTarget dropTarget = new DropTarget(Row.this, DnDConstants.ACTION_LINK, this, true, null);
+				}
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public void drop(DropTargetDropEvent event) {
+					Transferable transferable = event.getTransferable();
+					ImmutableList<CATreeNode> object;
+					try {
+						object = (ImmutableList<CATreeNode>) transferable
+								.getTransferData(NodeListTransferable.dataFlavor);
+						documentModel.edit(new UpdateEntityRelation(relation, EntityRelationProperty.ADD_ENTITY,
+								object.getFirst().getEntity()));
+						event.acceptDrop(TransferHandler.LINK);
+					} catch (UnsupportedFlavorException | IOException e) {
+						Annotator.logger.catching(e);
+					}
+				}
+			}
+
 		}
 
 	}
