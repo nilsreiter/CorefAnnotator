@@ -91,6 +91,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 
 	}
 
+	@Deprecated
 	private void deleteSingle(CATreeNode tn) {
 		Operation operation = null;
 		if (tn.getFeatureStructure() instanceof Mention) {
