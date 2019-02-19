@@ -5,9 +5,12 @@ import org.eclipse.collections.api.list.ImmutableList;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
-public class RemoveSingletons implements CoreferenceModelOperation {
+public class RemoveSingletons extends AbstractRemoveOperation<Entity> implements CoreferenceModelOperation {
 	ImmutableList<Mention> mentions;
-	ImmutableList<Entity> entities;
+
+	public RemoveSingletons() {
+
+	}
 
 	public ImmutableList<Mention> getMentions() {
 		return mentions;
@@ -17,12 +20,14 @@ public class RemoveSingletons implements CoreferenceModelOperation {
 		this.mentions = mentions;
 	}
 
+	@Deprecated
 	public ImmutableList<Entity> getEntities() {
-		return entities;
+		return getFeatureStructures();
 	}
 
+	@Deprecated
 	public void setEntities(ImmutableList<Entity> entities) {
-		this.entities = entities;
+		setFeatureStructures(entities);
 	}
 
 }

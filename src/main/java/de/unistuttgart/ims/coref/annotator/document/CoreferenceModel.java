@@ -335,7 +335,7 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 		} else if (operation instanceof RemoveEntities) {
 			RemoveEntities op = (RemoveEntities) operation;
-			op.getEntities().forEach(e -> {
+			op.getFeatureStructures().forEach(e -> {
 				if (entityEntityGroupMap.containsKey(e))
 					op.entityEntityGroupMap.putAll(e, entityEntityGroupMap.get(e));
 				remove(e);
@@ -411,12 +411,12 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Remove, e, toRemove.toImmutable()));
 			allRemoved.addAll(toRemove);
 		});
-		op.setRemovedMentions(allRemoved.toImmutable());
+		op.setFeatureStructures(allRemoved.toList().toImmutable());
 		registerEdit(op);
 	}
 
 	protected void edit(RemoveMention op) {
-		op.getMentions().forEach(m -> {
+		op.getFeatureStructures().forEach(m -> {
 			remove(m, false);
 			if (m.getDiscontinuous() != null) {
 				DetachedMentionPart dmp = m.getDiscontinuous();
@@ -424,7 +424,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				fireEvent(Event.get(this, Type.Remove, m, dmp));
 			}
 		});
-		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
+		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
 		registerEdit(op);
 	}
 
@@ -447,7 +447,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				break;
 			}
 		}
-		operation.setEntities(entities.toList().toImmutable());
+		operation.setFeatureStructures(entities.toList().toImmutable());
 		operation.setMentions(mentions.toList().toImmutable());
 		// fireEvent(null); // TODO
 		registerEdit(operation);
@@ -482,6 +482,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
 	}
@@ -743,7 +744,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
 
-			op.getRemovedMentions().forEach(m -> {
+			op.getFeatureStructures().forEach(m -> {
 				m.addToIndexes();
 				entityMentionMap.put(m.getEntity(), m);
 				registerAnnotation(m);
@@ -758,14 +759,14 @@ public class CoreferenceModel extends SubModel implements Model {
 			undo((RemoveMention) operation);
 		} else if (operation instanceof RemoveEntities) {
 			RemoveEntities op = (RemoveEntities) operation;
-			op.getEntities().forEach(e -> {
+			op.getFeatureStructures().forEach(e -> {
 				e.addToIndexes();
 				if (op.entityEntityGroupMap.containsKey(e)) {
 					for (EntityGroup group : op.entityEntityGroupMap.get(e))
 						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
 				}
 			});
-			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntities()));
+			fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
 			FSArray oldArr = op.getEntityGroup().getMembers();
@@ -805,7 +806,7 @@ public class CoreferenceModel extends SubModel implements Model {
 
 	private void undo(RemoveMention op) {
 		// re-create all mentions and set them to the op
-		op.getMentions().forEach(m -> {
+		op.getFeatureStructures().forEach(m -> {
 			m.addToIndexes();
 			m.setEntity(op.getEntity());
 			entityMentionMap.put(op.getEntity(), m);
@@ -816,15 +817,15 @@ public class CoreferenceModel extends SubModel implements Model {
 			}
 		});
 		// fire event to draw them
-		fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
+		fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getFeatureStructures()));
 		// re-create attached parts (if any)
-		op.getMentions().select(m -> m.getDiscontinuous() != null)
+		op.getFeatureStructures().select(m -> m.getDiscontinuous() != null)
 				.forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous())));
 
 	}
 
 	private void undo(RemoveSingletons op) {
-		op.getEntities().forEach(e -> e.addToIndexes());
+		op.getFeatureStructures().forEach(e -> e.addToIndexes());
 		op.getMentions().forEach(m -> {
 			entityMentionMap.put(m.getEntity(), m);
 			characterPosition2AnnotationMap.add(m);
@@ -833,7 +834,7 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Add, null, m.getEntity()));
 			fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		});
-		fireEvent(Event.get(this, Event.Type.Add, null, op.getEntities()));
+		fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
 	}
 
 }
