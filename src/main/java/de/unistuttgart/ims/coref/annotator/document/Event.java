@@ -45,7 +45,7 @@ public interface Event extends Iterable<FeatureStructure> {
 	int getArity();
 
 	public static FeatureStructureEvent get(Model src, Type type, FeatureStructure fs,
-			ImmutableList<? extends FeatureStructure> fsi) {
+			Iterable<? extends FeatureStructure> fsi) {
 		MutableList<FeatureStructure> l = Lists.mutable.withAll(fsi);
 		l.add(0, fs);
 		return new FeatureStructureEvent(src, type, l);
