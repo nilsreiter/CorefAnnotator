@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -25,6 +26,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -44,7 +46,6 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -58,6 +59,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityRelation;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
+import de.unistuttgart.ims.coref.annotator.comp.EntityLabel;
 import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
@@ -394,7 +396,7 @@ public class RelationEditor extends JFrame {
 				if (clazz.isAssignableFrom(reln.getClass())) {
 					addRow(reln);
 				}
-				updateRowColor();
+				// updateRowColor();
 				validate();
 				repaint();
 				break;
@@ -409,7 +411,7 @@ public class RelationEditor extends JFrame {
 			case Remove:
 				int cIndex = componentMap.get(event.getArgument1());
 				remove(cIndex);
-				updateRowColor();
+				// updateRowColor();
 				validate();
 				repaint();
 				break;
@@ -425,8 +427,11 @@ public class RelationEditor extends JFrame {
 			public Row(T relation) {
 				this.relation = relation;
 
-				@SuppressWarnings("unused")
-				DropTargetListener dropTargetListener = new DropTargetListener();
+				if (relation instanceof SymmetricEntityRelation) {
+					@SuppressWarnings("unused")
+					DropTargetListener dropTargetListener = new DropTargetListener(this, e -> documentModel
+							.edit(new UpdateEntityRelation(relation, EntityRelationProperty.ADD_ENTITY, e)));
+				}
 				FlagComboBoxModel boxModel;
 				if (relation instanceof SymmetricEntityRelation)
 					boxModel = new FlagComboBoxModel(SymmetricEntityRelation.class);
@@ -446,20 +451,37 @@ public class RelationEditor extends JFrame {
 				JToolBar toolBar = new JToolBar();
 				toolBar.setFloatable(false);
 				toolBar.add(new DeleteAction(getDocumentWindow(), relation));
+				toolBar.setBackground(getBackground());
 				add(combobox);
 				add(toolBar);
 				if (relation instanceof SymmetricEntityRelation)
 					add(addFSArray(relation, Util.toList(((SymmetricEntityRelation) relation).getEntities())));
 				else if (relation instanceof DirectedEntityRelation) {
 					DirectedEntityRelation der = (DirectedEntityRelation) relation;
-					if (der.getSource() != null && der.getTarget() != null)
-						add(addFSArray(relation, Lists.immutable.of(der.getSource(), der.getTarget())));
+
+					JComponent sourceComponent, targetComponent;
+					if (der.getSource() != null)
+						sourceComponent = new EntityLabel(der.getSource());
 					else
-						add(addFSArray(relation, Lists.immutable.empty()));
+						sourceComponent = new JLabel("drop zone");
+					sourceComponent.setBorder(BorderFactory.createTitledBorder("source"));
+					new DropTargetListener(sourceComponent, e -> documentModel
+							.edit(new UpdateEntityRelation(relation, EntityRelationProperty.SOURCE, e)));
+					add(sourceComponent);
+
+					if (der.getTarget() != null)
+						targetComponent = new EntityLabel(der.getTarget());
+					else
+						targetComponent = new JLabel("drop zone");
+					targetComponent.setBorder(BorderFactory.createTitledBorder("target"));
+					new DropTargetListener(targetComponent, e -> documentModel
+							.edit(new UpdateEntityRelation(relation, EntityRelationProperty.TARGET, e)));
+					add(targetComponent);
+
 				}
 
 				setBorder(BorderFactory.createLineBorder(Color.gray));
-				pack();
+				// pack();
 			}
 
 			protected Component addFSArray(T relation, Iterable<Entity> arr) {
@@ -502,9 +524,12 @@ public class RelationEditor extends JFrame {
 
 			class DropTargetListener extends DropTargetAdapter {
 
-				public DropTargetListener() {
+				Consumer<Entity> func;
+
+				public DropTargetListener(Component comp, Consumer<Entity> func) {
 					@SuppressWarnings("unused")
-					DropTarget dropTarget = new DropTarget(Row.this, DnDConstants.ACTION_LINK, this, true, null);
+					DropTarget dropTarget = new DropTarget(comp, DnDConstants.ACTION_LINK, this, true, null);
+					this.func = func;
 				}
 
 				@SuppressWarnings("unchecked")
@@ -515,8 +540,7 @@ public class RelationEditor extends JFrame {
 					try {
 						object = (ImmutableList<CATreeNode>) transferable
 								.getTransferData(NodeListTransferable.dataFlavor);
-						documentModel.edit(new UpdateEntityRelation(relation, EntityRelationProperty.ADD_ENTITY,
-								object.getFirst().getEntity()));
+						func.accept(object.getFirst().getEntity());
 						event.acceptDrop(TransferHandler.LINK);
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
