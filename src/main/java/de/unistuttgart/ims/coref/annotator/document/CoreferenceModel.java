@@ -43,6 +43,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
+import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
@@ -244,7 +245,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		registerEdit(op);
 	}
 
-	protected synchronized void edit(Operation operation) {
+	protected synchronized void edit(CoreferenceModelOperation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
@@ -683,7 +684,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, eg, entity));
 	}
 
-	protected void undo(Operation operation) {
+	protected void undo(CoreferenceModelOperation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
