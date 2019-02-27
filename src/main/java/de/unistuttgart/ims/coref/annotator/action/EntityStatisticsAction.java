@@ -50,7 +50,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 				@Override
 				protected Object doInBackground() throws Exception {
-					getDocumentWindow().setMessage("Exporting ...");
+					getDocumentWindow().setMessage(Annotator.getString(Strings.ENTITY_STATISTICS_STATUS));
 					getDocumentWindow().setIndeterminateProgress();
 					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
 					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
