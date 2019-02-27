@@ -23,7 +23,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.document.IFlagModel;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
@@ -59,7 +59,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 				protected Object doInBackground() throws Exception {
 					getDocumentWindow().setMessage(Annotator.getString(Strings.ENTITY_STATISTICS_STATUS));
 					getDocumentWindow().setIndeterminateProgress();
-					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
+					IFlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
 					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
 							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
 					ImmutableList<Flag> entityFlags = flagModel.getFlags()

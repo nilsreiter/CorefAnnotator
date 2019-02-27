@@ -148,8 +148,8 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
+import de.unistuttgart.ims.coref.annotator.document.IFlagModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -1018,7 +1018,7 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
-			FlagModel fm = documentModel.getFlagModel();
+			IFlagModel fm = documentModel.getFlagModel();
 			lab1.setText(m.getCoveredText());
 			if (m.getFlags() != null)
 				for (String flagKey : m.getFlags()) {
