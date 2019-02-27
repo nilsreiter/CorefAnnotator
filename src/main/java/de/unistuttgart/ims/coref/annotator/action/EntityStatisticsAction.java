@@ -63,6 +63,9 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
 					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
 							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
+					ImmutableList<Flag> entityFlags = flagModel.getFlags()
+							.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
+
 					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
 						// this is the header row
 						p.print(BEGIN);
@@ -71,9 +74,11 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 						p.print(ENTITY_NUM);
 						p.print(ENTITY_LABEL);
 						p.print(ENTITY_GROUP);
-						p.print(ENTITY_GENERIC);
+						for (Flag flag : entityFlags) {
+							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
+						}
 						for (Flag flag : mentionFlags) {
-							p.print(flag.getLabel());
+							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
 						}
 						p.println();
 						int entityNum = 0;
@@ -89,7 +94,9 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 								p.print(entityNum);
 								p.print(entity.getLabel());
 								p.print((entity instanceof EntityGroup));
-								p.print(Util.isGeneric(entity));
+								for (Flag flag : entityFlags) {
+									p.print(Util.isX(entity, flag.getKey()));
+								}
 								for (Flag flag : mentionFlags) {
 									p.print(Util.isX(mention, flag.getKey()));
 								}
