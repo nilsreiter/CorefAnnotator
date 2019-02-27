@@ -27,6 +27,14 @@ import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
+	private static final String ENTITY_GENERIC = "entityGeneric";
+	private static final String ENTITY_GROUP = "entityGroup";
+	private static final String ENTITY_LABEL = "entityLabel";
+	private static final String ENTITY_NUM = "entityNum";
+	private static final String SURFACE = "surface";
+	private static final String END = "end";
+	private static final String BEGIN = "begin";
+
 	private static final long serialVersionUID = 1L;
 
 	public EntityStatisticsAction(DocumentWindow dw) {
@@ -56,13 +64,14 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
 							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
 					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
-						p.print("begin");
-						p.print("end");
-						p.print("surface");
-						p.print("entityNum");
-						p.print("entityLabel");
-						p.print("entityGroup");
-						p.print("entityGeneric");
+						// this is the header row
+						p.print(BEGIN);
+						p.print(END);
+						p.print(SURFACE);
+						p.print(ENTITY_NUM);
+						p.print(ENTITY_LABEL);
+						p.print(ENTITY_GROUP);
+						p.print(ENTITY_GENERIC);
 						for (Flag flag : mentionFlags) {
 							p.print(flag.getLabel());
 						}
