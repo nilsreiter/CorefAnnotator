@@ -27,7 +27,6 @@ import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
-	private static final String ENTITY_GENERIC = "entityGeneric";
 	private static final String ENTITY_GROUP = "entityGroup";
 	private static final String ENTITY_LABEL = "entityLabel";
 	private static final String ENTITY_NUM = "entityNum";
