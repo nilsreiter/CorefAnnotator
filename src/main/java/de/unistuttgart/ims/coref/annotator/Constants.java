@@ -195,6 +195,7 @@ public class Constants {
 		public static final String DIALOG_UNSAVED_CHANGES_TITLE = "dialog.unsaved_changes.title";
 		public static final String ENTITY_FLAG_GENERIC = "entity.flag.generic";
 		public static final String ENTITY_GROUP_AND = "entity.group.and";
+		public static final String ENTITY_STATISTICS_STATUS = "entity.statistics.status";
 		public static final String FLAG_EDITOR = "windowtitle.flag_editor";
 		public static final String FLAG_EDITOR_FLAG_COLLECTION_1 = "flag_editor.flag_collection.1";
 		public static final String FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP = "flag_editor.flag_collection.1.tooltip";
