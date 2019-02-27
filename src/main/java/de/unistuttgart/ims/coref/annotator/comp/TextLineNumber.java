@@ -29,6 +29,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.Utilities;
 
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
+import de.unistuttgart.ims.coref.annotator.Span;
+
 /**
  * This class will display line numbers for a related text component. The text
  * component must use the same line height for each line. TextLineNumber
@@ -54,7 +57,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	// Text component this TextTextLineNumber component is in sync with
 
 	private JTextComponent component;
-
+	AbstractTextWindow textWindow;
 	// Properties that can be changed
 
 	private boolean updateFont;
@@ -73,17 +76,6 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	private HashMap<String, FontMetrics> fonts;
 
 	/**
-	 * Create a line number component for a text component. This minimum display
-	 * width will be based on 3 digits.
-	 *
-	 * @param component
-	 *            the related text component
-	 */
-	public TextLineNumber(JTextComponent component) {
-		this(component, 3);
-	}
-
-	/**
 	 * Create a line number component for a text component.
 	 *
 	 * @param component
@@ -92,19 +84,21 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 *            the number of digits used to calculate the minimum width of the
 	 *            component
 	 */
-	public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
-		this.component = component;
+	public TextLineNumber(AbstractTextWindow component, int minimumDisplayDigits) {
+		this.component = component.getTextPane();
+		this.textWindow = component;
 
-		setFont(component.getFont());
+		setFont(component.getTextPane().getFont());
 
 		setBorderGap(5);
 		setCurrentLineForeground(Color.RED);
 		setDigitAlignment(RIGHT);
 		setMinimumDisplayDigits(minimumDisplayDigits);
+		setUpdateFont(true);
 
-		component.getDocument().addDocumentListener(this);
-		component.addCaretListener(this);
-		component.addPropertyChangeListener("font", this);
+		this.component.getDocument().addDocumentListener(this);
+		this.component.addCaretListener(this);
+		this.component.addPropertyChangeListener("font", this);
 	}
 
 	/**
@@ -246,6 +240,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
+		if (textWindow.getDocumentModel() != null)
+			this.setMinimumDisplayDigits((int) Math.log10(textWindow.getDocumentModel().getMaximalLineNumber()) + 1);
 		super.paintComponent(g);
 
 		// Determine the width of the space available to draw the line number
@@ -270,7 +266,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 				// Get the line number as a string and then determine the
 				// "X" and "Y" offsets for drawing the string.
 
-				String lineNumber = getTextLineNumber(rowStartOffset);
+				String lineNumber = getTextLineNumber(rowStartOffset, Utilities.getRowEnd(component, rowStartOffset));
 				int stringWidth = fontMetrics.stringWidth(lineNumber);
 				int x = getOffsetX(availableWidth, stringWidth) + insets.left;
 				int y = getOffsetY(rowStartOffset, fontMetrics);
@@ -314,6 +310,19 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 			return "";
 	}
 
+	protected String getTextLineNumber(int rowStartOffset, int rowEndOffset) {
+
+		if (textWindow.getDocumentModel().hasLineNumbers()) {
+			Integer n = textWindow.getDocumentModel().getLineNumber(new Span(rowStartOffset, rowEndOffset));
+			if (n != null)
+				return n.toString();
+			else
+				return "";
+		} else
+			return getTextLineNumber(rowStartOffset);
+
+	}
+
 	/*
 	 * Determine the X offset to properly align the line number when drawn
 	 */
@@ -352,6 +361,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 				AttributeSet as = child.getAttributes();
 				String fontFamily = (String) as.getAttribute(StyleConstants.FontFamily);
 				Integer fontSize = (Integer) as.getAttribute(StyleConstants.FontSize);
+
 				String key = fontFamily + fontSize;
 
 				FontMetrics fm = fonts.get(key);
@@ -363,10 +373,11 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 				}
 
 				descent = Math.max(descent, fm.getDescent());
+
 			}
 		}
 
-		return y - descent;
+		return y - descent - 8;
 	}
 
 	//

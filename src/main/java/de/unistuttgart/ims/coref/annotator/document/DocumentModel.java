@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.apache.uima.fit.util.JCasUtil;
@@ -14,8 +15,10 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
@@ -130,6 +133,29 @@ public class DocumentModel implements Model {
 
 	public String getLanguage() {
 		return jcas.getDocumentLanguage();
+	}
+
+	public boolean hasLineNumbers() {
+		return JCasUtil.exists(jcas, Line.class);
+	}
+
+	public Integer getMaximalLineNumber() {
+		int max = -1;
+		for (Line line : JCasUtil.select(jcas, Line.class)) {
+			if (line.getNumber() > max)
+				max = line.getNumber();
+		}
+		return max;
+	}
+
+	public Integer getLineNumber(Span range) {
+		List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
+		if (lineList.size() != 1)
+			return null;
+		Line line = lineList.get(0);
+		if (line.getNumber() < 0)
+			return null;
+		return line.getNumber();
 	}
 
 	public Preferences getPreferences() {

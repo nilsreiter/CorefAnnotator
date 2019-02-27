@@ -119,4 +119,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				highlightManager.underline(m.getDiscontinuous());
 		}
 	}
+
+	public JTextPane getTextPane() {
+		return textPane;
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
 }

@@ -339,7 +339,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// scrollPane.setRowHeaderView(segmentIndicator);
 		leftPanel.add(scrollPane, BorderLayout.CENTER);
 		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
-		TextLineNumber tln = new TextLineNumber(textPane, 5);
+		TextLineNumber tln = new TextLineNumber(this, 5);
 		scrollPane.setRowHeaderView(tln);
 		scrollPane.setVerticalScrollBar(segmentIndicator);
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
@@ -1498,10 +1498,6 @@ public class DocumentWindow extends AbstractTextWindow
 		return currentStyle;
 	}
 
-	public JTextPane getTextPane() {
-		return textPane;
-	}
-
 	@Override
 	public String getText() {
 		return textPane.getText();
@@ -1510,10 +1506,6 @@ public class DocumentWindow extends AbstractTextWindow
 	@Override
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
-	}
-
-	public DocumentModel getDocumentModel() {
-		return documentModel;
 	}
 
 	@Override
