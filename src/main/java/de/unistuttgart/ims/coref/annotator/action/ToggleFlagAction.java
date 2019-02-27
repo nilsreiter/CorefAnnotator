@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.document.IFlagModel;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 
 public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> implements CATreeSelectionListener {
@@ -21,9 +21,9 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 	private static final long serialVersionUID = 1L;
 
 	Flag flag;
-	IFlagModel flagModel;
+	FlagModel flagModel;
 
-	public ToggleFlagAction(DocumentWindow dw, IFlagModel flagModel, Flag flag) {
+	public ToggleFlagAction(DocumentWindow dw, FlagModel flagModel, Flag flag) {
 		super(dw, flag.getLabel(), false, flagModel.getIkon(flag));
 		this.flag = flag;
 		this.flagModel = flagModel;

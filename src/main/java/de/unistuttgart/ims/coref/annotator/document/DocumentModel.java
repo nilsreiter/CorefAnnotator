@@ -111,7 +111,7 @@ public class DocumentModel implements Model {
 		return typeSystemVersion;
 	}
 
-	public IFlagModel getFlagModel() {
+	public FlagModel getFlagModel() {
 		return flagModel;
 	}
 

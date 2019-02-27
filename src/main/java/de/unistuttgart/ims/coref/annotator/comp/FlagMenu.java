@@ -12,8 +12,8 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
-import de.unistuttgart.ims.coref.annotator.document.IFlagModel;
 
 public class FlagMenu extends JMenu implements FlagModelListener {
 
@@ -59,7 +59,7 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 		case Add:
 			f = (Flag) event.getArgument(0);
 			if (f.getTargetClass().equalsIgnoreCase(targetClass.getName())) {
-				ToggleFlagAction a = new ToggleFlagAction(dw, (IFlagModel) event.getSource(), f);
+				ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
 				dw.getTreeSelectionListener().addListener(a);
 				add(f, new JCheckBoxMenuItem(a));
 			}

@@ -56,7 +56,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
  * @author reiterns
  *
  */
-public class FlagModel extends SubModel implements Model, IFlagModel {
+public class FlagModel extends SubModel implements Model {
 	private MutableSet<String> keys = Sets.mutable.empty();
 	MutableSet<FlagModelListener> listeners = Sets.mutable.empty();
 
@@ -194,10 +194,6 @@ public class FlagModel extends SubModel implements Model, IFlagModel {
 		listeners.forEach(l -> l.flagEvent(evt));
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getFlags()
-	 */
-	@Override
 	public ImmutableList<Flag> getFlags() {
 		return Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Flag.class));
 	}
@@ -269,51 +265,27 @@ public class FlagModel extends SubModel implements Model, IFlagModel {
 		keys.add(Constants.ENTITY_FLAG_HIDDEN);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getTargetClass(de.unistuttgart.ims.coref.annotator.api.v1.Flag)
-	 */
-	@Override
 	public Class<?> getTargetClass(Flag f) throws ClassNotFoundException {
 		return Class.forName(f.getTargetClass());
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getLocalizedLabel(de.unistuttgart.ims.coref.annotator.api.v1.Flag)
-	 */
-	@Override
 	public String getLocalizedLabel(Flag f) {
 		return Annotator.getString(f.getLabel());
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getLabel(de.unistuttgart.ims.coref.annotator.api.v1.Flag)
-	 */
-	@Override
 	public String getLabel(Flag f) {
 		return f.getLabel();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getIkon(de.unistuttgart.ims.coref.annotator.api.v1.Flag)
-	 */
-	@Override
 	public Ikon getIkon(Flag f) {
 		return MaterialDesign.valueOf(f.getIcon());
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#addFlagModelListener(de.unistuttgart.ims.coref.annotator.document.FlagModelListener)
-	 */
-	@Override
 	public boolean addFlagModelListener(FlagModelListener e) {
 		e.flagEvent(Event.get(this, Event.Type.Init));
 		return listeners.add(e);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#removeFlagModelListener(java.lang.Object)
-	 */
-	@Override
 	public boolean removeFlagModelListener(Object o) {
 		return listeners.remove(o);
 	}
@@ -367,10 +339,6 @@ public class FlagModel extends SubModel implements Model, IFlagModel {
 		updateFlag(flag);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#updateFlag(de.unistuttgart.ims.coref.annotator.api.v1.Flag)
-	 */
-	@Override
 	public void updateFlag(Flag flag) {
 		Annotator.logger.entry(flag);
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
@@ -378,10 +346,6 @@ public class FlagModel extends SubModel implements Model, IFlagModel {
 				.fireEvent(Event.get(this, Event.Type.Update, getFlaggedFeatureStructures(flag)));
 	}
 
-	/* (non-Javadoc)
-	 * @see de.unistuttgart.ims.coref.annotator.document.IFlagModel#getFlag(java.lang.String)
-	 */
-	@Override
 	public Flag getFlag(String key) {
 		for (Flag f : getFlags())
 			if (f.getKey().equals(key))
