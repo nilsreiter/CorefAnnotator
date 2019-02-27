@@ -141,6 +141,7 @@ import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
@@ -338,7 +339,8 @@ public class DocumentWindow extends AbstractTextWindow
 		// scrollPane.setRowHeaderView(segmentIndicator);
 		leftPanel.add(scrollPane, BorderLayout.CENTER);
 		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
-
+		TextLineNumber tln = new TextLineNumber(textPane, 5);
+		scrollPane.setRowHeaderView(tln);
 		scrollPane.setVerticalScrollBar(segmentIndicator);
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
