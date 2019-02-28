@@ -30,7 +30,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.Utilities;
 
 import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
-import de.unistuttgart.ims.coref.annotator.Span;
 
 /**
  * This class will display line numbers for a related text component. The text
@@ -312,14 +311,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 
 	protected String getTextLineNumber(int rowStartOffset, int rowEndOffset) {
 
-		if (textWindow.getDocumentModel().hasLineNumbers()) {
-			Integer n = textWindow.getDocumentModel().getLineNumber(new Span(rowStartOffset, rowEndOffset));
-			if (n != null)
-				return n.toString();
-			else
-				return "";
-		} else
-			return getTextLineNumber(rowStartOffset);
+		return getTextLineNumber(rowStartOffset);
 
 	}
 
