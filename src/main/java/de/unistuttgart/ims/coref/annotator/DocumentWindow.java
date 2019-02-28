@@ -411,7 +411,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// viewMenu.add(fontFamilyMenu);
 
 		grp = new ButtonGroup();
-		JMenu lineNumbersMenu = new JMenu("line numbers");
+		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
 		JRadioButtonMenuItem radio;
 		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
 		radio.setSelected(true);

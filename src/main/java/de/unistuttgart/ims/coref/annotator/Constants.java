@@ -228,6 +228,7 @@ public class Constants {
 		public static final String MENU_VIEW = "menu.view";
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
 		public static final String MENU_VIEW_STYLE = "menu.view.style";
+		public static final String MENU_VIEW_LINE_NUMBERS = "menu.view.line_numbers";
 		public static final String MESSAGE_CREATES_ENTITY = "message.creates_entity";
 		public static final String MESSAGE_CREATES_MENTION = "message.creates_mention";
 		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
