@@ -66,7 +66,7 @@ public class DocumentModel implements Model {
 		if (operation instanceof DocumentModelOperation)
 			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
-			coreferenceModel.edit(operation);
+			coreferenceModel.edit((CoreferenceModelOperation) operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
@@ -245,7 +245,7 @@ public class DocumentModel implements Model {
 		if (operation instanceof DocumentModelOperation)
 			undo((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
-			coreferenceModel.undo(operation);
+			coreferenceModel.undo((CoreferenceModelOperation) operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.undo((FlagModelOperation) operation);
 
