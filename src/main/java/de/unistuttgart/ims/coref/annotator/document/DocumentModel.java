@@ -49,6 +49,8 @@ public class DocumentModel implements Model {
 
 	FlagModel flagModel;
 
+	LineNumberModel lineNumberModel;
+
 	TypeSystemVersion typeSystemVersion;
 
 	boolean unsavedChanges = false;
@@ -136,26 +138,15 @@ public class DocumentModel implements Model {
 	}
 
 	public boolean hasLineNumbers() {
-		return JCasUtil.exists(jcas, Line.class);
+		return lineNumberModel.isHasFixedLineNumbers();
 	}
 
 	public Integer getMaximalLineNumber() {
-		int max = -1;
-		for (Line line : JCasUtil.select(jcas, Line.class)) {
-			if (line.getNumber() > max)
-				max = line.getNumber();
-		}
-		return max;
+		return lineNumberModel.getMaximum();
 	}
 
 	public Integer getLineNumber(Span range) {
-		List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
-		if (lineList.size() != 1)
-			return null;
-		Line line = lineList.get(0);
-		if (line.getNumber() < 0)
-			return null;
-		return line.getNumber();
+		return lineNumberModel.getLineNumber(range);
 	}
 
 	public Preferences getPreferences() {
@@ -184,10 +175,13 @@ public class DocumentModel implements Model {
 		treeModel = new EntityTreeModel(coreferenceModel);
 		flagModel = new FlagModel(this, preferences);
 		segmentModel = new SegmentModel(this);
+		lineNumberModel = new LineNumberModel();
 
 		coreferenceModel.initialize();
 		segmentModel.initialize();
 		flagModel.initialize();
+		lineNumberModel.initialize();
+
 	}
 
 	public boolean isSavable() {
@@ -290,4 +284,41 @@ public class DocumentModel implements Model {
 		}
 	}
 
+	class LineNumberModel extends SubModel {
+
+		boolean hasFixedLineNumbers = false;
+
+		int maximum = -1;
+
+		public LineNumberModel() {
+			super(DocumentModel.this);
+		}
+
+		public boolean isHasFixedLineNumbers() {
+			return hasFixedLineNumbers;
+		}
+
+		@Override
+		protected void initializeOnce() {
+			for (Line line : JCasUtil.select(getJcas(), Line.class)) {
+				if (line.getNumber() > maximum)
+					maximum = line.getNumber();
+			}
+			hasFixedLineNumbers = maximum > 0;
+		};
+
+		public Integer getLineNumber(Span range) {
+			List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
+			if (lineList.size() != 1)
+				return null;
+			Line line = lineList.get(0);
+			if (line.getNumber() < 0)
+				return null;
+			return line.getNumber();
+		}
+
+		public int getMaximum() {
+			return maximum;
+		}
+	}
 }
