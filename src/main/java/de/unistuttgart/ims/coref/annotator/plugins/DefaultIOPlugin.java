@@ -22,7 +22,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
+import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFileIOPlugin {
 
@@ -91,6 +93,11 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFi
 			if (is != null)
 				is.close();
 		}
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return ExtensionFilters.xmi_gz;
 	}
 
 }

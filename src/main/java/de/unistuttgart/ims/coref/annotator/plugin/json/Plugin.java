@@ -12,8 +12,10 @@ import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
+import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements IOPlugin {
 
@@ -84,6 +86,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String[] getSupportedLanguages() {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return ExtensionFilters.json;
 	}
 
 }
