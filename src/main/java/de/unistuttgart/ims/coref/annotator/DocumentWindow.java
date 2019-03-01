@@ -918,14 +918,14 @@ public class DocumentWindow extends AbstractTextWindow
 			Annotator.logger.debug("Moving {} things", moved.size());
 			Operation operation = null;
 			if (targetFS instanceof Entity) {
-				if (targetFS instanceof EntityGroup) {
+				if (moved.allSatisfy(n -> n.isEntity()) && targetFS instanceof EntityGroup) {
 					operation = new AddEntityToEntityGroup((EntityGroup) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
-				}
-				documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
-						moved.select(n -> n.getFeatureStructure() instanceof Mention)
-								.collect(n -> n.getFeatureStructure())));
+				} else if (moved.allSatisfy(n -> n.isMention()))
+					documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
+							moved.select(n -> n.getFeatureStructure() instanceof Mention)
+									.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
 				operation = new MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else
