@@ -13,11 +13,13 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements IOPlugin {
 
@@ -78,6 +80,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String[] getSupportedLanguages() {
 		return null;
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return ExtensionFilters.tei;
 	}
 
 }

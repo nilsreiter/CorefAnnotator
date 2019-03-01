@@ -20,7 +20,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -176,9 +175,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		}
 	}
 
-	protected CATreeNode get(Object m) {
+	protected CATreeNode get(FeatureStructure m) {
 		if (m == null)
 			return getRoot();
+		if (!fsMap.containsKey(m)) {
+			entityEvent(Event.get(this, Event.Type.Add, null, m));
+		}
 		return fsMap.get(m);
 	}
 

@@ -155,6 +155,7 @@ import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
@@ -990,14 +991,16 @@ public class DocumentWindow extends AbstractTextWindow
 			Annotator.logger.debug("Moving {} things", moved.size());
 			Operation operation = null;
 			if (targetFS instanceof Entity) {
-				if (targetFS instanceof EntityGroup) {
+				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Entity)
+						&& targetFS instanceof EntityGroup) {
 					operation = new AddEntityToEntityGroup((EntityGroup) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
 				}
-				documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
-						moved.select(n -> n.getFeatureStructure() instanceof Mention)
-								.collect(n -> n.getFeatureStructure())));
+				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Mention))
+					documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
+							moved.select(n -> n.getFeatureStructure() instanceof Mention)
+									.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
 				operation = new MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
 			else

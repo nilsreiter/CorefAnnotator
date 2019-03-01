@@ -29,7 +29,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Span;
@@ -44,6 +43,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
+import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
@@ -249,7 +249,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		registerEdit(op);
 	}
 
-	protected synchronized void edit(Operation operation) {
+	protected synchronized void edit(CoreferenceModelOperation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
@@ -573,11 +573,11 @@ public class CoreferenceModel extends SubModel implements Model {
 
 	@Override
 	protected void initializeOnce() {
-		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			if (entity.getKey() != null)
 				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
 		}
-		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
+		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
@@ -729,7 +729,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, eg, entity));
 	}
 
-	protected void undo(Operation operation) {
+	protected void undo(CoreferenceModelOperation operation) {
 		Annotator.logger.entry(operation);
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
