@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
+@Deprecated
 public interface Op {
 
 	public class AddEntityToEntityGroup implements Op {
