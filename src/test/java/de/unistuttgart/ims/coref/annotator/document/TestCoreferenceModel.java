@@ -501,4 +501,21 @@ public class TestCoreferenceModel {
 		assertEquals(entities.get(0), group.getMembers(1));
 
 	}
+
+	@Test
+	public void testSequence2() {
+		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
+		model.edit(new AddMentionsToNewEntity(new Span(1, 2)));
+		model.edit(new AddMentionsToNewEntity(new Span(2, 3)));
+
+		ImmutableList<Entity> entities = Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class));
+		ImmutableList<Mention> mentions = Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class));
+
+		model.edit(new GroupEntities(entities.get(0), entities.get(1)));
+		EntityGroup group = JCasUtil.selectSingle(jcas, EntityGroup.class);
+
+		model.edit(new MoveMentionsToEntity(group, mentions.get(2)));
+
+		assertEquals(4, JCasUtil.select(jcas, Entity.class).size());
+	}
 }
