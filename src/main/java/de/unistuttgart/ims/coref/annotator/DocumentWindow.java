@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -261,6 +262,9 @@ public class DocumentWindow extends AbstractTextWindow
 		// initialise panel
 		JPanel rightPanel = new JPanel(new BorderLayout());
 
+		TreeMouseListener tml = new TreeMouseListener();
+		treeSelectionListener = new MyTreeSelectionListener();
+
 		tree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null, false)));
 		tree.setVisibleRowCount(-1);
 		tree.setDragEnabled(true);
@@ -269,16 +273,14 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.setCellEditor(new MyTreeCellEditor(tree, (DefaultTreeCellRenderer) tree.getCellRenderer()));
-		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
-		tree.addMouseListener(new TreeMouseListener());
+		tree.addTreeSelectionListener(treeSelectionListener);
+		tree.addMouseListener(tml);
+		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
 		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
 
 		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
-
-		treeSelectionListener = new MyTreeSelectionListener(tree);
-		tree.addTreeSelectionListener(treeSelectionListener);
 
 		ToolTipManager.sharedInstance().registerComponent(tree);
 
@@ -315,12 +317,14 @@ public class DocumentWindow extends AbstractTextWindow
 		// initialise text view
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
+		TextMouseListener textMouseListener = new TextMouseListener();
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
-		textPane.addMouseListener(new TextMouseListener());
+		textPane.addMouseListener(textMouseListener);
+		textPane.addMouseMotionListener(textMouseListener);
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
@@ -1220,7 +1224,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class TreeMouseListener implements MouseListener {
+	class TreeMouseListener implements MouseListener, MouseMotionListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -1236,7 +1240,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-
+			treeSelectionListener.setEnabled(true);
 		}
 
 		@Override
@@ -1249,9 +1253,18 @@ public class DocumentWindow extends AbstractTextWindow
 
 		}
 
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			treeSelectionListener.setEnabled(false);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+		}
+
 	}
 
-	class TextMouseListener implements MouseListener {
+	class TextMouseListener implements MouseListener, MouseMotionListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -1272,7 +1285,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-
+			treeSelectionListener.setEnabled(true);
 		}
 
 		@Override
@@ -1281,6 +1294,15 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			treeSelectionListener.setEnabled(false);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
 		}
 	}
 
@@ -1396,12 +1418,16 @@ public class DocumentWindow extends AbstractTextWindow
 
 		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
 
-		public MyTreeSelectionListener(JTree tree) {
-			super(tree);
+		boolean enabled = true;
+
+		public MyTreeSelectionListener() {
+			super(null);
 		}
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
+			if (!isEnabled())
+				return;
 			collectData(e);
 			actions.renameAction.setEnabled(this);
 			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
@@ -1436,6 +1462,15 @@ public class DocumentWindow extends AbstractTextWindow
 		public void removeListener(CATreeSelectionListener l) {
 			this.listeners.remove(l);
 		}
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
 	}
 
 	/**
