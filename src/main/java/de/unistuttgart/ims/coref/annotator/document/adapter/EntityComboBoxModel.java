@@ -2,11 +2,11 @@ package de.unistuttgart.ims.coref.annotator.document.adapter;
 
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
-import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
+import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 
 public class EntityComboBoxModel extends AbstractComboBoxModel<Entity> implements CoreferenceModelListener {
 
