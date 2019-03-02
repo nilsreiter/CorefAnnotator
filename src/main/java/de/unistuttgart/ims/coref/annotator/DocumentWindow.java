@@ -131,6 +131,7 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -138,10 +139,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
@@ -196,6 +199,7 @@ public class DocumentWindow extends AbstractTextWindow
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
+	JScrollPane textScrollPane;
 
 	// Menu components
 	JMenu documentMenu;
@@ -337,13 +341,13 @@ public class DocumentWindow extends AbstractTextWindow
 
 		highlightManager = new HighlightManager(textPane);
 
-		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		// scrollPane.setRowHeaderView(segmentIndicator);
-		leftPanel.add(scrollPane, BorderLayout.CENTER);
-		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
+		leftPanel.add(textScrollPane, BorderLayout.CENTER);
+		segmentIndicator = new SegmentedScrollBar<Segment>(textScrollPane);
 
-		scrollPane.setVerticalScrollBar(segmentIndicator);
+		textScrollPane.setVerticalScrollBar(segmentIndicator);
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
 		// split pane
@@ -410,6 +414,23 @@ public class DocumentWindow extends AbstractTextWindow
 		// TODO: Disabled for the moment
 		// viewMenu.add(fontFamilyMenu);
 
+		grp = new ButtonGroup();
+		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
+		JRadioButtonMenuItem radio;
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
+		radio.setSelected(true);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleFixed);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleDynamic);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		viewMenu.add(lineNumbersMenu);
 		viewMenu.addSeparator();
 
 		PluginManager pm = Annotator.app.getPluginManager();
@@ -634,6 +655,23 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
+	@Override
+	public void setLineNumberStyle(LineNumberStyle lns) {
+		TextLineNumber tln;
+		switch (lns) {
+		case FIXED:
+			tln = new FixedTextLineNumber(this, 5);
+			break;
+		case DYNAMIC:
+			tln = new TextLineNumber(this, 5);
+			break;
+		default:
+			tln = null;
+		}
+		textScrollPane.setRowHeaderView(tln);
+		super.setLineNumberStyle(lns);
+	}
+
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 
@@ -664,6 +702,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
+
+		actions.lineNumberStyleFixed.setEnabled(model.hasLineNumbers());
 
 		// listeners to the coref model
 		model.getCoreferenceModel().addCoreferenceModelListener(this);
@@ -1533,10 +1573,6 @@ public class DocumentWindow extends AbstractTextWindow
 		return currentStyle;
 	}
 
-	public JTextPane getTextPane() {
-		return textPane;
-	}
-
 	@Override
 	public String getText() {
 		return textPane.getText();
@@ -1545,10 +1581,6 @@ public class DocumentWindow extends AbstractTextWindow
 	@Override
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
-	}
-
-	public DocumentModel getDocumentModel() {
-		return documentModel;
 	}
 
 	@Override
@@ -1587,6 +1619,10 @@ public class DocumentWindow extends AbstractTextWindow
 		RenameEntityAction renameAction;
 		AbstractAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
+		AbstractAction lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.NONE);
+		AbstractAction lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.FIXED);
+		AbstractAction lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.DYNAMIC);
 
 	}
 
