@@ -42,6 +42,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -264,7 +265,6 @@ public class DocumentWindow extends AbstractTextWindow
 		textPopupMenu.addPopupMenuListener(new PopupListener());
 
 		// initialise panel
-		JPanel rightPanel = new JPanel(new BorderLayout());
 
 		TreeMouseListener tml = new TreeMouseListener();
 		treeSelectionListener = new MyTreeSelectionListener();
@@ -292,6 +292,7 @@ public class DocumentWindow extends AbstractTextWindow
 		EntityFinder entityFinder = new EntityFinder();
 		treeSearchField.getDocument().addDocumentListener(entityFinder);
 		treeSearchField.addKeyListener(entityFinder);
+		JPanel rightPanel = new JPanel(new BorderLayout());
 		rightPanel.setPreferredSize(new Dimension(300, 800));
 		rightPanel.add(treeSearchField, BorderLayout.NORTH);
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -351,14 +352,25 @@ public class DocumentWindow extends AbstractTextWindow
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
 		// split pane
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-		splitPane.setVisible(true);
-		splitPane.setDividerLocation(500);
-		getContentPane().add(splitPane);
-
-		setPreferredSize(new Dimension(800, 800));
+		if (false) {
+			getContentPane().add(leftPanel);
+			setPreferredSize(new Dimension(600, 800));
+			setLocationRelativeTo(Annotator.app.opening);
+			JFrame treeFrame = new JFrame();
+			treeFrame.setContentPane(rightPanel);
+			treeFrame.setPreferredSize(new Dimension(200, 800));
+			treeFrame.pack();
+			treeFrame.setLocation(this.getLocation().x + 600, this.getLocation().y);
+			treeFrame.setVisible(true);
+		} else {
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+			splitPane.setVisible(true);
+			splitPane.setDividerLocation(500);
+			setPreferredSize(new Dimension(800, 800));
+			setLocationRelativeTo(Annotator.app.opening);
+			getContentPane().add(splitPane);
+		}
 		pack();
-		setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
 	}
 
@@ -747,7 +759,6 @@ public class DocumentWindow extends AbstractTextWindow
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
 		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
-		splitPane.setVisible(true);
 
 		// Style
 		StylePlugin sPlugin = null;

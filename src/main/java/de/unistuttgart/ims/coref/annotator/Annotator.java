@@ -73,7 +73,7 @@ public class Annotator {
 	@Deprecated
 	JFileChooser openDialog;
 
-	JFrame opening;
+	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
