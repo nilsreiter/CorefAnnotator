@@ -146,6 +146,11 @@ public class Annotator {
 		openCompareAction = new FileCompareOpenAction();
 	}
 
+	public static String getAppName() {
+		// return "CorefAnnotator";
+		return Annotator.class.getPackage().getImplementationTitle();
+	}
+
 	protected JFrame getOpeningDialog() {
 		int width = 300;
 		JFrame opening = new JFrame();
@@ -244,8 +249,8 @@ public class Annotator {
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
-				DocumentWindow v = new DocumentWindow();
-				v.loadFile(file, flavor, language);
+		DocumentWindow v = new DocumentWindow();
+		v.loadFile(file, flavor, language);
 
 		SwingUtilities.invokeLater(new Runnable() {
 
