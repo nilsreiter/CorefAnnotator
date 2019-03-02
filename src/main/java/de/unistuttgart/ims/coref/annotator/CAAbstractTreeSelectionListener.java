@@ -32,6 +32,7 @@ public abstract class CAAbstractTreeSelectionListener implements TreeSelectionLi
 	}
 
 	protected synchronized void collectData(TreeSelectionEvent e) {
+		tree = (JTree) e.getSource();
 		currentEvent = e;
 		num = tree.getSelectionCount();
 		paths = Lists.immutable.of(tree.getSelectionPaths());

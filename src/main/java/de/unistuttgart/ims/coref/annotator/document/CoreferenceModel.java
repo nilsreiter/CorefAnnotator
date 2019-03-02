@@ -527,11 +527,11 @@ public class CoreferenceModel extends SubModel implements Model {
 
 	@Override
 	protected void initializeOnce() {
-		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			if (entity.getKey() != null)
 				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
 		}
-		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
+		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);

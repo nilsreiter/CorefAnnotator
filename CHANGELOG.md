@@ -15,6 +15,15 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - We now use a JavaFX-based file dialog, which should look more native 
   to the OS (no issue)
 
+## 1.7.4
+
+- If dragging, the entity mention tree no longer reacts on moving over 
+  mentions, i.e., the text no longer jumps to the mention if something 
+  is dragged #170
+- Moving a mention into an entity group was leading to file corruption.
+  Files could no longer be opened. This is fixed, and corrupted files
+  can be opened again. #171
+
 ## 1.7.3
 
 - Renamed an entity is now properly undoable #167
