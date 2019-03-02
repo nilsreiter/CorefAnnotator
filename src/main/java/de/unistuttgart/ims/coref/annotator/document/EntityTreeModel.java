@@ -169,9 +169,12 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		}
 	}
 
-	protected CATreeNode get(Object m) {
+	protected CATreeNode get(FeatureStructure m) {
 		if (m == null)
 			return getRoot();
+		if (!fsMap.containsKey(m)) {
+			entityEvent(Event.get(Event.Type.Add, null, m));
+		}
 		return fsMap.get(m);
 	}
 
