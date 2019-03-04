@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.regex.Matcher;
@@ -11,6 +13,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -32,7 +36,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
@@ -42,10 +46,10 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ARROW_RIGHT);
+			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
-			this.addIkon(MaterialDesign.MDI_ACCOUNT);
+			// this.addIkon(MaterialDesign.MDI_ACCOUNT);
 		}
 
 		@Override
@@ -113,7 +117,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 	}
 
-	class TSL extends CATreeSelectionListener implements ListSelectionListener {
+	class TSL extends CAAbstractTreeSelectionListener implements ListSelectionListener {
 
 		boolean treeCondition = false;
 
@@ -140,13 +144,12 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			collectData(e);
 			treeCondition = (isSingle() && isEntity());
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
 				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
-						+ ((Entity) featureStructures.get(0)).getLabel());
+						+ getEntity(0).getLabel());
 			else
 				selectedEntityLabel.setText("");
 		}
@@ -155,6 +158,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 	private static final long serialVersionUID = 1L;
 	JTextField textField;
+	JCheckBox restrictToMentions;
 	JList<SearchResult> text_list;
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
@@ -172,16 +176,38 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		textField.setToolTipText(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
 		textField.getDocument().addDocumentListener(this);
 
-		JToolBar bar = new JToolBar();
-		bar.setFloatable(false);
-		bar.add(runSearch);
-		bar.add(annotateSelectedFindings);
-		bar.add(annotateSelectedFindingsAsNew);
-		bar.add(clearFindings);
+		restrictToMentions = new JCheckBox(Annotator.getString(Constants.Strings.SEARCH_WINDOW_RESTRICT_TO_MENTIONS));
+		restrictToMentions.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				search(textField.getText());
+			}
+
+		});
+		JToolBar behaviourBar = new JToolBar();
+		behaviourBar.setFloatable(false);
+		behaviourBar.add(runSearch);
+		behaviourBar.add(restrictToMentions);
+
+		JToolBar actionBar = new JToolBar();
+		actionBar.setLayout(new BoxLayout(actionBar, BoxLayout.Y_AXIS));
+		actionBar.setFloatable(false);
+		actionBar.add(annotateSelectedFindings);
+		actionBar.add(annotateSelectedFindingsAsNew);
+		actionBar.add(clearFindings);
+
+		JPanel searchBehaviourPanel = new JPanel();
+		searchBehaviourPanel.add(textField);
+		searchBehaviourPanel.add(behaviourBar);
+
+		JPanel searchActionPanel = new JPanel();
+		searchActionPanel.add(actionBar);
 
 		JPanel searchPanel = new JPanel();
-		searchPanel.add(textField);
-		searchPanel.add(bar);
+		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
+		searchPanel.add(searchBehaviourPanel);
+		searchPanel.add(searchActionPanel);
 
 		text_list = new JList<SearchResult>(listModel);
 		text_list.getSelectionModel().addListSelectionListener(tsl);
@@ -202,6 +228,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 		setLayout(new BorderLayout());
 		add(searchPanel, BorderLayout.NORTH);
+		add(actionBar, BorderLayout.WEST);
 		add(listScroller, BorderLayout.CENTER);
 		add(statusbar, BorderLayout.SOUTH);
 	}
@@ -252,18 +279,34 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		annotateSelectedFindingsAsNew.setEnabled(false);
 		clearResults();
 		if (s.length() > 0) {
-
 			Pattern p = Pattern.compile(s);
-			Matcher m = p.matcher(searchContainer.getDocumentWindow().getText());
-			int finding = 0;
-			while (m.find() && finding < limit) {
-				try {
-					listModel.addElement(new SearchResult(this.searchContainer, m.start(), m.end()));
-					highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
-				} catch (BadLocationException e) {
-					e.printStackTrace();
+
+			if (restrictToMentions.isSelected()) {
+				for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()
+						.getMentions()) {
+					Matcher matcher = p.matcher(m.getCoveredText());
+					if (matcher.find()) {
+						try {
+							listModel.addElement(new SearchResult(this.searchContainer, m.getBegin(), m.getEnd()));
+							highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+						} catch (BadLocationException e) {
+							Annotator.logger.catching(e);
+						}
+
+					}
 				}
-				finding++;
+			} else {
+				Matcher m = p.matcher(searchContainer.getDocumentWindow().getText());
+				int finding = 0;
+				while (m.find() && finding < limit) {
+					try {
+						listModel.addElement(new SearchResult(this.searchContainer, m.start(), m.end()));
+						highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
+					} catch (BadLocationException e) {
+						Annotator.logger.catching(e);
+					}
+					finding++;
+				}
 			}
 			text_list.getSelectionModel().addListSelectionListener(tsl);
 			tsl.listCondition = false;
@@ -274,10 +317,20 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 	}
 
 	@Override
+	public void windowActivated(WindowEvent e) {
+		textField.grabFocus();
+	}
+
+	@Override
 	public void windowClosing(WindowEvent e) {
 		for (Object o : highlights)
 			hilit.removeHighlight(o);
 
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		textField.grabFocus();
 	}
 
 }

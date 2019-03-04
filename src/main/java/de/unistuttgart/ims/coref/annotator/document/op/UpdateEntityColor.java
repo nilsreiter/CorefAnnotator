@@ -2,7 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 
-public class UpdateEntityColor extends UpdateOp<Entity> {
+public class UpdateEntityColor extends UpdateOperation<Entity> implements CoreferenceModelOperation {
 	int oldColor;
 	int newColor;
 

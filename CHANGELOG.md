@@ -3,6 +3,21 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.8.0
+
+- It's now possible to create new flags that can be assigned to entities, 
+  mentions, and detached mention parts. The flags can be created with
+  the flag editor (in the tools menu). #126
+- The text view can now display line numbers. See 
+  [the wiki](https://github.com/nilsreiter/CorefAnnotator/wiki/Line-Numbers) for 
+  details. #169 
+- The text field in the search dialog is now automatically in focus when
+  the window is opened #159
+- The text field now maintains previous searches #161
+- The search can now be restricted to mentions only #162
+- We now use a JavaFX-based file dialog, which should look more native 
+  to the OS (no issue)
+
 ## 1.7.4
 
 - If dragging, the entity mention tree no longer reacts on moving over 

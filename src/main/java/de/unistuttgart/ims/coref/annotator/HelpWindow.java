@@ -1,14 +1,18 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,6 +33,7 @@ public class HelpWindow extends JFrame {
 		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto")));
 		tabbedPane.addTab("Compare annotations", new JScrollPane(load("docs/compare")));
 		tabbedPane.addTab("Automatic processing", new JScrollPane(load("docs/processing")));
+		tabbedPane.addTab("Flag editing", new JScrollPane(load("docs/flags")));
 		tabbedPane.addTab("Input/Output", new JScrollPane(loadIOPlugins()));
 
 		this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
@@ -48,6 +53,22 @@ public class HelpWindow extends JFrame {
 			textArea.setContentType("text/html");
 			textArea.setEditable(false);
 			textArea.setPreferredSize(new Dimension(500, 500));
+			textArea.addHyperlinkListener(new HyperlinkListener() {
+				@Override
+				public void hyperlinkUpdate(HyperlinkEvent e) {
+					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+						if (Desktop.isDesktopSupported()) {
+							try {
+								Desktop.getDesktop().browse(e.getURL().toURI());
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							} catch (URISyntaxException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+			});
 			return textArea;
 		} catch (IOException e) {
 			Annotator.logger.catching(e);

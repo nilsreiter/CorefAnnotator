@@ -13,10 +13,12 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements IOPlugin {
 
@@ -25,7 +27,8 @@ public class Plugin implements IOPlugin {
 		try {
 			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
 		} catch (Exception e) {
-			e.printStackTrace();
+			// TODO: find out why this doesn't work
+			// e.printStackTrace();
 		}
 		return "";
 	}
@@ -77,6 +80,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String[] getSupportedLanguages() {
 		return null;
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return ExtensionFilters.tei;
 	}
 
 }

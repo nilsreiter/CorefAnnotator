@@ -31,7 +31,11 @@ public interface Event extends Iterable<FeatureStructure> {
 		 * This describes moving arg3 to argn from arg1 to arg2. Arg2 becomes the new
 		 * parent, arg1 is the old one.
 		 */
-		Move, Merge, Op
+		Move, Merge, Op,
+		/**
+		 * Once a listener is registered with a model, the init-event is sent.
+		 */
+		Init
 	};
 
 	Type getType();
@@ -40,31 +44,31 @@ public interface Event extends Iterable<FeatureStructure> {
 
 	int getArity();
 
-	public static FeatureStructureEvent get(Type type, FeatureStructure fs,
-			ImmutableList<? extends FeatureStructure> fsi) {
+	public static FeatureStructureEvent get(Model src, Type type, FeatureStructure fs,
+			Iterable<? extends FeatureStructure> fsi) {
 		MutableList<FeatureStructure> l = Lists.mutable.withAll(fsi);
 		l.add(0, fs);
-		return new FeatureStructureEvent(type, l);
+		return new FeatureStructureEvent(src, type, l);
 	}
 
-	public static FeatureStructureEvent get(Type type, FeatureStructure arg1, FeatureStructure arg2,
+	public static FeatureStructureEvent get(Model src, Type type, FeatureStructure arg1, FeatureStructure arg2,
 			ImmutableList<? extends FeatureStructure> fsi) {
 		MutableList<FeatureStructure> l = Lists.mutable.withAll(fsi);
 		l.add(0, arg2);
 		l.add(0, arg1);
-		return new FeatureStructureEvent(type, l);
+		return new FeatureStructureEvent(src, type, l);
 	}
 
-	public static FeatureStructureEvent get(Type type, Iterable<? extends FeatureStructure> fs) {
-		return new FeatureStructureEvent(type, fs);
+	public static FeatureStructureEvent get(Model src, Type type, Iterable<? extends FeatureStructure> fs) {
+		return new FeatureStructureEvent(src, type, fs);
 	}
 
-	public static FeatureStructureEvent get(Type type, List<FeatureStructure> fs) {
-		return new FeatureStructureEvent(type, fs);
+	public static FeatureStructureEvent get(Model src, Type type, List<FeatureStructure> fs) {
+		return new FeatureStructureEvent(src, type, fs);
 	}
 
-	public static FeatureStructureEvent get(Type type, FeatureStructure... fs) {
-		return new FeatureStructureEvent(type, fs);
+	public static FeatureStructureEvent get(Model src, Type type, FeatureStructure... fs) {
+		return new FeatureStructureEvent(src, type, fs);
 	}
 
 }

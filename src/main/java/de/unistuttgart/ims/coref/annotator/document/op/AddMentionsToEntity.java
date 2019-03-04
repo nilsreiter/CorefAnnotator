@@ -38,4 +38,8 @@ public class AddMentionsToEntity implements CoreferenceModelOperation {
 		this.mentions = mentions;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(" + getEntity().hashCode() + "," + spans.makeString(",") + ")";
+	}
 }
