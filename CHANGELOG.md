@@ -8,6 +8,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - It's now possible to create new flags that can be assigned to entities, 
   mentions, and detached mention parts. The flags can be created with
   the flag editor (in the tools menu). #126
+- The text view can now display line numbers. See 
+  [the wiki](https://github.com/nilsreiter/CorefAnnotator/wiki/Line-Numbers) for 
+  details. #169 
 - The text field in the search dialog is now automatically in focus when
   the window is opened #159
 - The text field now maintains previous searches #161
