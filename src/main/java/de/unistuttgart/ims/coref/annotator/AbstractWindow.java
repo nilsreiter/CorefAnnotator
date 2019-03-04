@@ -49,8 +49,7 @@ public abstract class AbstractWindow extends JFrame {
 		messageLabel.setSize(new Dimension(1, 20));
 		statusBar.add(messageLabel);
 
-		JLabel versionLabel = new JLabel(
-				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
+		JLabel versionLabel = new JLabel(Annotator.getAppName() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 

@@ -18,6 +18,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
@@ -66,6 +67,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		});
 
 		gxr.addRule("div", Segment.class);
+		gxr.addRule("l", Line.class,
+				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
 
 		Resource res = nextFile();
 

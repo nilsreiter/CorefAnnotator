@@ -25,6 +25,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	HighlightManager highlightManager;
 	JTextPane textPane;
 
+	LineNumberStyle lineNumberStyle;
+
+	public enum LineNumberStyle {
+		NONE, FIXED, DYNAMIC
+	}
+
 	@Override
 	public String getText() {
 		return getJCas().getDocumentText();
@@ -118,5 +124,21 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (m.getDiscontinuous() != null)
 				highlightManager.underline(m.getDiscontinuous());
 		}
+	}
+
+	public JTextPane getTextPane() {
+		return textPane;
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
+	public LineNumberStyle getLineNumberStyle() {
+		return lineNumberStyle;
+	}
+
+	public void setLineNumberStyle(LineNumberStyle lineNumberStyle) {
+		this.lineNumberStyle = lineNumberStyle;
 	}
 }
