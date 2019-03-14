@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
@@ -221,7 +222,7 @@ public class Util {
 		if (languageNames == null) {
 			languageNames = new String[Constants.SUPPORTED_LANGUAGES.length];
 			for (int i = 0; i < languageNames.length; i++) {
-				languageNames[i] = Annotator.getString("language." + Constants.SUPPORTED_LANGUAGES[i]);
+				languageNames[i] = new Locale(Constants.SUPPORTED_LANGUAGES[i]).getDisplayLanguage();
 			}
 			Arrays.sort(languageNames);
 		}
