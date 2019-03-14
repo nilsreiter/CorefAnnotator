@@ -35,6 +35,7 @@
 								<typeSystemInclude>src/main/resources/types.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-format.xml</typeSystemInclude>
 							</typeSystemIncludes>
 							<!-- true or false, default = false -->
 							<!-- if true, then although the complete merged type system will be 
