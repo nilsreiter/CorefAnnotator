@@ -17,6 +17,10 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.api.format.Bold;
+import de.unistuttgart.ims.coref.annotator.api.format.Head;
+import de.unistuttgart.ims.coref.annotator.api.format.Italic;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -50,7 +54,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.setPreserveWhitespace(true);
 
 		// set the document title
-		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
+		gxr.addGlobalRule("titleStmt > title", (d, e) -> d.setDocumentTitle(e.text()));
+
+		gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
 
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
@@ -66,7 +72,14 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(entity);
 		});
 
-		gxr.addRule("div", Segment.class);
+		gxr.addRule("head", Head.class);
+		gxr.addRule("emph", Italic.class);
+		gxr.addRule("[rend*=bold]", Bold.class);
+		gxr.addRule("[rend*=italic]", Italic.class);
+		gxr.addRule("div", Segment.class, (s, e) -> {
+			if (e.selectFirst("head") != null)
+				s.setLabel(e.selectFirst("head").text());
+		});
 		gxr.addRule("l", Line.class,
 				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
 
@@ -83,6 +96,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			DocumentMetaData.get(jcas).setDocumentId(documentId);
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
+
+		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 
 		// TODO: Remove <rs> elements
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
