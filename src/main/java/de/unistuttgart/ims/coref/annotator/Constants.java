@@ -339,7 +339,7 @@ public class Constants {
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
-			"nl", "ru" };
+			"nl", "ru", "gmh" };
 
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 
