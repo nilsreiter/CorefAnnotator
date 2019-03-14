@@ -77,6 +77,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("emph", Italic.class);
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
+		gxr.addRule("lg", Segment.class);
 		gxr.addRule("div", Segment.class, (s, e) -> {
 			if (e.selectFirst("head") != null)
 				s.setLabel(e.selectFirst("head").text());
