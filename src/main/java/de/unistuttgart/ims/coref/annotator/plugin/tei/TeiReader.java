@@ -17,6 +17,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
@@ -98,7 +99,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
 		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
-
+		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 		// TODO: Remove <rs> elements
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs"))
