@@ -18,7 +18,9 @@ import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
+import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements IOPlugin {
 
@@ -36,6 +38,7 @@ public class Plugin implements IOPlugin {
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
 		b.add(AnalysisEngineFactory.createEngineDescription(ImportDKpro.class));
+		b.add(AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
 		return b.createAggregateDescription();
 	}
 
@@ -99,6 +102,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String[] getSupportedLanguages() {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
+
+	@Override
+	public ExtensionFilter getExtensionFilter() {
+		return new ExtensionFilter("CoNLL 2012", "*.conll");
 	}
 
 }

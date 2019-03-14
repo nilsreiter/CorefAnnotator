@@ -3,6 +3,169 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.8.0
+
+- It's now possible to create new flags that can be assigned to entities, 
+  mentions, and detached mention parts. The flags can be created with
+  the flag editor (in the tools menu). #126
+- The text view can now display line numbers. See 
+  [the wiki](https://github.com/nilsreiter/CorefAnnotator/wiki/Line-Numbers) for 
+  details. #169 
+- The text field in the search dialog is now automatically in focus when
+  the window is opened #159
+- The text field now maintains previous searches #161
+- The search can now be restricted to mentions only #162
+- We now use a JavaFX-based file dialog, which should look more native 
+  to the OS (no issue)
+
+## 1.7.4
+
+- If dragging, the entity mention tree no longer reacts on moving over 
+  mentions, i.e., the text no longer jumps to the mention if something 
+  is dragged #170
+- Moving a mention into an entity group was leading to file corruption.
+  Files could no longer be opened. This is fixed, and corrupted files
+  can be opened again. #171
+
+## 1.7.3
+
+- Renamed an entity is now properly undoable #167
+- Setting the language now actually works #168
+
+## 1.7.2
+
+- Fixed a bug that prevented loading files when run on OpenJDK #166
+
+## 1.7.1
+
+- Fixed a bug that changed the entity name to null if its' properties
+  are changed #163
+- Fixed a bug that showed a wrong icon when editing the entity name 
+  #164
+- It's no longer possible to rename mentions 
+
+## 1.7.0
+
+- If a group contains more than two entities, the number of additional 
+  entities is now displayed in the label #156
+- Long entity names are now abbreviated, but tooltips show the full 
+  name
+- Entity names can be edited by double clicking on it in the tree view
+  #152
+- Deleting a mention no longer collapses the entity tree, even if the 
+  tree is automatically sorted by mention count (in this case, the 
+  expanded sub tree may be moved). #155
+
+## 1.6.1
+
+- Fixed a bug with the export to TEI. XML ids may now include special 
+  characters #157
+
+## 1.6.0
+
+- Removed commenting system #130
+- Context menu in the text view is now flatter #146
+- Clicking on an entity now highlights all mentions of it #142
+- If segments are annotated in the XMI file, they can now be 
+  displayed in the scroll bar. This is a preparation for segment 
+  support, and not yet directly usable. #84
+- The search panel now has a second tab that allows searching for 
+  mention flags #42
+
+## 1.5.6
+
+- Fixed an issue that prevented merging compressed files #150
+
+## 1.5.5
+
+- Fixed an issue that resulted in copied mentions #141
+
+## 1.5.4
+
+- Fixed that creating new documents from plain text (and others) did
+  not set the correct file version number #137
+- Fixed that the style is not correctly set when importing QuaDramA 
+  files #139
+- Fixed that hidden entities also have their properties in gray #133
+
+## 1.5.3
+
+- Fixed a bug that caused detached mention parts to disappear 
+  after conversion #131
+- Fixed an issue that caused entities to be disrupted after 
+  conversion #129
+
+## 1.5.2
+
+- Fixed an issue that prevented loading of the correct style
+
+## 1.5.1
+
+- Fixes that hiding an entity didn't de-underline its mentions #127
+
+## 1.5.0
+
+- Searching in the tree view now behaves slightly different: If a new 
+  mention is dragged in (or added a key) while the tree view is ranked 
+  according to the search, the ranking remains after having added the 
+  mention. If the user presses enter, the ranking (and search) is 
+  removed. #100
+- Added a new command to automatically remove all singletons. Empty
+  entities are also removed at the same time. #103
+- If a text segment has been selected, clicking on the context menu 
+  shows the option "copy formatted example". This copies the selection 
+  with their markdown or plain text formatted annotations onto the 
+  clipboard. Currently, the markdown format uses <sub></sub> to 
+  subscript, but other formats can be included. #110
+- **New type system**: This version introduces a modified type system, 
+  which entails that the file format has to change. At this point, 
+  the changes are not significant, but provide the stage for later 
+  changes. When an old file is opened for the first time, it gets 
+  converted automatically. #101
+- The user can now control whether singletons are ignored for comparing
+  two annotation files. #106
+- Compressed files: If the file name entered in the Save As dialog ends 
+  on ".xmi.gz", the file will be gzipped and therefore take much less 
+  space on disk (and is more email-friendly). Files ending on ".xmi.gz" 
+  can be loaded directly as usual. #125
+- QuaDramA/CRETA-specific importers that we used to import files from 
+  WebAnno have been removed. Import (of coreference annotations) from 
+  WebAnno can still be done using the dkpro importer. #124
+- JSON export: Coreference annotations can now be exported as JSON
+  files. The file contains a list of tokens, and each token can be 
+  associated with one or more entities. This JSON format will be 
+  importable by [rCat](http://www.rcat-ims.de:5000/) in the future. #120
+
+## 1.4.4
+
+- Fixed an issue in the compare view that led to displaced underlines.
+  Root cause was the handling of windows-style newlines `\r\n` #114
+- Fixed an issue in the TEI importer that caused the document title to 
+  be wrong #119
+
+## 1.4.3
+
+- Fixed an issue with the TEI/XML handling. The base TEI IO plugin now
+  *only* handles elements with `@ref` attribute, and does not read or 
+  write `@xml:id` attributes. This is in line with the documentation 
+  of the `@ref` attribute, which is not restricted to XML IDs. #118
+
+## 1.4.2
+
+- Fixed that detached mention parts were not included in the tree
+  after loading a file. #111
+- Fixed that warning dialogs were displayed even if all changes were 
+  saved. The downside is that saving now clears the history. #109
+- Delete everything now deletes everything. #97
+- Fixed that the settings menu would disappear on Windows if multiple
+  windows are opened. #113
+
+## 1.4.1
+
+- App now launches on a Mac with Java 9 and higher. #71
+- Mentions can now be moved into an entity group properly #108
+
+
 ## 1.4
 
 - Selecting text in the compare view now displays agreement calculated 

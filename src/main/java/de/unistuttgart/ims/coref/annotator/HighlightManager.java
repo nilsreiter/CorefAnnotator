@@ -14,10 +14,11 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 class HighlightManager {
+	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
@@ -34,32 +35,48 @@ class HighlightManager {
 	@Deprecated
 	public void clearAndDrawAllAnnotations(JCas jcas) {
 		hilit.removeAllHighlights();
-		highlightMap.clear();
+		underlineMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			draw(m, new Color(m.getEntity().getColor()), false, false, null);
+			highlight(m, new Color(m.getEntity().getColor()), false, false, null);
 			if (m.getDiscontinuous() != null)
-				draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+				highlight(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 
 		}
 		textComponent.repaint();
 	}
 
-	protected void draw(Annotation a, Color c, boolean dotted, boolean repaint,
-			LayeredHighlighter.LayerPainter painter) {
-		Object hi = highlightMap.get(a);
+	protected void underline(Annotation a, Color c, boolean dotted, boolean repaint) {
 		Span span = new Span(a);
+
+		try {
+			if (underlineMap.containsKey(a)) {
+				Object hi = underlineMap.get(a);
+				spanCounter.subtract(span, hi);
+				hilit.removeHighlight(hi);
+			}
+			int n = spanCounter.getNextLevel(span);
+			Object hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
+			spanCounter.add(span, hi, n);
+			underlineMap.put(a, hi);
+			// TODO: this is overkill, but didn't work otherwise
+			if (repaint)
+				textComponent.repaint();
+		} catch (BadLocationException e) {
+			Annotator.logger.catching(e);
+		}
+	}
+
+	protected void highlight(Annotation a, Color c, boolean dotted, boolean repaint,
+			LayeredHighlighter.LayerPainter painter) {
+		if (painter == null)
+			throw new NullPointerException();
+		Object hi = highlightMap.get(a);
 		if (hi != null) {
-			spanCounter.subtract(span, hi);
 			hilit.removeHighlight(hi);
 		}
 		try {
-			int n = spanCounter.getNextLevel(span);
-			if (painter == null)
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), new UnderlinePainter(c, n * 3, dotted));
-			else
-				hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
-			spanCounter.add(span, hi, n);
+			hi = hilit.addHighlight(a.getBegin(), a.getEnd(), painter);
 			highlightMap.put(a, hi);
 			// TODO: this is overkill, but didn't work otherwise
 			if (repaint)
@@ -75,8 +92,11 @@ class HighlightManager {
 	}
 
 	public void highlight(Annotation a) {
-		draw(a, new Color(255, 255, 150), false, false,
-				new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 200)));
+		highlight(a, new Color(255, 255, 150));
+	}
+
+	public void highlight(Annotation a, Color c) {
+		highlight(a, c, false, false, new DefaultHighlighter.DefaultHighlightPainter(c));
 	}
 
 	public void underline(Annotation a) {
@@ -88,15 +108,15 @@ class HighlightManager {
 
 	public void underline(DetachedMentionPart dmp) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true, null);
+		underline(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, new Color(m.getEntity().getColor()), false, true, null);
+		underline(m, new Color(m.getEntity().getColor()), false, true);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true, null);
+			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
@@ -105,29 +125,51 @@ class HighlightManager {
 			underline((Mention) m, color);
 		else {
 			hilit.setDrawsLayeredHighlights(true);
-			draw(m, color, false, true, null);
+			underline(m, color, false, true);
 			hilit.setDrawsLayeredHighlights(false);
 		}
 	}
 
 	public void underline(Mention m, Color color) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, color, false, true, null);
+		underline(m, color, false, true);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), color, true, true, null);
+			underline(m.getDiscontinuous(), color, true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, boolean repaint) {
 		hilit.setDrawsLayeredHighlights(true);
-		draw(m, new Color(m.getEntity().getColor()), false, false, null);
+		underline(m, new Color(m.getEntity().getColor()), false, false);
 		if (m.getDiscontinuous() != null)
-			draw(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
-	public void undraw(Annotation a) {
+	public void unUnderline(Annotation a) {
+		Object hi = underlineMap.get(a);
+		Span span = new Span(a);
+		if (span != null)
+			spanCounter.subtract(span, hi);
+		if (hi != null)
+			hilit.removeHighlight(hi);
+
+	}
+
+	public void unHighlight() {
+		highlightMap.values().forEach(o -> hilit.removeHighlight(o));
+	}
+
+	public void unHighlight(Annotation a) {
 		Object hi = highlightMap.get(a);
+		if (hi != null)
+			hilit.removeHighlight(hi);
+
+	}
+
+	@Deprecated
+	public void undraw(Annotation a) {
+		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
 		if (span != null)
 			spanCounter.subtract(span, hi);

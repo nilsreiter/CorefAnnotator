@@ -42,16 +42,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.OpenFilesEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.OpenFilesHandler;
-import com.apple.eawt.PreferencesHandler;
-import com.apple.eawt.QuitHandler;
-import com.apple.eawt.QuitResponse;
-
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
@@ -63,8 +53,10 @@ import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 
-public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHandler, QuitHandler {
+public class Annotator {
 
 	public static final Logger logger = LogManager.getLogger(Annotator.class);
 
@@ -78,9 +70,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	PluginManager pluginManager = new PluginManager();
 
+	@Deprecated
 	JFileChooser openDialog;
 
-	JFrame opening;
+	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
@@ -116,8 +109,10 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		});
 	}
 
+	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
-		logger.trace("Application startup");
+		logger.trace("Application startup. Version " + Version.get().toString());
+		new JFXPanel();
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -129,7 +124,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			Annotator.logger.catching(e);
 		}
 
 		this.initialiseActions();
@@ -141,7 +136,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	protected void initialiseDialogs() {
 		openDialog = new JFileChooser();
 		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi);
+		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}
@@ -149,6 +144,11 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	protected void initialiseActions() {
 		openAction = new FileSelectOpenAction(this);
 		openCompareAction = new FileCompareOpenAction();
+	}
+
+	public static String getAppName() {
+		// return "CorefAnnotator";
+		return Annotator.class.getPackage().getImplementationTitle();
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -160,7 +160,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			@Override
 			public void windowClosing(WindowEvent e) {
 				opening.dispose();
-				handleQuitRequestWith(null, null);
+				handleQuitRequestWith();
 			}
 		});
 
@@ -249,21 +249,23 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
+		DocumentWindow v = new DocumentWindow();
+		v.loadFile(file, flavor, language);
 
-		Runnable runnable = new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
+
 			@Override
 			public void run() {
-				DocumentWindow v = new DocumentWindow(Annotator.this);
-				v.loadFile(file, flavor, language);
 				openFiles.add(v);
 				if (flavor instanceof DefaultIOPlugin)
 					recentFiles.add(0, file);
+				v.initialise();
 
 			}
-		};
+		});
 
-		SwingUtilities.invokeLater(runnable);
 		return null;
+
 	}
 
 	public void close(DocumentWindow viewer) {
@@ -273,17 +275,7 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 			this.showOpening();
 	};
 
-	@Override
-	public void openFiles(OpenFilesEvent e) {
-		for (Object file : e.getFiles()) {
-			if (file instanceof File) {
-				open((File) file, new DefaultIOPlugin(), null);
-			}
-		}
-	}
-
-	@Override
-	public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
+	public void handleQuitRequestWith() {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
 		storeRecentFiles();
@@ -295,14 +287,6 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		System.exit(0);
 	}
 
-	@Override
-	public void handleAbout(AboutEvent e) {
-	}
-
-	@Override
-	public void handlePreferences(PreferencesEvent e) {
-	}
-
 	public void warnDialog(String message, String title) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
 	}
@@ -312,20 +296,24 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 	}
 
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
-		openDialog.setFileFilter(flavor.getFileFilter());
-		openDialog.setCurrentDirectory(getCurrentDirectory());
-		int r = openDialog.showOpenDialog(parent);
-		switch (r) {
-		case JFileChooser.APPROVE_OPTION:
-			for (File f : openDialog.getSelectedFiles()) {
-				setCurrentDirectory(f.getParentFile());
-				open(f, flavor, Constants.X_UNSPECIFIED);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+				fileChooser.setInitialDirectory(getCurrentDirectory());
+				// fileChooser.getExtensionFilters().clear();
+				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
+				File file = fileChooser.showOpenDialog(null);
+				if (file != null)
+					open(file, flavor, Constants.X_UNSPECIFIED);
+				else
+					showOpening();
+
 			}
-			break;
-		default:
-			showOpening();
-		}
+
+		});
+
 	}
 
 	public static String getString(String key) {
@@ -341,6 +329,14 @@ public class Annotator implements AboutHandler, PreferencesHandler, OpenFilesHan
 		if (rbundle == null)
 			rbundle = ResourceBundle.getBundle("locales/strings", locale);
 		return rbundle.getString(key);
+	}
+
+	public static String getString(String key, String defaultValue) {
+		try {
+			return getString(key, Locale.getDefault());
+		} catch (java.util.MissingResourceException e) {
+			return defaultValue;
+		}
 	}
 
 	public PluginManager getPluginManager() {

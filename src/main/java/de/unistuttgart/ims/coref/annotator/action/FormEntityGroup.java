@@ -10,10 +10,10 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CATreeSelectionListener;
+import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.document.Op;
+import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 
 public class FormEntityGroup extends DocumentWindowAction implements CAAction {
 	private static final long serialVersionUID = 1L;
@@ -28,12 +28,11 @@ public class FormEntityGroup extends DocumentWindowAction implements CAAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getTarget().getDocumentModel().getCoreferenceModel()
-				.edit(new Op.GroupEntities(getTarget().getSelectedEntities()));
+		getTarget().getDocumentModel().edit(new GroupEntities(getTarget().getSelectedEntities()));
 	}
 
 	@Override
-	public void setEnabled(CATreeSelectionListener l) {
+	public void setEnabled(CAAbstractTreeSelectionListener l) {
 		setEnabled(l.isEntity() & l.size() > 1);
 	}
 

@@ -5,6 +5,9 @@ import java.util.Arrays;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
+import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.CASRuntimeException;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -15,9 +18,9 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public class Util {
 	private static String[] languageNames = null;
@@ -53,6 +56,27 @@ public class Util {
 		return false;
 	}
 
+	public static void addFlagKey(FeatureStructure fs, String flagKey) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		try {
+			StringArray arr = addTo(fs.getCAS().getJCas(), (StringArray) fs.getFeatureValue(feature), flagKey);
+			fs.setFeatureValue(feature, arr);
+		} catch (CASRuntimeException | CASException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void removeFlagKey(FeatureStructure fs, String flagKey) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		try {
+			StringArray arr = removeFrom(fs.getCAS().getJCas(), (StringArray) fs.getFeatureValue(feature), flagKey);
+			fs.setFeatureValue(feature, arr);
+		} catch (CASRuntimeException | CASException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public static StringArray removeFrom(JCas jcas, StringArray arr, String fs) {
 		int i = 0, j = 0;
 		StringArray nArr = null;
@@ -64,7 +88,6 @@ public class Util {
 			else
 				j--;
 		}
-
 		return nArr;
 	}
 
@@ -123,11 +146,8 @@ public class Util {
 	}
 
 	public static boolean isX(FeatureStructure fs, String flag) {
-		if (fs instanceof Entity)
-			return Util.contains(((Entity) fs).getFlags(), flag);
-		if (fs instanceof Mention)
-			return Util.contains(((Mention) fs).getFlags(), flag);
-		return false;
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		return Util.contains((StringArray) fs.getFeatureValue(feature), flag);
 	}
 
 	public static boolean isGeneric(Entity e) {
@@ -214,8 +234,8 @@ public class Util {
 
 	public static String getLanguage(String languageName) {
 		getSupportedLanguageNames();
-		for (int i = 0; i < languageNames.length; i++)
-			if (languageName == languageNames[i])
+		for (int i = 0; i < Constants.SUPPORTED_LANGUAGES.length; i++)
+			if (languageName == getLanguageName(Constants.SUPPORTED_LANGUAGES[i]))
 				return Constants.SUPPORTED_LANGUAGES[i];
 
 		return null;
@@ -230,6 +250,45 @@ public class Util {
 		MutableList<T> list = Lists.mutable.empty();
 		arr.forEach(fs -> list.add((T) fs));
 		return list;
+	}
+
+	public static StringArray getFlags(FeatureStructure fs) throws CASException {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return new StringArray(fs.getCAS().getJCas(), 0);
+		else {
+			StringArray sa = (StringArray) fs.getFeatureValue(feature);
+			if (sa == null)
+				return new StringArray(fs.getCAS().getJCas(), 0);
+			else
+				return sa;
+		}
+	}
+
+	public static String[] getFlagsAsStringArray(FeatureStructure fs) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return new String[0];
+		else {
+			StringArray sa = (StringArray) fs.getFeatureValue(feature);
+			if (sa == null)
+				return new String[0];
+			else
+				return sa.toStringArray();
+		}
+	}
+
+	public static void setFlags(FeatureStructure fs, StringArray arr) throws CASException {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		if (feature == null)
+			return;
+		else
+			fs.setFeatureValue(feature, arr);
+	}
+
+	public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+		int x = Constants.RANDOM.nextInt(clazz.getEnumConstants().length);
+		return clazz.getEnumConstants()[x];
 	}
 
 }

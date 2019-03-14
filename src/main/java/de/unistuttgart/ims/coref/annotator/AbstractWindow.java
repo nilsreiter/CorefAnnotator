@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -28,7 +29,7 @@ public abstract class AbstractWindow extends JFrame {
 	Thread messageVoider;
 	JMenuBar menuBar = new JMenuBar();
 
-	static JMenu menu_settings = null;
+	JMenu menu_settings = null;
 
 	protected void initializeWindow() {
 		SpringLayout springs = new SpringLayout();
@@ -48,8 +49,7 @@ public abstract class AbstractWindow extends JFrame {
 		messageLabel.setSize(new Dimension(1, 20));
 		statusBar.add(messageLabel);
 
-		JLabel versionLabel = new JLabel(
-				Annotator.class.getPackage().getImplementationTitle() + " " + Version.get().toString());
+		JLabel versionLabel = new JLabel(Annotator.getAppName() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
@@ -79,33 +79,49 @@ public abstract class AbstractWindow extends JFrame {
 		progressBar.setVisible(false);
 	}
 
+	/**
+	 * Runs on the EDT
+	 * 
+	 * @param message
+	 */
 	public void setMessage(String message) {
-		setMessage(message, false);
+		setMessage(message, 5000);
 	}
 
-	protected synchronized void setMessage(String message, boolean disappearing) {
-		messageLabel.setText(message);
-		messageLabel.repaint();
-		statusBar.revalidate();
+	protected synchronized void setMessage(String message, int disappearingAfter) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				messageLabel.setText(message);
+				messageLabel.repaint();
+				statusBar.revalidate();
+			}
+		});
 
 		if (messageVoider != null && messageVoider.isAlive())
 			messageVoider.interrupt();
 
-		if (disappearing) {
+		if (disappearingAfter > 0) {
 			messageVoider = new Thread() {
 
 				@Override
 				public void run() {
 					try {
-						Thread.sleep(1000);
-						setMessage("");
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+						Thread.sleep(disappearingAfter);
+						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
+							public void run() {
+								setMessage("");
+							}
+						});
+					} catch (InterruptedException | InvocationTargetException e) {
+						// ignore
 					}
 				}
 
 			};
-			SwingUtilities.invokeLater(messageVoider);
+			messageVoider.start();
 		}
 	}
 
@@ -114,8 +130,6 @@ public abstract class AbstractWindow extends JFrame {
 	}
 
 	public JMenu initialiseMenuSettings() {
-		if (menu_settings != null)
-			return menu_settings;
 		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
@@ -130,6 +144,8 @@ public abstract class AbstractWindow extends JFrame {
 		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
 		return menu_settings;
 
 	}

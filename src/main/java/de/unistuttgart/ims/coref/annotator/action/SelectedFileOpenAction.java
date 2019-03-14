@@ -22,7 +22,14 @@ public class SelectedFileOpenAction extends IkonAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Annotator.app.open(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), null);
+		new Runnable() {
+
+			@Override
+			public void run() {
+				Annotator.app.open(file, Annotator.app.getPluginManager().getDefaultIOPlugin(), null);
+
+			}
+		}.run();
 	}
 
 }

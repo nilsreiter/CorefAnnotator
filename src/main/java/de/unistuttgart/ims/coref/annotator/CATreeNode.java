@@ -10,17 +10,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 
-public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode> {
+public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATreeNode>, Tooltipable {
 
 	private static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
 	private static final long serialVersionUID = 1L;
-
-	transient FeatureStructure featureStructure = null;
 
 	int featureStructureHash;
 
@@ -30,7 +30,7 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
-			this.featureStructure = featureStructure;
+			this.userObject = featureStructure;
 			this.featureStructureHash = featureStructure.hashCode();
 			mentionCache.put(featureStructure.hashCode(), featureStructure);
 		}
@@ -47,9 +47,9 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	@SuppressWarnings("unchecked")
 	public <T extends FeatureStructure> T getFeatureStructure() {
-		if (featureStructure == null)
-			featureStructure = mentionCache.get(featureStructureHash);
-		return (T) featureStructure;
+		if (userObject == null)
+			userObject = mentionCache.get(featureStructureHash);
+		return (T) userObject;
 	}
 
 	@Override
@@ -84,15 +84,15 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 	}
 
 	public boolean isEntity() {
-		return featureStructure instanceof Entity;
+		return userObject instanceof Entity;
 	}
 
 	public boolean isMention() {
-		return featureStructure instanceof Mention;
+		return userObject instanceof Mention;
 	}
 
 	public boolean isMentionPart() {
-		return featureStructure instanceof DetachedMentionPart;
+		return userObject instanceof DetachedMentionPart;
 	}
 
 	@Override
@@ -128,6 +128,31 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 
 	public void setRank(int rank) {
 		this.rank = rank;
+	}
+
+	@Override
+	public String getToolTip() {
+		if (getUserObject() instanceof EntityGroup) {
+			StringBuilder b = new StringBuilder();
+			EntityGroup entityGroup = (EntityGroup) getUserObject();
+			if (entityGroup.getMembers().size() > 0) {
+				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+					b.append(entityGroup.getMembers(0).getLabel());
+				else {
+					System.out.println();
+				}
+				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+					b.append(", ");
+					b.append(entityGroup.getMembers(i).getLabel());
+				}
+				return b.toString();
+			} else {
+				return null;
+			}
+		} else if (getUserObject() instanceof Entity) {
+			return getEntity().getLabel();
+		}
+		return null;
 	}
 
 }

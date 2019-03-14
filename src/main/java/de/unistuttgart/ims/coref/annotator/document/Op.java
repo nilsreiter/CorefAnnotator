@@ -9,11 +9,12 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Multimaps;
 
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.Entity;
-import de.unistuttgart.ims.coref.annotator.api.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
+@Deprecated
 public interface Op {
 
 	public class AddEntityToEntityGroup implements Op {
@@ -249,11 +250,11 @@ public interface Op {
 		}
 
 		public FeatureStructureEvent toEvent() {
-			return Event.get(Event.Type.Move, getSource(), getTarget(), getObjects());
+			return Event.get(null, Event.Type.Move, getSource(), getTarget(), getObjects());
 		}
 
 		public FeatureStructureEvent toReversedEvent() {
-			return Event.get(Event.Type.Move, getTarget(), getSource(), getObjects());
+			return Event.get(null, Event.Type.Move, getTarget(), getSource(), getObjects());
 		}
 	}
 
@@ -447,6 +448,29 @@ public interface Op {
 
 	}
 
+	public class RemoveSingletons implements Op {
+		ImmutableList<Mention> mentions;
+		ImmutableList<Entity> entities;
+
+		public ImmutableList<Mention> getMentions() {
+			return mentions;
+		}
+
+		public void setMentions(ImmutableList<Mention> mentions) {
+			this.mentions = mentions;
+		}
+
+		public ImmutableList<Entity> getEntities() {
+			return entities;
+		}
+
+		public void setEntities(ImmutableList<Entity> entities) {
+			this.entities = entities;
+		}
+
+	}
+
+	@Deprecated
 	public class ToggleEntityFlag extends ToggleFlag<Entity> {
 
 		public ToggleEntityFlag(String flag, Iterable<Entity> objects) {
@@ -455,12 +479,20 @@ public interface Op {
 
 	}
 
+	@Deprecated
 	public class ToggleMentionFlag extends ToggleFlag<Mention> {
 
 		public ToggleMentionFlag(String flag, Iterable<Mention> objects) {
 			super(flag, objects);
 		}
 
+	}
+
+	public class ToggleGenericFlag extends ToggleFlag<FeatureStructure> {
+
+		public ToggleGenericFlag(String flag, Iterable<FeatureStructure> objects) {
+			super(flag, objects);
+		}
 	}
 
 	public abstract class ToggleFlag<T extends FeatureStructure> extends UpdateOp<T> {
