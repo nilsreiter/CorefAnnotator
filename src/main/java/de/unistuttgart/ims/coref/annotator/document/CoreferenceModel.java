@@ -552,7 +552,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	public Mention getPreviousMention(int position) {
-		for (int i = position; i > 0; i--) {
+		for (int i = position - 1; i >= 0; i--) {
 			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
 			if (!mentions.isEmpty())
 				return mentions.iterator().next();
