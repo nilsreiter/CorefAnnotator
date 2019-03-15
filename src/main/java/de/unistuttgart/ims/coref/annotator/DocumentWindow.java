@@ -121,6 +121,7 @@ import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
+import de.unistuttgart.ims.coref.annotator.action.RenameAllEntitiesAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
@@ -501,6 +502,7 @@ public class DocumentWindow extends AbstractTextWindow
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
+		toolsMenu.add(new RenameAllEntitiesAction(this));
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.add(new ShowFlagEditor(this));
 		toolsMenu.addSeparator();
