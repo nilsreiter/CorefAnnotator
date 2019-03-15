@@ -68,8 +68,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 				int high = getTarget().getTextPane().getSelectionEnd();
 				MutableSet<? extends Annotation> annotations = Sets.mutable
 						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
-				@SuppressWarnings("unchecked")
-				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
+				MutableSet<Mention> mentions = annotations.selectInstancesOf(Mention.class)
 						.select(a -> a.getBegin() == low && a.getEnd() == high);
 
 				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),

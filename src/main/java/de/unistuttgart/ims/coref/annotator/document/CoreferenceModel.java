@@ -19,10 +19,12 @@ import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
@@ -58,6 +60,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -531,12 +534,30 @@ public class CoreferenceModel extends SubModel implements Model {
 		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
 	}
 
-	public ImmutableSet<Mention> getMentions() {
-		return Sets.immutable.withAll(JCasUtil.select(getJCas(), Mention.class));
+	public ImmutableSortedSet<Mention> getMentions() {
+		return SortedSets.immutable.withAll(new AnnotationComparator(), JCasUtil.select(getJCas(), Mention.class));
 	}
 
 	public ImmutableSet<Mention> getMentions(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
+	}
+
+	public Mention getNextMention(int position) {
+		for (int i = position; i < getDocumentModel().getJcas().getDocumentText().length(); i++) {
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			if (!mentions.isEmpty())
+				return mentions.iterator().next();
+		}
+		return null;
+	}
+
+	public Mention getPreviousMention(int position) {
+		for (int i = position - 1; i >= 0; i--) {
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			if (!mentions.isEmpty())
+				return mentions.iterator().next();
+		}
+		return null;
 	}
 
 	/**

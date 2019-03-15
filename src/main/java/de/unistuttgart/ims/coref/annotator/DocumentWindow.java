@@ -117,6 +117,8 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
@@ -350,6 +352,8 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.getActionMap().put(DeleteAction.class, actions.deleteAction);
 		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
 		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, actions.deleteAllAction);
+		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
+		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				CopyAction.class);
@@ -357,6 +361,10 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				DeleteAllMentionsInSelection.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK),
+				SelectNextMentionAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK),
+				SelectPreviousMentionAction.class);
 
 		highlightManager = new HighlightManager(textPane);
 
