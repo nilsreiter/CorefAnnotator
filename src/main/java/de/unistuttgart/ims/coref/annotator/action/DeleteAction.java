@@ -9,8 +9,12 @@ import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -52,62 +56,55 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		FeatureStructure fs = featureStructure;
-		Operation operation = null;
+		MutableList<Operation> operations = Lists.mutable.empty();
 		if (fs == null) {
-			MutableList<TreePath> selection = Lists.mutable.of(getTarget().getTree().getSelectionPaths());
-			CATreeNode node = (CATreeNode) getTarget().getTree().getSelectionPath().getLastPathComponent();
-			fs = node.getFeatureStructure();
+			if (e.getSource() == getTarget().getTree() || getTarget().getTree().hasFocus()) {
+				MutableList<TreePath> selection = Lists.mutable.of(getTarget().getTree().getSelectionPaths());
+				CATreeNode node = (CATreeNode) getTarget().getTree().getSelectionPath().getLastPathComponent();
+				fs = node.getFeatureStructure();
 
-			if (fs instanceof Entity) {
-				FeatureStructure parentFs = node.getParent().getFeatureStructure();
-				if (parentFs instanceof EntityGroup) {
-					operation = new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity());
-				} else if (node.isLeaf()) {
-					operation = new RemoveEntities(getTarget().getSelectedEntities());
+				if (fs instanceof Entity) {
+					FeatureStructure parentFs = node.getParent().getFeatureStructure();
+					if (parentFs instanceof EntityGroup) {
+						operations.add(new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity()));
+					} else if (node.isLeaf()) {
+						operations.add(new RemoveEntities(getTarget().getSelectedEntities()));
+					}
+				} else if (fs instanceof Mention) {
+					operations.add(new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
+							.collect(tn -> (Mention) tn.getFeatureStructure())));
+				} else if (fs instanceof DetachedMentionPart) {
+					operations.add(new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs));
 				}
-			} else if (fs instanceof Mention) {
-				operation = new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-						.collect(tn -> (Mention) tn.getFeatureStructure()));
-			} else if (fs instanceof DetachedMentionPart) {
-				operation = new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs);
+			} else if (e.getSource() == getTarget().getTextPane()) {
+				int low = getTarget().getTextPane().getSelectionStart();
+				int high = getTarget().getTextPane().getSelectionEnd();
+				MutableSet<? extends Annotation> annotations = Sets.mutable
+						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
+				@SuppressWarnings("unchecked")
+				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
+						.select(a -> a.getBegin() == low && a.getEnd() == high);
+
+				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),
+						() -> Sets.mutable.empty(), (set, mention) -> {
+							set.add(mention);
+							return set;
+						});
+				mentionsByEntity.forEachValue(s -> operations.add(new RemoveMention(s)));
+			} else {
+
 			}
 		} else if (featureStructure instanceof Mention) {
-			operation = new RemoveMention((Mention) featureStructure);
+			operations.add(new RemoveMention((Mention) featureStructure));
 		} else if (featureStructure instanceof Entity) {
-			operation = new RemoveEntities((Entity) featureStructure);
+			operations.add(new RemoveEntities((Entity) featureStructure));
 		} else if (featureStructure instanceof DetachedMentionPart) {
 			DetachedMentionPart dmp = (DetachedMentionPart) featureStructure;
-			operation = new RemovePart(dmp.getMention(), dmp);
+			operations.add(new RemovePart(dmp.getMention(), dmp));
 		}
-		if (operation != null)
-			this.getTarget().getDocumentModel().edit(operation);
-		else
-			for (TreePath tp : getTarget().getTree().getSelectionPaths())
-				deleteSingle((CATreeNode) tp.getLastPathComponent());
+		if (!operations.isEmpty())
+			operations.forEach(op -> getTarget().getDocumentModel().edit(op));
 
-	}
-
-	private void deleteSingle(CATreeNode tn) {
-		Operation operation = null;
-		if (tn.getFeatureStructure() instanceof Mention) {
-			int row = getTarget().getTree().getLeadSelectionRow() - 1;
-			getTarget().getDocumentModel().edit(new RemoveMention(tn.getFeatureStructure()));
-			getTarget().getTree().setSelectionRow(row);
-		} else if (tn.getFeatureStructure() instanceof EntityGroup) {
-			getTarget().getDocumentModel().edit(new RemoveEntities(tn.getFeatureStructure()));
-		} else if (tn.getFeatureStructure() instanceof DetachedMentionPart) {
-			DetachedMentionPart dmp = (DetachedMentionPart) tn.getFeatureStructure();
-			getTarget().getDocumentModel().edit(new RemovePart(dmp.getMention(), dmp));
-		} else if (tn.isEntity()) {
-			FeatureStructure parentFs = tn.getParent().getFeatureStructure();
-			if (parentFs instanceof EntityGroup) {
-				operation = new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, tn.getEntity());
-			} else if (tn.isLeaf()) {
-				getTarget().getDocumentModel().edit(new RemoveEntities(tn.getEntity()));
-			}
-		}
-		if (operation != null)
-			getTarget().getDocumentModel().edit(operation);
 	}
 
 	@Override

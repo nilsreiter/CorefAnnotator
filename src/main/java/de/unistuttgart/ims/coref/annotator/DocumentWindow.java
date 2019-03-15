@@ -281,8 +281,10 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.addMouseListener(tml);
 		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
-		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+		tree.getActionMap().put(DeleteAction.class, new DeleteAction(this));
+		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
+		tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
 
 		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
 
@@ -332,13 +334,17 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.addMouseMotionListener(textMouseListener);
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
+		textPane.addCaretListener(new TextCaretListener());
 		textPane.addFocusListener(caret);
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
+		textPane.getActionMap().put(DeleteAction.class, new DeleteAction(this));
+		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				actions.copyAction);
+				CopyAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
 
 		highlightManager = new HighlightManager(textPane);
 
