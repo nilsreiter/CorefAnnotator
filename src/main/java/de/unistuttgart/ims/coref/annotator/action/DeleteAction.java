@@ -63,7 +63,22 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		FeatureStructure fs = featureStructure;
 		MutableList<Operation> operations = Lists.mutable.empty();
 		if (fs == null) {
-			if (e.getSource() == getTarget().getTree() || getTarget().getTree().hasFocus()) {
+			if (e.getSource() == getTarget().getTextPane()) {
+				int low = getTarget().getTextPane().getSelectionStart();
+				int high = getTarget().getTextPane().getSelectionEnd();
+				MutableSet<? extends Annotation> annotations = Sets.mutable
+						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
+				@SuppressWarnings("unchecked")
+				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
+						.select(a -> a.getBegin() == low && a.getEnd() == high);
+
+				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),
+						() -> Sets.mutable.empty(), (set, mention) -> {
+							set.add(mention);
+							return set;
+						});
+				mentionsByEntity.forEachValue(s -> operations.add(new RemoveMention(s)));
+			} else {
 				MutableList<TreePath> selection = Lists.mutable.of(getTarget().getTree().getSelectionPaths());
 				CATreeNode node = (CATreeNode) getTarget().getTree().getSelectionPath().getLastPathComponent();
 				fs = node.getFeatureStructure();
@@ -81,23 +96,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 				} else if (fs instanceof DetachedMentionPart) {
 					operations.add(new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs));
 				}
-			} else if (e.getSource() == getTarget().getTextPane()) {
-				int low = getTarget().getTextPane().getSelectionStart();
-				int high = getTarget().getTextPane().getSelectionEnd();
-				MutableSet<? extends Annotation> annotations = Sets.mutable
-						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
-				@SuppressWarnings("unchecked")
-				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
-						.select(a -> a.getBegin() == low && a.getEnd() == high);
-
-				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),
-						() -> Sets.mutable.empty(), (set, mention) -> {
-							set.add(mention);
-							return set;
-						});
-				mentionsByEntity.forEachValue(s -> operations.add(new RemoveMention(s)));
-			} else {
-
 			}
 		} else if (featureStructure instanceof Mention) {
 			operations.add(new RemoveMention((Mention) featureStructure));
