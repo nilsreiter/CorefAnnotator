@@ -1344,7 +1344,6 @@ public class DocumentWindow extends AbstractTextWindow
 			if (dot == mark) {
 				// nothing is selected
 			} else {
-				actions.deleteAction.setEnabled(true);
 				// something is selected
 			}
 		}
