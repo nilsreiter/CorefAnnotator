@@ -3,6 +3,28 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.0
+
+- Using shift-arrow, the user can now jump from one annotated piece to 
+  the next. This function does not entirely iterate over mentions. If 
+  two mentions have the exact same boundaries, pressing the combo again 
+  jumps to the next mention with different boundaries. #182
+- Entities can now be automatically renamed. The new name is derived 
+  from the first, last, or longest mention. This is decided ad hoc in 
+  a dialog. The renaiming is fully undoable, so users can try with 
+  different options. #173
+- Pressing backspace while a mention is selected removes it. Multiple 
+  mentions with the same span are deleted as well. ctrl-backspace 
+  deletes *all* mentions in the selected area. #175
+- The label of the entity of a selected mention is now displayed in the 
+  status bar #176
+- Some formatting information can now be read from TEI/XML files and 
+  will be displayed accordingly. All `<head>` elements are shown large,
+  everything with a `rend=italic` or `rend=bold` will be display as 
+  such. In addition `<emph>` is rendered as italic. `<lg>` and `<div>`
+  elements will be marked as segments (and if they have `<head>`, 
+  they're displayed in the scrollbar). #181
+
 ## 1.8.0
 
 - It's now possible to create new flags that can be assigned to entities, 
