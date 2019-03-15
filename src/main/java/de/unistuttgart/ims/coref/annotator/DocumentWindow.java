@@ -70,6 +70,7 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -279,12 +280,15 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.setCellEditor(new MyTreeCellEditor(tree, (DefaultTreeCellRenderer) tree.getCellRenderer()));
 		tree.addTreeSelectionListener(treeSelectionListener);
+		tree.addTreeSelectionListener(actions.deleteAction);
+		tree.addTreeSelectionListener(actions.formGroupAction);
+		tree.addTreeSelectionListener(actions.renameAction);
 		tree.addMouseListener(tml);
 		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
-		tree.getActionMap().put(DeleteAction.class, new DeleteAction(this));
-		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
+		tree.getActionMap().put(DeleteAction.class, actions.deleteAction);
+		tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), AddCurrentSpanToCurrentEntity.class);
 		tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
 
 		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
@@ -336,13 +340,15 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addCaretListener(new TextCaretListener());
+		textPane.addCaretListener(actions.deleteAllAction);
+		textPane.addCaretListener(actions.deleteAction);
 		textPane.addFocusListener(caret);
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
-		textPane.getActionMap().put(DeleteAction.class, new DeleteAction(this));
+		textPane.getActionMap().put(DeleteAction.class, actions.deleteAction);
 		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
-		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, new DeleteAllMentionsInSelection(this));
+		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, actions.deleteAllAction);
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				CopyAction.class);
@@ -748,7 +754,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		for (Flag f : model.getFlagModel().getFlags()) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
-			treeSelectionListener.addListener(a);
+			tree.addTreeSelectionListener(a);
 			try {
 				if (model.getFlagModel().getTargetClass(f).equals(Mention.class)) {
 					mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
@@ -1337,6 +1343,7 @@ public class DocumentWindow extends AbstractTextWindow
 			if (dot == mark) {
 				// nothing is selected
 			} else {
+				actions.deleteAction.setEnabled(true);
 				// something is selected
 			}
 		}
@@ -1493,53 +1500,34 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	public class MyTreeSelectionListener extends CAAbstractTreeSelectionListener {
-
-		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
+	public class MyTreeSelectionListener implements TreeSelectionListener {
 
 		boolean enabled = true;
-
-		public MyTreeSelectionListener() {
-			super(null);
-		}
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			if (!isEnabled())
 				return;
-			collectData(e);
-			actions.renameAction.setEnabled(this);
-			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
-			actions.changeColorAction.setEnabled(isSingle() && isEntity());
+			TreeSelectionUtil tsu = new TreeSelectionUtil();
+			tsu.collectData(e);
 
-			actions.deleteAction.setEnabled(this);
-			actions.formGroupAction.setEnabled(this);
+			actions.changeKeyAction.setEnabled(tsu.isSingle() && tsu.isEntity());
+			actions.changeColorAction.setEnabled(tsu.isSingle() && tsu.isEntity());
 
-			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
+			actions.mergeSelectedEntitiesAction.setEnabled(!tsu.isSingle() && tsu.isEntity());
 
-			actions.removeDuplicatesAction.setEnabled(isEntity());
+			actions.removeDuplicatesAction.setEnabled(tsu.isEntity());
 
-			actions.entityStatisticsAction.setEnabled(isEntity());
+			actions.entityStatisticsAction.setEnabled(tsu.isEntity());
 
-			// inform all listeners
-			listeners.forEach(l -> l.valueChanged(this));
-
-			if (isSingle() && (isMention() || isDetachedMentionPart()))
-				annotationSelected(getAnnotation(0));
-			else if (isSingle() && isEntity()) {
+			if (tsu.isSingle() && (tsu.isMention() || tsu.isDetachedMentionPart()))
+				annotationSelected(tsu.getAnnotation(0));
+			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();
-				documentModel.getCoreferenceModel().getMentions(getEntity(0))
+				documentModel.getCoreferenceModel().getMentions(tsu.getEntity(0))
 						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
 			} else
 				annotationSelected(null);
-		}
-
-		public void addListener(CATreeSelectionListener l) {
-			this.listeners.add(l);
-		}
-
-		public void removeListener(CATreeSelectionListener l) {
-			this.listeners.remove(l);
 		}
 
 		public boolean isEnabled() {
@@ -1643,6 +1631,7 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction changeKeyAction;
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
+		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
 		FileSaveAction fileSaveAction;
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;

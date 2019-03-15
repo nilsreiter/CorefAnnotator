@@ -6,6 +6,10 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
@@ -18,10 +22,10 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -32,17 +36,18 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 
-public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements CAAction {
+public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements CaretListener, TreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
 
 	FeatureStructure featureStructure = null;
+	boolean enabledByText;
+	boolean enabledByTree;
 
 	public DeleteAction(DocumentWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
 	}
 
 	public DeleteAction(DocumentWindow documentWindow, FeatureStructure featureStructure) {
@@ -108,10 +113,23 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	}
 
 	@Override
-	public void setEnabled(CAAbstractTreeSelectionListener l) {
-		setEnabled(l.isDetachedMentionPart() || l.isMention() || (l.isEntityGroup() && l.isLeaf())
-				|| (l.isEntity() && l.isLeaf()));
+	public void caretUpdate(CaretEvent e) {
+		enabledByText = e.getDot() != e.getMark();
+		setStatus();
+	}
 
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		TreeSelectionUtil tsu = new TreeSelectionUtil();
+		tsu.collectData(e);
+		enabledByTree = tsu.isDetachedMentionPart() || tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf())
+				|| (tsu.isEntity() && tsu.isLeaf());
+		setStatus();
+
+	}
+
+	protected void setStatus() {
+		setEnabled(enabledByText || enabledByTree);
 	}
 
 }
