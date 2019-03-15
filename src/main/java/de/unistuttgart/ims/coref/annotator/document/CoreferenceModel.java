@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -517,8 +516,16 @@ public class CoreferenceModel extends SubModel implements Model {
 	 *            The character position
 	 * @return A collection of annotations
 	 */
-	public Collection<Annotation> getMentions(int position) {
+	public MutableSet<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
+	}
+
+	public ImmutableSet<Annotation> getMentions(int start, int end) {
+		MutableSet<Annotation> mentions = Sets.mutable.empty();
+		for (int i = start; i <= end; i++) {
+			mentions.addAll(characterPosition2AnnotationMap.get(i).select(a -> a instanceof Mention));
+		}
+		return mentions.toImmutable();
 	}
 
 	public Preferences getPreferences() {

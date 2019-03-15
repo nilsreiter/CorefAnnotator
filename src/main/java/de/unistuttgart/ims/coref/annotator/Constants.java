@@ -101,6 +101,8 @@ public class Constants {
 		public static final String ACTION_COMPARE_TOOLTIP = "action.compare.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
+		public static final String ACTION_DELETE_IN_SELECTION = "action.delete_in_selection";
+		public static final String ACTION_DELETE_IN_SELECTION_TOOLTIP = "action.delete_in_selection.tooltip";
 		public static final String ACTION_DELETE_FLAG = "action.delete_flag";
 		public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
