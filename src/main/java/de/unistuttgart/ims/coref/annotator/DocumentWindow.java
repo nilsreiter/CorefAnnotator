@@ -1343,8 +1343,23 @@ public class DocumentWindow extends AbstractTextWindow
 			int high = Math.max(dot, mark);
 			if (dot == mark) {
 				// nothing is selected
+
+				setMessage("", 0);
 			} else {
 				// something is selected
+
+				MutableSet<? extends Annotation> annotations = Sets.mutable
+						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
+				@SuppressWarnings("unchecked")
+				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
+						.select(a -> a.getBegin() == low && a.getEnd() == high);
+				if (mentions.size() == 1) {
+					setMessage("Selected entity: " + mentions.iterator().next().getEntity().getLabel(), 0);
+				} else if (mentions.size() > 1) {
+					setMessage(mentions.size() + " entities selected.", 0);
+				} else {
+					setMessage("", 0);
+				}
 			}
 		}
 
