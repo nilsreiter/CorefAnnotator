@@ -553,6 +553,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		entityMenu.add(actions.deleteAllAction);
 		entityMenu.add(mentionFlagsInMenuBar);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
@@ -1399,7 +1400,7 @@ public class DocumentWindow extends AbstractTextWindow
 			boolean selection = textPane.getSelectionStart() != textPane.getSelectionEnd();
 
 			MutableList<Action> exportActions = Lists.mutable.empty();
-			MutableList<JMenu> mentionActions = Lists.mutable.empty();
+			MutableList<JMenuItem> mentionActions = Lists.mutable.empty();
 			if (selection) {
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
@@ -1430,6 +1431,7 @@ public class DocumentWindow extends AbstractTextWindow
 						Annotator.app.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
+				mentionActions.add(new JMenuItem(actions.deleteAllAction));
 			}
 
 			if (selection) {
