@@ -53,6 +53,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
+import de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -365,6 +366,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			edit((MergeEntities) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
+		} else if (operation instanceof RenameAllEntities) {
+			edit((RenameAllEntities) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -450,6 +453,33 @@ public class CoreferenceModel extends SubModel implements Model {
 		operation.setMentions(mentions.toList().toImmutable());
 		// fireEvent(null); // TODO
 		registerEdit(operation);
+	}
+
+	protected void edit(RenameAllEntities operation) {
+		for (Entity entity : entityMentionMap.keySet()) {
+
+			Mention nameGiver;
+
+			switch (operation.getStrategy()) {
+			case LAST:
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getBegin());
+				break;
+			case LONGEST:
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getEnd() - m.getBegin());
+				break;
+			case FIRST:
+			default:
+				nameGiver = entityMentionMap.get(entity).minBy(m -> m.getBegin());
+				break;
+
+			}
+			operation.registerOldName(entity, getLabel(entity));
+			String newName = nameGiver.getCoveredText();
+			entity.setLabel(newName);
+
+		}
+		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
+
 	}
 
 	protected void edit(ToggleGenericFlag operation) {
@@ -808,6 +838,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			remove(op.getEntityGroup());
 			op.getEntities().forEach(e -> entityEntityGroupMap.remove(e, op.getEntityGroup()));
 			fireEvent(Event.get(this, Event.Type.Remove, null, op.getEntityGroup()));
+		} else if (operation instanceof RenameAllEntities) {
+			undo((RenameAllEntities) operation);
 		}
 	}
 
@@ -842,6 +874,13 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		});
 		fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
+	}
+
+	protected void undo(RenameAllEntities operation) {
+		for (Entity entity : operation.getOldNames().keySet()) {
+			entity.setLabel(operation.getOldNames().get(entity));
+		}
+		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
 	}
 
 }
