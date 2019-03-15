@@ -105,6 +105,7 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteAllMentionsInSelection;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.ExampleExport;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
@@ -341,10 +342,14 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.addCaretListener(this);
 		textPane.getActionMap().put(DeleteAction.class, new DeleteAction(this));
 		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
+		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, new DeleteAllMentionsInSelection(this));
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				CopyAction.class);
 		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
+		textPane.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				DeleteAllMentionsInSelection.class);
 
 		highlightManager = new HighlightManager(textPane);
 
@@ -1317,6 +1322,23 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+		}
+
+	}
+
+	class TextCaretListener implements CaretListener {
+
+		@Override
+		public void caretUpdate(CaretEvent e) {
+			int dot = e.getDot();
+			int mark = e.getMark();
+			int low = Math.min(dot, mark);
+			int high = Math.max(dot, mark);
+			if (dot == mark) {
+				// nothing is selected
+			} else {
+				// something is selected
+			}
 		}
 
 	}
