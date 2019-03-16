@@ -5,11 +5,12 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 ## 1.9.0
 
-
-- When searching an entity in the tree view, the tree now scrolls to 
-  top automatically. #178
 - The CoNLL 2012 importer now always reads coreference information from
   the last column. Thanks @andreasvc. #127
+- The README now contains a section on requirements and installation, 
+  specifying the JavaFX dependency explicitly. Thanks @andreasvc. #174
+- When searching an entity in the tree view, the tree now scrolls to 
+  top automatically. #178
 - Using shift-arrow, the user can now jump from one annotated piece to 
   the next. This function does not entirely iterate over mentions. If 
   two mentions have the exact same boundaries, pressing the combo again 
