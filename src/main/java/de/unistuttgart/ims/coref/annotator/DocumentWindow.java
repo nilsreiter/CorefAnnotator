@@ -1575,6 +1575,7 @@ public class DocumentWindow extends AbstractTextWindow
 		Pattern pattern;
 
 		public void filter(String s) {
+			tree.scrollRowToVisible(0);
 			documentModel.getTreeModel().rankBySearchString(s);
 		}
 
