@@ -9,10 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.csv.QuoteMode;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.factory.JCasBuilder;
 import org.apache.uima.fit.util.JCasUtil;
@@ -39,27 +35,25 @@ public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 		initCas(aJCas, res);
 
 		BufferedReader reader = null;
-		CSVParser p = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(
 					CompressionUtils.getInputStream(res.getLocation(), res.getInputStream()), "UTF-8"));
-			p = new CSVParser(reader, CSVFormat.TDF.withIgnoreEmptyLines(false).withCommentMarker('#').withEscape('\\')
-					.withQuoteMode(QuoteMode.NONE).withQuote(null));
-			Iterator<CSVRecord> iterator = p.iterator();
 			JCasBuilder b = new JCasBuilder(aJCas);
 
 			Map<Integer, Integer> beginMentionMap = Maps.mutable.empty();
 			Map<Integer, Entity> entityMap = Maps.mutable.empty();
 			int sentenceBegin = 0;
-			while (iterator.hasNext()) {
-				CSVRecord line = iterator.next();
-
-				if (line.size() == 1) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String[] fields = line.trim().split(" +|\t");
+				if (fields.length == 1) {
 					b.add(sentenceBegin, Sentence.class);
 					b.add("\n");
 					sentenceBegin = b.getPosition();
-				} else if (line.size() > 3) {
-					String[] crP = line.get(10).split("\\|");
+				} else if (fields[0].startsWith("#")) {
+					// skip comments and headers
+				} else if (fields.length > 3) {
+					String[] crP = fields[fields.length - 1].split("\\|");
 					for (String cr : crP) {
 						Matcher m = pattern.matcher(cr);
 						if (m.find() && cr.startsWith("(")) {
@@ -67,7 +61,7 @@ public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 							beginMentionMap.put(id, b.getPosition());
 						}
 					}
-					b.add(line.get(3), Token.class);
+					b.add(fields[3], Token.class);
 					for (String cr : crP) {
 						Matcher m = pattern.matcher(cr);
 						if (m.find() && cr.endsWith(")")) {
@@ -87,8 +81,6 @@ public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 		} finally {
 			if (reader != null)
 				reader.close();
-			if (p != null)
-				p.close();
 		}
 
 	}
