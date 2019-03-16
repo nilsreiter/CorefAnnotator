@@ -18,3 +18,10 @@ This is an annotation tool for coreference. It's built on top of [Apache's UIMA]
 - Localisable in other languages (currently: English and German)
 - Import and export in a few file formats
 - Automatically generated candidates
+
+## Requirements
+
+- Java 8 or higher; both Oracle Java and OpenJDK are supported.
+- JavaFX: https://openjfx.io/openjfx-docs/#install-javafx
+- [Oracle Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) includes JavaFX;
+  if you use OpenJDK or Oracle Java 11, you need to install JavaFX separately.
