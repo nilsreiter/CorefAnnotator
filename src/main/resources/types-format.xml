@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<typeSystemDescription
+	xmlns="http://uima.apache.org/resourceSpecifier">
+	<name>Coref Annotator</name>
+	<description />
+	<version>1</version>
+	<vendor>Nils Reiter</vendor>
+	<types>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.format.Format</name>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<description />
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.format.Italic</name>
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.format.Format</supertypeName>
+			<description />
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.format.Bold</name>
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.format.Format</supertypeName>
+			<description />
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.format.Head</name>
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.format.Format</supertypeName>
+			<description />
+		</typeDescription>
+	</types>
+</typeSystemDescription>

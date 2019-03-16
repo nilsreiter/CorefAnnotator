@@ -60,7 +60,7 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 			f = (Flag) event.getArgument(0);
 			if (f.getTargetClass().equalsIgnoreCase(targetClass.getName())) {
 				ToggleFlagAction a = new ToggleFlagAction(dw, (FlagModel) event.getSource(), f);
-				dw.getTreeSelectionListener().addListener(a);
+				dw.getTree().addTreeSelectionListener(a);
 				add(f, new JCheckBoxMenuItem(a));
 			}
 			break;

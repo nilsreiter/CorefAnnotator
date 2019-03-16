@@ -165,6 +165,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 	TSL tsl = null;
 	JLabel selectedEntityLabel = new JLabel();
 	int limit = 1000;
+	SearchThread thread = null;
 
 	public SearchTextPanel(SearchContainer sd) {
 		super(sd);
@@ -272,48 +273,12 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		}
 	}
 
-	public synchronized void search(String s) {
-		text_list.getSelectionModel().removeListSelectionListener(tsl);
-		text_list.clearSelection();
-		annotateSelectedFindings.setEnabled(false);
-		annotateSelectedFindingsAsNew.setEnabled(false);
-		clearResults();
-		if (s.length() > 0) {
-			Pattern p = Pattern.compile(s);
-
-			if (restrictToMentions.isSelected()) {
-				for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()
-						.getMentions()) {
-					Matcher matcher = p.matcher(m.getCoveredText());
-					if (matcher.find()) {
-						try {
-							listModel.addElement(new SearchResult(this.searchContainer, m.getBegin(), m.getEnd()));
-							highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
-						} catch (BadLocationException e) {
-							Annotator.logger.catching(e);
-						}
-
-					}
-				}
-			} else {
-				Matcher m = p.matcher(searchContainer.getDocumentWindow().getText());
-				int finding = 0;
-				while (m.find() && finding < limit) {
-					try {
-						listModel.addElement(new SearchResult(this.searchContainer, m.start(), m.end()));
-						highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
-					} catch (BadLocationException e) {
-						Annotator.logger.catching(e);
-					}
-					finding++;
-				}
-			}
-			text_list.getSelectionModel().addListSelectionListener(tsl);
-			tsl.listCondition = false;
+	public void search(String s) {
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
 		}
-		updateLabel();
-		searchContainer.pack();
-
+		thread = new SearchThread(s);
+		thread.run();
 	}
 
 	@Override
@@ -331,6 +296,60 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 	@Override
 	public void windowOpened(WindowEvent e) {
 		textField.grabFocus();
+	}
+
+	class SearchThread extends Thread implements Runnable {
+
+		String searchString;
+
+		public SearchThread(String searchString) {
+			this.searchString = searchString;
+		}
+
+		@Override
+		public void run() {
+			text_list.getSelectionModel().removeListSelectionListener(tsl);
+			text_list.clearSelection();
+			annotateSelectedFindings.setEnabled(false);
+			annotateSelectedFindingsAsNew.setEnabled(false);
+			clearResults();
+			if (searchString.length() > 0) {
+				Pattern p = Pattern.compile(searchString);
+
+				if (restrictToMentions.isSelected()) {
+					for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()
+							.getMentions()) {
+						Matcher matcher = p.matcher(m.getCoveredText());
+						if (matcher.find()) {
+							try {
+								listModel.addElement(new SearchResult(searchContainer, m.getBegin(), m.getEnd()));
+								highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+							} catch (BadLocationException e) {
+								Annotator.logger.catching(e);
+							}
+
+						}
+					}
+				} else {
+					Matcher m = p.matcher(searchContainer.getDocumentWindow().getText());
+					int finding = 0;
+					while (m.find() && finding < limit) {
+						try {
+							listModel.addElement(new SearchResult(searchContainer, m.start(), m.end()));
+							highlights.add(hilit.addHighlight(m.start(), m.end(), painter));
+						} catch (BadLocationException e) {
+							Annotator.logger.catching(e);
+						}
+						finding++;
+					}
+				}
+				text_list.getSelectionModel().addListSelectionListener(tsl);
+				tsl.listCondition = false;
+			}
+			updateLabel();
+			searchContainer.pack();
+		}
+
 	}
 
 }

@@ -2,7 +2,6 @@ package de.unistuttgart.ims.coref.annotator;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -17,8 +16,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
-@Deprecated
-public abstract class CAAbstractTreeSelectionListener implements TreeSelectionListener {
+public class TreeSelectionUtil {
 	TreeSelectionEvent currentEvent = null;
 	int num;
 	JTree tree;
@@ -28,11 +26,14 @@ public abstract class CAAbstractTreeSelectionListener implements TreeSelectionLi
 	MutableList<CATreeNode> nodes;
 	MutableList<FeatureStructure> featureStructures;
 
-	public CAAbstractTreeSelectionListener(JTree tree) {
-		this.tree = tree;
+	public TreeSelectionUtil() {
 	}
 
-	protected synchronized void collectData(TreeSelectionEvent e) {
+	public TreeSelectionUtil(TreeSelectionEvent event) {
+		this.collectData(event);
+	}
+
+	public synchronized void collectData(TreeSelectionEvent e) {
 		tree = (JTree) e.getSource();
 		currentEvent = e;
 		num = tree.getSelectionCount();

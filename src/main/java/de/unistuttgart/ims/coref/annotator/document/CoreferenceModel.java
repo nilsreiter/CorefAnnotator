@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -20,10 +19,12 @@ import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
@@ -54,10 +55,12 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityG
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
+import de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -366,6 +369,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			edit((MergeEntities) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
+		} else if (operation instanceof RenameAllEntities) {
+			edit((RenameAllEntities) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -453,6 +458,33 @@ public class CoreferenceModel extends SubModel implements Model {
 		registerEdit(operation);
 	}
 
+	protected void edit(RenameAllEntities operation) {
+		for (Entity entity : entityMentionMap.keySet()) {
+
+			Mention nameGiver;
+
+			switch (operation.getStrategy()) {
+			case LAST:
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getBegin());
+				break;
+			case LONGEST:
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getEnd() - m.getBegin());
+				break;
+			case FIRST:
+			default:
+				nameGiver = entityMentionMap.get(entity).minBy(m -> m.getBegin());
+				break;
+
+			}
+			operation.registerOldName(entity, getLabel(entity));
+			String newName = nameGiver.getCoveredText();
+			entity.setLabel(newName);
+
+		}
+		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
+
+	}
+
 	protected void edit(ToggleGenericFlag operation) {
 		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
 		operation.getObjects().forEach(fs -> {
@@ -502,12 +534,30 @@ public class CoreferenceModel extends SubModel implements Model {
 		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
 	}
 
-	public ImmutableSet<Mention> getMentions() {
-		return Sets.immutable.withAll(JCasUtil.select(getJCas(), Mention.class));
+	public ImmutableSortedSet<Mention> getMentions() {
+		return SortedSets.immutable.withAll(new AnnotationComparator(), JCasUtil.select(getJCas(), Mention.class));
 	}
 
 	public ImmutableSet<Mention> getMentions(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
+	}
+
+	public Mention getNextMention(int position) {
+		for (int i = position; i < getDocumentModel().getJcas().getDocumentText().length(); i++) {
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			if (!mentions.isEmpty())
+				return mentions.iterator().next();
+		}
+		return null;
+	}
+
+	public Mention getPreviousMention(int position) {
+		for (int i = position - 1; i >= 0; i--) {
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			if (!mentions.isEmpty())
+				return mentions.iterator().next();
+		}
+		return null;
 	}
 
 	/**
@@ -517,8 +567,16 @@ public class CoreferenceModel extends SubModel implements Model {
 	 *            The character position
 	 * @return A collection of annotations
 	 */
-	public Collection<Annotation> getMentions(int position) {
+	public MutableSet<Annotation> getMentions(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
+	}
+
+	public ImmutableSet<Annotation> getMentions(int start, int end) {
+		MutableSet<Annotation> mentions = Sets.mutable.empty();
+		for (int i = start; i <= end; i++) {
+			mentions.addAll(characterPosition2AnnotationMap.get(i).select(a -> a instanceof Mention));
+		}
+		return mentions.toImmutable();
 	}
 
 	public Preferences getPreferences() {
@@ -801,6 +859,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			remove(op.getEntityGroup());
 			op.getEntities().forEach(e -> entityEntityGroupMap.remove(e, op.getEntityGroup()));
 			fireEvent(Event.get(this, Event.Type.Remove, null, op.getEntityGroup()));
+		} else if (operation instanceof RenameAllEntities) {
+			undo((RenameAllEntities) operation);
 		}
 	}
 
@@ -835,6 +895,13 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		});
 		fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
+	}
+
+	protected void undo(RenameAllEntities operation) {
+		for (Entity entity : operation.getOldNames().keySet()) {
+			entity.setLabel(operation.getOldNames().get(entity));
+		}
+		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
 	}
 
 }
