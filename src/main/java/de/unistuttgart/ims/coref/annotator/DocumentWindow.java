@@ -117,14 +117,14 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
-import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameAllEntitiesAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -1187,14 +1187,22 @@ public class DocumentWindow extends AbstractTextWindow
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
+			CoreferenceModel cModel = getDocumentModel().getCoreferenceModel();
+
+			if (cModel.getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.edit(new AddMentionsToEntity(
-						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+						&& getSelectedAnnotations(Mention.class).size() == 1) {
+					getDocumentModel().edit(new MoveMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()),
+							getSelectedAnnotations(Mention.class)));
+				} else {
+					getDocumentModel()
+							.edit(new AddMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()), getSelection()));
+				}
 			} else if (e.getKeyChar() == ' ') {
 				Rectangle p;
 				try {
-					p = textPane.modelToView(textPane.getSelectionStart());
+					p = getTextPane().modelToView(getTextPane().getSelectionStart());
 					textPopupMenu.show(e.getComponent(), p.x, p.y + 15);
 				} catch (BadLocationException e1) {
 					Annotator.logger.catching(e1);
