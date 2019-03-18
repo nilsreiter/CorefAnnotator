@@ -1233,7 +1233,12 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTextComponent t = (JTextComponent) comp;
-			return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+					&& getSelectedAnnotations(Mention.class).size() == 1) {
+				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
+				return new AnnotationTransfer<Mention>(mention, documentModel.getTreeModel().get(mention));
+			} else
+				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
 
 		@Override

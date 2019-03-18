@@ -6,10 +6,14 @@ import javax.swing.tree.TreePath;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 
 public class AddCurrentSpanToCurrentEntity extends TargetedIkonAction<DocumentWindow> {
 
@@ -26,7 +30,12 @@ public class AddCurrentSpanToCurrentEntity extends TargetedIkonAction<DocumentWi
 			for (TreePath tp : getTarget().getTree().getSelectionPaths()) {
 				if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 					CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
-					getTarget().getDocumentModel().edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
+					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+							&& getTarget().getSelectedAnnotations(Mention.class).size() == 1) {
+						getTarget().getDocumentModel().edit(new MoveMentionsToEntity(etn.getEntity(),
+								getTarget().getSelectedAnnotations(Mention.class)));
+					} else
+						getTarget().getDocumentModel().edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
 				}
 			}
 			getTarget().getTextPane().requestFocusInWindow();
