@@ -913,6 +913,8 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 			// move existing node
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (targetFS instanceof Entity)
+					return true;
 				if (targetFS instanceof TOP)
 					return false;
 			}
@@ -928,7 +930,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// Check for flavor
 			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
-					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
+					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)
+					&& !info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
 				return false;
 			}
 
@@ -965,6 +968,15 @@ public class DocumentWindow extends AbstractTextWindow
 					ImmutableList<CATreeNode> object = (ImmutableList<CATreeNode>) info.getTransferable()
 							.getTransferData(NodeListTransferable.dataFlavor);
 					handleNodeMoving(object);
+				} catch (UnsupportedFlavorException | IOException e) {
+					Annotator.logger.catching(e);
+				}
+			} else if (dataFlavor == AnnotationTransfer.dataFlavor) {
+				Object a;
+				try {
+					a = info.getTransferable().getTransferData(dataFlavor);
+					if (a instanceof Mention && targetFS instanceof Entity)
+						getDocumentModel().edit(new MoveMentionsToEntity((Entity) targetFS, (Mention) a));
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
