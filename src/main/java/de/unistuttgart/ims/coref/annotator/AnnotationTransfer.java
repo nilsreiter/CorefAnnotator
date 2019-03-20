@@ -6,20 +6,25 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
-public class AnnotationTransfer<T extends Annotation> implements Transferable {
+public class AnnotationTransfer implements Transferable {
 	public static DataFlavor dataFlavor = new DataFlavor(AnnotationTransfer.class, "Annotation");
 
-	T annotation;
 	CATreeNode treeNode;
+	ImmutableList<Annotation> annotationList;
 
-	public AnnotationTransfer(T annotation, CATreeNode tn) {
-		this.annotation = annotation;
+	public AnnotationTransfer(Annotation annotation, CATreeNode tn) {
 		this.treeNode = tn;
+		this.annotationList = Lists.immutable.of(annotation);
+	}
+
+	public AnnotationTransfer(Iterable<Annotation> annotations) {
+		this.annotationList = Lists.immutable.withAll(annotations);
 	}
 
 	@Override
-
 	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { dataFlavor };
 	}
@@ -31,7 +36,7 @@ public class AnnotationTransfer<T extends Annotation> implements Transferable {
 
 	@Override
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		return annotation;
+		return annotationList;
 	}
 
 	public CATreeNode getTreeNode() {

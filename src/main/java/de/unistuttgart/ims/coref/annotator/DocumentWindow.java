@@ -975,8 +975,11 @@ public class DocumentWindow extends AbstractTextWindow
 				Object a;
 				try {
 					a = info.getTransferable().getTransferData(dataFlavor);
-					if (a instanceof Mention && targetFS instanceof Entity)
-						getDocumentModel().edit(new MoveMentionsToEntity((Entity) targetFS, (Mention) a));
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> aList = (ImmutableList<Annotation>) a;
+					if (aList.anySatisfy(anno -> anno instanceof Mention) && targetFS instanceof Entity)
+						getDocumentModel().edit(
+								new MoveMentionsToEntity((Entity) targetFS, aList.selectInstancesOf(Mention.class)));
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1248,7 +1251,7 @@ public class DocumentWindow extends AbstractTextWindow
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
 					&& getSelectedAnnotations(Mention.class).size() == 1) {
 				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
-				return new AnnotationTransfer<Mention>(mention, documentModel.getTreeModel().get(mention));
+				return new AnnotationTransfer(mention, documentModel.getTreeModel().get(mention));
 			} else
 				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
@@ -1263,7 +1266,10 @@ public class DocumentWindow extends AbstractTextWindow
 					return true;
 			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
 				try {
-					return info.getTransferable().getTransferData(AnnotationTransfer.dataFlavor) instanceof Mention;
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> annoList = (ImmutableList<Annotation>) info.getTransferable()
+							.getTransferData(AnnotationTransfer.dataFlavor);
+					return annoList.anySatisfy(a -> a instanceof Mention);
 				} catch (UnsupportedFlavorException | IOException e) {
 					return false;
 				}
@@ -1289,9 +1295,10 @@ public class DocumentWindow extends AbstractTextWindow
 									.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
 						} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-							Annotation annotation = (Annotation) pat.getTransferData(AnnotationTransfer.dataFlavor);
-							if (annotation instanceof Mention)
-								documentModel.edit(new MoveMentionsToEntity(m.getEntity(), (Mention) annotation));
+							Object annotationList = pat.getTransferData(AnnotationTransfer.dataFlavor);
+							if (annotationList instanceof ImmutableList<?>)
+								documentModel.edit(new MoveMentionsToEntity(m.getEntity(),
+										((ImmutableList<?>) annotationList).selectInstancesOf(Mention.class)));
 						}
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
