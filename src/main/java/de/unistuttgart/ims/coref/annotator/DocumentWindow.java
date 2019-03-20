@@ -1261,6 +1261,12 @@ public class DocumentWindow extends AbstractTextWindow
 				Collection<Annotation> mentions = documentModel.getCoreferenceModel().getMentions(dl.getIndex());
 				if (mentions.size() > 0)
 					return true;
+			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				try {
+					return info.getTransferable().getTransferData(AnnotationTransfer.dataFlavor) instanceof Mention;
+				} catch (UnsupportedFlavorException | IOException e) {
+					return false;
+				}
 			}
 			return false;
 		}
@@ -1275,13 +1281,18 @@ public class DocumentWindow extends AbstractTextWindow
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
 					try {
-						Transferable pat = info.getTransferable();
-						@SuppressWarnings("unchecked")
-						ImmutableList<Span> spans = (ImmutableList<Span>) pat
-								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
-
+						Transferable pat = info.getTransferable();
+						if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+							@SuppressWarnings("unchecked")
+							ImmutableList<Span> spans = (ImmutableList<Span>) pat
+									.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
+						} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+							Annotation annotation = (Annotation) pat.getTransferData(AnnotationTransfer.dataFlavor);
+							if (annotation instanceof Mention)
+								documentModel.edit(new MoveMentionsToEntity(m.getEntity(), (Mention) annotation));
+						}
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
 					}
