@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.1
+
+- The shortcut key to jump to mentions has been changed to alt-arrow, 
+  because shift arrow collided with extending the selection by keyboard.
+  #185
+
 ## 1.9.0
 
 - The CoNLL 2012 importer now always reads coreference information from
