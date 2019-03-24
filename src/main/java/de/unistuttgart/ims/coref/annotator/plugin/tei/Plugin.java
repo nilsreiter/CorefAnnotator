@@ -5,6 +5,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -44,10 +46,16 @@ public class Plugin implements ConfigurableIOPlugin {
 	boolean importIncludeHeader = true;
 	String language = Constants.X_UNSPECIFIED;
 
+	ResourceBundle resourceBundle;
+
+	public Plugin() {
+		resourceBundle = ResourceBundle.getBundle("/plugins/tei/strings", Locale.getDefault());
+	}
+
 	@Override
 	public String getDescription() {
 		try {
-			return IOUtils.toString(getClass().getResourceAsStream("/plugin.tei/description.txt"), "UTF-8");
+			return IOUtils.toString(getClass().getResourceAsStream("/plugins/tei/description.txt"), "UTF-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -125,10 +133,10 @@ public class Plugin implements ConfigurableIOPlugin {
 		}
 
 		JDialog dialog = new JDialog(parent,
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_TITLE));
+				resourceBundle.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_TITLE));
 
 		Action okAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_OK)) {
+				resourceBundle.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_OK)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -143,7 +151,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action cancelAction = new AbstractAction(Strings.DIALOG_CANCEL) {
+		Action cancelAction = new AbstractAction(resourceBundle.getString(Strings.DIALOG_CANCEL)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -152,7 +160,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action helpAction = new AbstractAction(Strings.MENU_HELP) {
+		Action helpAction = new AbstractAction(resourceBundle.getString(Strings.MENU_HELP)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -162,7 +170,7 @@ public class Plugin implements ConfigurableIOPlugin {
 		};
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
-		optionPanel.add(new JLabel(Annotator
+		optionPanel.add(new JLabel(resourceBundle
 				.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_INCLUDE_HEADER)));
 		optionPanel.add(teiHeaderCheckBox);
 
