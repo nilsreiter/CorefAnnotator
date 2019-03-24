@@ -14,10 +14,10 @@ When importing from TEI/XML, several options can be specified:
 <th>Option</th><th>Default value</th><th>Description</th>
 </tr>
 <tr>
-<td>Include TEI header</td><td>Selected</td><td>If selected, the TEI 
-header will be included in the document, and can be annotated. If 
-deselected, the document will only include content below the 
-<code>TEI > text</code>-node.</td>
+<td>Text root selector</td><td>empty</td><td>The CSS-like expression 
+entered here can be used to select a portion of the XML document to be
+extracted. To ignore the TEI header, <code>TEI > text</code> could be 
+used.</td>
 </tr>
 <tr>
 <td>Language</td><td><code>x-unspecified</code></td>

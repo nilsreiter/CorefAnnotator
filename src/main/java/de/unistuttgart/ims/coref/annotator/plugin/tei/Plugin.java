@@ -12,12 +12,12 @@ import java.util.function.Consumer;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
@@ -43,13 +43,13 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements ConfigurableIOPlugin {
 
-	boolean importIncludeHeader = true;
 	String language = Constants.X_UNSPECIFIED;
+	String textRootSelector = null;
 
 	ResourceBundle resourceBundle;
 
 	public Plugin() {
-		resourceBundle = ResourceBundle.getBundle("/plugins/tei/strings", Locale.getDefault());
+		resourceBundle = ResourceBundle.getBundle("plugins.tei.strings", Locale.getDefault());
 	}
 
 	@Override
@@ -82,8 +82,8 @@ public class Plugin implements ConfigurableIOPlugin {
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TeiReader.class, TeiReader.PARAM_SOURCE_LOCATION,
-				f.getAbsoluteFile(), TeiReader.PARAM_TEXT_ROOT_SELECTOR, (importIncludeHeader ? "" : "TEI > text"),
-				TeiReader.PARAM_LANGUAGE, language, TeiReader.PARAM_DOCUMENT_ID, f.getName());
+				f.getAbsoluteFile(), TeiReader.PARAM_TEXT_ROOT_SELECTOR, textRootSelector, TeiReader.PARAM_LANGUAGE,
+				language, TeiReader.PARAM_DOCUMENT_ID, f.getName());
 	}
 
 	@Override
@@ -120,8 +120,7 @@ public class Plugin implements ConfigurableIOPlugin {
 	@Override
 	public void showInputConfigurationDialog(JFrame parent, Consumer<ConfigurableIOPlugin> callback) {
 
-		JCheckBox teiHeaderCheckBox = new JCheckBox();
-		teiHeaderCheckBox.setSelected(true);
+		JTextField rootSelectorInput = new JTextField();
 
 		JComboBox<String> languageDropdown = new JComboBox<String>();
 		for (int i = 0; i < Util.getSupportedLanguageNames().length; i++) {
@@ -141,7 +140,7 @@ public class Plugin implements ConfigurableIOPlugin {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				importIncludeHeader = teiHeaderCheckBox.isSelected();
+				textRootSelector = rootSelectorInput.getText();
 				language = Util.getLanguage((String) languageDropdown.getSelectedItem());
 				if (language == null)
 					language = Constants.X_UNSPECIFIED;
@@ -151,7 +150,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action cancelAction = new AbstractAction(resourceBundle.getString(Strings.DIALOG_CANCEL)) {
+		Action cancelAction = new AbstractAction(Annotator.getString(Strings.DIALOG_CANCEL)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -160,7 +159,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action helpAction = new AbstractAction(resourceBundle.getString(Strings.MENU_HELP)) {
+		Action helpAction = new AbstractAction(Annotator.getString(Strings.MENU_HELP)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -171,8 +170,8 @@ public class Plugin implements ConfigurableIOPlugin {
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
 		optionPanel.add(new JLabel(resourceBundle
-				.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_INCLUDE_HEADER)));
-		optionPanel.add(teiHeaderCheckBox);
+				.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_ROOT_SELECTOR)));
+		optionPanel.add(rootSelectorInput);
 
 		optionPanel.add(new JLabel(Annotator.getString(Strings.LANGUAGE)));
 		optionPanel.add(languageDropdown);
