@@ -31,7 +31,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
@@ -150,7 +149,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action cancelAction = new AbstractAction(Annotator.getString(Strings.DIALOG_CANCEL)) {
+		Action cancelAction = new AbstractAction(Annotator.getString(Constants.Strings.DIALOG_CANCEL)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -159,7 +158,7 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action helpAction = new AbstractAction(Annotator.getString(Strings.MENU_HELP)) {
+		Action helpAction = new AbstractAction(Annotator.getString(Constants.Strings.MENU_HELP)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -169,11 +168,12 @@ public class Plugin implements ConfigurableIOPlugin {
 		};
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
-		optionPanel.add(new JLabel(resourceBundle
-				.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_ROOT_SELECTOR)));
+		optionPanel.add(getLabel(resourceBundle.getString(Strings.IMPORT_DIALOG_ROOT_SELECTOR),
+				resourceBundle.getString(Strings.IMPORT_DIALOG_ROOT_SELECTOR_TOOLTIP)));
 		optionPanel.add(rootSelectorInput);
 
-		optionPanel.add(new JLabel(Annotator.getString(Strings.LANGUAGE)));
+		optionPanel.add(getLabel(Annotator.getString(Constants.Strings.LANGUAGE),
+				resourceBundle.getString(Strings.IMPORT_DIALOG_LANGUAGE_TOOLTIP)));
 		optionPanel.add(languageDropdown);
 
 		JButton okButton = new JButton(okAction);
@@ -195,6 +195,12 @@ public class Plugin implements ConfigurableIOPlugin {
 	@Override
 	public void showOutputConfigurationDialog() {
 
+	}
+
+	protected JLabel getLabel(String text, String tooltip) {
+		JLabel lab = new JLabel(text);
+		lab.setToolTipText(tooltip);
+		return lab;
 	}
 
 }
