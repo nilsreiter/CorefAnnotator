@@ -32,9 +32,13 @@ import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 public class TeiReader extends ResourceCollectionReaderBase {
 
 	public static final String PARAM_DOCUMENT_ID = "Document Id";
+	public static final String PARAM_TEXT_ROOT_SELECTOR = "Root Selector";
 
 	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
 	String documentId = null;
+
+	@ConfigurationParameter(name = PARAM_TEXT_ROOT_SELECTOR, mandatory = false, defaultValue = "")
+	String rootSelector = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -51,7 +55,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
-		gxr.setTextRootSelector(null);
+		gxr.setTextRootSelector(rootSelector.isEmpty() ? null : rootSelector);
 		gxr.setPreserveWhitespace(true);
 
 		// set the document title

@@ -51,6 +51,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
+import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import javafx.application.Platform;
@@ -250,20 +251,38 @@ public class Annotator {
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow();
-		v.loadFile(file, flavor, language);
 
-		SwingUtilities.invokeLater(new Runnable() {
+		if (flavor instanceof ConfigurableIOPlugin)
+			((ConfigurableIOPlugin) flavor).showInputConfigurationDialog(v, fl -> {
+				v.loadFile(file, flavor, language);
 
-			@Override
-			public void run() {
-				openFiles.add(v);
-				if (flavor instanceof DefaultIOPlugin)
-					recentFiles.add(0, file);
-				v.initialise();
+				SwingUtilities.invokeLater(new Runnable() {
 
-			}
-		});
+					@Override
+					public void run() {
+						openFiles.add(v);
+						if (flavor instanceof DefaultIOPlugin)
+							recentFiles.add(0, file);
+						v.initialise();
 
+					}
+				});
+			});
+		else {
+			v.loadFile(file, flavor, language);
+
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					openFiles.add(v);
+					if (flavor instanceof DefaultIOPlugin)
+						recentFiles.add(0, file);
+					v.initialise();
+
+				}
+			});
+		}
 		return null;
 
 	}
@@ -309,9 +328,7 @@ public class Annotator {
 					open(file, flavor, Constants.X_UNSPECIFIED);
 				else
 					showOpening();
-
 			}
-
 		});
 
 	}
