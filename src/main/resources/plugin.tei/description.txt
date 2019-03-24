@@ -4,3 +4,27 @@ everything not in tags will be in the document. All
 elements with the attribute 'ref' are treated as a mention. Exporting 
 into TEI/XML only works when the document has been imported from 
 TEI/XML before.
+
+<h3>Configuration Options</h3>
+
+When importing from TEI/XML, several options can be specified:
+
+<table>
+<tr>
+<th>Option</th><th>Default value</th><th>Description</th>
+</tr>
+<tr>
+<td>Include TEI header</td><td>Selected</td><td>If selected, the TEI 
+header will be included in the document, and can be annotated. If 
+deselected, the document will only include content below the 
+<code>TEI > text</code>-node.</td>
+</tr>
+<tr>
+<td>Language</td><td><code>x-unspecified</code></td>
+<td>If a language is specified, the document will be marked with that 
+language (this can be changed later). If left unspecified, the importer 
+tries to extract an explicitly specified language from the document, by
+looking for an element <code>langUsage[usage=100]</code>.</td>
+</tr>
+</table>
+
