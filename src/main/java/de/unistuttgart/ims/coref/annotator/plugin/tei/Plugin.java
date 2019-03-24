@@ -1,16 +1,22 @@
 package de.unistuttgart.ims.coref.annotator.plugin.tei;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.IOUtils;
@@ -21,8 +27,13 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import de.unistuttgart.ims.coref.annotator.HelpWindow;
+import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
@@ -31,6 +42,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class Plugin implements ConfigurableIOPlugin {
 
 	boolean importIncludeHeader = true;
+	String language = Constants.X_UNSPECIFIED;
 
 	@Override
 	public String getDescription() {
@@ -63,7 +75,7 @@ public class Plugin implements ConfigurableIOPlugin {
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TeiReader.class, TeiReader.PARAM_SOURCE_LOCATION,
 				f.getAbsoluteFile(), TeiReader.PARAM_TEXT_ROOT_SELECTOR, (importIncludeHeader ? "" : "TEI > text"),
-				TeiReader.PARAM_LANGUAGE, "de", TeiReader.PARAM_DOCUMENT_ID, f.getName());
+				TeiReader.PARAM_LANGUAGE, language, TeiReader.PARAM_DOCUMENT_ID, f.getName());
 	}
 
 	@Override
@@ -99,27 +111,77 @@ public class Plugin implements ConfigurableIOPlugin {
 
 	@Override
 	public void showInputConfigurationDialog(JFrame parent, Consumer<ConfigurableIOPlugin> callback) {
+
 		JCheckBox teiHeaderCheckBox = new JCheckBox();
 		teiHeaderCheckBox.setSelected(true);
 
-		JDialog dialog = new JDialog(parent);
+		JComboBox<String> languageDropdown = new JComboBox<String>();
+		for (int i = 0; i < Util.getSupportedLanguageNames().length; i++) {
+			String l = Util.getSupportedLanguageNames()[i];
+			languageDropdown.addItem(l);
+			if (l == Constants.X_UNSPECIFIED)
+				languageDropdown.setSelectedIndex(i);
 
-		dialog.getContentPane().setLayout(new GridLayout(0, 2));
-		dialog.getContentPane().add(new JLabel("Include TEI header?"));
-		dialog.getContentPane().add(teiHeaderCheckBox);
+		}
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(parent);
-		dialog.setVisible(true);
-		dialog.addWindowListener(new WindowAdapter() {
+		JDialog dialog = new JDialog(parent,
+				Annotator.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_TITLE));
+
+		Action okAction = new AbstractAction(
+				Annotator.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_OK)) {
+			private static final long serialVersionUID = 1L;
+
 			@Override
-			public void windowClosing(WindowEvent e) {
-				System.err.println("!");
+			public void actionPerformed(ActionEvent e) {
 				importIncludeHeader = teiHeaderCheckBox.isSelected();
+				language = Util.getLanguage((String) languageDropdown.getSelectedItem());
+				if (language == null)
+					language = Constants.X_UNSPECIFIED;
+
 				dialog.dispose();
 				callback.accept(Plugin.this);
 			}
-		});
+		};
+
+		Action cancelAction = new AbstractAction(Strings.DIALOG_CANCEL) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.dispose();
+			}
+		};
+
+		Action helpAction = new AbstractAction(Strings.MENU_HELP) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HelpWindow.show("Input/Output");
+			}
+		};
+
+		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
+		optionPanel.add(new JLabel(Annotator
+				.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_INCLUDE_HEADER)));
+		optionPanel.add(teiHeaderCheckBox);
+
+		optionPanel.add(new JLabel(Annotator.getString(Strings.LANGUAGE)));
+		optionPanel.add(languageDropdown);
+
+		JButton okButton = new JButton(okAction);
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(okButton);
+		buttonPanel.add(new JButton(cancelAction));
+		buttonPanel.add(new JButton(helpAction));
+
+		dialog.getContentPane().add(optionPanel, BorderLayout.CENTER);
+		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+		dialog.pack();
+		dialog.setLocationRelativeTo(parent);
+		dialog.setVisible(true);
+		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
