@@ -40,8 +40,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
 				fileChooser.setTitle(Annotator.getString(Strings.DIALOG_EXPORT_AS_TITLE));
 				fileChooser.setInitialDirectory(Annotator.app.getCurrentDirectory());
-				fileChooser.getExtensionFilters()
-						.add(Annotator.app.getPluginManager().getDefaultIOPlugin().getExtensionFilter());
+				fileChooser.getExtensionFilters().add(plugin.getExtensionFilter());
 				File f = fileChooser.showSaveDialog(null);
 
 				if (f != null) {
