@@ -20,7 +20,14 @@ public class AnnotationComparator implements Comparator<Annotation> {
 	public int compare(Annotation o1, Annotation o2) {
 		if (useEnd)
 			return (descending ? -1 : 1) * Integer.compare(o1.getEnd(), o2.getEnd());
-		return (descending ? -1 : 1) * Integer.compare(o1.getBegin(), o2.getBegin());
+		else {
+			int returnValue = Integer.compare(o1.getBegin(), o2.getBegin());
+			if (returnValue == 0)
+				returnValue = Integer.compare(o1.getEnd(), o2.getEnd());
+			if (returnValue == 0)
+				returnValue = Integer.compare(o1.hashCode(), o2.hashCode());
+			return (descending ? -1 : 1) * returnValue;
+		}
 	}
 
 	public boolean isUseEnd() {
