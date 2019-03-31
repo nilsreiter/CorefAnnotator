@@ -4,14 +4,11 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
-import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
@@ -48,14 +45,6 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 						f = new File(f.getAbsolutePath() + plugin.getSuffix());
 					}
 
-					if (f.exists() && Annotator.app.getPreferences().getBoolean(Constants.CFG_ASK_BEFORE_FILE_OVERWRITE,
-							Defaults.CFG_ASK_BEFORE_FILE_OVERWRITE)) {
-						int answer = JOptionPane.showConfirmDialog(target,
-								Annotator.getString(Constants.Strings.DIALOG_FILE_EXISTS_OVERWRITE));
-						if (answer != JOptionPane.YES_OPTION) {
-							return;
-						}
-					}
 					target.setIndeterminateProgress();
 					target.setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 
