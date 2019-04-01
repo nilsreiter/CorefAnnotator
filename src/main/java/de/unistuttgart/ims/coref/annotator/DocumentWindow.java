@@ -1352,12 +1352,23 @@ public class DocumentWindow extends AbstractTextWindow
 			int low = Math.min(dot, mark);
 			int high = Math.max(dot, mark);
 			if (dot == mark) {
-				// nothing is selected
-
-				setMessage("", 0);
+				// nothing is selected: show all mentions cursor is part of
+				if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
+					MutableSet<? extends Annotation> annotations = Sets.mutable.withAll(
+							getDocumentModel().getCoreferenceModel().getMentions(dot));
+					@SuppressWarnings("unchecked")
+					MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(
+							a -> a instanceof Mention).select(
+								a -> a.getBegin() <= dot && a.getEnd() >= dot);
+					if (mentions.size() == 0) {
+						setMessage("", 0);
+					} else {
+						setMessage(String.join(
+								"; ", mentions.collect(m -> m.getEntity().getLabel())), 0);
+					}
+				}
 			} else {
 				// something is selected
-
 				MutableSet<? extends Annotation> annotations = Sets.mutable
 						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
 				@SuppressWarnings("unchecked")
