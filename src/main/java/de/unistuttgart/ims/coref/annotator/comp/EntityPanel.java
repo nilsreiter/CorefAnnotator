@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -29,6 +30,8 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener {
 	public EntityPanel(DocumentModel documentModel, Entity entity) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.setOpaque(false);
+		// this.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
+		this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		this.setToolTipText(documentModel.getCoreferenceModel().getToolTipText(entity));
 
 		JLabel mainLabel = new EntityLabel(entity);

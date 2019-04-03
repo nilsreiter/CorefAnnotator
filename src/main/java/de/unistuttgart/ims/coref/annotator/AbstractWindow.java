@@ -1,9 +1,14 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,6 +31,7 @@ public abstract class AbstractWindow extends JFrame {
 	JProgressBar progressBar = new JProgressBar();
 	JLabel messageLabel = new JLabel();
 	JLabel miscLabel = new JLabel();
+	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
 	JMenuBar menuBar = new JMenuBar();
 
@@ -36,6 +42,7 @@ public abstract class AbstractWindow extends JFrame {
 		statusBar = new JPanel();
 		statusBar.setPreferredSize(new Dimension(800, 20));
 		statusBar.setLayout(springs);
+		// statusBar.setBorder(BorderFactory.createLineBorder(Color.CYAN));
 
 		progressBar = new JProgressBar();
 		progressBar.setMaximum(100);
@@ -47,16 +54,27 @@ public abstract class AbstractWindow extends JFrame {
 
 		messageLabel = new JLabel();
 		messageLabel.setSize(new Dimension(1, 20));
+		messageLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
 		statusBar.add(messageLabel);
+
+		entityPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		// entityPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
+		entityPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		entityPanel.setSize(new Dimension(0, 20));
+		statusBar.add(entityPanel);
 
 		JLabel versionLabel = new JLabel(Annotator.getAppName() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
+		// from east
 		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
-		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.EAST, messageLabel);
-		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);
 		springs.putConstraint(SpringLayout.EAST, miscLabel, 10, SpringLayout.WEST, versionLabel);
+
+		// from west
+		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);
+		springs.putConstraint(SpringLayout.WEST, progressBar, 10, SpringLayout.EAST, messageLabel);
+		springs.putConstraint(SpringLayout.WEST, entityPanel, 10, SpringLayout.EAST, progressBar);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 		statusBar.revalidate();
 	}
@@ -69,13 +87,31 @@ public abstract class AbstractWindow extends JFrame {
 		return progressBar;
 	}
 
+	public void setCollectionPanel(Iterable<? extends Component> entities) {
+		entityPanel.removeAll();
+		int maxObjects = 2;
+		Iterator<? extends Component> iterator = entities.iterator();
+
+		int length = 0;
+		while (iterator.hasNext()) {
+			Component e = iterator.next();
+			if (length++ < maxObjects)
+				entityPanel.add(e);
+		}
+		if (length > maxObjects)
+			entityPanel.add(new JLabel(" and " + (length - maxObjects) + " more."));
+		entityPanel.updateUI();
+	};
+
 	public void setIndeterminateProgress() {
 		progressBar.setVisible(true);
+		progressBar.setPreferredSize(new Dimension(300, 20));
 		progressBar.setIndeterminate(true);
 	}
 
 	public void stopIndeterminateProgress() {
 		progressBar.setIndeterminate(false);
+		progressBar.setPreferredSize(new Dimension(0, 20));
 		progressBar.setVisible(false);
 	}
 
