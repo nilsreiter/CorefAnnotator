@@ -1,4 +1,5 @@
 classpath*:types.xml
 classpath*:types-meta.xml
 classpath*:types-v1.xml
+classpath*:types-format.xml
 classpath*:creta-coref.xml

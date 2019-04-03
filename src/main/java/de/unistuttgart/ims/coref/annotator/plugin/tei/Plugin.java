@@ -15,7 +15,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
@@ -64,7 +63,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public Class<? extends StylePlugin> getStylePlugin() {
-		return DefaultStylePlugin.class;
+		return TeiStylePlugin.class;
 	}
 
 	@Override

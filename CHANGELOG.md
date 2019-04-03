@@ -3,6 +3,72 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.2
+
+- CoNLL export now also works if no entities have been annotated. #191
+- Fixed a bug that prevented mentions with the same begin position to be 
+  underlined. #186
+- Exporting to CoNLL format now shows the proper file extensions and 
+  allows overwriting. #187
+
+## 1.9.1
+
+- The shortcut key to jump to mentions has been changed to alt-arrow, 
+  because shift arrow collided with extending the selection by keyboard.
+  #185
+
+## 1.9.0
+
+- The CoNLL 2012 importer now always reads coreference information from
+  the last column. Thanks @andreasvc. #127
+- The README now contains a section on requirements and installation, 
+  specifying the JavaFX dependency explicitly. Thanks @andreasvc. #174
+- When searching an entity in the tree view, the tree now scrolls to 
+  top automatically. #178
+- Using shift-arrow, the user can now jump from one annotated piece to 
+  the next. This function does not entirely iterate over mentions. If 
+  two mentions have the exact same boundaries, pressing the combo again 
+  jumps to the next mention with different boundaries. #182
+- Entities can now be automatically renamed. The new name is derived 
+  from the first, last, or longest mention. This is decided ad hoc in 
+  a dialog. The renaiming is fully undoable, so users can try with 
+  different options. #173
+- Pressing backspace while a mention is selected removes it. Multiple 
+  mentions with the same span are deleted as well. ctrl-backspace 
+  deletes *all* mentions in the selected area. #175
+- The label of the entity of a selected mention is now displayed in the 
+  status bar #176
+- Some formatting information can now be read from TEI/XML files and 
+  will be displayed accordingly. All `<head>` elements are shown large,
+  everything with a `rend=italic` or `rend=bold` will be display as 
+  such. In addition `<emph>` is rendered as italic. `<lg>` and `<div>`
+  elements will be marked as segments (and if they have `<head>`, 
+  they're displayed in the scrollbar). #181
+
+## 1.8.0
+
+- It's now possible to create new flags that can be assigned to entities, 
+  mentions, and detached mention parts. The flags can be created with
+  the flag editor (in the tools menu). #126
+- The text view can now display line numbers. See 
+  [the wiki](https://github.com/nilsreiter/CorefAnnotator/wiki/Line-Numbers) for 
+  details. #169 
+- The text field in the search dialog is now automatically in focus when
+  the window is opened #159
+- The text field now maintains previous searches #161
+- The search can now be restricted to mentions only #162
+- We now use a JavaFX-based file dialog, which should look more native 
+  to the OS (no issue)
+
+## 1.7.4
+
+- If dragging, the entity mention tree no longer reacts on moving over 
+  mentions, i.e., the text no longer jumps to the mention if something 
+  is dragged #170
+- Moving a mention into an entity group was leading to file corruption.
+  Files could no longer be opened. This is fixed, and corrupted files
+  can be opened again. #171
+
 ## 1.7.3
 
 - Renamed an entity is now properly undoable #167

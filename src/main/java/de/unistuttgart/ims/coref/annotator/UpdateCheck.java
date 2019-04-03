@@ -98,6 +98,8 @@ public class UpdateCheck {
 
 		public static Version get() {
 			if (version == null) {
+				// for demo purposes
+				// String s = "1.8.0";
 				String s = Annotator.class.getPackage().getImplementationVersion();
 				if (s == null)
 					s = DEFAULT_VERSION;

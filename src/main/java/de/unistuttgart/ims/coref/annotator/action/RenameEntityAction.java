@@ -7,15 +7,17 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 
-public class RenameEntityAction extends DocumentWindowAction implements CAAction {
+public class RenameEntityAction extends DocumentWindowAction implements TreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,8 +40,9 @@ public class RenameEntityAction extends DocumentWindowAction implements CAAction
 	}
 
 	@Override
-	public void setEnabled(CAAbstractTreeSelectionListener l) {
-		setEnabled(l.isSingle() && l.isEntity());
+	public void valueChanged(TreeSelectionEvent e) {
+		TreeSelectionUtil tsu = new TreeSelectionUtil(e);
+		setEnabled(tsu.isSingle() && tsu.isEntity());
 	}
 
 }

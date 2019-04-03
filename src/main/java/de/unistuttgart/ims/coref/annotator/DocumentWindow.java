@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -42,6 +43,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -74,6 +76,7 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -109,6 +112,7 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
+import de.unistuttgart.ims.coref.annotator.action.DeleteAllMentionsInSelection;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.ExampleExport;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
@@ -124,7 +128,10 @@ import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
+import de.unistuttgart.ims.coref.annotator.action.RenameAllEntitiesAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -138,6 +145,7 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.DirectedEntityRelation;
@@ -149,10 +157,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.api.v1.SymmetricEntityRelation;
 import de.unistuttgart.ims.coref.annotator.comp.CircleColorIcon;
+import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
@@ -282,6 +292,7 @@ public class DocumentWindow extends AbstractTextWindow
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	JList<EntityRelation> relationsList = new JList<EntityRelation>();
 	SegmentedScrollBar<Segment> segmentIndicator;
+	JScrollPane textScrollPane;
 
 	// Menu components
 	JMenu documentMenu;
@@ -346,7 +357,9 @@ public class DocumentWindow extends AbstractTextWindow
 		textPopupMenu.addPopupMenuListener(new PopupListener());
 
 		// initialise panel
-		JPanel rightPanel = new JPanel(new BorderLayout());
+
+		TreeMouseListener tml = new TreeMouseListener();
+		treeSelectionListener = new MyTreeSelectionListener();
 
 		tree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode(null, false)));
 		tree.setVisibleRowCount(-1);
@@ -356,16 +369,19 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setTransferHandler(new MyTreeTransferHandler());
 		tree.setCellRenderer(new MyTreeCellRenderer());
 		tree.setCellEditor(new MyTreeCellEditor(tree, (DefaultTreeCellRenderer) tree.getCellRenderer()));
-		tree.addTreeSelectionListener(new MyTreeSelectionListener(tree));
-		tree.addMouseListener(new TreeMouseListener());
+		tree.addTreeSelectionListener(treeSelectionListener);
+		tree.addTreeSelectionListener(actions.deleteAction);
+		tree.addTreeSelectionListener(actions.formGroupAction);
+		tree.addTreeSelectionListener(actions.renameAction);
+		tree.addMouseListener(tml);
+		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
-		tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), AddCurrentSpanToCurrentEntity.class);
 		tree.getActionMap().put(AddCurrentSpanToCurrentEntity.class, new AddCurrentSpanToCurrentEntity(this));
+		tree.getActionMap().put(DeleteAction.class, actions.deleteAction);
+		tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), AddCurrentSpanToCurrentEntity.class);
+		tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
 
 		Annotator.app.getPreferences().addPreferenceChangeListener((PreferenceChangeListener) tree.getCellRenderer());
-
-		treeSelectionListener = new MyTreeSelectionListener(tree);
-		tree.addTreeSelectionListener(treeSelectionListener);
 
 		ToolTipManager.sharedInstance().registerComponent(tree);
 
@@ -373,6 +389,7 @@ public class DocumentWindow extends AbstractTextWindow
 		EntityFinder entityFinder = new EntityFinder();
 		treeSearchField.getDocument().addDocumentListener(entityFinder);
 		treeSearchField.addKeyListener(entityFinder);
+		JPanel rightPanel = new JPanel(new BorderLayout());
 		rightPanel.setPreferredSize(new Dimension(300, 800));
 		rightPanel.add(treeSearchField, BorderLayout.NORTH);
 		rightPanel.add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -403,48 +420,79 @@ public class DocumentWindow extends AbstractTextWindow
 		// initialise text view
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
+		TextMouseListener textMouseListener = new TextMouseListener();
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
-		textPane.addMouseListener(new TextMouseListener());
+		textPane.addMouseListener(textMouseListener);
+		textPane.addMouseMotionListener(textMouseListener);
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
+		textPane.addCaretListener(new TextCaretListener());
+		textPane.addCaretListener(actions.deleteAllAction);
+		textPane.addCaretListener(actions.deleteAction);
 		textPane.addFocusListener(caret);
 		textPane.addKeyListener(new TextViewKeyListener());
 		textPane.setCaretPosition(0);
 		textPane.addCaretListener(this);
+		textPane.getActionMap().put(DeleteAction.class, actions.deleteAction);
+		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
+		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, actions.deleteAllAction);
+		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
+		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				actions.copyAction);
+				CopyAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
+		textPane.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				DeleteAllMentionsInSelection.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
+				SelectNextMentionAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
+				SelectPreviousMentionAction.class);
 
 		highlightManager = new HighlightManager(textPane);
 
-		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		// scrollPane.setRowHeaderView(segmentIndicator);
-		leftPanel.add(scrollPane, BorderLayout.CENTER);
-		segmentIndicator = new SegmentedScrollBar<Segment>(scrollPane);
+		leftPanel.add(textScrollPane, BorderLayout.CENTER);
+		segmentIndicator = new SegmentedScrollBar<Segment>(textScrollPane);
 
 		relationsList.setCellRenderer(new RelationListRenderer());
 
-		scrollPane.setVerticalScrollBar(segmentIndicator);
+		textScrollPane.setVerticalScrollBar(segmentIndicator);
 		// leftPanel.add(segmentIndicator, BorderLayout.LINE_START);
 
 		// split pane
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-		splitPane.setVisible(true);
-		splitPane.setDividerLocation(500);
+		if (false) {
+			getContentPane().add(leftPanel);
+			setPreferredSize(new Dimension(600, 800));
+			setLocationRelativeTo(Annotator.app.opening);
+			JFrame treeFrame = new JFrame();
+			treeFrame.setContentPane(rightPanel);
+			treeFrame.setPreferredSize(new Dimension(200, 800));
+			treeFrame.pack();
+			treeFrame.setLocation(this.getLocation().x + 600, this.getLocation().y);
+			treeFrame.setVisible(true);
+		} else {
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+			splitPane.setVisible(true);
+			splitPane.setDividerLocation(500);
 
 		JTabbedPane tabbed = new JTabbedPane();
 		tabbed.add(Annotator.getString("tabs.text"), splitPane);
 		tabbed.add(Annotator.getString("tabs.relations"), relationsList);
 		getContentPane().add(tabbed);
 
-		setPreferredSize(new Dimension(800, 800));
+			setPreferredSize(new Dimension(800, 800));
+			setLocationRelativeTo(Annotator.app.opening);
+			getContentPane().add(splitPane);
+		}
 		pack();
-		setLocationRelativeTo(null);
 		Annotator.logger.info("Window initialised.");
 	}
 
@@ -500,6 +548,23 @@ public class DocumentWindow extends AbstractTextWindow
 		// TODO: Disabled for the moment
 		// viewMenu.add(fontFamilyMenu);
 
+		grp = new ButtonGroup();
+		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
+		JRadioButtonMenuItem radio;
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
+		radio.setSelected(true);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleFixed);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleDynamic);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		viewMenu.add(lineNumbersMenu);
 		viewMenu.addSeparator();
 
 		PluginManager pm = Annotator.app.getPluginManager();
@@ -541,6 +606,7 @@ public class DocumentWindow extends AbstractTextWindow
 		toolsMenu.add(actions.showSearchPanelAction);
 		toolsMenu.add(actions.setDocumentLanguageAction);
 		toolsMenu.add(actions.clearAction);
+		toolsMenu.add(new RenameAllEntitiesAction(this));
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.add(new ShowFlagEditor(this));
 		toolsMenu.add(new ShowRelationEditor(this));
@@ -594,6 +660,7 @@ public class DocumentWindow extends AbstractTextWindow
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionAmbiguous));
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionDifficult));
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
+		entityMenu.add(actions.deleteAllAction);
 		entityMenu.add(mentionFlagsInMenuBar);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
@@ -725,6 +792,23 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
+	@Override
+	public void setLineNumberStyle(LineNumberStyle lns) {
+		TextLineNumber tln;
+		switch (lns) {
+		case FIXED:
+			tln = new FixedTextLineNumber(this, 5);
+			break;
+		case DYNAMIC:
+			tln = new TextLineNumber(this, 5);
+			break;
+		default:
+			tln = null;
+		}
+		textScrollPane.setRowHeaderView(tln);
+		super.setLineNumberStyle(lns);
+	}
+
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 
@@ -756,6 +840,8 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
 
+		actions.lineNumberStyleFixed.setEnabled(model.hasLineNumbers());
+
 		// listeners to the coref model
 		model.getCoreferenceModel().addCoreferenceModelListener(this);
 
@@ -778,7 +864,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		for (Flag f : model.getFlagModel().getFlags()) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
-			treeSelectionListener.addListener(a);
+			tree.addTreeSelectionListener(a);
 			try {
 				if (model.getFlagModel().getTargetClass(f).equals(Mention.class)) {
 					mentionFlagsInTreePopup.add(f, new JCheckBoxMenuItem(a));
@@ -800,7 +886,6 @@ public class DocumentWindow extends AbstractTextWindow
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
 		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
-		splitPane.setVisible(true);
 
 		// Style
 		StylePlugin sPlugin = null;
@@ -1317,7 +1402,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	}
 
-	class TreeMouseListener implements MouseListener {
+	class TreeMouseListener implements MouseListener, MouseMotionListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -1333,7 +1418,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-
+			treeSelectionListener.setEnabled(true);
 		}
 
 		@Override
@@ -1346,9 +1431,50 @@ public class DocumentWindow extends AbstractTextWindow
 
 		}
 
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			treeSelectionListener.setEnabled(false);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+		}
+
 	}
 
-	class TextMouseListener implements MouseListener {
+	class TextCaretListener implements CaretListener {
+
+		@Override
+		public void caretUpdate(CaretEvent e) {
+			int dot = e.getDot();
+			int mark = e.getMark();
+			int low = Math.min(dot, mark);
+			int high = Math.max(dot, mark);
+			if (dot == mark) {
+				// nothing is selected
+
+				setMessage("", 0);
+			} else {
+				// something is selected
+
+				MutableSet<? extends Annotation> annotations = Sets.mutable
+						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
+				@SuppressWarnings("unchecked")
+				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
+						.select(a -> a.getBegin() == low && a.getEnd() == high);
+				if (mentions.size() == 1) {
+					setMessage("Selected entity: " + mentions.iterator().next().getEntity().getLabel(), 0);
+				} else if (mentions.size() > 1) {
+					setMessage(mentions.size() + " entities selected.", 0);
+				} else {
+					setMessage("", 0);
+				}
+			}
+		}
+
+	}
+
+	class TextMouseListener implements MouseListener, MouseMotionListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -1369,7 +1495,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-
+			treeSelectionListener.setEnabled(true);
 		}
 
 		@Override
@@ -1378,6 +1504,15 @@ public class DocumentWindow extends AbstractTextWindow
 
 		@Override
 		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			treeSelectionListener.setEnabled(false);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
 		}
 	}
 
@@ -1388,7 +1523,7 @@ public class DocumentWindow extends AbstractTextWindow
 			boolean selection = textPane.getSelectionStart() != textPane.getSelectionEnd();
 
 			MutableList<Action> exportActions = Lists.mutable.empty();
-			MutableList<JMenu> mentionActions = Lists.mutable.empty();
+			MutableList<JMenuItem> mentionActions = Lists.mutable.empty();
 			if (selection) {
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.MARKDOWN));
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
@@ -1419,6 +1554,7 @@ public class DocumentWindow extends AbstractTextWindow
 						Annotator.app.getPluginManager().getEntityRankingPlugin(PreceedingRanker.class) }) {
 					candidates.addAll(erp.rank(getSelection(), getCoreferenceModel(), getJCas()).take(5));
 				}
+				mentionActions.add(new JMenuItem(actions.deleteAllAction));
 			}
 
 			if (selection) {
@@ -1489,50 +1625,44 @@ public class DocumentWindow extends AbstractTextWindow
 		}
 	}
 
-	public class MyTreeSelectionListener extends CAAbstractTreeSelectionListener {
+	public class MyTreeSelectionListener implements TreeSelectionListener {
 
-		MutableSet<CATreeSelectionListener> listeners = Sets.mutable.empty();
-
-		public MyTreeSelectionListener(JTree tree) {
-			super(tree);
-		}
+		boolean enabled = true;
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			collectData(e);
-			actions.renameAction.setEnabled(this);
-			actions.changeKeyAction.setEnabled(isSingle() && isEntity());
-			actions.changeColorAction.setEnabled(isSingle() && isEntity());
+			if (!isEnabled())
+				return;
+			TreeSelectionUtil tsu = new TreeSelectionUtil();
+			tsu.collectData(e);
 
-			actions.deleteAction.setEnabled(this);
-			actions.formGroupAction.setEnabled(this);
+			actions.changeKeyAction.setEnabled(tsu.isSingle() && tsu.isEntity());
+			actions.changeColorAction.setEnabled(tsu.isSingle() && tsu.isEntity());
 
-			actions.mergeSelectedEntitiesAction.setEnabled(!isSingle() && isEntity());
+			actions.mergeSelectedEntitiesAction.setEnabled(!tsu.isSingle() && tsu.isEntity());
 
-			actions.removeDuplicatesAction.setEnabled(isEntity());
+			actions.removeDuplicatesAction.setEnabled(tsu.isEntity());
 
-			actions.entityStatisticsAction.setEnabled(isEntity());
+			actions.entityStatisticsAction.setEnabled(tsu.isEntity());
 
-			// inform all listeners
-			listeners.forEach(l -> l.valueChanged(this));
-
-			if (isSingle() && (isMention() || isDetachedMentionPart()))
-				annotationSelected(getAnnotation(0));
-			else if (isSingle() && isEntity()) {
+			if (tsu.isSingle() && (tsu.isMention() || tsu.isDetachedMentionPart()))
+				annotationSelected(tsu.getAnnotation(0));
+			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();
-				documentModel.getCoreferenceModel().getMentions(getEntity(0))
+				documentModel.getCoreferenceModel().getMentions(tsu.getEntity(0))
 						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
 			} else
 				annotationSelected(null);
 		}
 
-		public void addListener(CATreeSelectionListener l) {
-			this.listeners.add(l);
+		public boolean isEnabled() {
+			return enabled;
 		}
 
-		public void removeListener(CATreeSelectionListener l) {
-			this.listeners.remove(l);
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
 		}
+
 	}
 
 	/**
@@ -1544,6 +1674,7 @@ public class DocumentWindow extends AbstractTextWindow
 		Pattern pattern;
 
 		public void filter(String s) {
+			tree.scrollRowToVisible(0);
 			documentModel.getTreeModel().rankBySearchString(s);
 		}
 
@@ -1595,10 +1726,6 @@ public class DocumentWindow extends AbstractTextWindow
 		return currentStyle;
 	}
 
-	public JTextPane getTextPane() {
-		return textPane;
-	}
-
 	@Override
 	public String getText() {
 		return textPane.getText();
@@ -1607,10 +1734,6 @@ public class DocumentWindow extends AbstractTextWindow
 	@Override
 	public Span getSelection() {
 		return new Span(textPane.getSelectionStart(), textPane.getSelectionEnd());
-	}
-
-	public DocumentModel getDocumentModel() {
-		return documentModel;
 	}
 
 	@Override
@@ -1634,6 +1757,7 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction changeKeyAction;
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
+		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
 		FileSaveAction fileSaveAction;
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
@@ -1649,6 +1773,10 @@ public class DocumentWindow extends AbstractTextWindow
 		RenameEntityAction renameAction;
 		AbstractAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
+		AbstractAction lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.NONE);
+		AbstractAction lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.FIXED);
+		AbstractAction lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.DYNAMIC);
 
 	}
 

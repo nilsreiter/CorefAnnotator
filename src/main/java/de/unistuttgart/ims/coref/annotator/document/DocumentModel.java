@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.apache.uima.fit.util.JCasUtil;
@@ -14,9 +15,11 @@ import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.document.adapter.EntityTreeModel;
+import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
@@ -48,6 +51,8 @@ public class DocumentModel implements Model {
 	EntityTreeModel treeModel;
 
 	FlagModel flagModel;
+
+	LineNumberModel lineNumberModel;
 
 	TypeSystemVersion typeSystemVersion;
 
@@ -137,6 +142,18 @@ public class DocumentModel implements Model {
 		return jcas.getDocumentLanguage();
 	}
 
+	public boolean hasLineNumbers() {
+		return lineNumberModel.isHasFixedLineNumbers();
+	}
+
+	public Integer getMaximalLineNumber() {
+		return lineNumberModel.getMaximum();
+	}
+
+	public Integer getLineNumber(Span range) {
+		return lineNumberModel.getLineNumber(range);
+	}
+
 	public Preferences getPreferences() {
 		return preferences;
 	}
@@ -168,10 +185,13 @@ public class DocumentModel implements Model {
 		flagModel = new FlagModel(this, preferences);
 		segmentModel = new SegmentModel(this);
 		relationModel = new RelationModel(this);
+		lineNumberModel = new LineNumberModel();
 
 		coreferenceModel.initialize();
 		segmentModel.initialize();
 		flagModel.initialize();
+		lineNumberModel.initialize();
+
 	}
 
 	public boolean isSavable() {
@@ -280,4 +300,41 @@ public class DocumentModel implements Model {
 		}
 	}
 
+	class LineNumberModel extends SubModel {
+
+		boolean hasFixedLineNumbers = false;
+
+		int maximum = -1;
+
+		public LineNumberModel() {
+			super(DocumentModel.this);
+		}
+
+		public boolean isHasFixedLineNumbers() {
+			return hasFixedLineNumbers;
+		}
+
+		@Override
+		protected void initializeOnce() {
+			for (Line line : JCasUtil.select(getJcas(), Line.class)) {
+				if (line.getNumber() > maximum)
+					maximum = line.getNumber();
+			}
+			hasFixedLineNumbers = maximum > 0;
+		};
+
+		public Integer getLineNumber(Span range) {
+			List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
+			if (lineList.size() != 1)
+				return null;
+			Line line = lineList.get(0);
+			if (line.getNumber() < 0)
+				return null;
+			return line.getNumber();
+		}
+
+		public int getMaximum() {
+			return maximum;
+		}
+	}
 }

@@ -105,6 +105,8 @@ public class Constants {
 		public static final String ACTION_COMPARE_TOOLTIP = "action.compare.tooltip";
 		public static final String ACTION_COPY = "action.copy";
 		public static final String ACTION_DELETE = "action.delete";
+		public static final String ACTION_DELETE_IN_SELECTION = "action.delete_in_selection";
+		public static final String ACTION_DELETE_IN_SELECTION_TOOLTIP = "action.delete_in_selection.tooltip";
 		public static final String ACTION_DELETE_FLAG = "action.delete_flag";
 		public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 		public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
@@ -133,6 +135,8 @@ public class Constants {
 		public static final String ACTION_REMOVE_FOREIGN_ANNOTATIONS_TOOLTIP = "action.remove.foreign_annotations.tooltip";
 		public static final String ACTION_RENAME = "action.rename";
 		public static final String ACTION_RENAME_TOOLTIP = "action.rename.tooltip";
+		public static final String ACTION_RENAME_ALL = "action.rename_all";
+		public static final String ACTION_RENAME_ALL_TOOLTIP = "action.rename_all.tooltip";
 		public static final String ACTION_SAVE_AS = "action.save_as";
 		public static final String ACTION_SEARCH = "action.search";
 		public static final String ACTION_SEARCH_MENTION = "action.search.mention";
@@ -186,6 +190,8 @@ public class Constants {
 		public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
 		public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
 		public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
+		public static final String DIALOG_RENAME_ALL_SELECT_STRATEGY_PROMPT = "dialog.rename_all.prompt";
+		public static final String DIALOG_RENAME_ALL_SELECT_STRATEGY_TITLE = "dialog.rename_all.title";
 		public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
 		public static final String DIALOG_SELECT_FILE = "dialog.select_file";
 		public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
@@ -232,6 +238,7 @@ public class Constants {
 		public static final String MENU_VIEW = "menu.view";
 		public static final String MENU_VIEW_FONTFAMILY = "menu.view.fontfamily";
 		public static final String MENU_VIEW_STYLE = "menu.view.style";
+		public static final String MENU_VIEW_LINE_NUMBERS = "menu.view.line_numbers";
 		public static final String MESSAGE_CREATES_ENTITY = "message.creates_entity";
 		public static final String MESSAGE_CREATES_MENTION = "message.creates_mention";
 		public static final String MESSAGE_CREATES_MENTION_PART = "message.creates_mention_part";
@@ -343,7 +350,7 @@ public class Constants {
 			MaterialDesign.MDI_ARROW_COMPRESS);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
-			"nl", "ru" };
+			"nl", "ru", "gmh" };
 
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 

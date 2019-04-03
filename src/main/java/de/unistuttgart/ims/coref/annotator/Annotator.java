@@ -73,7 +73,7 @@ public class Annotator {
 	@Deprecated
 	JFileChooser openDialog;
 
-	JFrame opening;
+	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
@@ -144,6 +144,11 @@ public class Annotator {
 	protected void initialiseActions() {
 		openAction = new FileSelectOpenAction(this);
 		openCompareAction = new FileCompareOpenAction();
+	}
+
+	public static String getAppName() {
+		// return "CorefAnnotator";
+		return Annotator.class.getPackage().getImplementationTitle();
 	}
 
 	protected JFrame getOpeningDialog() {
@@ -244,8 +249,8 @@ public class Annotator {
 
 	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
-				DocumentWindow v = new DocumentWindow();
-				v.loadFile(file, flavor, language);
+		DocumentWindow v = new DocumentWindow();
+		v.loadFile(file, flavor, language);
 
 		SwingUtilities.invokeLater(new Runnable() {
 

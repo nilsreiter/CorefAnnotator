@@ -6,16 +6,18 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.CAAbstractTreeSelectionListener;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 
-public class FormEntityGroup extends DocumentWindowAction implements CAAction {
+public class FormEntityGroup extends DocumentWindowAction implements TreeSelectionListener {
 	private static final long serialVersionUID = 1L;
 
 	public FormEntityGroup(DocumentWindow documentWindow) {
@@ -32,8 +34,9 @@ public class FormEntityGroup extends DocumentWindowAction implements CAAction {
 	}
 
 	@Override
-	public void setEnabled(CAAbstractTreeSelectionListener l) {
-		setEnabled(l.isEntity() & l.size() > 1);
+	public void valueChanged(TreeSelectionEvent e) {
+		TreeSelectionUtil tsu = new TreeSelectionUtil(e);
+		setEnabled(tsu.size() > 1 && tsu.isEntity());
 	}
 
 }
