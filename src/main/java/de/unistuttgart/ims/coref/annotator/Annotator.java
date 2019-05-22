@@ -402,7 +402,10 @@ public class Annotator {
 	}
 
 	public File getCurrentDirectory() {
-		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, System.getProperty("user.home")));
+		File f = new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, System.getProperty("user.home")));
+		if (!f.isDirectory())
+			f = new File(System.getProperty("user.home"));
+		return f;
 	}
 
 	public void setCurrentDirectory(File f) {
