@@ -685,6 +685,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
+		Annotator.logger.entry(entity);
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
