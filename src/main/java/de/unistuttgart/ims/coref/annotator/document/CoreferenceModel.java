@@ -337,12 +337,16 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(op.toEvent());
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 		} else if (operation instanceof RemoveEntities) {
+			boolean keepTreeSortedSetting = getPreferences().getBoolean(Constants.CFG_KEEP_TREE_SORTED,
+					Defaults.CFG_KEEP_TREE_SORTED);
+			getPreferences().putBoolean(Constants.CFG_KEEP_TREE_SORTED, false);
 			RemoveEntities op = (RemoveEntities) operation;
 			op.getFeatureStructures().forEach(e -> {
 				if (entityEntityGroupMap.containsKey(e))
 					op.entityEntityGroupMap.putAll(e, entityEntityGroupMap.get(e));
 				remove(e);
 			});
+			getPreferences().putBoolean(Constants.CFG_KEEP_TREE_SORTED, keepTreeSortedSetting);
 
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
@@ -685,6 +689,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
+		Annotator.logger.entry(entity);
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
@@ -700,7 +705,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
-
+		Annotator.logger.exit();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {
