@@ -701,7 +701,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
-
+		Annotator.logger.exit();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {
