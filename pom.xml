@@ -141,6 +141,11 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
 	</build>
 	<profiles>
 		<profile>
@@ -203,10 +208,7 @@
 		<profile>
 			<id>quadrama</id>
 			<activation>
-				<property>
-					<name>release</name>
-					<value>release</value>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
@@ -252,12 +254,25 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>develop</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/test/resources</directory>
+						<includes>
+							<include>log4j2-test.xml</include>
+						</includes>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+		<profile>
 			<id>creta</id>
 			<activation>
-				<property>
-					<name>release</name>
-					<value>release</value>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
