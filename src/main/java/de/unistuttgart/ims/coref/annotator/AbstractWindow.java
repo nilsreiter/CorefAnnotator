@@ -146,6 +146,8 @@ public abstract class AbstractWindow extends JFrame {
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
 		return menu_settings;
 
 	}
