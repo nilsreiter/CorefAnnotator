@@ -3,6 +3,18 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.10.0
+
+- With a new toggle setting, assigning a mention over an already 
+  existing mention replaces the annotation #149
+
+## 1.9.3
+
+- Fixed a bug that prevented the display of the file open dialog #207
+- Deleting many empty entities no longer creates an infinite loop 
+  on OpenJDK #192
+- Less console output and file logging (but can be activated if needed)
+
 ## 1.9.2
 
 - CoNLL export now also works if no entities have been annotated. #191

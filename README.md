@@ -3,7 +3,7 @@
 ![Github All Releases](https://img.shields.io/github/downloads/nilsreiter/CorefAnnotator/total.svg)
 ![GitHub (pre-)release](https://img.shields.io/github/release/nilsreiter/CorefAnnotator/all.svg)
 [![Build Status](https://travis-ci.org/nilsreiter/CorefAnnotator.svg?branch=master)](https://travis-ci.org/nilsreiter/CorefAnnotator)
-[![CodeFactor](https://www.codefactor.io/repository/github/nilsreiter/corefannotator/badge)](https://www.codefactor.io/repository/github/nilsreiter/corefannotator)
+[![CodeFactor](https://www.codefactor.io/repository/github/nilsreiter/corefannotator/badge)](https://www.codefactor.io/repository/github/nilsreiter/corefannotator) [![Join the chat at https://gitter.im/CorefAnnotator/community](https://badges.gitter.im/CorefAnnotator/community.svg)](https://gitter.im/CorefAnnotator/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 # Coref Annotator
 
 This is an annotation tool for coreference. It's built on top of [Apache's UIMA](https://uima.apache.org), and works with long documents and long coreference chains.

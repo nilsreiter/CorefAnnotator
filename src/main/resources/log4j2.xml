@@ -8,16 +8,16 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
 		</Console>
-		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File">
+		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File" createOnDemand="true">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
 		</File>
 	</Appenders>
 	<Loggers>
-		<Logger name="${loggername}" level="info">
-			<AppenderRef ref="File" />
+		<Logger name="${loggername}">
+			<AppenderRef ref="File"    level="WARN" />
+			<AppenderRef ref="Console" level="ERROR"/>	
 		</Logger>
-		<Root level="warn">
-			<AppenderRef ref="Console" />	
+		<Root level="ALL">
 		</Root>
 	</Loggers>
 </Configuration>

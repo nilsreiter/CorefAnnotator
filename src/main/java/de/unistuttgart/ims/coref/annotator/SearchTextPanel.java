@@ -91,8 +91,14 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 			@SuppressWarnings("unchecked")
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
-			return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
-					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)) {
+				return new AnnotationTransfer(Lists.immutable.ofAll(list.getSelectedValuesList())
+						.collect(sr -> sr.getSpan()).flatCollect(span -> searchContainer.getDocumentWindow()
+								.getDocumentModel().getCoreferenceModel().getMentions(span.begin, span.end)));
+
+			} else
+				return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
+						Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
 		}
 
 		@Override

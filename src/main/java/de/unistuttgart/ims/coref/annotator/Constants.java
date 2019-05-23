@@ -163,6 +163,8 @@ public class Constants {
 		public static final String ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP = "action.toggle.ignore_singletons.tooltip";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED = "action.toggle.keep_tree_sorted";
 		public static final String ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP = "action.toggle.keep_tree_sorted.tooltip";
+		public static final String ACTION_TOGGLE_REPLACE_MENTION = "action.toggle.replace_mention";
+		public static final String ACTION_TOGGLE_REPLACE_MENTION_TOOLTIP = "action.toggle.replace_mention.tooltip";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
 		public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 		public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
@@ -288,6 +290,7 @@ public class Constants {
 	public static final String CFG_FULL_TOKENS = "full_tokens";
 	public static final String CFG_IGNORE_SINGLETONS_WHEN_COMPARING = "CFG_IGNORE_SINGLETONS_WHEN_COMPARING";
 	public static final String CFG_KEEP_TREE_SORTED = "CFG_KEEP_TREE_SORTED";
+	public static final String CFG_REPLACE_MENTION = "CFG_REPLACE_MENTION";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
@@ -343,6 +346,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
+
+	public static final Setting<Boolean> SETTING_REPLACE_MENTION = new Setting<Boolean>(CFG_REPLACE_MENTION,
+			Strings.ACTION_TOGGLE_REPLACE_MENTION, Strings.ACTION_TOGGLE_REPLACE_MENTION_TOOLTIP, false,
+			MaterialDesign.MDI_DIRECTIONS_FORK);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };
