@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.10.0
+
+- With a new toggle setting, assigning a mention over an already 
+  existing mention replaces the annotation #149
+
 ## 1.9.3
 
 - Fixed a bug that prevented the display of the file open dialog #207
