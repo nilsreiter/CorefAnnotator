@@ -913,6 +913,8 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 			// move existing node
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (targetFS instanceof Entity)
+					return true;
 				if (targetFS instanceof TOP)
 					return false;
 			}
@@ -928,7 +930,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// Check for flavor
 			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
-					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
+					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)
+					&& !info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
 				return false;
 			}
 
@@ -965,6 +968,18 @@ public class DocumentWindow extends AbstractTextWindow
 					ImmutableList<CATreeNode> object = (ImmutableList<CATreeNode>) info.getTransferable()
 							.getTransferData(NodeListTransferable.dataFlavor);
 					handleNodeMoving(object);
+				} catch (UnsupportedFlavorException | IOException e) {
+					Annotator.logger.catching(e);
+				}
+			} else if (dataFlavor == AnnotationTransfer.dataFlavor) {
+				Object a;
+				try {
+					a = info.getTransferable().getTransferData(dataFlavor);
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> aList = (ImmutableList<Annotation>) a;
+					if (aList.anySatisfy(anno -> anno instanceof Mention) && targetFS instanceof Entity)
+						getDocumentModel().edit(
+								new MoveMentionsToEntity((Entity) targetFS, aList.selectInstancesOf(Mention.class)));
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1187,14 +1202,22 @@ public class DocumentWindow extends AbstractTextWindow
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
+			CoreferenceModel cModel = getDocumentModel().getCoreferenceModel();
+
+			if (cModel.getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.edit(new AddMentionsToEntity(
-						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+						&& getSelectedAnnotations(Mention.class).size() == 1) {
+					getDocumentModel().edit(new MoveMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()),
+							getSelectedAnnotations(Mention.class)));
+				} else {
+					getDocumentModel()
+							.edit(new AddMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()), getSelection()));
+				}
 			} else if (e.getKeyChar() == ' ') {
 				Rectangle p;
 				try {
-					p = textPane.modelToView(textPane.getSelectionStart());
+					p = getTextPane().modelToView(getTextPane().getSelectionStart());
 					textPopupMenu.show(e.getComponent(), p.x, p.y + 15);
 				} catch (BadLocationException e1) {
 					Annotator.logger.catching(e1);
@@ -1225,7 +1248,12 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTextComponent t = (JTextComponent) comp;
-			return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+					&& getSelectedAnnotations(Mention.class).size() == 1) {
+				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
+				return new AnnotationTransfer(mention, documentModel.getTreeModel().get(mention));
+			} else
+				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
 
 		@Override
@@ -1236,6 +1264,15 @@ public class DocumentWindow extends AbstractTextWindow
 				Collection<Annotation> mentions = documentModel.getCoreferenceModel().getMentions(dl.getIndex());
 				if (mentions.size() > 0)
 					return true;
+			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				try {
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> annoList = (ImmutableList<Annotation>) info.getTransferable()
+							.getTransferData(AnnotationTransfer.dataFlavor);
+					return annoList.anySatisfy(a -> a instanceof Mention);
+				} catch (UnsupportedFlavorException | IOException e) {
+					return false;
+				}
 			}
 			return false;
 		}
@@ -1250,13 +1287,19 @@ public class DocumentWindow extends AbstractTextWindow
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
 					try {
-						Transferable pat = info.getTransferable();
-						@SuppressWarnings("unchecked")
-						ImmutableList<Span> spans = (ImmutableList<Span>) pat
-								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
-
+						Transferable pat = info.getTransferable();
+						if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+							@SuppressWarnings("unchecked")
+							ImmutableList<Span> spans = (ImmutableList<Span>) pat
+									.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
+						} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+							Object annotationList = pat.getTransferData(AnnotationTransfer.dataFlavor);
+							if (annotationList instanceof ImmutableList<?>)
+								documentModel.edit(new MoveMentionsToEntity(m.getEntity(),
+										((ImmutableList<?>) annotationList).selectInstancesOf(Mention.class)));
+						}
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
 					}
