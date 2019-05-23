@@ -361,9 +361,9 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 				DeleteAllMentionsInSelection.class);
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK),
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
 				SelectNextMentionAction.class);
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK),
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
 				SelectPreviousMentionAction.class);
 
 		highlightManager = new HighlightManager(textPane);

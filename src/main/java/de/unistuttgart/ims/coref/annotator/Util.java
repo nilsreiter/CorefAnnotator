@@ -230,7 +230,7 @@ public class Util {
 	}
 
 	public static String getLanguageName(String iso) {
-		return Annotator.getString("language." + iso);
+		return new Locale(iso).getDisplayLanguage();
 	}
 
 	public static String getLanguage(String languageName) {

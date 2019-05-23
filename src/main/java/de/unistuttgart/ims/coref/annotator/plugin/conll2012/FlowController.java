@@ -13,6 +13,7 @@ import org.apache.uima.jcas.JCas;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 
 public class FlowController extends JCasFlowController_ImplBase {
 
@@ -29,8 +30,12 @@ public class FlowController extends JCasFlowController_ImplBase {
 				if (!JCasUtil.exists(jcas, Sentence.class)) {
 					return new SimpleStep(Constants.FLOW_KEY_SENTENCE_SPLITTER);
 				}
-				if (!JCasUtil.exists(jcas, CoreferenceChain.class)) {
-					return new SimpleStep(Constants.FLOW_KEY_CONVERTER);
+				if (JCasUtil.exists(jcas, Entity.class)) {
+					if (!JCasUtil.exists(jcas, CoreferenceChain.class)) {
+						return new SimpleStep(Constants.FLOW_KEY_CONVERTER);
+					}
+				} else {
+					return new FinalStep();
 				}
 				return new FinalStep();
 			}
