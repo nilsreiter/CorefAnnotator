@@ -1410,7 +1410,12 @@ public class DocumentWindow extends AbstractTextWindow
 							.selectInstancesOf(Mention.class);
 					mentions.addAllIterable(ms);
 				}
-				setCollectionPanel(mentions.collect(m -> new EntityPanel(getDocumentModel(), m.getEntity())));
+				setCollectionPanel(mentions.collect(m -> {
+					EntityPanel ep = new EntityPanel(getDocumentModel(), m.getEntity());
+					Annotator.app.getPreferences().addPreferenceChangeListener(ep);
+					getDocumentModel().getCoreferenceModel().addCoreferenceModelListener(ep);
+					return ep;
+				}));
 			}
 
 		}

@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -18,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+
+import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
@@ -88,6 +91,8 @@ public abstract class AbstractWindow extends JFrame {
 	}
 
 	public void setCollectionPanel(Iterable<? extends Component> entities) {
+		Lists.immutable.of(entityPanel.getComponents()).selectInstancesOf(PreferenceChangeListener.class)
+				.forEach(ep -> Annotator.app.getPreferences().removePreferenceChangeListener(ep));
 		entityPanel.removeAll();
 		int maxObjects = 2;
 		Iterator<? extends Component> iterator = entities.iterator();
