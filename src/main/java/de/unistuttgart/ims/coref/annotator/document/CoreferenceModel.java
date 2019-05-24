@@ -211,7 +211,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected String createEntityGroupLabel(ImmutableList<Entity> entityList) {
-		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null)
+		String s = entityList.subList(0, Math.min(entityList.size(), 2)).select(e -> e.getLabel() != null)
 				.collect(
 						e -> StringUtils.abbreviate(e.getLabel(), "…", (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 4))
 				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
@@ -298,6 +298,7 @@ public class CoreferenceModel extends SubModel implements Model {
 			arr.addToIndexes();
 			op.getEntityGroup().removeFromIndexes();
 			op.getEntityGroup().setMembers(arr);
+			updateEntityGroupLabel(op.getEntityGroup());
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntityGroup(), op.getEntities()));
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
@@ -353,6 +354,7 @@ public class CoreferenceModel extends SubModel implements Model {
 			op.getEntities().forEach(e -> {
 				entityEntityGroupMap.remove(e, op.getEntityGroup());
 				removeFrom(op.getEntityGroup(), e);
+				updateEntityGroupLabel(op.getEntityGroup());
 			});
 		} else if (operation instanceof RemovePart) {
 			RemovePart op = (RemovePart) operation;
@@ -701,6 +703,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
+			updateEntityGroupLabel(group);
 			fireEvent(Event.get(this, Event.Type.Remove, group, entity));
 		}
 
@@ -784,6 +787,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof AddEntityToEntityGroup) {
 			AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
+			updateEntityGroupLabel(op.getEntityGroup());
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
 			remove(op.getEntity());
@@ -829,8 +833,11 @@ public class CoreferenceModel extends SubModel implements Model {
 			op.getFeatureStructures().forEach(e -> {
 				e.addToIndexes();
 				if (op.entityEntityGroupMap.containsKey(e)) {
-					for (EntityGroup group : op.entityEntityGroupMap.get(e))
+					for (EntityGroup group : op.entityEntityGroupMap.get(e)) {
 						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
+						entityEntityGroupMap.put(e, group);
+						updateEntityGroupLabel(group);
+					}
 				}
 			});
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
@@ -846,6 +853,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				newArr.set(i, op.getEntities().get(i - oldArr.size()));
 			}
 			op.getEntityGroup().setMembers(newArr);
+			updateEntityGroupLabel(op.getEntityGroup());
 			newArr.addToIndexes();
 			oldArr.removeFromIndexes();
 		} else if (operation instanceof RemoveSingletons) {
@@ -911,6 +919,12 @@ public class CoreferenceModel extends SubModel implements Model {
 			entity.setLabel(operation.getOldNames().get(entity));
 		}
 		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
+	}
+
+	private void updateEntityGroupLabel(EntityGroup entityGroup) {
+		entityGroup.setLabel(createEntityGroupLabel(
+				Lists.immutable.ofAll(entityGroup.getMembers()).selectInstancesOf(Entity.class)));
+
 	}
 
 }
