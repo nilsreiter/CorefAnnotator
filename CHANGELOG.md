@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.4
+
+- Improved stability of the grouping mechanism. #210
+
 ## 1.9.3
 
 - Fixed a bug that prevented the display of the file open dialog #207
