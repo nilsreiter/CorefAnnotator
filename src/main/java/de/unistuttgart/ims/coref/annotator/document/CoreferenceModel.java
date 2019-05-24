@@ -350,7 +350,10 @@ public class CoreferenceModel extends SubModel implements Model {
 
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
-			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
+			op.getEntities().forEach(e -> {
+				entityEntityGroupMap.remove(e, op.getEntityGroup());
+				removeFrom(op.getEntityGroup(), e);
+			});
 		} else if (operation instanceof RemovePart) {
 			RemovePart op = (RemovePart) operation;
 			remove(op.getPart());
