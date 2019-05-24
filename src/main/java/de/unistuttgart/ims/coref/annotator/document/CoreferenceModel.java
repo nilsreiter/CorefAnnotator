@@ -736,7 +736,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 */
 	private void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
-		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
+		FSArray arr = new FSArray(jcas, oldArray.size() - 1);
 
 		for (int i = 0, j = 0; i < oldArray.size() - 1 && j < arr.size() - 1; i++, j++) {
 
