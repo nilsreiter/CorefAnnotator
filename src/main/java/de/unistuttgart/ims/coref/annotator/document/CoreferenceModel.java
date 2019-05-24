@@ -701,6 +701,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
+			fireEvent(Event.get(this, Event.Type.Remove, group, entity));
 		}
 
 		entityEntityGroupMap.removeAll(entity);
