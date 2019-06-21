@@ -20,9 +20,8 @@ deploy:
   file_glob: true
   file:
   - target/bundles/*
-  - CorefAnnotator-*.dmg
   on:
-  	branch: feature/newer-jdks
-  	repo: nilsreiter/CorefAnnotator
+    branch: feature/newer-jdks
+    repo: nilsreiter/CorefAnnotator
   draft: true
   name: $TRAVIS_TAG
