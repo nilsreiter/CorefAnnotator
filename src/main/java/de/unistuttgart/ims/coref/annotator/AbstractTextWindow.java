@@ -108,6 +108,14 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	protected void entityEventMove(FeatureStructureEvent event) {
+		for (FeatureStructure fs : event) {
+			if (fs instanceof Mention) {
+				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+					highlightManager.unUnderline((Annotation) fs);
+				else
+					highlightManager.underline((Annotation) fs);
+			}
+		}
 	}
 
 	protected void entityEventMerge(FeatureStructureEvent event) {
