@@ -19,7 +19,7 @@ deploy:
     secure: iIB3NJmXlg0TIjqul5lpuRjF9YJf0syskDxgtdNrKTrFmRp/zXLvHBXzcYuHh+oS1DlueHChC+JRIIQx3NnP4LN9ErcgOAtQbpzl9EntCoGEtcMCd1bpwj1fLKirxxTBi9389g4dTutfIpK3nbhFU9vu6fOQVEKAle2x3g64zRIksUTWwCLTBn5UcctYEAgy+/Zi4uJwzzfEQUckDjCuaaFuIVuGfncK1n7hjtQA/omrgmHwGZ8910WHhgw4ErpKjyeooLvXcwzk/tbuvqFfbMhcqsscoaevkutfuygMCsVa4ux9y1F85QoE605zpSCYjwK4Pre/Y9rLPZ++SCuNS9gZ2wONqw69q5KJ8338hnNEGp+EXn1FwgbYvtYHxKVAFy7pF5MJaOCgWHEd8jC9miij0u21oRdcd1lc0eTATeNFXZ0BLWGmrm19Z0MrCu+7Pk1cku40tzA3cjRjLLMsZ3B8irNXIroj6AIVdkY8Md1OyDcAnxT3EGHawrPzl0+Q48FwPUCMptEBqMsgzjzN149ft3q/EAcfIO3ldFGz/4QXwfqodwHHvAWN1ctJFyH+kgrf3X5+DcH1Ce/9nZ635UYhyTrXem8c0v9yS0T5X5lsMy7As/I7r4Jr48C6278gcsmOh6ABFyaaK4fjOEXSkTpsGf+ITZPRU254/uV+/e4=
   file_glob: true
   file:
-  - target/CorefAnnotator-*-full.jar
+  - target/bundles/*
   - CorefAnnotator-*.dmg
   on:
   	branch: feature/newer-jdks
