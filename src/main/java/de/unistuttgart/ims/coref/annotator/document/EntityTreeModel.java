@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
@@ -100,7 +101,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			if (event.getArgument1() instanceof EntityGroup) {
 				CATreeNode gn = fsMap.get(event.getArgument1());
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
-						.collect(n -> n.getFeatureStructure());
+						.selectInstancesOf(CATreeNode.class).collect(n -> n.getFeatureStructure());
 				for (int i = members.size() - 1; i >= 0; i--) {
 					if (event.arguments.contains(members.get(i)))
 						removeNodeFromParent(gn.getChildAt(i));
@@ -293,7 +294,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			resort(entitySortOrder.getComparator());
 	}
 
-	public void resort(Comparator<CATreeNode> comparator) {
+	public void resort(Comparator<TreeNode> comparator) {
 		if (!getRoot().isLeaf()) {
 			getRoot().getChildren().sort(comparator);
 			fireTreeNodesPreResort(this, new CATreeNode[] { getRoot() }, null, null);

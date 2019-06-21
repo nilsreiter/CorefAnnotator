@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -113,12 +114,11 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 		};
 	}
 
-	@SuppressWarnings("unchecked")
-	public Vector<CATreeNode> getChildren() {
+	public Vector<TreeNode> getChildren() {
 		return this.children;
 	}
 
-	public void setChildren(Vector<CATreeNode> vec) {
+	public void setChildren(Vector<TreeNode> vec) {
 		this.children = vec;
 	}
 

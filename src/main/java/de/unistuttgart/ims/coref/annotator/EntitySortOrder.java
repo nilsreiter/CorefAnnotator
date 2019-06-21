@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Comparator;
 
+import javax.swing.tree.TreeNode;
+
 public enum EntitySortOrder {
 	Mentions, Alphabet, None;
 
@@ -11,29 +13,32 @@ public enum EntitySortOrder {
 		return descending;
 	}
 
-	public Comparator<CATreeNode> getComparator() {
+	public Comparator<TreeNode> getComparator() {
 
 		switch (this) {
 		case None:
-			return new Comparator<CATreeNode>() {
+			return new Comparator<TreeNode>() {
 				@Override
-				public int compare(CATreeNode o1, CATreeNode o2) {
+				public int compare(TreeNode o1, TreeNode o2) {
 					return 0;
 				}
 			};
 		case Mentions:
-			return new Comparator<CATreeNode>() {
+			return new Comparator<TreeNode>() {
 				@Override
-				public int compare(CATreeNode o1, CATreeNode o2) {
+				public int compare(TreeNode o1, TreeNode o2) {
 					int l1 = o1.getChildCount();
 					int l2 = o2.getChildCount();
 					return (isDescending() ? -1 : 1) * Integer.compare(l1, l2);
 				}
 			};
 		default:
-			return new Comparator<CATreeNode>() {
+			return new Comparator<TreeNode>() {
 				@Override
-				public int compare(CATreeNode o1, CATreeNode o2) {
+				public int compare(TreeNode n1, TreeNode n2) {
+					CATreeNode o1 = (CATreeNode) n1;
+					CATreeNode o2 = (CATreeNode) n2;
+
 					if (!o1.isEntity() || !o2.isEntity())
 						return 0;
 					String l1 = o1.getEntity().getLabel();
@@ -49,10 +54,13 @@ public enum EntitySortOrder {
 
 	}
 
-	public static Comparator<CATreeNode> getVisibilitySortOrder(Comparator<CATreeNode> def) {
-		return new Comparator<CATreeNode>() {
+	public static Comparator<TreeNode> getVisibilitySortOrder(Comparator<TreeNode> def) {
+		return new Comparator<TreeNode>() {
 			@Override
-			public int compare(CATreeNode o1, CATreeNode o2) {
+			public int compare(TreeNode n1, TreeNode n2) {
+				CATreeNode o1 = (CATreeNode) n1;
+				CATreeNode o2 = (CATreeNode) n2;
+
 				int r = Integer.compare(o2.getRank(), o1.getRank());
 				if (r == 0)
 					return def.compare(o1, o2);
