@@ -510,7 +510,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(this, Event.Type.Update, featureStructures));
+		fireEvent(Event.get(this, Event.Type.Update,
+				featureStructures.selectInstancesOf(Entity.class).flatCollect(e -> entityMentionMap.get(e)).toList()));
 		registerEdit(operation);
 
 	}
