@@ -6,6 +6,10 @@ language: java
 jdk:
 - oraclejdk8
 script: mvn package -Prelease -Pquadrama -Pcreta -Drelease=release
+addons:
+  apt:
+    packages:
+    - fakeroot
 deploy:
   skip_cleanup: true
   provider: releases
