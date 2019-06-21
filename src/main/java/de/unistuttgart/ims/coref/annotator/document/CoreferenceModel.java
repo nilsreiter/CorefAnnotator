@@ -326,8 +326,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
-			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
-			fireEvent(op.toEvent());
+			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getMentions()));
 		} else if (operation instanceof MoveMentionPartToMention) {
 			MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
 			op.getObjects().forEach(d -> {
@@ -810,8 +809,8 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
-			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
-			fireEvent(op.toReversedEvent());
+			fireEvent(Event.get(this, Event.Type.Move, op.getTarget(), op.getSource(), op.getMentions()));
+
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
 
