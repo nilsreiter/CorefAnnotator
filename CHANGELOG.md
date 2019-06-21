@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.5
+
+- Fixed the loading of GerDraCor files #219
+- Fixed that the entity tree is not updated when mentions are moved #217
+- Entities can be hidden again properly #216
+
 ## 1.9.4
 
 - Improved stability of the grouping mechanism. #210
