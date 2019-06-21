@@ -15,6 +15,7 @@
 		<version.javafx>11.0.2</version.javafx>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<mainClass>de.unistuttgart.ims.coref.annotator.Annotator</mainClass>
 	</properties>
 	<build>
 		<plugins>
@@ -200,6 +201,46 @@
 								<goals>
 									<goal>bundle</goal>
 								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>package-jar2</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>
+										${env.JAVA_HOME}/bin/javapackager
+									</executable>
+									<arguments>
+										<argument>-deploy</argument>
+										<argument>-native</argument>
+										<argument>installer</argument>
+										<argument>-name</argument>
+										<argument>${project.name}</argument>
+										<argument>-appclass</argument>
+										<argument>${mainClass}</argument>
+										<argument>-srcfiles</argument>
+										<argument>
+											${project.build.directory}/${project.name}-${project.version}-full.jar
+										</argument>
+										<argument>-BappVersion=${project.version}</argument>
+										<argument>-native</argument>
+										<argument>image</argument>
+										<argument>-outdir</argument>
+										<argument>./target</argument>
+										<argument>-outfile</argument>
+										<argument>
+											${project.name}-app
+										</argument>
+									</arguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>

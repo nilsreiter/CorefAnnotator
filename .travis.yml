@@ -11,7 +11,7 @@ matrix:
   exclude:
   - jdk: oraclejdk8
     os: osx
-script: mvn test -Pquadrama -Pcreta -Drelease=release
+script: mvn package -Prelease -Pquadrama -Pcreta -Drelease=release
 deploy:
   skip_cleanup: true
   provider: releases
@@ -22,8 +22,7 @@ deploy:
   - target/CorefAnnotator-*-full.jar
   - CorefAnnotator-*.dmg
   on:
+  	branch: feature/newer-jdks
     repo: nilsreiter/CorefAnnotator
-    tags: true
-    condition: 1 = 0
   draft: true
   name: $TRAVIS_TAG
