@@ -231,8 +231,6 @@
 											${project.build.directory}/${project.name}-${project.version}-full.jar
 										</argument>
 										<argument>-BappVersion=${project.version}</argument>
-										<argument>-native</argument>
-										<argument>image</argument>
 										<argument>-outdir</argument>
 										<argument>./target</argument>
 										<argument>-outfile</argument>
