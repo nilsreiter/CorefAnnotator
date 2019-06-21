@@ -23,6 +23,6 @@ deploy:
   - CorefAnnotator-*.dmg
   on:
   	branch: feature/newer-jdks
-    repo: nilsreiter/CorefAnnotator
+  	repo: nilsreiter/CorefAnnotator
   draft: true
   name: $TRAVIS_TAG
