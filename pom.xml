@@ -207,6 +207,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.6.0</version>
 						<executions>
 							<execution>
 								<id>package-jar2</id>
@@ -221,22 +222,24 @@
 									<arguments>
 										<argument>-deploy</argument>
 										<argument>-native</argument>
-										<argument>installer</argument>
+										<argument>pkg</argument>
+										<argument>-nosign</argument>
 										<argument>-name</argument>
 										<argument>${project.name}</argument>
 										<argument>-appclass</argument>
 										<argument>${mainClass}</argument>
+										<argument>-srcdir</argument>
+										<argument>${project.build.directory}</argument>
 										<argument>-srcfiles</argument>
-										<argument>
-											${project.build.directory}/${project.name}-${project.version}-full.jar
-										</argument>
+										<argument>${project.name}-${project.version}-full.jar</argument>
 										<argument>-BappVersion=${project.version}</argument>
-										<argument>-outdir</argument>
-										<argument>./target</argument>
+										<argument>-BjvmProperties=com.apple.macos.useScreenMenuBar=true</argument>
+										<argument>-Bruntime=${java.home}</argument>
+										<argument>-Bmac.CFBundleVersion=1.0</argument>
 										<argument>-outfile</argument>
-										<argument>
-											${project.name}-app
-										</argument>
+										<argument>${project.name}</argument>
+										<argument>-outdir</argument>
+										<argument>${project.build.directory}</argument>
 									</arguments>
 								</configuration>
 							</execution>
