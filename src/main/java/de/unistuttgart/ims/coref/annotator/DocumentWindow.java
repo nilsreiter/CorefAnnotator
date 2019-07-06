@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -447,9 +448,11 @@ public class DocumentWindow extends AbstractTextWindow
 		JMenu lineSpacingMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_SPACING));
 		lineSpacingMenu.setIcon(FontIcon.of(MaterialDesign.MDI_FORMAT_LINE_SPACING));
 		for (int i = 0; i < 10; i++) {
-			radio = new JRadioButtonMenuItem(new ViewSetLineSpacingAction(this, i * 0.5f));
+			ViewSetLineSpacingAction action = new ViewSetLineSpacingAction(this, i * 0.5f);
+			radio = new JRadioButtonMenuItem(action);
 			grp.add(radio);
 			lineSpacingMenu.add(radio);
+			this.addStyleChangeListener(action);
 		}
 
 		viewMenu.add(lineSpacingMenu);
@@ -843,7 +846,9 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void updateStyle(Object constant, Object value) {
 		MutableAttributeSet baseStyle = currentStyle.getBaseStyle();
+		Object oldValue = baseStyle.getAttribute(constant);
 		baseStyle.addAttribute(constant, value);
+		pcs.firePropertyChange(constant.toString(), oldValue, value);
 		switchStyle(currentStyle);
 	}
 
@@ -865,7 +870,14 @@ public class DocumentWindow extends AbstractTextWindow
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
 						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
-				StyleManager.styleParagraph(textPane.getStyledDocument(), baseStyle);
+
+				for (Enumeration<?> e = baseStyle.getAttributeNames(); e.hasMoreElements();) {
+					Object aName = e.nextElement();
+					pcs.firePropertyChange(aName.toString(), null, baseStyle.getAttribute(aName));
+				}
+				textPane.getStyledDocument().setParagraphAttributes(0, textPane.getDocument().getLength(), baseStyle,
+						true);
+
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,

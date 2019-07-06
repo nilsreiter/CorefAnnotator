@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 
 import javax.swing.JTextPane;
@@ -27,6 +29,16 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	JTextPane textPane;
 
 	LineNumberStyle lineNumberStyle;
+
+	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	public void addStyleChangeListener(PropertyChangeListener listener) {
+		this.pcs.addPropertyChangeListener(listener);
+	}
+
+	public void removeStyleChangeListener(PropertyChangeListener listener) {
+		this.pcs.removePropertyChangeListener(listener);
+	}
 
 	public enum LineNumberStyle {
 		NONE, FIXED, DYNAMIC
