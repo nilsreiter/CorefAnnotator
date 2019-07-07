@@ -7,7 +7,6 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 - Improved painting of underlinings for long annotations and a lot of
   overlapping annotations #225
-- 
 
 ## 1.9.5
 
