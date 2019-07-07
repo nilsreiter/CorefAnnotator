@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.9.6
+
+- Improved painting of underlinings for long annotations and a lot of
+  overlapping annotations #225
+- 
+
 ## 1.9.5
 
 - Fixed the loading of GerDraCor files #219
