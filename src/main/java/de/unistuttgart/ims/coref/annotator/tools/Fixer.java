@@ -21,7 +21,7 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class Fixer {
-	static Options options;
+	static FixerOptions options;
 
 	public static enum Fix {
 		None, RemoveCarriageReturn
@@ -29,7 +29,7 @@ public class Fixer {
 
 	public static void main(String[] args)
 			throws ResourceInitializationException, InvocationTargetException, InterruptedException {
-		options = CliFactory.parseArguments(Options.class, args);
+		options = CliFactory.parseArguments(FixerOptions.class, args);
 
 		SwingUtilities.invokeAndWait(new Runnable() {
 
