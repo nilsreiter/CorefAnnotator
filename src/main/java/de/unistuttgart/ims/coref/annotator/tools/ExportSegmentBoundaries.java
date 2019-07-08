@@ -36,6 +36,8 @@ public class ExportSegmentBoundaries {
 		JCas jcas = JCasFactory.createJCas();
 		XmiCasDeserializer.deserialize(is, jcas.getCas());
 
+		is.close();
+
 		FileWriter fw = new FileWriter(options.getOutput());
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			if (options.getBoundary() == "end") {
@@ -43,12 +45,13 @@ public class ExportSegmentBoundaries {
 			} else {
 				fw.write(String.valueOf(m.getBegin()));
 			}
+			fw.write("\n");
 		}
 		fw.close();
 	}
 
 	public static interface Options extends InputOutputOptions {
-		@Option
+		@Option(defaultValue = "begin")
 		String getBoundary();
 	}
 
