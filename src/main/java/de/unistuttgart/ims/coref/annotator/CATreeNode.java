@@ -143,7 +143,9 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 				}
 				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
 					b.append(", ");
-					b.append(entityGroup.getMembers(i).getLabel());
+					Entity member = entityGroup.getMembers(i);
+					if (member != null)
+						b.append(member.getLabel());
 				}
 				return b.toString();
 			} else {
