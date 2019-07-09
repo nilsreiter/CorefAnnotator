@@ -7,6 +7,15 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 - With a new toggle setting, assigning a mention over an already 
   existing mention replaces the annotation #149
+- The status bar at the bottom now shows the entity name if the cursor
+  is within a mention of an entity #189
+- Line spacing can now be set explicitly in the View menu #226
+
+## 1.9.6
+
+- Improved painting of underlinings for long annotations and a lot of 
+  overlapping annotations #225
+
 
 ## 1.9.5
 
