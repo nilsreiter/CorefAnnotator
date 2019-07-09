@@ -126,6 +126,7 @@ public class Constants {
 		public static final String ACTION_MERGE_TOOLTIP = "action.merge.tooltip";
 		public static final String ACTION_NEW = "action.new";
 		public static final String ACTION_NEW_TOOLTIP = "action.new.tooltip";
+		public static final String ACTION_MERGE_ADJACENT_MENTIONS = "action.merge.adjacent_mentions";
 		public static final String ACTION_OPEN = "action.open";
 		public static final String ACTION_REMOVE_FOREIGN_ANNOTATIONS = "action.remove.foreign_annotations";
 		public static final String ACTION_REMOVE_FOREIGN_ANNOTATIONS_TOOLTIP = "action.remove.foreign_annotations.tooltip";
