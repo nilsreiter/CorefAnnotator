@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -70,6 +71,10 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  *
  */
 public class CoreferenceModel extends SubModel implements Model {
+
+	public static enum EntitySorter {
+		LABEL, CHILDREN, COLOR
+	}
 
 	/**
 	 * A mapping from character positions to annotations
@@ -528,6 +533,26 @@ public class CoreferenceModel extends SubModel implements Model {
 		return documentModel;
 	}
 
+	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
+
+		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
+		return eset.toSortedList(new Comparator<Entity>() {
+
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				switch (entitySorter) {
+				case CHILDREN:
+					return Integer.compare(entityMentionMap.get(o2).size(), entityMentionMap.get(o1).size());
+				case COLOR:
+					return Integer.compare(o1.getColor(), o2.getColor());
+				default:
+					return o1.getLabel().compareTo(o2.getLabel());
+				}
+			}
+
+		}).toImmutable();
+	}
+
 	public JCas getJCas() {
 		return documentModel.getJcas();
 	}
@@ -590,6 +615,27 @@ public class CoreferenceModel extends SubModel implements Model {
 
 	public Preferences getPreferences() {
 		return documentModel.getPreferences();
+	}
+
+	public String getToolTipText(FeatureStructure featureStructure) {
+		if (featureStructure instanceof EntityGroup) {
+			StringBuilder b = new StringBuilder();
+			EntityGroup entityGroup = (EntityGroup) featureStructure;
+			if (entityGroup.getMembers().size() > 0) {
+				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+					b.append(entityGroup.getMembers(0).getLabel());
+				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+					b.append(", ");
+					b.append(entityGroup.getMembers(i).getLabel());
+				}
+				return b.toString();
+			} else {
+				return null;
+			}
+		} else if (featureStructure instanceof Entity) {
+			return ((Entity) featureStructure).getLabel();
+		}
+		return null;
 	}
 
 	@Override

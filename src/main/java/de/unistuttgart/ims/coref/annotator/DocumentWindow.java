@@ -147,6 +147,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
@@ -1420,26 +1421,29 @@ public class DocumentWindow extends AbstractTextWindow
 			int mark = e.getMark();
 			int low = Math.min(dot, mark);
 			int high = Math.max(dot, mark);
-			if (dot == mark) {
-				// nothing is selected
 
-				setMessage("", 0);
-			} else {
-				// something is selected
+			MutableSet<Mention> mentions = Sets.mutable.empty();
+			if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
 
+				// nothing is selected: show all mentions cursor is part of
 				MutableSet<? extends Annotation> annotations = Sets.mutable
 						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
-				@SuppressWarnings("unchecked")
-				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
-						.select(a -> a.getBegin() == low && a.getEnd() == high);
-				if (mentions.size() == 1) {
-					setMessage("Selected entity: " + mentions.iterator().next().getEntity().getLabel(), 0);
-				} else if (mentions.size() > 1) {
-					setMessage(mentions.size() + " entities selected.", 0);
-				} else {
-					setMessage("", 0);
+				mentions = annotations.selectInstancesOf(Mention.class);
+
+				// something is selected
+				if (dot != mark) {
+					ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentions(low, high)
+							.selectInstancesOf(Mention.class);
+					mentions.addAllIterable(ms);
 				}
+				setCollectionPanel(mentions.collect(m -> {
+					EntityPanel ep = new EntityPanel(getDocumentModel(), m.getEntity());
+					Annotator.app.getPreferences().addPreferenceChangeListener(ep);
+					getDocumentModel().getCoreferenceModel().addCoreferenceModelListener(ep);
+					return ep;
+				}));
 			}
+
 		}
 
 	}
