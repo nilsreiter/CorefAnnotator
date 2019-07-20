@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
@@ -9,6 +10,7 @@ import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
@@ -36,6 +38,8 @@ public class MergeAdjacentMentions extends TargetedIkonAction<DocumentWindow> im
 
 		if (!(tsu.isMention() && tsu.isDouble())) {
 			setEnabled(false);
+			putValue(Action.SHORT_DESCRIPTION,
+					Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_UNABLE_NOT_TWO_MENTIONS));
 			return;
 		}
 		boolean areAdjacent = false;
@@ -50,7 +54,12 @@ public class MergeAdjacentMentions extends TargetedIkonAction<DocumentWindow> im
 			String between = getTarget().getJCas().getDocumentText().substring(firstEnd, secondBegin);
 			areAdjacent = between.matches("^\\p{Space}*$");
 		}
-		setEnabled(areAdjacent && tsu.isMention() && tsu.isDouble());
+		if (areAdjacent)
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_TOOLTIP));
+		else
+			putValue(Action.SHORT_DESCRIPTION,
+					Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_UNABLE_NOT_ADJACENT));
+		setEnabled(areAdjacent);
 	}
 
 }
