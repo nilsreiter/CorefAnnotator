@@ -6,17 +6,13 @@ import javax.swing.Action;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
-import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
-import org.eclipse.collections.impl.factory.SortedSets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
 public class MergeAdjacentMentions extends TargetedIkonAction<DocumentWindow> implements TreeSelectionListener {
 
@@ -36,30 +32,24 @@ public class MergeAdjacentMentions extends TargetedIkonAction<DocumentWindow> im
 	public void valueChanged(TreeSelectionEvent e) {
 		TreeSelectionUtil tsu = new TreeSelectionUtil(e);
 
-		if (!(tsu.isMention() && tsu.isDouble())) {
-			setEnabled(false);
+		int applicable = MergeMentions.isApplicable().apply(tsu.getFeatureStructures().toSet().toImmutable());
+
+		switch (applicable) {
+		case MergeMentions.STATE_NOT_ADJACENT:
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_TOOLTIP));
+			break;
+		case MergeMentions.STATE_NOT_MENTIONS:
 			putValue(Action.SHORT_DESCRIPTION,
 					Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_UNABLE_NOT_TWO_MENTIONS));
-			return;
-		}
-		boolean areAdjacent = false;
-		ImmutableSortedSet<Mention> mentions = SortedSets.immutable.ofAll(new AnnotationComparator(),
-				tsu.getFeatureStructures().selectInstancesOf(Mention.class));
-		int firstEnd = mentions.getFirstOptional().get().getEnd();
-		int secondBegin = mentions.getLastOptional().get().getBegin();
-
-		if (firstEnd == secondBegin)
-			areAdjacent = true;
-		else if (firstEnd < secondBegin) {
-			String between = getTarget().getJCas().getDocumentText().substring(firstEnd, secondBegin);
-			areAdjacent = between.matches("^\\p{Space}*$");
-		}
-		if (areAdjacent)
+			break;
+		case MergeMentions.STATE_NOT_SAME_ENTITY:
+			break;
+		case MergeMentions.STATE_OK:
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_TOOLTIP));
-		else
-			putValue(Action.SHORT_DESCRIPTION,
-					Annotator.getString(Strings.ACTION_MERGE_ADJACENT_MENTIONS_UNABLE_NOT_ADJACENT));
-		setEnabled(areAdjacent);
+			break;
+		}
+
+		setEnabled(applicable == 0);
 	}
 
 }
