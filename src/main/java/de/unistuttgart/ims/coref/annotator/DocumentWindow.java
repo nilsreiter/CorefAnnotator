@@ -117,6 +117,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.MergeAdjacentMentions;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
@@ -257,6 +258,7 @@ public class DocumentWindow extends AbstractTextWindow
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(mentionFlagsInTreePopup);
+		treePopupMenu.add(this.actions.mergeMentions);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -289,6 +291,7 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.addTreeSelectionListener(actions.deleteAction);
 		tree.addTreeSelectionListener(actions.formGroupAction);
 		tree.addTreeSelectionListener(actions.renameAction);
+		tree.addTreeSelectionListener(actions.mergeMentions);
 		tree.addMouseListener(tml);
 		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
@@ -1607,8 +1610,7 @@ public class DocumentWindow extends AbstractTextWindow
 		public void valueChanged(TreeSelectionEvent e) {
 			if (!isEnabled())
 				return;
-			TreeSelectionUtil tsu = new TreeSelectionUtil();
-			tsu.collectData(e);
+			TreeSelectionUtil tsu = new TreeSelectionUtil(e);
 
 			actions.changeKeyAction.setEnabled(tsu.isSingle() && tsu.isEntity());
 			actions.changeColorAction.setEnabled(tsu.isSingle() && tsu.isEntity());
@@ -1725,6 +1727,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	class ActionContainer {
 
+		MergeAdjacentMentions mergeMentions = new MergeAdjacentMentions(DocumentWindow.this);
 		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();
 		AbstractAction changeColorAction;
@@ -1758,6 +1761,14 @@ public class DocumentWindow extends AbstractTextWindow
 		Entity[] entities = new Entity[tree.getSelectionPaths().length];
 		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
+		}
+		return Sets.immutable.of(entities);
+	}
+
+	public ImmutableSet<Mention> getSelectedMentions() {
+		Mention[] entities = new Mention[tree.getSelectionPaths().length];
+		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getFeatureStructure();
 		}
 		return Sets.immutable.of(entities);
 	}

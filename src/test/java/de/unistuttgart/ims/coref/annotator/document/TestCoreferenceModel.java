@@ -16,6 +16,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
+import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsInEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
@@ -517,5 +519,33 @@ public class TestCoreferenceModel {
 		model.edit(new MoveMentionsToEntity(group, mentions.get(2)));
 
 		assertEquals(4, JCasUtil.select(jcas, Entity.class).size());
+	}
+
+	@Test
+	public void testMergeMentions() {
+		model.edit(new AddMentionsToNewEntity(new Span(0, 3)));
+
+		assertTrue(JCasUtil.exists(jcas, Mention.class));
+		assertTrue(JCasUtil.exists(jcas, Entity.class));
+
+		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
+
+		model.edit(new AddMentionsToEntity(e, new Span(4, 6)));
+		Mention m1 = JCasUtil.selectByIndex(jcas, Mention.class, 0);
+		Mention m2 = JCasUtil.selectByIndex(jcas, Mention.class, 1);
+		ImmutableSet<Mention> em = model.getCoreferenceModel().get(e);
+		assertEquals(2, em.size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+
+		model.edit(new MergeMentions(m1, m2));
+
+		assertEquals(1, JCasUtil.select(jcas, Mention.class).size());
+		assertEquals(1, model.getCoreferenceModel().get(e).size());
+
+		model.undo();
+
+		assertEquals(2, model.getCoreferenceModel().get(e).size());
+		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
+
 	}
 }
