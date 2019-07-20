@@ -1610,8 +1610,7 @@ public class DocumentWindow extends AbstractTextWindow
 		public void valueChanged(TreeSelectionEvent e) {
 			if (!isEnabled())
 				return;
-			TreeSelectionUtil tsu = new TreeSelectionUtil();
-			tsu.collectData(e);
+			TreeSelectionUtil tsu = new TreeSelectionUtil(e);
 
 			actions.changeKeyAction.setEnabled(tsu.isSingle() && tsu.isEntity());
 			actions.changeColorAction.setEnabled(tsu.isSingle() && tsu.isEntity());
