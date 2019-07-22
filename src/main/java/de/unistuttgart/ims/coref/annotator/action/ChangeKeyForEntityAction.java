@@ -15,9 +15,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 
@@ -49,9 +48,9 @@ public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow>
 
 		int result = JOptionPane.showOptionDialog(getTarget(), panel, "", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, FontIcon.of(MaterialDesign.MDI_KEYBOARD),
-				new String[] { Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CLEAR),
-						Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_CANCEL),
-						Annotator.getString(Constants.Strings.DIALOG_CHANGE_KEY_OK) },
+				new String[] { Annotator.getString(Strings.DIALOG_CHANGE_KEY_CLEAR),
+						Annotator.getString(Strings.DIALOG_CHANGE_KEY_CANCEL),
+						Annotator.getString(Strings.DIALOG_CHANGE_KEY_OK) },
 				s);
 		String newKey = textField.getText();
 		switch (result) {

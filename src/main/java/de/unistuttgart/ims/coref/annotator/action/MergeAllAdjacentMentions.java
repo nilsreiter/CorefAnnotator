@@ -6,8 +6,8 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 
 public class MergeAllAdjacentMentions extends TargetedIkonAction<DocumentWindow> {

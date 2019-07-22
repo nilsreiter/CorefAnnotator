@@ -6,9 +6,9 @@ import javax.swing.tree.TreePath;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class ShowMentionInTreeAction extends DocumentWindowAction {
 

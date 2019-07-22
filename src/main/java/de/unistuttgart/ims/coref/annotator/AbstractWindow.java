@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;

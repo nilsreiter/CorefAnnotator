@@ -10,8 +10,8 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
 

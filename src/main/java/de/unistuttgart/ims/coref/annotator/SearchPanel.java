@@ -25,8 +25,8 @@ public abstract class SearchPanel<T> extends JPanel implements WindowListener {
 		private static final long serialVersionUID = 1L;
 
 		public ClearFindings() {
-			super(Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_BOOKMARK_REMOVE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_CLEAR_TOOLTIP));
+			super(Strings.ACTION_CLEAR, MaterialDesign.MDI_BOOKMARK_REMOVE);
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_CLEAR_TOOLTIP));
 			setEnabled(false);
 		}
 
@@ -69,7 +69,7 @@ public abstract class SearchPanel<T> extends JPanel implements WindowListener {
 	protected void updateLabel() {
 		clearFindings.setEnabled(listModel.size() > 0);
 		searchResultsLabel
-				.setText(listModel.size() + " " + Annotator.getString(Constants.Strings.STATUS_SEARCH_RESULTS));
+				.setText(listModel.size() + " " + Annotator.getString(Strings.STATUS_SEARCH_RESULTS));
 	}
 
 	protected void clearEvent() {

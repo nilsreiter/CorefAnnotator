@@ -11,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
@@ -23,7 +23,7 @@ public class DeleteFlagAction extends TargetedIkonAction<DocumentModel> implemen
 	JTable table;
 
 	public DeleteFlagAction(DocumentModel dw, JTable table) {
-		super(dw, Constants.Strings.ACTION_DELETE_FLAG, MaterialDesign.MDI_FLAG);
+		super(dw, Strings.ACTION_DELETE_FLAG, MaterialDesign.MDI_FLAG);
 		this.table = table;
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_FLAG_TOOLTIP));
 	}

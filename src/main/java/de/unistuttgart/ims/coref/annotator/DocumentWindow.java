@@ -101,7 +101,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
@@ -249,8 +248,8 @@ public class DocumentWindow extends AbstractTextWindow
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
-		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
-		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Entity.class);
 
 		// tree popup
 		treePopupMenu = new JPopupMenu();
@@ -571,8 +570,8 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
-		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Entity.class);
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
@@ -1344,7 +1343,7 @@ public class DocumentWindow extends AbstractTextWindow
 		private static final long serialVersionUID = 1L;
 
 		public ClearAction(DocumentWindow dm) {
-			super(dm, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+			super(dm, Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
@@ -1535,7 +1534,7 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 
 			if (selection) {
-				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				textPopupMenu.add(Annotator.getString(Strings.MENU_ENTITIES_CANDIDATES));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				textPopupMenu.add(actions.newEntityAction);
 				if (!candidates.isEmpty()) {
@@ -1555,7 +1554,7 @@ public class DocumentWindow extends AbstractTextWindow
 			if (!mentionActions.isEmpty()) {
 				if (selection)
 					textPopupMenu.addSeparator();
-				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+				textPopupMenu.add(Annotator.getString(Strings.MENU_ENTITIES));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				mentionActions.forEach(mi -> {
 					textPopupMenu.add(mi);
@@ -1563,7 +1562,7 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 			if (!exportActions.isEmpty()) {
 				textPopupMenu.addSeparator();
-				textPopupMenu.add(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
+				textPopupMenu.add(Annotator.getString(Strings.ACTION_EXPORT_EXAMPLE));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				exportActions.forEach(ea -> textPopupMenu.add(ea));
 			}

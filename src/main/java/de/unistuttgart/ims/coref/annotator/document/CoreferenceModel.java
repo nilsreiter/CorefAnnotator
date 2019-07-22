@@ -33,6 +33,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -218,7 +219,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		String s = entityList.subList(0, Math.min(entityList.size(), 2)).select(e -> e.getLabel() != null)
 				.collect(
 						e -> StringUtils.abbreviate(e.getLabel(), "…", (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 4))
-				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
+				.makeString(" " + Annotator.getString(Strings.ENTITY_GROUP_AND) + " ");
 		if (entityList.size() > 2)
 			s += " + " + String.valueOf(entityList.size() - 2);
 		return s;

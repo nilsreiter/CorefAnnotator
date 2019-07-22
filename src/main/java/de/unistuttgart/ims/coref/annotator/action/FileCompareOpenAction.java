@@ -13,7 +13,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
@@ -22,8 +22,8 @@ public class FileCompareOpenAction extends IkonAction {
 	private static final long serialVersionUID = 1L;
 
 	public FileCompareOpenAction() {
-		super(Constants.Strings.ACTION_COMPARE, MaterialDesign.MDI_COMPARE);
-		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Constants.Strings.ACTION_COMPARE_TOOLTIP));
+		super(Strings.ACTION_COMPARE, MaterialDesign.MDI_COMPARE);
+		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_COMPARE_TOOLTIP));
 	}
 
 	@Override
