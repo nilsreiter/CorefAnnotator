@@ -13,6 +13,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Adjacent mentions that belong to the same entity can now be merged
   with a single action. Two mentions are considered adjacent, if there is
   only whitespace between them. #218
+- Entity label in context menu now has limited width #232
 
 ## 1.9.6
 

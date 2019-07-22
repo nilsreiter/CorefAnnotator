@@ -17,8 +17,6 @@ public class EntityLabel extends JLabel {
 
 	private static final long serialVersionUID = 1L;
 
-	int maxLength = 15;
-
 	public EntityLabel(Entity entity) {
 		Color entityColor = new Color(entity.getColor());
 
@@ -28,7 +26,7 @@ public class EntityLabel extends JLabel {
 		else
 			this.setForeground(Color.BLACK);
 
-		this.setText(StringUtils.abbreviate(entity.getLabel(), maxLength));
+		this.setText(StringUtils.abbreviate(entity.getLabel(), Constants.UI_MAX_STRING_WIDTH_IN_STATUSBAR));
 		if (entity instanceof EntityGroup) {
 			this.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE, (isGrey ? Color.GRAY : entityColor)));
 		} else {

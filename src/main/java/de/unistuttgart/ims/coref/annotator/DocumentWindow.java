@@ -1584,11 +1584,15 @@ public class DocumentWindow extends AbstractTextWindow
 			b.append(m.getAddress());
 
 			String surf = m.getCoveredText();
+			surf = StringUtils.abbreviateMiddle(surf, "...", 20);
 
 			if (dmp != null)
 				surf += " [,] " + dmp.getCoveredText();
 			if (m.getEntity().getLabel() != null)
-				b.append(": ").append(m.getEntity().getLabel());
+				b.append(": ")
+						.append(StringUtils.abbreviateMiddle(
+								getDocumentModel().getCoreferenceModel().getLabel(m.getEntity()), "...",
+								Constants.UI_MAX_STRING_WIDTH_IN_MENU));
 
 			JMenu mentionMenu = new JMenu(b.toString());
 			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
