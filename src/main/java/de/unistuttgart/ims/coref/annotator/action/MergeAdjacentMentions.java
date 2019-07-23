@@ -12,7 +12,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
+import de.unistuttgart.ims.coref.annotator.document.MergeMentions;
 
 public class MergeAdjacentMentions extends TargetedIkonAction<DocumentWindow> implements TreeSelectionListener {
 

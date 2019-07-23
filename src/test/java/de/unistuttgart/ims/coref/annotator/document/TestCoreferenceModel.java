@@ -35,7 +35,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
-import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsInEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;

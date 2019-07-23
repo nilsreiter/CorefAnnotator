@@ -48,7 +48,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
-import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
@@ -148,7 +147,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param end
 	 * @return
 	 */
-	private Mention addTo(Entity e, int begin, int end) {
+	Mention addTo(Entity e, int begin, int end) {
 		Mention m = createMention(begin, end);
 		m.setEntity(e);
 		entityMentionMap.put(e, m);
@@ -163,7 +162,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param span
 	 * @return
 	 */
-	private Mention addTo(Entity e, Span span) {
+	Mention addTo(Entity e, Span span) {
 		return addTo(e, span.begin, span.end);
 	}
 
@@ -739,7 +738,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		characterPosition2AnnotationMap.add(a);
 	}
 
-	private void registerEdit(Operation operation) {
+	void registerEdit(Operation operation) {
 		documentModel.fireDocumentChangedEvent();
 	}
 
@@ -748,7 +747,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * 
 	 * @param dmp
 	 */
-	private void remove(DetachedMentionPart dmp) {
+	void remove(DetachedMentionPart dmp) {
 		dmp.removeFromIndexes();
 		characterPosition2AnnotationMap.remove(dmp);
 	};
@@ -780,7 +779,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		Annotator.logger.exit();
 	}
 
-	private void remove(Mention m, boolean autoRemove) {
+	void remove(Mention m, boolean autoRemove) {
 		Entity entity = m.getEntity();
 		characterPosition2AnnotationMap.remove(m);
 		entityMentionMap.remove(entity, m);

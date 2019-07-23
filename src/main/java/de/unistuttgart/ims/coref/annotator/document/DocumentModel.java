@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation2;
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
@@ -70,8 +71,11 @@ public class DocumentModel implements Model {
 		Annotator.logger.trace(operation);
 		if (operation instanceof DocumentModelOperation)
 			edit((DocumentModelOperation) operation);
-		if (operation instanceof CoreferenceModelOperation)
+		if (operation instanceof CoreferenceModelOperation2)
+			((CoreferenceModelOperation2) operation).edit(coreferenceModel);
+		if (operation instanceof CoreferenceModelOperation) {
 			coreferenceModel.edit((CoreferenceModelOperation) operation);
+		}
 		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
 		history.push(operation);
