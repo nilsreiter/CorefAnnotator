@@ -48,6 +48,7 @@ public class StyleManager {
 		document.setCharacterAttributes(0, document.getLength(), style, true);
 	}
 
+	@Deprecated
 	public static void styleParagraph(StyledDocument document, AttributeSet style) {
 		document.setParagraphAttributes(0, document.getLength(), style, true);
 	}

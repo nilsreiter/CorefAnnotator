@@ -83,4 +83,8 @@ public class FeatureStructureEvent implements Event {
 	public String toString() {
 		return getSource().toString() + " " + eventType + ": " + arguments.toString();
 	}
+
+	public ImmutableList<FeatureStructure> getArguments() {
+		return arguments;
+	}
 }

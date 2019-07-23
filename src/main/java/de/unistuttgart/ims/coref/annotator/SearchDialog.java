@@ -82,13 +82,13 @@ public class SearchDialog extends JDialog implements DocumentListener, SearchCon
 		addWindowListener(pane1);
 		addWindowListener(pane2);
 
-		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_TEXT), pane1);
-		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_STRUCTURE), pane2);
+		tabbedPane.addTab(Annotator.getString(Strings.SEARCH_WINDOW_TAB_TEXT), pane1);
+		tabbedPane.addTab(Annotator.getString(Strings.SEARCH_WINDOW_TAB_STRUCTURE), pane2);
 
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
-		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
+		setTitle(Annotator.getString(Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
 		setLocationRelativeTo(documentWindow);
 		addWindowListener(new SearchDialogWindowListener());

@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 
 import javax.swing.JTextPane;
@@ -7,6 +9,7 @@ import javax.swing.JTextPane;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.set.MutableSet;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -26,6 +29,16 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	JTextPane textPane;
 
 	LineNumberStyle lineNumberStyle;
+
+	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+	public void addStyleChangeListener(PropertyChangeListener listener) {
+		this.pcs.addPropertyChangeListener(listener);
+	}
+
+	public void removeStyleChangeListener(PropertyChangeListener listener) {
+		this.pcs.removePropertyChangeListener(listener);
+	}
 
 	public enum LineNumberStyle {
 		NONE, FIXED, DYNAMIC
@@ -132,6 +145,14 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (m.getDiscontinuous() != null)
 				highlightManager.underline(m.getDiscontinuous());
 		}
+	}
+
+	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
+		MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
+				.getMentions(getTextPane().getSelectionStart())
+				.select(a -> a.getBegin() == getTextPane().getSelectionStart()
+						&& a.getEnd() == getTextPane().getSelectionEnd());
+		return annotations.selectInstancesOf(clazz);
 	}
 
 	public JTextPane getTextPane() {

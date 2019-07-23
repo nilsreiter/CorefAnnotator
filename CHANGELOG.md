@@ -3,10 +3,24 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.10.0
+
+- With a new toggle setting, assigning a mention over an already 
+  existing mention replaces the annotation #149
+- The status bar at the bottom now shows the entity name if the cursor
+  is within a mention of an entity. Thanks @andreasvc for the initial 
+  code contribution! #189
+- Line spacing can now be set explicitly in the View menu #226
+- Adjacent mentions that belong to the same entity can now be merged
+  with a single action. Two mentions are considered adjacent, if there is
+  only whitespace between them. #218
+- Entity label in context menu now has limited width #232
+
 ## 1.9.6
 
-- Improved painting of underlinings for long annotations and a lot of
+- Improved painting of underlinings for long annotations and a lot of 
   overlapping annotations #225
+
 
 ## 1.9.5
 

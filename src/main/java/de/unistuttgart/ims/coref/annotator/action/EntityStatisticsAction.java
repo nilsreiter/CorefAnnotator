@@ -14,10 +14,9 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -37,7 +36,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public EntityStatisticsAction(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_ENTITY_STATISTICS, MaterialDesign.MDI_CHART_BAR);
+		super(dw, Strings.ACTION_ENTITY_STATISTICS, MaterialDesign.MDI_CHART_BAR);
 	}
 
 	@Override

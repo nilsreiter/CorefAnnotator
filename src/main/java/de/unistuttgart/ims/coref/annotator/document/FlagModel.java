@@ -16,6 +16,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -111,7 +112,7 @@ public class FlagModel extends SubModel implements Model {
 		if (operation.getLabel() != null)
 			f.setLabel(operation.getLabel());
 		else
-			f.setLabel(Annotator.getString(Constants.Strings.FLAGMODEL_NEW_FLAG));
+			f.setLabel(Annotator.getString(Strings.FLAGMODEL_NEW_FLAG));
 
 		String key = UUID.randomUUID().toString();
 		if (operation.getKey() != null)
@@ -222,7 +223,7 @@ public class FlagModel extends SubModel implements Model {
 		// ambiguous
 		flag = new Flag(documentModel.getJcas());
 		flag.setKey(Constants.MENTION_FLAG_AMBIGUOUS);
-		flag.setLabel(Constants.Strings.MENTION_FLAG_AMBIGUOUS);
+		flag.setLabel(Strings.MENTION_FLAG_AMBIGUOUS);
 		flag.setIcon("MDI_SHARE_VARIANT");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
@@ -231,7 +232,7 @@ public class FlagModel extends SubModel implements Model {
 		// difficult
 		flag = new Flag(documentModel.getJcas());
 		flag.setKey(Constants.MENTION_FLAG_DIFFICULT);
-		flag.setLabel(Constants.Strings.MENTION_FLAG_DIFFICULT);
+		flag.setLabel(Strings.MENTION_FLAG_DIFFICULT);
 		flag.setIcon("MDI_ALERT_BOX");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
@@ -240,7 +241,7 @@ public class FlagModel extends SubModel implements Model {
 		// non-nominal
 		flag = new Flag(documentModel.getJcas());
 		flag.setKey(Constants.MENTION_FLAG_NON_NOMINAL);
-		flag.setLabel(Constants.Strings.MENTION_FLAG_NON_NOMINAL);
+		flag.setLabel(Strings.MENTION_FLAG_NON_NOMINAL);
 		flag.setIcon("MDI_FLAG");
 		flag.setTargetClass(Mention.class.getName());
 		flag.addToIndexes();
@@ -249,7 +250,7 @@ public class FlagModel extends SubModel implements Model {
 		// generic
 		flag = new Flag(documentModel.getJcas());
 		flag.setKey(Constants.ENTITY_FLAG_GENERIC);
-		flag.setLabel(Constants.Strings.ACTION_FLAG_ENTITY_GENERIC);
+		flag.setLabel(Strings.ACTION_FLAG_ENTITY_GENERIC);
 		flag.setIcon("MDI_CLOUD");
 		flag.setTargetClass(Entity.class.getName());
 		flag.addToIndexes();
@@ -258,7 +259,7 @@ public class FlagModel extends SubModel implements Model {
 		// hidden
 		flag = new Flag(documentModel.getJcas());
 		flag.setKey(Constants.ENTITY_FLAG_HIDDEN);
-		flag.setLabel(Constants.Strings.ACTION_TOGGLE_ENTITY_VISIBILITY);
+		flag.setLabel(Strings.ACTION_TOGGLE_ENTITY_VISIBILITY);
 		flag.setIcon("MDI_ACCOUNT_OUTLINE");
 		flag.setTargetClass(Entity.class.getName());
 		flag.addToIndexes();

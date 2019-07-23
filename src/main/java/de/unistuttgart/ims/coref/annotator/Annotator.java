@@ -213,7 +213,7 @@ public class Annotator {
 		try {
 			if (updateCheck.checkForUpdate()) {
 				JButton button = new JButton();
-				button.setText(Annotator.getString(Constants.Strings.STATUS_NOW_AVAILABLE) + ": "
+				button.setText(Annotator.getString(Strings.STATUS_NOW_AVAILABLE) + ": "
 						+ updateCheck.getRemoteVersion().toString());
 				button.setIcon(FontIcon.of(MaterialDesign.MDI_NEW_BOX));
 				button.addActionListener(new ActionListener() {

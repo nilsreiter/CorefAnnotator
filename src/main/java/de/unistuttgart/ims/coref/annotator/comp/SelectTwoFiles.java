@@ -25,7 +25,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class SelectTwoFiles extends JDialog {
 
@@ -88,7 +88,7 @@ public class SelectTwoFiles extends JDialog {
 		add(splitPane, BorderLayout.CENTER);
 
 		JButton cancelButton = new JButton();
-		cancelButton.setText(Annotator.getString(Constants.Strings.DIALOG_CANCEL));
+		cancelButton.setText(Annotator.getString(Strings.DIALOG_CANCEL));
 		cancelButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -112,9 +112,9 @@ public class SelectTwoFiles extends JDialog {
 		textField.setMaximumSize(new Dimension(200, 20));
 		textField.setColumns(40);
 		textfields.set(index, textField);
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.DIALOG_ANNOTATOR_LABEL)));
+		panel.add(new JLabel(Annotator.getString(Strings.DIALOG_ANNOTATOR_LABEL)));
 		panel.add(textField);
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.DIALOG_SELECT_FILE)));
+		panel.add(new JLabel(Annotator.getString(Strings.DIALOG_SELECT_FILE)));
 		panel.add(new JButton(new SelectFileAction(panel, index)));
 		panel.setPreferredSize(new Dimension(200, 80));
 		return panel;

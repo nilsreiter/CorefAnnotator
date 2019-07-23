@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -56,7 +57,7 @@ public class TestFlagModel {
 		assertEquals(5, fmodel.getFlags().size());
 		Flag flag = fmodel.getFlag(Constants.MENTION_FLAG_AMBIGUOUS);
 		assertEquals(Mention.class, fmodel.getTargetClass(flag));
-		assertEquals(Constants.Strings.MENTION_FLAG_AMBIGUOUS, fmodel.getLabel(flag));
+		assertEquals(Strings.MENTION_FLAG_AMBIGUOUS, fmodel.getLabel(flag));
 	}
 
 	@Test
