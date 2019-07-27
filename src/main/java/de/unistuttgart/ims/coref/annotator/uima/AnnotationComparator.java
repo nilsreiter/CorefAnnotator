@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import org.apache.uima.jcas.tcas.Annotation;
 
-public class AnnotationComparator implements Comparator<Annotation> {
+public class AnnotationComparator<T extends Annotation> implements Comparator<T> {
 
 	boolean useEnd = false;
 	boolean descending = false;
@@ -14,6 +14,11 @@ public class AnnotationComparator implements Comparator<Annotation> {
 
 	public AnnotationComparator(boolean useEnd) {
 		this.useEnd = useEnd;
+	}
+
+	public AnnotationComparator(boolean useEnd, boolean descending) {
+		this.useEnd = useEnd;
+		this.descending = descending;
 	}
 
 	@Override
