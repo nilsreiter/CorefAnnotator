@@ -87,6 +87,8 @@ public class Annotator {
 
 	public static Annotator app;
 
+	static Boolean javafx = null;
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 
@@ -417,4 +419,15 @@ public class Annotator {
 		}
 	}
 
+	public static boolean javafx() {
+		if (javafx == null)
+			try {
+				Class.forName("javafx.embed.swing.JFXPanel");
+				new JFXPanel();
+				javafx = true;
+			} catch (Exception e) {
+				javafx = false;
+			}
+		return javafx;
+	}
 }
