@@ -70,9 +70,6 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
-	@Deprecated
-	JFileChooser openDialog;
-
 	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
@@ -137,9 +134,6 @@ public class Annotator {
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
-		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}
