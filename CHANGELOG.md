@@ -3,6 +3,15 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.11.0
+
+- JavaFX is now optional. If JavaFX classes can't be loaded, the application
+  uses file open/save windows from classic swing. #220
+- Updated guava from 28.0-jre to 28.1-jre #236
+- Updated log4j-core from 2.12.0 to 2.12.1 #234
+- Updated log4j-api from 2.12.0 to 2.12.1 #233
+- Updated mockito-core from 2.27.0 to 3.0.0 #229
+
 ## 1.10.0
 
 - With a new toggle setting, assigning a mention over an already 
