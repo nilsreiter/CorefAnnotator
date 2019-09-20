@@ -70,9 +70,6 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
-	@Deprecated
-	JFileChooser openDialog;
-
 	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
@@ -86,6 +83,8 @@ public class Annotator {
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
 	public static Annotator app;
+
+	static Boolean javafx = null;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -112,7 +111,8 @@ public class Annotator {
 	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
 		logger.trace("Application startup. Version " + Version.get().toString());
-		new JFXPanel();
+		if (Annotator.javafx())
+			new JFXPanel();
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -134,9 +134,6 @@ public class Annotator {
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
-		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}
@@ -296,24 +293,42 @@ public class Annotator {
 	}
 
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
-				fileChooser.setInitialDirectory(getCurrentDirectory());
-				// fileChooser.getExtensionFilters().clear();
-				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
-				File file = fileChooser.showOpenDialog(null);
-				if (file != null)
-					open(file, flavor, Constants.X_UNSPECIFIED);
-				else
-					showOpening();
-
+		if (Annotator.javafx()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+					fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+					fileChooser.setInitialDirectory(getCurrentDirectory());
+					// fileChooser.getExtensionFilters().clear();
+					fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
+					File file = fileChooser.showOpenDialog(null);
+					if (file != null)
+						open(file, flavor, Constants.X_UNSPECIFIED);
+					else
+						showOpening();
+				}
+			});
+		} else {
+			JFileChooser openDialog;
+			openDialog = new JFileChooser();
+			openDialog.setMultiSelectionEnabled(true);
+			openDialog.setFileFilter(FileFilters.xmi_gz);
+			openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
+			openDialog.setFileFilter(flavor.getFileFilter());
+			openDialog.setCurrentDirectory(getCurrentDirectory());
+			int r = openDialog.showOpenDialog(parent);
+			switch (r) {
+			case JFileChooser.APPROVE_OPTION:
+				for (File f : openDialog.getSelectedFiles()) {
+					setCurrentDirectory(f.getParentFile());
+					open(f, flavor, Constants.X_UNSPECIFIED);
+				}
+				break;
+			default:
+				showOpening();
 			}
-
-		});
-
+		}
 	}
 
 	public static String getString(String key) {
@@ -417,4 +432,15 @@ public class Annotator {
 		}
 	}
 
+	public static boolean javafx() {
+		if (javafx == null)
+			try {
+				Class.forName("javafx.embed.swing.JFXPanel");
+				new JFXPanel();
+				javafx = true;
+			} catch (Exception e) {
+				javafx = false;
+			}
+		return javafx;
+	}
 }
