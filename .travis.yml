@@ -3,7 +3,7 @@ osx_image: xcode11
 language: java
 jdk:
 - openjdk13
-script: mvn package -Pquadrama -Pcreta -Drelease=release
+script: mvn test -Pquadrama -Pcreta -Drelease=release
 deploy:
   skip_cleanup: true
   provider: releases
