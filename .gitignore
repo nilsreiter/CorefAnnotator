@@ -3,3 +3,4 @@
 .settings
 *.dmg
 bin
+.classpath
