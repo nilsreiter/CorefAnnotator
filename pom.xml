@@ -470,6 +470,16 @@
 			<version>3.0.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+      		<groupId>org.openjfx</groupId>
+      		<artifactId>javafx-controls</artifactId>
+      		<version>13</version>
+    	</dependency>
+		<dependency>
+      		<groupId>org.openjfx</groupId>
+      		<artifactId>javafx-swing</artifactId>
+      		<version>13</version>
+    	</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
