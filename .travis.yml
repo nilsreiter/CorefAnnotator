@@ -1,4 +1,6 @@
-os: osx
+os:
+- osx
+- linux
 osx_image: xcode11
 language: java
 jdk:
