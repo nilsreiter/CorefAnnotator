@@ -14,7 +14,6 @@
 		<version.ikonli>2.1.1</version.ikonli>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -474,56 +473,12 @@
 		<dependency>
       		<groupId>org.openjfx</groupId>
       		<artifactId>javafx-controls</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>win</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-controls</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>linux</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-controls</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>mac</classifier>
+      		<version>13</version>
     	</dependency>
 		<dependency>
       		<groupId>org.openjfx</groupId>
       		<artifactId>javafx-swing</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>win</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-swing</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>linux</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-swing</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>mac</classifier>
-    	</dependency>
-    	<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-graphics</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>win</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-graphics</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>linux</classifier>
-    	</dependency>
-		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-graphics</artifactId>
-      		<version>${version.javafx}</version>
-      		<classifier>mac</classifier>
+      		<version>13</version>
     	</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -545,6 +500,13 @@
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.oracle</groupId>
+				<artifactId>javafx</artifactId>
+				<version>2.2</version>
+				<systemPath>${java.home}/lib/ext/jfxrt.jar</systemPath>
+				<scope>system</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
