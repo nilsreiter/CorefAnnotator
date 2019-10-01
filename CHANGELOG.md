@@ -5,8 +5,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 ## 1.11.0
 
-- JavaFX is now optional. If JavaFX classes can't be loaded, the application
-  uses file open/save windows from classic swing. #220
+- JavaFX is now optional, but included. Fat jar contains JavaFX 
+  libraries for linux, mac, win. If they still can't be loaded, 
+  the application uses file open/save windows from 
+  classic swing  #220
+- The app now compiles with OpenJDK properly. Tested using OpenJDK 13. #237
 - Updated guava from 28.0-jre to 28.1-jre #236
 - Updated log4j-core from 2.12.0 to 2.12.1 #234
 - Updated log4j-api from 2.12.0 to 2.12.1 #233
