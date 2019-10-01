@@ -6,6 +6,10 @@ language: java
 jdk:
 - openjdk13
 - openjdk12
+matrix:
+  exclude:
+  - jdk: openjdk12
+    os: osx
 script: mvn test -Pquadrama -Pcreta -Drelease=release
 deploy:
   skip_cleanup: true
