@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
@@ -27,7 +28,9 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 	String label;
 
 	int rank = 50;
-
+	
+	Vector<CATreeNode> children = new Vector<CATreeNode>();
+	
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
 			this.userObject = featureStructure;
@@ -113,7 +116,6 @@ public class CATreeNode extends DefaultMutableTreeNode implements Iterable<CATre
 		};
 	}
 
-	@SuppressWarnings("unchecked")
 	public Vector<CATreeNode> getChildren() {
 		return this.children;
 	}
