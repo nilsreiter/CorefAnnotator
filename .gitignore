@@ -2,3 +2,5 @@
 .project
 .settings
 *.dmg
+bin
+.classpath

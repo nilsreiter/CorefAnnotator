@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.10.0</version>
+	<version>1.11.0</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
@@ -14,6 +14,7 @@
 		<version.ikonli>2.1.1</version.ikonli>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<version.javafx>13</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -123,6 +124,11 @@
 							</excludes>
 						</filter>
 					</filters>
+					<artifactSet>
+						<excludes>
+							<exclude>org.openjfx:*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
@@ -201,6 +207,18 @@
 								</goals>
 							</execution>
 						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.codehaus.plexus</groupId>
+								<artifactId>plexus-archiver</artifactId>
+								<version>4.1.0</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.velocity</groupId>
+								<artifactId>velocity-tools</artifactId>
+								<version>2.0</version>
+							</dependency>
+						</dependencies>
 					</plugin>
 				</plugins>
 			</build>
@@ -366,18 +384,18 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.12.0</version>
+			<version>2.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.12.0</version>
+			<version>2.12.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>28.0-jre</version>
+			<version>28.1-jre</version>
 		</dependency>
 
 		<dependency>
@@ -467,8 +485,18 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.27.0</version>
+			<version>3.0.0</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${version.javafx}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -490,13 +518,6 @@
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>javafx</artifactId>
-				<version>2.2</version>
-				<systemPath>${java.home}/lib/ext/jfxrt.jar</systemPath>
-				<scope>system</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
