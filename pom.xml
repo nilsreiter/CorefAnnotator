@@ -124,6 +124,11 @@
 							</excludes>
 						</filter>
 					</filters>
+					<artifactSet>
+						<excludes>
+							<exclude>org.openjfx:*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
@@ -330,53 +335,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		<profile>
-			<id>win</id>
-			<properties>
-				<os>win</os>
-			</properties>
-		</profile>
-		<profile>
-			<id>mac</id>
-			<properties>
-				<os>mac</os>
-			</properties>
-		</profile>
-		<profile>
-			<id>linux</id>
-			<properties>
-				<os>linux</os>
-			</properties>
-		</profile>
-		<profile>
-			<id>includeJavaFX</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-controls</artifactId>
-					<version>${version.javafx}</version>
-					<classifier>${os}</classifier>
-				</dependency>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-swing</artifactId>
-					<version>${version.javafx}</version>
-					<classifier>${os}</classifier>
-				</dependency>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-graphics</artifactId>
-					<version>${version.javafx}</version>
-					<classifier>${os}</classifier>
-				</dependency>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-base</artifactId>
-					<version>${version.javafx}</version>
-					<classifier>${os}</classifier>
-				</dependency>
-			</dependencies>
-		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -529,6 +487,16 @@
 			<artifactId>mockito-core</artifactId>
 			<version>3.0.0</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${version.javafx}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
