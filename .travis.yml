@@ -4,8 +4,12 @@ os:
 osx_image: xcode11
 language: java
 jdk:
-- openjdk13
+- openjdk11
 - openjdk12
+matrix:
+  exclude:
+  - jdk: openjdk11
+    os: osx
 script: mvn test -Pquadrama -Pcreta -Drelease=release
 deploy:
   skip_cleanup: true
