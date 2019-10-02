@@ -23,7 +23,7 @@ This is an annotation tool for coreference. It's built on top of [Apache's UIMA]
 
 ## Requirements and Installation
 
-See file [Install.md](Install.md)
+See file [INSTALL.md](INSTALL.md)
  
 ## How to cite
 If you are using this annotation tool, it would be nice to cite this 
