@@ -14,6 +14,7 @@
 		<version.ikonli>2.1.1</version.ikonli>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<version.javafx>13</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -329,6 +330,53 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>win</id>
+			<properties>
+				<os>win</os>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac</id>
+			<properties>
+				<os>mac</os>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux</id>
+			<properties>
+				<os>linux</os>
+			</properties>
+		</profile>
+		<profile>
+			<id>includeJavaFX</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${version.javafx}</version>
+					<classifier>${os}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-swing</artifactId>
+					<version>${version.javafx}</version>
+					<classifier>${os}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${version.javafx}</version>
+					<classifier>${os}</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>${version.javafx}</version>
+					<classifier>${os}</classifier>
+				</dependency>
+			</dependencies>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -482,16 +530,6 @@
 			<version>3.0.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>13</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-swing</artifactId>
-			<version>13</version>
-		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -512,13 +550,6 @@
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>javafx</artifactId>
-				<version>2.2</version>
-				<systemPath>${java.home}/lib/ext/jfxrt.jar</systemPath>
-				<scope>system</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
