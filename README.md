@@ -21,13 +21,9 @@ This is an annotation tool for coreference. It's built on top of [Apache's UIMA]
 - Search terms (including regular expressions) can be annotated en bloc
 
 
-## Requirements
+## Requirements and Installation
 
-- Java 8 or higher; both Oracle Java and OpenJDK are supported.
-- JavaFX: https://openjfx.io/openjfx-docs/#install-javafx
-- [Oracle Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) includes JavaFX;
-  if you use OpenJDK or Oracle Java 11, you need to install JavaFX separately.
-
+See file [Install.md](Install.md)
  
 ## How to cite
 If you are using this annotation tool, it would be nice to cite this 
