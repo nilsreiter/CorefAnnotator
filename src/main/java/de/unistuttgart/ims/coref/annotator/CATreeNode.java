@@ -22,8 +22,6 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	private static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
 
-	private static final long serialVersionUID = 1L;
-
 	int featureStructureHash;
 
 	transient FeatureStructure userObject;
