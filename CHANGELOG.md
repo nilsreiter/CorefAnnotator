@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.11.1
+
+- Entities in tree are now sortable again #241
+
 ## 1.11.0
 
 - JavaFX is now optional. If JavaFX classes can't be loaded, the application
