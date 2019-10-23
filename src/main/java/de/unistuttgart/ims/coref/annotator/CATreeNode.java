@@ -1,9 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.tree.MutableTreeNode;
@@ -20,11 +18,7 @@ import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 
 public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Tooltipable {
 
-	private static Map<Integer, FeatureStructure> mentionCache = new HashMap<Integer, FeatureStructure>();
-
-	int featureStructureHash;
-
-	transient FeatureStructure userObject;
+	FeatureStructure userObject;
 
 	String label;
 
@@ -41,8 +35,6 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 	public CATreeNode(FeatureStructure featureStructure, String label) {
 		if (featureStructure != null) {
 			this.userObject = featureStructure;
-			this.featureStructureHash = featureStructure.hashCode();
-			mentionCache.put(featureStructure.hashCode(), featureStructure);
 		}
 		this.label = label;
 	}
@@ -77,8 +69,6 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	@SuppressWarnings("unchecked")
 	public <T extends FeatureStructure> T getFeatureStructure() {
-		if (userObject == null)
-			userObject = mentionCache.get(featureStructureHash);
 		return (T) userObject;
 	}
 
