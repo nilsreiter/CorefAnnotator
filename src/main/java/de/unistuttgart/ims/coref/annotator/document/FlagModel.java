@@ -187,7 +187,7 @@ public class FlagModel extends SubModel implements Model {
 			flag.setKey((String) op.getNewValue());
 			break;
 		}
-		Annotator.logger.entry(op);
+		Annotator.logger.traceEntry();
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 
@@ -341,7 +341,7 @@ public class FlagModel extends SubModel implements Model {
 	}
 
 	public void updateFlag(Flag flag) {
-		Annotator.logger.entry(flag);
+		Annotator.logger.traceEntry();
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 		documentModel.getCoreferenceModel()
 				.fireEvent(Event.get(this, Event.Type.Update, getFlaggedFeatureStructures(flag)));
