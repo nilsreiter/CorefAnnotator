@@ -74,7 +74,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
-		Annotator.logger.entry(event);
+		Annotator.logger.traceEntry();
 		Event.Type eventType = event.getType();
 		switch (eventType) {
 		case Add:
