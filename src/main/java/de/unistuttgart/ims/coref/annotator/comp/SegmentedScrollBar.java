@@ -79,7 +79,7 @@ public class SegmentedScrollBar<T extends Annotation> extends JScrollBar impleme
 		int maxDoc = getLastCharacterPosition();
 		int maxView = getHeight();
 		try {
-			Rectangle2D r = ((JTextComponent) scrollPane.getViewport().getView()).modelToView((int) vpos);
+			Rectangle2D r = ((JTextComponent) scrollPane.getViewport().getView()).modelToView2D((int) vpos);
 			vpos = r.getY();
 			maxDoc = getMaximum();
 		} catch (BadLocationException e) {
@@ -154,8 +154,7 @@ public class SegmentedScrollBar<T extends Annotation> extends JScrollBar impleme
 	 * Messages super to set the value, and resets the
 	 * <code>blockIncrementSet</code> instance variable to true.
 	 *
-	 * @param blockIncrement
-	 *            the new block increment value, in pixels
+	 * @param blockIncrement the new block increment value, in pixels
 	 */
 	@Override
 	public void setBlockIncrement(int blockIncrement) {
@@ -170,8 +169,8 @@ public class SegmentedScrollBar<T extends Annotation> extends JScrollBar impleme
 	 * equals the viewport's width or height. If there's no viewport return
 	 * <code>super.getBlockIncrement</code>.
 	 *
-	 * @param direction
-	 *            less than zero to scroll up/left, greater than zero for down/right
+	 * @param direction less than zero to scroll up/left, greater than zero for
+	 *                  down/right
 	 * @return an integer, in pixels, containing the block increment
 	 * @see Scrollable#getScrollableBlockIncrement
 	 */
