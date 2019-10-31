@@ -121,7 +121,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @return The new mention
 	 */
 	private Mention add(int begin, int end) {
-		Annotator.logger.entry(begin, end);
+		Annotator.logger.traceEntry();
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
@@ -271,7 +271,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected synchronized void edit(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getNewLabel());
@@ -661,7 +661,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	protected void initializeOnce() {
 		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			if (entity.getKey() != null)
-				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
+				keyMap.put(Character.valueOf(entity.getKey().charAt(0)), entity);
 		}
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
@@ -759,7 +759,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
-		Annotator.logger.entry(entity);
+		Annotator.logger.traceEntry();
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
@@ -777,7 +777,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
-		Annotator.logger.exit();
+		Annotator.logger.traceExit();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {
@@ -819,7 +819,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected void undo(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getOldLabel());
