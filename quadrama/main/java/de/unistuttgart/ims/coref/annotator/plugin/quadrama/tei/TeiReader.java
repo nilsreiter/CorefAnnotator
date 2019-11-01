@@ -114,6 +114,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(entity);
 		});
 
+		// identify speaker tags
 		gxr.addRule("text speaker", Mention.class, (m, e) -> {
 			Element parent = e.parent();
 			if (parent.hasAttr("who")) {
