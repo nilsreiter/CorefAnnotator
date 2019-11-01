@@ -146,9 +146,11 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
+		// set meta data
 		Util.getMeta(jcas).setStylePlugin(QDStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
+		// Remove <rs> und <name> elements from XML structure (they'll be added later)
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs") && element.getSelector().contains("> text >"))
 				element.removeFromIndexes();
