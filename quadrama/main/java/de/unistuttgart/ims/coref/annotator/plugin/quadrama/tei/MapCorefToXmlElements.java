@@ -10,8 +10,10 @@ import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
@@ -50,6 +52,8 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		// the <text>-element
 		XMLElement textElement = null;
 
+		MutableList<XMLElement> spElements = Lists.mutable.empty();
+
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
 
 			// if the xmlElement has an xml:id attribute
@@ -65,9 +69,38 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			// we assume it's unique
 			if (xmlElement.getTag().equalsIgnoreCase("text"))
 				textElement = xmlElement;
+
+			// scrub all who= attributes in <sp>-elements
+			if (xmlElement.getTag().equalsIgnoreCase("sp") && xmlElement.getAttributes().contains("who=")) {
+				xmlElement.setAttributes(
+						Pattern.compile("who=\"[^\"]*\"").matcher(xmlElement.getAttributes()).replaceFirst(""));
+				spElements.add(xmlElement);
+			}
+
 		}
 
-		// TODO: Handle who= elements
+		// handle <sp>-elements separately
+		for (XMLElement spElement : spElements) {
+
+			// we first collect all mentions that designate speaker tags
+			MutableSet<Mention> speakerMentions = Sets.mutable.empty();
+			for (Speaker speaker : JCasUtil.selectCovered(Speaker.class, spElement)) {
+				speakerMentions.addAll(JCasUtil.selectCovered(Mention.class, speaker));
+			}
+			if (speakerMentions.isEmpty())
+				continue;
+
+			// generate the new string for the who attribute
+			String newAttributeString = spElement.getAttributes();
+			if (!(newAttributeString.isEmpty() || newAttributeString.endsWith(" ")))
+				newAttributeString += " ";
+			newAttributeString += "who=\"" + speakerMentions.collect(m -> "#" + toXmlId(m.getEntity())).makeString(" ")
+					+ "\"";
+
+			// add id to the xml element
+			spElement.setAttributes(newAttributeString);
+		}
+
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 
 			// we skip all mentions in the tei header
