@@ -26,6 +26,9 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIText;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -85,6 +88,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("l", Line.class,
 				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
 
+		gxr.addRule("TEI > text", TEIText.class);
+		gxr.addRule("TEI > teiHeader", TEIHeader.class);
+		gxr.addRule("TEI > text > body", TEIBody.class);
+
 		Resource res = nextFile();
 
 		// Read XMI file
@@ -101,7 +108,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 
 		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
-		// TODO: Remove <rs> elements
+
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs"))
 				element.removeFromIndexes();

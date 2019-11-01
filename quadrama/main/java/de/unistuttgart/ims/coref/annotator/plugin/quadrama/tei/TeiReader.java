@@ -23,6 +23,9 @@ import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIText;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
@@ -76,7 +79,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(cf);
 		});
 
-		gxr.addRule("speaker", Speaker.class);
+		gxr.addRule("text speaker", Speaker.class);
+		gxr.addRule("TEI > text", TEIText.class);
+		gxr.addRule("TEI > teiHeader", TEIHeader.class);
+		gxr.addRule("TEI > text > body", TEIBody.class);
 
 		// entity references
 		gxr.addRule("text rs[ref]", Mention.class, (m, e) -> {
