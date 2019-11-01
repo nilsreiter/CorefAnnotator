@@ -25,7 +25,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 	/**
 	 * Pattern to extract xml ids from a string representation of the xml attributes
 	 */
-	Pattern pattern = Pattern.compile("xml:id=\"([^\"]+)\"");
+	Pattern xmlIdPattern = Pattern.compile("xml:id=\"([^\"]+)\"");
 
 	/**
 	 * This will be used to ensure that ids are unique within a document
@@ -53,7 +53,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
 
 			// if the xmlElement has an xml:id attribute
-			Matcher m = pattern.matcher(xmlElement.getAttributes());
+			Matcher m = xmlIdPattern.matcher(xmlElement.getAttributes());
 			if (m.find()) {
 				String id = m.group(1);
 
