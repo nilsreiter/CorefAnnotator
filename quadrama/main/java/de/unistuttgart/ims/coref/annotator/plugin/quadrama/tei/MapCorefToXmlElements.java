@@ -51,6 +51,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 		// the <text>-element
 		XMLElement textElement = null;
+		XMLElement teiHeaderElement = null;
 
 		MutableList<XMLElement> spElements = Lists.mutable.empty();
 
@@ -69,6 +70,10 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			// we assume it's unique
 			if (xmlElement.getTag().equalsIgnoreCase("text"))
 				textElement = xmlElement;
+
+			// identify <teiHeader>-element
+			if (xmlElement.getTag().equalsIgnoreCase("teiHeader"))
+				teiHeaderElement = xmlElement;
 
 			// scrub all who= attributes in <sp>-elements
 			if (xmlElement.getTag().equalsIgnoreCase("sp") && xmlElement.getAttributes().contains("who=")) {
@@ -103,7 +108,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 
-			// we skip all mentions in the tei header
+			// we skip all mentions not in the text
 			if (!coveringXMLElement.get(m).contains(textElement))
 				continue;
 
