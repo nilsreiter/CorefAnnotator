@@ -92,6 +92,8 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			for (Speaker speaker : JCasUtil.selectCovered(Speaker.class, spElement)) {
 				speakerMentions.addAll(JCasUtil.selectCovered(Mention.class, speaker));
 			}
+
+			// skip if <sp> doesn't contain a single <speaker> element
 			if (speakerMentions.isEmpty())
 				continue;
 
