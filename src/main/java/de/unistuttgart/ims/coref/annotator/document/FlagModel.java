@@ -136,13 +136,12 @@ public class FlagModel extends SubModel implements Model {
 		keys.add(key);
 
 		operation.setAddedFlag(f);
-		fireFlagEvent(Event.get(this, Type.Add, f));
 		documentModel.fireDocumentChangedEvent();
+		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
 	protected void edit(DeleteFlag operation) {
 		Flag flag = operation.getFlag();
-		fireFlagEvent(Event.get(this, Type.Remove, flag));
 
 		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
 				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
@@ -161,6 +160,8 @@ public class FlagModel extends SubModel implements Model {
 		});
 
 		flag.removeFromIndexes();
+		fireFlagEvent(Event.get(this, Type.Remove, flag));
+
 	}
 
 	protected void edit(UpdateFlag op) {
