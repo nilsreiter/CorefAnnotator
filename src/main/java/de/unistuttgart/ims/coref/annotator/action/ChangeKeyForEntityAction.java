@@ -20,7 +20,7 @@ import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 
-public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow> {
+public class ChangeKeyForEntityAction extends TargetedOperationIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow>
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
+		operationClass = UpdateEntityKey.class;
 	}
 
 	@Override

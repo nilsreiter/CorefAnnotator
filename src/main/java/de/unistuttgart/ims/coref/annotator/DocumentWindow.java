@@ -769,6 +769,9 @@ public class DocumentWindow extends AbstractTextWindow
 		model.addDocumentStateListener(this);
 
 		actions.lineNumberStyleFixed.setEnabled(model.hasLineNumbers());
+		actions.newEntityAction.setEnabled();
+		actions.changeColorAction.setEnabled();
+		actions.changeKeyAction.setEnabled();
 
 		// listeners to the coref model
 		model.getCoreferenceModel().addCoreferenceModelListener(this);
@@ -1742,10 +1745,10 @@ public class DocumentWindow extends AbstractTextWindow
 	class ActionContainer {
 
 		MergeAdjacentMentions mergeMentions = new MergeAdjacentMentions(DocumentWindow.this);
-		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
+		ClearAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();
-		AbstractAction changeColorAction;
-		AbstractAction changeKeyAction;
+		ChangeColorForEntity changeColorAction;
+		ChangeKeyForEntityAction changeKeyAction;
 		AbstractAction copyAction;
 		DeleteAction deleteAction;
 		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
@@ -1760,9 +1763,9 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
-		AbstractAction newEntityAction;
+		NewEntityAction newEntityAction;
 		RenameEntityAction renameAction;
-		AbstractAction removeDuplicatesAction;
+		RemoveDuplicatesAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
 		AbstractAction lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.NONE);
 		AbstractAction lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.FIXED);

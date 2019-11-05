@@ -14,13 +14,14 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 
-public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
+public class ChangeColorForEntity extends TargetedOperationIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
 	public ChangeColorForEntity(DocumentWindow dw) {
 		super(dw, Strings.ACTION_SET_COLOR, MaterialDesign.MDI_FORMAT_COLOR_FILL);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_COLOR_TOOLTIP));
+		operationClass = UpdateEntityColor.class;
 	}
 
 	@Override
