@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,9 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
@@ -57,6 +60,8 @@ public class DocumentModel implements Model {
 
 	Preferences preferences;
 
+	MutableSet<Class<? extends Operation>> blockedOperations = Sets.mutable.empty();
+
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 		this.preferences = preferences;
@@ -68,6 +73,12 @@ public class DocumentModel implements Model {
 
 	public void edit(Operation operation) {
 		Annotator.logger.trace(operation);
+
+		if (blockedOperations.contains(operation.getClass())) {
+			Annotator.logger.info("Operation {} blocked.", operation.getClass().getCanonicalName());
+			return;
+		}
+
 		if (operation instanceof DocumentModelOperation)
 			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
@@ -320,5 +331,21 @@ public class DocumentModel implements Model {
 		public int getMaximum() {
 			return maximum;
 		}
+	}
+
+	public boolean addBlockedOperation(Class<? extends Operation> e) {
+		return blockedOperations.add(e);
+	}
+
+	public boolean removeBlockedOperation(Object o) {
+		return blockedOperations.remove(o);
+	}
+
+	public boolean addAllBlockedOperation(Collection<? extends Class<? extends Operation>> c) {
+		return blockedOperations.addAll(c);
+	}
+
+	public boolean isBlocked(Class<? extends Operation> o) {
+		return blockedOperations.contains(o);
 	}
 }
