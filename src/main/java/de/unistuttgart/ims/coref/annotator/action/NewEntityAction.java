@@ -22,7 +22,8 @@ public class NewEntityAction extends TargetedOperationIkonAction<DocumentWindow>
 		super(dw, Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+
 		operationClass = AddMentionsToNewEntity.class;
 	}
 

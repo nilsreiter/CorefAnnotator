@@ -28,7 +28,8 @@ public class ChangeKeyForEntityAction extends TargetedOperationIkonAction<Docume
 		super(documentWindow, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+
 		operationClass = UpdateEntityKey.class;
 	}
 

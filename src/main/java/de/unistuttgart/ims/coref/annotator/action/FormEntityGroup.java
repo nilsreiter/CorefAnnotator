@@ -24,7 +24,7 @@ public class FormEntityGroup extends DocumentWindowAction implements TreeSelecti
 		super(documentWindow, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
 	}
 

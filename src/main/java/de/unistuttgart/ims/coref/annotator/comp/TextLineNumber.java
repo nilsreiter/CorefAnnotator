@@ -77,11 +77,9 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	/**
 	 * Create a line number component for a text component.
 	 *
-	 * @param component
-	 *            the related text component
-	 * @param minimumDisplayDigits
-	 *            the number of digits used to calculate the minimum width of the
-	 *            component
+	 * @param component            the related text component
+	 * @param minimumDisplayDigits the number of digits used to calculate the
+	 *                             minimum width of the component
 	 */
 	public TextLineNumber(AbstractTextWindow component, int minimumDisplayDigits) {
 		this.component = component.getTextPane();
@@ -113,9 +111,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 * Set the update font property. Indicates whether this Font should be updated
 	 * automatically when the Font of the related text component is changed.
 	 *
-	 * @param updateFont
-	 *            when true update the Font and repaint the line numbers, otherwise
-	 *            just repaint the line numbers.
+	 * @param updateFont when true update the Font and repaint the line numbers,
+	 *                   otherwise just repaint the line numbers.
 	 */
 	public void setUpdateFont(boolean updateFont) {
 		this.updateFont = updateFont;
@@ -134,8 +131,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 * The border gap is used in calculating the left and right insets of the
 	 * border. Default value is 5.
 	 *
-	 * @param borderGap
-	 *            the gap in pixels
+	 * @param borderGap the gap in pixels
 	 */
 	public void setBorderGap(int borderGap) {
 		this.borderGap = borderGap;
@@ -157,8 +153,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	/**
 	 * The Color used to render the current line digits. Default is Coolor.RED.
 	 *
-	 * @param currentLineForeground
-	 *            the Color used to render the current line
+	 * @param currentLineForeground the Color used to render the current line
 	 */
 	public void setCurrentLineForeground(Color currentLineForeground) {
 		this.currentLineForeground = currentLineForeground;
@@ -182,8 +177,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 * <li>TextLineNumber.RIGHT (default)
 	 * </ul>
 	 * 
-	 * @param currentLineForeground
-	 *            the Color used to render the current line
+	 * @param currentLineForeground the Color used to render the current line
 	 */
 	public void setDigitAlignment(float digitAlignment) {
 		this.digitAlignment = digitAlignment > 1.0f ? 1.0f : digitAlignment < 0.0f ? -1.0f : digitAlignment;
@@ -202,8 +196,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	 * Specify the mimimum number of digits used to calculate the preferred width of
 	 * the component. Default is 3.
 	 *
-	 * @param minimumDisplayDigits
-	 *            the number digits used in the preferred width calculation
+	 * @param minimumDisplayDigits the number digits used in the preferred width
+	 *                             calculation
 	 */
 	public void setMinimumDisplayDigits(int minimumDisplayDigits) {
 		this.minimumDisplayDigits = minimumDisplayDigits;
@@ -252,8 +246,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 		// Determine the rows to draw within the clipped bounds.
 
 		Rectangle clip = g.getClipBounds();
-		int rowStartOffset = component.viewToModel(new Point(0, clip.y));
-		int endOffset = component.viewToModel(new Point(0, clip.y + clip.height));
+		int rowStartOffset = component.viewToModel2D(new Point(0, clip.y));
+		int endOffset = component.viewToModel2D(new Point(0, clip.y + clip.height));
 
 		while (rowStartOffset <= endOffset) {
 			try {

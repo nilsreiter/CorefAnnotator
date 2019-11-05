@@ -54,7 +54,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		this.featureStructure = featureStructure;
 	}
 

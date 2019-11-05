@@ -139,7 +139,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
 				JPopupMenu pMenu = new JPopupMenu();
-				int offset = textPane.viewToModel(e.getPoint());
+				int offset = textPane.viewToModel2D(e.getPoint());
 
 				for (int i = 0; i < models.size(); i++) {
 					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models.get(i).getMentions(offset));
@@ -356,8 +356,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			panel.add(desc);
 			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()));
 
-			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL) + ":",
-					SwingConstants.RIGHT);
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
 			panel.add(desc);
 			JLabel percTotalLabel = new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
@@ -365,8 +364,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 			panel.add(percTotalLabel);
 
-			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL) + ":",
-					SwingConstants.RIGHT);
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
 			panel.add(desc);
 			JLabel percOvrLabel = new JLabel(
@@ -374,8 +372,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 					SwingConstants.RIGHT);
 			panel.add(percOvrLabel);
 
-			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED) + ":",
-					SwingConstants.RIGHT);
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
 			panel.add(desc);
 			JLabel selectedAgreementLabel = new BoundLabel(stats, "agreementInSpan",
@@ -507,7 +504,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		textPane.setCaretPosition(0);
 		// mentionsTextPane.addMouseListener(new TextMouseListener());
 		textPane.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				copyAction);
 		textPane.addCaretListener(new TextCaretListener());
 
