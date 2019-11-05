@@ -180,6 +180,8 @@ import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.profile.Parser;
+import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
@@ -652,7 +654,11 @@ public class DocumentWindow extends AbstractTextWindow
 		JCasLoader lai;
 		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
 		setIndeterminateProgress();
-		lai = new JCasLoader(file, flavor, language, jcas -> this.setJCas(jcas), ex -> {
+		File profileFile = new File(file.getParentFile(), "profile.xml");
+		final Profile profile = new Parser().getProfileOrNull(profileFile);
+		lai = new JCasLoader(file, flavor, language, jcas -> {
+			this.setJCas(jcas, profile);
+		}, ex -> {
 			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
 					Annotator.getString("message.wrong_file_version.help") };
 			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
@@ -830,6 +836,10 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	public void setJCas(JCas jcas) {
+		setJCas(jcas, null);
+	}
+
+	public void setJCas(JCas jcas, Profile profile) {
 
 		Annotator.logger.info("JCas has been loaded.");
 		textPane.setStyledDocument(new DefaultStyledDocument(styleContext));
@@ -838,6 +848,7 @@ public class DocumentWindow extends AbstractTextWindow
 		segmentIndicator.setLastCharacterPosition(jcas.getDocumentText().length());
 
 		DocumentModelLoader im = new DocumentModelLoader(cm -> this.setDocumentModel(cm), jcas);
+		im.setProfile(profile);
 		im.execute();
 	}
 
