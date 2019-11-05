@@ -146,6 +146,22 @@
 					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<configuration>
+					<schemaDirectory>src/main/xsd</schemaDirectory>
+					<generatePackage>de.unistuttgart.ims.coref.annotator.profile</generatePackage>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="https://nilsreiter.de/code/corefannotator-1.12.0/profile" xmlns:tns="http://www.example.org/profile" elementFormDefault="qualified" xmlns:Q1="https://nilsreiter.de/code/corefannotator-1.12.0/profile">
+
+    <element name="profile">
+    	<complexType>
+    		<sequence>
+    			<element name="entities" maxOccurs="1"
+    				minOccurs="0">
+    				<complexType>
+    					<sequence>
+    						<element name="entity" type="Q1:entityType" maxOccurs="unbounded" minOccurs="0"></element>
+    					</sequence>
+    				</complexType>
+    			</element>
+    			<element name="flags" maxOccurs="1"
+    				minOccurs="0">
+    				<complexType>
+    					<sequence>
+    						<element name="flag" type="Q1:flagType" maxOccurs="unbounded" minOccurs="0"></element>
+    					</sequence>
+    				</complexType>
+    			</element>
+    		</sequence>
+    	</complexType>
+    </element>
+
+    <complexType name="entityType">
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="color" type="int"></attribute>
+    	<attribute name="shortcut">
+    		<simpleType>
+    			<restriction base="string">
+    				<minLength value="0"></minLength>
+    				<maxLength value="1"></maxLength>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="flags" type="string"></attribute>
+    </complexType>
+
+    <complexType name="flagType">
+    	<attribute name="label" type="string"></attribute>
+    	<attribute name="icon" type="string"></attribute>
+    	<attribute name="uuid" type="string"></attribute>
+    	<attribute name="targetClass" type="Q1:targetClassType"></attribute>
+    </complexType>
+
+    <simpleType name="targetClassType">
+    	<restriction base="string">
+    		<enumeration value="Entity"></enumeration>
+    		<enumeration value="Mention"></enumeration>
+    	</restriction>
+    </simpleType>
+</schema>
