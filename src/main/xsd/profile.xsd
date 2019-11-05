@@ -4,19 +4,28 @@
     <element name="profile">
     	<complexType>
     		<sequence>
-    			<element name="entities" maxOccurs="1"
-    				minOccurs="0">
+                <element name="forbidden" maxOccurs="1" minOccurs="0">
+                	<complexType>
+                		<sequence>
+                			<element name="operation" type="string" maxOccurs="unbounded" minOccurs="0"></element>
+                		</sequence>
+                	</complexType>
+                </element>
+                <element name="entities" maxOccurs="1" minOccurs="0">
     				<complexType>
     					<sequence>
-    						<element name="entity" type="Q1:entityType" maxOccurs="unbounded" minOccurs="0"></element>
+    						<element name="entity" type="Q1:entityType"
+    							maxOccurs="unbounded" minOccurs="0">
+    						</element>
     					</sequence>
     				</complexType>
     			</element>
-    			<element name="flags" maxOccurs="1"
-    				minOccurs="0">
+    			<element name="flags" maxOccurs="1" minOccurs="0">
     				<complexType>
     					<sequence>
-    						<element name="flag" type="Q1:flagType" maxOccurs="unbounded" minOccurs="0"></element>
+    						<element name="flag" type="Q1:flagType"
+    							maxOccurs="unbounded" minOccurs="0">
+    						</element>
     					</sequence>
     				</complexType>
     			</element>

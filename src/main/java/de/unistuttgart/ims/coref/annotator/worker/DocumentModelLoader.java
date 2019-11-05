@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
@@ -63,6 +64,16 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 				documentModel.edit(new UpdateEntityColor(op.getEntity(), et.getColor()));
 				documentModel.edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)));
 
+			}
+
+			for (String operation : profile.getForbidden().getOperation()) {
+				try {
+					Class<? extends Operation> opClass = (Class<? extends Operation>) Class.forName(operation);
+					documentModel.addBlockedOperation(opClass);
+
+				} catch (ClassNotFoundException e) {
+					Annotator.logger.catching(e);
+				}
 			}
 		}
 
