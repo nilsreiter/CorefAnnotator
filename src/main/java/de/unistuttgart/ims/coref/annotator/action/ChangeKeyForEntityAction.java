@@ -58,7 +58,7 @@ public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow>
 			// for setting a new key
 			if (newKey.length() == 1) {
 				Character newChar = newKey.charAt(0);
-				getTarget().getDocumentModel().edit(new UpdateEntityKey(newChar, entity));
+				getTarget().getDocumentModel().edit(new UpdateEntityKey(entity, newChar));
 			} else {
 				JOptionPane.showMessageDialog(getTarget(),
 						Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
