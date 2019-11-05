@@ -32,7 +32,7 @@ public class ChangeColorForEntity extends TargetedIkonAction<DocumentWindow> {
 		Color newColor = JColorChooser.showDialog(getTarget(), Annotator.getString(Strings.DIALOG_CHANGE_COLOR_PROMPT),
 				color);
 		if (color != newColor) {
-			getTarget().getDocumentModel().edit(new UpdateEntityColor(newColor.getRGB(), etn.getEntity()));
+			getTarget().getDocumentModel().edit(new UpdateEntityColor(etn.getEntity(), newColor.getRGB()));
 		}
 
 	}
