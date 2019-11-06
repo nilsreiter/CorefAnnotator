@@ -14,13 +14,11 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.profile.EntityType;
 import de.unistuttgart.ims.coref.annotator.profile.FlagType;
-import de.unistuttgart.ims.coref.annotator.profile.OperationType;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 
 public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
@@ -67,17 +65,8 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 			}
 
-			for (OperationType operation : profile.getForbidden().getOperation()) {
-				try {
-					@SuppressWarnings("unchecked")
-					Class<? extends Operation> opClass = (Class<? extends Operation>) Class
-							.forName(operation.getClazz());
-					documentModel.addBlockedOperation(opClass);
+			documentModel.setProfile(profile);
 
-				} catch (ClassNotFoundException e) {
-					Annotator.logger.catching(e);
-				}
-			}
 		}
 
 		return documentModel;

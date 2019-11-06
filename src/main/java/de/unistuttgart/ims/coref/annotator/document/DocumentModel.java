@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +27,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.profile.Profile;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -59,6 +59,8 @@ public class DocumentModel implements Model {
 	boolean unsavedChanges = false;
 
 	Preferences preferences;
+
+	Profile profile;
 
 	MutableSet<Class<? extends Operation>> blockedOperations = Sets.mutable.empty();
 
@@ -333,19 +335,26 @@ public class DocumentModel implements Model {
 		}
 	}
 
-	public boolean addBlockedOperation(Class<? extends Operation> e) {
-		return blockedOperations.add(e);
-	}
-
-	public boolean removeBlockedOperation(Object o) {
-		return blockedOperations.remove(o);
-	}
-
-	public boolean addAllBlockedOperation(Collection<? extends Class<? extends Operation>> c) {
-		return blockedOperations.addAll(c);
-	}
-
 	public boolean isBlocked(Class<? extends Operation> o) {
-		return blockedOperations.contains(o);
+		return isBlocked(o, null);
+	}
+
+	public boolean isBlocked(Class<? extends Operation> o, Class<?> target) {
+		return Lists.immutable.withAll(profile.getForbidden().getOperation()).collect(op -> {
+			try {
+				return Class.forName(op.getClazz());
+			} catch (ClassNotFoundException e1) {
+				Annotator.logger.catching(e1);
+			}
+			return null;
+		}).reject(c -> c == null).contains(o);
+	}
+
+	public Profile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(Profile profile) {
+		this.profile = profile;
 	}
 }
