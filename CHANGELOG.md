@@ -11,6 +11,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   properly #255
 - Export mention statistics now has some configuration options. 
   Import and export plugins can have that as well now. #76
+- Sorting of entities in the tree is now case insensitive #257
 
 ## 1.11.2
 

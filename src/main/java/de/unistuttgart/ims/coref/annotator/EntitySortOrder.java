@@ -36,8 +36,8 @@ public enum EntitySortOrder {
 				public int compare(CATreeNode o1, CATreeNode o2) {
 					if (!o1.isEntity() || !o2.isEntity())
 						return 0;
-					String l1 = o1.getEntity().getLabel();
-					String l2 = o2.getEntity().getLabel();
+					String l1 = o1.getEntity().getLabel().toLowerCase();
+					String l2 = o2.getEntity().getLabel().toLowerCase();
 					l1 = (l1 == null ? "null" : l1);
 					l2 = (l2 == null ? "null" : l2);
 					if (l1 == null || l2 == null)
