@@ -11,7 +11,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.reflections.Reflections;
 
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
@@ -35,7 +34,6 @@ public class PluginManager {
 		// it's unclear why this is found in the first place
 		ioPlugins.remove(DefaultIOPlugin.class);
 		ioPlugins.remove(AbstractXmiPlugin.class);
-		ioPlugins.remove(ConfigurableIOPlugin.class);
 		this.ioPlugins = ioPlugins.toImmutable();
 
 		rankingPlugins = Sets.immutable.withAll(reflections.getSubTypesOf(EntityRankingPlugin.class));

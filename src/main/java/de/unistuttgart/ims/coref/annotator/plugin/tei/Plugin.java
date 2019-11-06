@@ -35,12 +35,13 @@ import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements ConfigurableIOPlugin {
+public class Plugin implements ConfigurableImportPlugin, IOPlugin {
 
 	String language = Constants.X_UNSPECIFIED;
 	String textRootSelector = null;
@@ -117,7 +118,7 @@ public class Plugin implements ConfigurableIOPlugin {
 	}
 
 	@Override
-	public void showInputConfigurationDialog(JFrame parent, Consumer<ConfigurableIOPlugin> callback) {
+	public void showImportConfigurationDialog(JFrame parent, Consumer<ConfigurableImportPlugin> callback) {
 
 		JTextField rootSelectorInput = new JTextField();
 
@@ -192,11 +193,6 @@ public class Plugin implements ConfigurableIOPlugin {
 		dialog.setVisible(true);
 		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-	}
-
-	@Override
-	public void showOutputConfigurationDialog() {
-
 	}
 
 	protected JLabel getLabel(String text, String tooltip) {

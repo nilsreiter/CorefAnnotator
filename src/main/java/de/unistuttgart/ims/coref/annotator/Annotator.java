@@ -51,7 +51,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
-import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import javafx.application.Platform;
@@ -249,8 +249,8 @@ public class Annotator {
 		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow();
 
-		if (flavor instanceof ConfigurableIOPlugin)
-			((ConfigurableIOPlugin) flavor).showInputConfigurationDialog(v, fl -> {
+		if (flavor instanceof ConfigurableImportPlugin)
+			((ConfigurableImportPlugin) flavor).showImportConfigurationDialog(v, fl -> {
 				v.loadFile(file, flavor, language);
 
 				SwingUtilities.invokeLater(new Runnable() {
