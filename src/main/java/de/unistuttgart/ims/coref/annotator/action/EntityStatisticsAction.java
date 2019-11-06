@@ -54,8 +54,9 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	// initial option values
-	int optionContextWidth = 10;
+	int optionContextWidth = 0;
 	boolean optionTrimWhitespace = true;
+	boolean optionReplaceNewlines = true;
 
 	public EntityStatisticsAction(DocumentWindow dw) {
 		super(dw, Strings.ACTION_ENTITY_STATISTICS, MaterialDesign.MDI_CHART_BAR);
@@ -63,8 +64,9 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 	protected void optionDialog(Consumer<EntityStatisticsAction> callback) {
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(optionContextWidth, 0, 100, 5));
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(optionContextWidth, 0, 500, 25));
 		JCheckBox trimWhitespace = new JCheckBox();
+		JCheckBox replaceNewlineCharacters = new JCheckBox();
 		trimWhitespace.setSelected(optionTrimWhitespace);
 
 		JDialog dialog = new JDialog(getTarget(), Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
@@ -78,6 +80,10 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 				Annotator.getString("dialog.export_options.trim_whitespace.tooltip")));
 		optionPanel.add(trimWhitespace);
 
+		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.replace_newline"),
+				Annotator.getString("dialog.export_options.replace_newline.tooltip")));
+		optionPanel.add(replaceNewlineCharacters);
+
 		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
 		Action okAction = new AbstractAction(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_OK)) {
@@ -87,6 +93,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 			public void actionPerformed(ActionEvent e) {
 				optionContextWidth = ((SpinnerNumberModel) spinner.getModel()).getNumber().intValue();
 				optionTrimWhitespace = trimWhitespace.isSelected();
+				optionReplaceNewlines = replaceNewlineCharacters.isSelected();
 				dialog.dispose();
 				callback.accept(EntityStatisticsAction.this);
 			}
@@ -182,29 +189,35 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 								String surface = mention.getCoveredText();
 								if (mention.getDiscontinuous() != null)
 									surface += " " + mention.getDiscontinuous().getCoveredText();
+								if (optionReplaceNewlines)
+									surface = surface.replaceAll("[\n\r\f]", "");
 								p.print(mention.getBegin());
 								p.print(mention.getEnd());
 								if (optionContextWidth > 0) {
-									String lc;
+									String contextString;
 									if (optionTrimWhitespace) {
-										lc = StringUtils.right(text.substring(0, mention.getBegin()).trim(),
+										contextString = StringUtils.right(text.substring(0, mention.getBegin()).trim(),
 												optionContextWidth);
 
 									} else {
-										lc = StringUtils.right(text, optionContextWidth);
+										contextString = StringUtils.right(text, optionContextWidth);
 									}
-									p.print(lc);
+									if (optionReplaceNewlines)
+										contextString = contextString.replaceAll("[\n\r\f]", " ");
+									p.print(contextString);
 								}
 								p.print((optionTrimWhitespace ? surface.trim() : surface));
 								if (optionContextWidth > 0) {
-									String rc;
+									String contextString;
 									if (optionTrimWhitespace) {
-										rc = StringUtils.left(text.substring(mention.getEnd()).trim(),
+										contextString = StringUtils.left(text.substring(mention.getEnd()).trim(),
 												optionContextWidth);
 									} else {
-										rc = StringUtils.left(text, optionContextWidth);
+										contextString = StringUtils.left(text, optionContextWidth);
 									}
-									p.print(rc);
+									if (optionReplaceNewlines)
+										contextString = contextString.replaceAll("[\n\r\f]", " ");
+									p.print(contextString);
 								}
 								p.print(entityNum);
 								p.print(entity.getLabel());
