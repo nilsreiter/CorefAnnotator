@@ -56,7 +56,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public Class<? extends StylePlugin> getStylePlugin() {
-		return TeiStylePlugin.class;
+		return null;
 	}
 
 	@Override
