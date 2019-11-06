@@ -7,7 +7,10 @@
                 <element name="forbidden" maxOccurs="1" minOccurs="0">
                 	<complexType>
                 		<sequence>
-                			<element name="operation" type="string" maxOccurs="unbounded" minOccurs="0"></element>
+                			<element name="operation"
+                				type="Q1:operationType" maxOccurs="unbounded"
+                				minOccurs="0">
+                			</element>
                 		</sequence>
                 	</complexType>
                 </element>
@@ -60,4 +63,15 @@
     		<enumeration value="Mention"></enumeration>
     	</restriction>
     </simpleType>
+
+    <complexType name="operationType">
+    	<sequence>
+    		<element name="target" maxOccurs="1" minOccurs="0">
+    			<complexType>
+    				<attribute name="class" type="string"></attribute>
+    			</complexType>
+    		</element>
+    	</sequence>
+    	<attribute name="class" type="string"></attribute>
+    </complexType>
 </schema>

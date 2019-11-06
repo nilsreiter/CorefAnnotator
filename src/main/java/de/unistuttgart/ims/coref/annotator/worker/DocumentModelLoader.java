@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.profile.EntityType;
 import de.unistuttgart.ims.coref.annotator.profile.FlagType;
+import de.unistuttgart.ims.coref.annotator.profile.OperationType;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 
 public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
@@ -66,9 +67,11 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 			}
 
-			for (String operation : profile.getForbidden().getOperation()) {
+			for (OperationType operation : profile.getForbidden().getOperation()) {
 				try {
-					Class<? extends Operation> opClass = (Class<? extends Operation>) Class.forName(operation);
+					@SuppressWarnings("unchecked")
+					Class<? extends Operation> opClass = (Class<? extends Operation>) Class
+							.forName(operation.getClazz());
 					documentModel.addBlockedOperation(opClass);
 
 				} catch (ClassNotFoundException e) {
