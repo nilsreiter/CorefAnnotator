@@ -21,6 +21,7 @@ import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
@@ -212,10 +213,11 @@ public class DocumentModel implements Model {
 		return hasUnsavedChanges() || getHistory().size() > 0;
 	}
 
-	// TODO: Verify that entities / flags are not doubled
 	public void loadProfile(Profile profile) {
 		Annotator.logger.debug("Processing profile {}.", profile);
 		for (FlagType ft : profile.getFlags().getFlag()) {
+			if (getFlagModel().getFlag(ft.getUuid()) != null)
+				continue;
 			try {
 				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v1." + ft.getTargetClass().value();
 
@@ -230,6 +232,9 @@ public class DocumentModel implements Model {
 		}
 
 		for (EntityType et : profile.getEntities().getEntity()) {
+			if (getCoreferenceModel().getEntities(EntitySorter.CHILDREN).collect(e -> e.getLabel())
+					.contains(et.getLabel()))
+				continue;
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity();
 			edit(op, false);
 			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
