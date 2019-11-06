@@ -143,7 +143,8 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 	@Override
 	protected void done() {
 		try {
-			this.success.accept(get());
+			if (this.success != null)
+				this.success.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 			failConsumer.accept(e);

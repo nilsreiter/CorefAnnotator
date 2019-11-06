@@ -9,8 +9,8 @@ import javax.swing.KeyStroke;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 
@@ -19,9 +19,9 @@ public class UndoAction extends DocumentWindowAction implements DocumentStateLis
 	private static final long serialVersionUID = 1L;
 
 	public UndoAction(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_UNDO, MaterialDesign.MDI_UNDO);
+		super(dw, Strings.ACTION_UNDO, MaterialDesign.MDI_UNDO);
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
 	}
 

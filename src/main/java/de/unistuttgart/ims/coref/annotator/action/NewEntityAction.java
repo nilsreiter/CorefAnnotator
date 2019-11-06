@@ -10,8 +10,8 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
 public class NewEntityAction extends TargetedIkonAction<DocumentWindow> {
@@ -22,7 +22,7 @@ public class NewEntityAction extends TargetedIkonAction<DocumentWindow> {
 		super(dw, Strings.ACTION_NEW, MaterialDesign.MDI_ACCOUNT_PLUS);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_NEW_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
 	}
 

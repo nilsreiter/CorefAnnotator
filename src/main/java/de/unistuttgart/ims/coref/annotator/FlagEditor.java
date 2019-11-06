@@ -31,7 +31,6 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
@@ -67,7 +66,7 @@ public class FlagEditor extends AbstractWindow {
 		progressBar.setVisible(false);
 
 		documentWindow.addWindowListener(new DocumentWindowWindowListener());
-		this.setTitle(Annotator.getString(Constants.Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
+		this.setTitle(Annotator.getString(Strings.FLAG_EDITOR) + ": " + documentWindow.getTitle());
 		this.addWindowListener(new FlagEditorWindowListener());
 
 		JComboBox<Class<?>> combobox = new JComboBox<Class<?>>();
@@ -93,7 +92,7 @@ public class FlagEditor extends AbstractWindow {
 		deleteFlagAction.setEnabled(false);
 
 		// Menu
-		JMenu fileMenu = new JMenu(Annotator.getString(Constants.Strings.MENU_FILE));
+		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
 		fileMenu.add(new CloseAction());
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
@@ -105,10 +104,10 @@ public class FlagEditor extends AbstractWindow {
 		flagMenu.add(new JMenuItem(deleteFlagAction));
 		flagMenu.addSeparator();
 		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
-				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
 				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP))));
 		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_2,
-				Annotator.getString(Constants.Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
+				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
 				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP))));
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
@@ -141,7 +140,7 @@ public class FlagEditor extends AbstractWindow {
 
 			@Override
 			public String getToolTipText() {
-				return Annotator.getString(Constants.Strings.FLAG_EDITOR_ICON_TOOLTIP);
+				return Annotator.getString(Strings.FLAG_EDITOR_ICON_TOOLTIP);
 			}
 		});
 		this.table.getColumnModel().getColumn(1).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
@@ -150,7 +149,7 @@ public class FlagEditor extends AbstractWindow {
 
 			@Override
 			public String getToolTipText() {
-				return Annotator.getString(Constants.Strings.FLAG_EDITOR_KEY_TOOLTIP);
+				return Annotator.getString(Strings.FLAG_EDITOR_KEY_TOOLTIP);
 			}
 		});
 		this.table.getColumnModel().getColumn(2).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
@@ -159,7 +158,7 @@ public class FlagEditor extends AbstractWindow {
 
 			@Override
 			public String getToolTipText() {
-				return Annotator.getString(Constants.Strings.FLAG_EDITOR_LABEL_TOOLTIP);
+				return Annotator.getString(Strings.FLAG_EDITOR_LABEL_TOOLTIP);
 			}
 		});
 		this.table.getColumnModel().getColumn(3).setHeaderRenderer(new DefaultTableHeaderCellRenderer() {
@@ -168,7 +167,7 @@ public class FlagEditor extends AbstractWindow {
 
 			@Override
 			public String getToolTipText() {
-				return Annotator.getString(Constants.Strings.FLAG_EDITOR_TARGETCLASS_TOOLTIP);
+				return Annotator.getString(Strings.FLAG_EDITOR_TARGETCLASS_TOOLTIP);
 			}
 		});
 

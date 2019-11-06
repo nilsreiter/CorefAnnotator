@@ -7,16 +7,16 @@ import javax.swing.SwingWorker;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class RemoveForeignAnnotationsAction extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;
 
 	public RemoveForeignAnnotationsAction(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_REMOVE_FOREIGN_ANNOTATIONS, MaterialDesign.MDI_PHARMACY);
-		putValue(Action.SHORT_DESCRIPTION, Constants.Strings.ACTION_REMOVE_FOREIGN_ANNOTATIONS_TOOLTIP);
+		super(dw, Strings.ACTION_REMOVE_FOREIGN_ANNOTATIONS, MaterialDesign.MDI_PHARMACY);
+		putValue(Action.SHORT_DESCRIPTION, Strings.ACTION_REMOVE_FOREIGN_ANNOTATIONS_TOOLTIP);
 	}
 
 	@Override

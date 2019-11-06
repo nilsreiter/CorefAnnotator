@@ -74,6 +74,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
+		Annotator.logger.traceEntry();
 		Event.Type eventType = event.getType();
 		switch (eventType) {
 		case Add:
@@ -171,7 +172,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		}
 	}
 
-	protected CATreeNode get(FeatureStructure m) {
+	public CATreeNode get(FeatureStructure m) {
 		if (m == null)
 			return getRoot();
 		if (!fsMap.containsKey(m)) {

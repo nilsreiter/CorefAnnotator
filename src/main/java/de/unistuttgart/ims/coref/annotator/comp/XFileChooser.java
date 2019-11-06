@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 
 public class XFileChooser extends JFileChooser {
@@ -19,7 +19,7 @@ public class XFileChooser extends JFileChooser {
 		super();
 		JPanel languageSelectPanel = new JPanel();
 		languageSelectPanel.setOpaque(false);
-		languageSelectPanel.add(new JLabel(Annotator.getString(Constants.Strings.LANGUAGE) + ":"));
+		languageSelectPanel.add(new JLabel(Annotator.getString(Strings.LANGUAGE) + ":"));
 		languageSelectPanel.add(languageSelector);
 		((java.awt.Container) ((java.awt.Container) getComponent(4)).getComponent(0)).add(languageSelectPanel);
 	}

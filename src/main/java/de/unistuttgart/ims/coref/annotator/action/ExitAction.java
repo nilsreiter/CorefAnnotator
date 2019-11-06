@@ -18,7 +18,7 @@ public class ExitAction extends IkonAction {
 		super(MaterialDesign.MDI_CLOSE);
 		putValue(Action.NAME, Annotator.getString("action.quit"));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

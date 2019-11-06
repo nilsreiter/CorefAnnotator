@@ -149,7 +149,8 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action cancelAction = new AbstractAction(Annotator.getString(Constants.Strings.DIALOG_CANCEL)) {
+		Action cancelAction = new AbstractAction(
+				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.DIALOG_CANCEL)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -158,7 +159,8 @@ public class Plugin implements ConfigurableIOPlugin {
 			}
 		};
 
-		Action helpAction = new AbstractAction(Annotator.getString(Constants.Strings.MENU_HELP)) {
+		Action helpAction = new AbstractAction(
+				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.MENU_HELP)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -172,7 +174,7 @@ public class Plugin implements ConfigurableIOPlugin {
 				resourceBundle.getString(Strings.IMPORT_DIALOG_ROOT_SELECTOR_TOOLTIP)));
 		optionPanel.add(rootSelectorInput);
 
-		optionPanel.add(getLabel(Annotator.getString(Constants.Strings.LANGUAGE),
+		optionPanel.add(getLabel(Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.LANGUAGE),
 				resourceBundle.getString(Strings.IMPORT_DIALOG_LANGUAGE_TOOLTIP)));
 		optionPanel.add(languageDropdown);
 

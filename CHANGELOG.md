@@ -3,6 +3,76 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.12.0
+
+- The app now includes a command line tool to convert multiple 
+  files at once. #242
+
+## 1.11.2
+
+- Using the QuaDramA/TEI importer no longer generates files in the
+  old format #246
+- Flags can now be deleted properly #247
+
+## 1.11.1
+
+- Entities in tree are now sortable again #241
+
+## 1.11.0
+
+- JavaFX is now optional. If JavaFX classes can't be loaded, the application
+  uses file open/save windows from classic swing. #220
+- The app now compiles with OpenJDK properly. 
+  Tested using OpenJDK 12 #237
+- Updated guava from 28.0-jre to 28.1-jre #236
+- Updated log4j-core from 2.12.0 to 2.12.1 #234
+- Updated log4j-api from 2.12.0 to 2.12.1 #233
+- Updated mockito-core from 2.27.0 to 3.0.0 #229
+
+## 1.10.0
+
+- With a new toggle setting, assigning a mention over an already 
+  existing mention replaces the annotation #149
+- The status bar at the bottom now shows the entity name if the cursor
+  is within a mention of an entity. Thanks @andreasvc for the initial 
+  code contribution! #189
+- Line spacing can now be set explicitly in the View menu #226
+- Adjacent mentions that belong to the same entity can now be merged
+  with a single action. Two mentions are considered adjacent, if there is
+  only whitespace between them. #218
+- Entity label in context menu now has limited width #232
+
+## 1.9.6
+
+- Improved painting of underlinings for long annotations and a lot of 
+  overlapping annotations #225
+
+
+## 1.9.5
+
+- Fixed the loading of GerDraCor files #219
+- Fixed that the entity tree is not updated when mentions are moved #217
+- Entities can be hidden again properly #216
+
+## 1.9.4
+
+- Improved stability of the grouping mechanism. #210
+
+## 1.9.3
+
+- Fixed a bug that prevented the display of the file open dialog #207
+- Deleting many empty entities no longer creates an infinite loop 
+  on OpenJDK #192
+- Less console output and file logging (but can be activated if needed)
+
+## 1.9.2
+
+- CoNLL export now also works if no entities have been annotated. #191
+- Fixed a bug that prevented mentions with the same begin position to be 
+  underlined. #186
+- Exporting to CoNLL format now shows the proper file extensions and 
+  allows overwriting. #187
+
 ## 1.9.1
 
 - The shortcut key to jump to mentions has been changed to alt-arrow, 

@@ -10,7 +10,7 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
@@ -38,13 +38,13 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return Annotator.getString(Constants.Strings.FLAG_EDITOR_ICON);
+			return Annotator.getString(Strings.FLAG_EDITOR_ICON);
 		case 1:
-			return Annotator.getString(Constants.Strings.FLAG_EDITOR_KEY);
+			return Annotator.getString(Strings.FLAG_EDITOR_KEY);
 		case 2:
-			return Annotator.getString(Constants.Strings.FLAG_EDITOR_LABEL);
+			return Annotator.getString(Strings.FLAG_EDITOR_LABEL);
 		case 3:
-			return Annotator.getString(Constants.Strings.FLAG_EDITOR_TARGETCLASS);
+			return Annotator.getString(Strings.FLAG_EDITOR_TARGETCLASS);
 		default:
 			return null;
 		}
@@ -95,7 +95,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		Annotator.logger.entry(aValue, rowIndex, columnIndex);
+		Annotator.logger.traceEntry();
 		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
 		UpdateFlag.FlagProperty property = null;
 		Object value = null;
@@ -134,7 +134,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
-		Annotator.logger.entry(event);
+		Annotator.logger.traceEntry();
 
 		TableModelEvent tme = null;
 		switch (event.getType()) {

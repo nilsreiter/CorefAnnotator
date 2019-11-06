@@ -74,26 +74,14 @@ public class UnderlinePainter extends DefaultHighlighter.DefaultHighlightPainter
 	private Rectangle getDrawingArea(int offs0, int offs1, Shape bounds, View view) {
 		// Contained in view, can just use bounds.
 
-		if (offs0 == view.getStartOffset() && offs1 == view.getEndOffset()) {
-			Rectangle alloc;
+		try {
+			// --- determine locations ---
+			Shape shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, bounds);
+			Rectangle r = (shape instanceof Rectangle) ? (Rectangle) shape : shape.getBounds();
 
-			if (bounds instanceof Rectangle) {
-				alloc = (Rectangle) bounds;
-			} else {
-				alloc = bounds.getBounds();
-			}
-			return alloc;
-		} else {
-			// Should only render part of View.
-			try {
-				// --- determine locations ---
-				Shape shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, bounds);
-				Rectangle r = (shape instanceof Rectangle) ? (Rectangle) shape : shape.getBounds();
-
-				return r;
-			} catch (BadLocationException e) {
-				// can't render
-			}
+			return r;
+		} catch (BadLocationException e) {
+			// can't render
 		}
 
 		// Can't render

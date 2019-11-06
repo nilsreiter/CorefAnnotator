@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -32,6 +33,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -46,6 +48,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
+import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
@@ -70,6 +73,10 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  *
  */
 public class CoreferenceModel extends SubModel implements Model {
+
+	public static enum EntitySorter {
+		LABEL, CHILDREN, COLOR
+	}
 
 	/**
 	 * A mapping from character positions to annotations
@@ -109,14 +116,12 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * Create a new entity e and a new mention m, and add m to e. Does not fire any
 	 * events.
 	 * 
-	 * @param begin
-	 *            Begin of mention
-	 * @param end
-	 *            End of mention
+	 * @param begin Begin of mention
+	 * @param end   End of mention
 	 * @return The new mention
 	 */
 	private Mention add(int begin, int end) {
-		Annotator.logger.entry(begin, end);
+		Annotator.logger.traceEntry();
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
@@ -211,10 +216,10 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected String createEntityGroupLabel(ImmutableList<Entity> entityList) {
-		String s = entityList.subList(0, 2).select(e -> e.getLabel() != null)
+		String s = entityList.subList(0, Math.min(entityList.size(), 2)).select(e -> e.getLabel() != null)
 				.collect(
 						e -> StringUtils.abbreviate(e.getLabel(), "…", (Constants.UI_MAX_STRING_WIDTH_IN_TREE / 2) - 4))
-				.makeString(" " + Annotator.getString(Constants.Strings.ENTITY_GROUP_AND) + " ");
+				.makeString(" " + Annotator.getString(Strings.ENTITY_GROUP_AND) + " ");
 		if (entityList.size() > 2)
 			s += " + " + String.valueOf(entityList.size() - 2);
 		return s;
@@ -223,10 +228,8 @@ public class CoreferenceModel extends SubModel implements Model {
 	/**
 	 * Creates a new mention annotation in the document and adds it to the indexes
 	 * 
-	 * @param b
-	 *            the begin character position
-	 * @param e
-	 *            the end character position
+	 * @param b the begin character position
+	 * @param e the end character position
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
@@ -247,8 +250,28 @@ public class CoreferenceModel extends SubModel implements Model {
 		registerEdit(op);
 	}
 
+	protected void edit(MergeMentions op) {
+		Mention firstMention = op.getMentions().getFirstOptional().get();
+		int begin = op.getMentions().getFirstOptional().get().getBegin();
+		int end = op.getMentions().getLastOptional().get().getEnd();
+		Mention newMention = addTo(firstMention.getEntity(), begin, end);
+
+		op.getMentions().forEach(m -> {
+			remove(m, false);
+			if (m.getDiscontinuous() != null) {
+				DetachedMentionPart dmp = m.getDiscontinuous();
+				remove(dmp);
+				fireEvent(Event.get(this, Type.Remove, m, dmp));
+			}
+		});
+		fireEvent(Event.get(this, Event.Type.Remove, firstMention.getEntity(), op.getMentions()));
+		fireEvent(Event.get(this, Type.Add, newMention.getEntity(), newMention));
+		op.setNewMention(newMention);
+		registerEdit(op);
+	}
+
 	protected synchronized void edit(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getNewLabel());
@@ -298,6 +321,7 @@ public class CoreferenceModel extends SubModel implements Model {
 			arr.addToIndexes();
 			op.getEntityGroup().removeFromIndexes();
 			op.getEntityGroup().setMembers(arr);
+			updateEntityGroupLabel(op.getEntityGroup());
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntityGroup(), op.getEntities()));
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
@@ -325,8 +349,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
-			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
-			fireEvent(op.toEvent());
+			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getMentions()));
 		} else if (operation instanceof MoveMentionPartToMention) {
 			MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
 			op.getObjects().forEach(d -> {
@@ -337,16 +360,24 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(op.toEvent());
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 		} else if (operation instanceof RemoveEntities) {
+			boolean keepTreeSortedSetting = getPreferences().getBoolean(Constants.CFG_KEEP_TREE_SORTED,
+					Defaults.CFG_KEEP_TREE_SORTED);
+			getPreferences().putBoolean(Constants.CFG_KEEP_TREE_SORTED, false);
 			RemoveEntities op = (RemoveEntities) operation;
 			op.getFeatureStructures().forEach(e -> {
 				if (entityEntityGroupMap.containsKey(e))
 					op.entityEntityGroupMap.putAll(e, entityEntityGroupMap.get(e));
 				remove(e);
 			});
+			getPreferences().putBoolean(Constants.CFG_KEEP_TREE_SORTED, keepTreeSortedSetting);
 
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
-			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
+			op.getEntities().forEach(e -> {
+				entityEntityGroupMap.remove(e, op.getEntityGroup());
+				removeFrom(op.getEntityGroup(), e);
+				updateEntityGroupLabel(op.getEntityGroup());
+			});
 		} else if (operation instanceof RemovePart) {
 			RemovePart op = (RemovePart) operation;
 			remove(op.getPart());
@@ -367,6 +398,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			edit((RemoveSingletons) operation);
 		} else if (operation instanceof MergeEntities) {
 			edit((MergeEntities) operation);
+		} else if (operation instanceof MergeMentions) {
+			edit((MergeMentions) operation);
 		} else if (operation instanceof ToggleGenericFlag) {
 			edit((ToggleGenericFlag) operation);
 		} else if (operation instanceof RenameAllEntities) {
@@ -501,7 +534,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
-		fireEvent(Event.get(this, Event.Type.Update, featureStructures));
+		fireEvent(Event.get(this, Event.Type.Update,
+				featureStructures.selectInstancesOf(Entity.class).flatCollect(e -> entityMentionMap.get(e)).toList()));
 		registerEdit(operation);
 
 	}
@@ -517,6 +551,26 @@ public class CoreferenceModel extends SubModel implements Model {
 	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
+	}
+
+	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
+
+		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
+		return eset.toSortedList(new Comparator<Entity>() {
+
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				switch (entitySorter) {
+				case CHILDREN:
+					return Integer.compare(entityMentionMap.get(o2).size(), entityMentionMap.get(o1).size());
+				case COLOR:
+					return Integer.compare(o1.getColor(), o2.getColor());
+				default:
+					return o1.getLabel().compareTo(o2.getLabel());
+				}
+			}
+
+		}).toImmutable();
 	}
 
 	public JCas getJCas() {
@@ -563,8 +617,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	/**
 	 * Retrieve all annotations that cover the current character position
 	 * 
-	 * @param position
-	 *            The character position
+	 * @param position The character position
 	 * @return A collection of annotations
 	 */
 	public MutableSet<Annotation> getMentions(int position) {
@@ -583,11 +636,32 @@ public class CoreferenceModel extends SubModel implements Model {
 		return documentModel.getPreferences();
 	}
 
+	public String getToolTipText(FeatureStructure featureStructure) {
+		if (featureStructure instanceof EntityGroup) {
+			StringBuilder b = new StringBuilder();
+			EntityGroup entityGroup = (EntityGroup) featureStructure;
+			if (entityGroup.getMembers().size() > 0) {
+				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+					b.append(entityGroup.getMembers(0).getLabel());
+				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+					b.append(", ");
+					b.append(entityGroup.getMembers(i).getLabel());
+				}
+				return b.toString();
+			} else {
+				return null;
+			}
+		} else if (featureStructure instanceof Entity) {
+			return ((Entity) featureStructure).getLabel();
+		}
+		return null;
+	}
+
 	@Override
 	protected void initializeOnce() {
 		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			if (entity.getKey() != null)
-				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
+				keyMap.put(Character.valueOf(entity.getKey().charAt(0)), entity);
 		}
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
@@ -685,6 +759,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
+		Annotator.logger.traceEntry();
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
@@ -693,6 +768,8 @@ public class CoreferenceModel extends SubModel implements Model {
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
+			updateEntityGroupLabel(group);
+			fireEvent(Event.get(this, Event.Type.Remove, group, entity));
 		}
 
 		entityEntityGroupMap.removeAll(entity);
@@ -700,7 +777,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
-
+		Annotator.logger.traceExit();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {
@@ -727,7 +804,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 */
 	private void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
-		FSArray arr = new FSArray(jcas, eg.getMembers().size() - 1);
+		FSArray arr = new FSArray(jcas, oldArray.size() - 1);
 
 		for (int i = 0, j = 0; i < oldArray.size() - 1 && j < arr.size() - 1; i++, j++) {
 
@@ -742,7 +819,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected void undo(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getOldLabel());
@@ -775,6 +852,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof AddEntityToEntityGroup) {
 			AddEntityToEntityGroup op = (AddEntityToEntityGroup) operation;
 			op.getEntities().forEach(e -> removeFrom(op.getEntityGroup(), e));
+			updateEntityGroupLabel(op.getEntityGroup());
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
 			remove(op.getEntity());
@@ -797,8 +875,8 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
-			fireEvent(Event.get(this, Event.Type.Update, op.getObjects()));
-			fireEvent(op.toReversedEvent());
+			fireEvent(Event.get(this, Event.Type.Move, op.getTarget(), op.getSource(), op.getMentions()));
+
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
 
@@ -820,8 +898,11 @@ public class CoreferenceModel extends SubModel implements Model {
 			op.getFeatureStructures().forEach(e -> {
 				e.addToIndexes();
 				if (op.entityEntityGroupMap.containsKey(e)) {
-					for (EntityGroup group : op.entityEntityGroupMap.get(e))
+					for (EntityGroup group : op.entityEntityGroupMap.get(e)) {
 						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
+						entityEntityGroupMap.put(e, group);
+						updateEntityGroupLabel(group);
+					}
 				}
 			});
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
@@ -837,6 +918,7 @@ public class CoreferenceModel extends SubModel implements Model {
 				newArr.set(i, op.getEntities().get(i - oldArr.size()));
 			}
 			op.getEntityGroup().setMembers(newArr);
+			updateEntityGroupLabel(op.getEntityGroup());
 			newArr.addToIndexes();
 			oldArr.removeFromIndexes();
 		} else if (operation instanceof RemoveSingletons) {
@@ -861,6 +943,8 @@ public class CoreferenceModel extends SubModel implements Model {
 			fireEvent(Event.get(this, Event.Type.Remove, null, op.getEntityGroup()));
 		} else if (operation instanceof RenameAllEntities) {
 			undo((RenameAllEntities) operation);
+		} else if (operation instanceof MergeMentions) {
+			undo((MergeMentions) operation);
 		}
 	}
 
@@ -902,6 +986,38 @@ public class CoreferenceModel extends SubModel implements Model {
 			entity.setLabel(operation.getOldNames().get(entity));
 		}
 		fireEvent(Event.get(this, Event.Type.Update, operation.getOldNames().keySet()));
+	}
+
+	/**
+	 * Mention firstMention = op.getMentions().getFirstOptional().get(); int begin =
+	 * op.getMentions().getFirstOptional().get().getBegin(); int end =
+	 * op.getMentions().getLastOptional().get().getEnd(); Mention newMention =
+	 * addTo(firstMention.getEntity(), begin, end);
+	 * 
+	 * op.getMentions().forEach(m -> { remove(m, false); if (m.getDiscontinuous() !=
+	 * null) { DetachedMentionPart dmp = m.getDiscontinuous(); remove(dmp);
+	 * fireEvent(Event.get(this, Type.Remove, m, dmp)); } });
+	 * fireEvent(Event.get(this, Event.Type.Remove, firstMention.getEntity(),
+	 * op.getMentions())); fireEvent(Event.get(this, Type.Add,
+	 * newMention.getEntity(), newMention)); op.setNewMention(newMention);
+	 * registerEdit(op);
+	 * 
+	 * @param operation
+	 */
+	protected void undo(MergeMentions operation) {
+		operation.getMentions().forEach(m -> {
+			m.addToIndexes();
+			entityMentionMap.put(operation.getNewMention().getEntity(), m);
+			fireEvent(Event.get(this, Type.Add, m.getEntity(), m));
+		});
+		remove(operation.getNewMention(), false);
+		fireEvent(Event.get(this, Type.Remove, operation.getNewMention().getEntity(), operation.getNewMention()));
+	}
+
+	private void updateEntityGroupLabel(EntityGroup entityGroup) {
+		entityGroup.setLabel(createEntityGroupLabel(
+				Lists.immutable.ofAll(entityGroup.getMembers()).selectInstancesOf(Entity.class)));
+
 	}
 
 }

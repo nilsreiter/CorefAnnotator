@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class ToggleEntitySortOrder extends TargetedIkonAction<DocumentWindow> {
 

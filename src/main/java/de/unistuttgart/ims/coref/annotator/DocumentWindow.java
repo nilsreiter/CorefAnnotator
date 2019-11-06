@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +101,6 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
@@ -116,6 +116,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSaveAsAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.MergeAdjacentMentions;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
@@ -138,6 +139,7 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -145,6 +147,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
@@ -245,8 +248,8 @@ public class DocumentWindow extends AbstractTextWindow
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
-		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
-		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
+		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Entity.class);
 
 		// tree popup
 		treePopupMenu = new JPopupMenu();
@@ -254,6 +257,7 @@ public class DocumentWindow extends AbstractTextWindow
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(mentionFlagsInTreePopup);
+		treePopupMenu.add(this.actions.mergeMentions);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -286,6 +290,7 @@ public class DocumentWindow extends AbstractTextWindow
 		tree.addTreeSelectionListener(actions.deleteAction);
 		tree.addTreeSelectionListener(actions.formGroupAction);
 		tree.addTreeSelectionListener(actions.renameAction);
+		tree.addTreeSelectionListener(actions.mergeMentions);
 		tree.addMouseListener(tml);
 		tree.addMouseMotionListener(tml);
 		tree.setEditable(true);
@@ -355,11 +360,11 @@ public class DocumentWindow extends AbstractTextWindow
 		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
 		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
 		textPane.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				CopyAction.class);
 		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DeleteAction.class);
 		textPane.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				DeleteAllMentionsInSelection.class);
 		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
 				SelectNextMentionAction.class);
@@ -436,16 +441,31 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuView() {
+		JRadioButtonMenuItem radio;
 		JMenu viewMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW));
 		viewMenu.add(new ViewFontSizeDecreaseAction(this));
 		viewMenu.add(new ViewFontSizeIncreaseAction(this));
 
+		ButtonGroup grp = new ButtonGroup();
+
+		JMenu lineSpacingMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_SPACING));
+		lineSpacingMenu.setIcon(FontIcon.of(MaterialDesign.MDI_FORMAT_LINE_SPACING));
+		for (int i = 0; i < 10; i++) {
+			ViewSetLineSpacingAction action = new ViewSetLineSpacingAction(this, i * 0.5f);
+			radio = new JRadioButtonMenuItem(action);
+			grp.add(radio);
+			lineSpacingMenu.add(radio);
+			this.addStyleChangeListener(action);
+		}
+
+		viewMenu.add(lineSpacingMenu);
+
 		JMenu fontFamilyMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_FONTFAMILY));
 		String[] fontFamilies = new String[] { Font.SANS_SERIF, Font.SERIF, Font.MONOSPACED };
-		ButtonGroup grp = new ButtonGroup();
+		grp = new ButtonGroup();
 		for (String s : fontFamilies) {
 			AbstractAction a = new ViewFontFamilySelectAction(this, s);
-			JRadioButtonMenuItem radio = new JRadioButtonMenuItem(a);
+			radio = new JRadioButtonMenuItem(a);
 			fontFamilyMenu.add(radio);
 			grp.add(radio);
 		}
@@ -454,7 +474,6 @@ public class DocumentWindow extends AbstractTextWindow
 
 		grp = new ButtonGroup();
 		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
-		JRadioButtonMenuItem radio;
 		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
 		radio.setSelected(true);
 		grp.add(radio);
@@ -551,8 +570,8 @@ public class DocumentWindow extends AbstractTextWindow
 	}
 
 	protected JMenu initialiseMenuEntity() {
-		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Mention.class);
-		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Constants.Strings.MENU_FLAGS), this, Entity.class);
+		mentionFlagsInMenuBar = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
+		entityFlagsInMenuBar = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Entity.class);
 
 		JMenu entityMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT));
 		entityMenu.add(new JMenuItem(actions.undoAction));
@@ -830,7 +849,9 @@ public class DocumentWindow extends AbstractTextWindow
 
 	public void updateStyle(Object constant, Object value) {
 		MutableAttributeSet baseStyle = currentStyle.getBaseStyle();
+		Object oldValue = baseStyle.getAttribute(constant);
 		baseStyle.addAttribute(constant, value);
+		pcs.firePropertyChange(constant.toString(), oldValue, value);
 		switchStyle(currentStyle);
 	}
 
@@ -852,6 +873,14 @@ public class DocumentWindow extends AbstractTextWindow
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
 						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
+
+				for (Enumeration<?> e = baseStyle.getAttributeNames(); e.hasMoreElements();) {
+					Object aName = e.nextElement();
+					pcs.firePropertyChange(aName.toString(), null, baseStyle.getAttribute(aName));
+				}
+				textPane.getStyledDocument().setParagraphAttributes(0, textPane.getDocument().getLength(), baseStyle,
+						true);
+
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
 						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,
@@ -913,6 +942,8 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 			// move existing node
 			if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				if (targetFS instanceof Entity)
+					return true;
 				if (targetFS instanceof TOP)
 					return false;
 			}
@@ -928,7 +959,8 @@ public class DocumentWindow extends AbstractTextWindow
 
 			// Check for flavor
 			if (!info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)
-					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)) {
+					&& !info.isDataFlavorSupported(NodeListTransferable.dataFlavor)
+					&& !info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
 				return false;
 			}
 
@@ -965,6 +997,18 @@ public class DocumentWindow extends AbstractTextWindow
 					ImmutableList<CATreeNode> object = (ImmutableList<CATreeNode>) info.getTransferable()
 							.getTransferData(NodeListTransferable.dataFlavor);
 					handleNodeMoving(object);
+				} catch (UnsupportedFlavorException | IOException e) {
+					Annotator.logger.catching(e);
+				}
+			} else if (dataFlavor == AnnotationTransfer.dataFlavor) {
+				Object a;
+				try {
+					a = info.getTransferable().getTransferData(dataFlavor);
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> aList = (ImmutableList<Annotation>) a;
+					if (aList.anySatisfy(anno -> anno instanceof Mention) && targetFS instanceof Entity)
+						getDocumentModel().edit(
+								new MoveMentionsToEntity((Entity) targetFS, aList.selectInstancesOf(Mention.class)));
 				} catch (UnsupportedFlavorException | IOException e) {
 					Annotator.logger.catching(e);
 				}
@@ -1187,14 +1231,22 @@ public class DocumentWindow extends AbstractTextWindow
 	class TextViewKeyListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if (documentModel.getCoreferenceModel().getKeyMap().containsKey(e.getKeyChar())) {
+			CoreferenceModel cModel = getDocumentModel().getCoreferenceModel();
+
+			if (cModel.getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
-				documentModel.edit(new AddMentionsToEntity(
-						documentModel.getCoreferenceModel().getKeyMap().get(e.getKeyChar()), getSelection()));
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+						&& getSelectedAnnotations(Mention.class).size() == 1) {
+					getDocumentModel().edit(new MoveMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()),
+							getSelectedAnnotations(Mention.class)));
+				} else {
+					getDocumentModel()
+							.edit(new AddMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()), getSelection()));
+				}
 			} else if (e.getKeyChar() == ' ') {
 				Rectangle p;
 				try {
-					p = textPane.modelToView(textPane.getSelectionStart());
+					p = getTextPane().modelToView(getTextPane().getSelectionStart());
 					textPopupMenu.show(e.getComponent(), p.x, p.y + 15);
 				} catch (BadLocationException e1) {
 					Annotator.logger.catching(e1);
@@ -1225,7 +1277,12 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public Transferable createTransferable(JComponent comp) {
 			JTextComponent t = (JTextComponent) comp;
-			return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+					&& getSelectedAnnotations(Mention.class).size() == 1) {
+				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
+				return new AnnotationTransfer(mention, documentModel.getTreeModel().get(mention));
+			} else
+				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
 
 		@Override
@@ -1236,6 +1293,15 @@ public class DocumentWindow extends AbstractTextWindow
 				Collection<Annotation> mentions = documentModel.getCoreferenceModel().getMentions(dl.getIndex());
 				if (mentions.size() > 0)
 					return true;
+			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+				try {
+					@SuppressWarnings("unchecked")
+					ImmutableList<Annotation> annoList = (ImmutableList<Annotation>) info.getTransferable()
+							.getTransferData(AnnotationTransfer.dataFlavor);
+					return annoList.anySatisfy(a -> a instanceof Mention);
+				} catch (UnsupportedFlavorException | IOException e) {
+					return false;
+				}
 			}
 			return false;
 		}
@@ -1250,13 +1316,19 @@ public class DocumentWindow extends AbstractTextWindow
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
 					try {
-						Transferable pat = info.getTransferable();
-						@SuppressWarnings("unchecked")
-						ImmutableList<Span> spans = (ImmutableList<Span>) pat
-								.getTransferData(PotentialAnnotationTransfer.dataFlavor);
 						Mention m = (Mention) a;
-						documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
-
+						Transferable pat = info.getTransferable();
+						if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
+							@SuppressWarnings("unchecked")
+							ImmutableList<Span> spans = (ImmutableList<Span>) pat
+									.getTransferData(PotentialAnnotationTransfer.dataFlavor);
+							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
+						} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
+							Object annotationList = pat.getTransferData(AnnotationTransfer.dataFlavor);
+							if (annotationList instanceof ImmutableList<?>)
+								documentModel.edit(new MoveMentionsToEntity(m.getEntity(),
+										((ImmutableList<?>) annotationList).selectInstancesOf(Mention.class)));
+						}
 					} catch (UnsupportedFlavorException | IOException e) {
 						Annotator.logger.catching(e);
 					}
@@ -1271,7 +1343,7 @@ public class DocumentWindow extends AbstractTextWindow
 		private static final long serialVersionUID = 1L;
 
 		public ClearAction(DocumentWindow dm) {
-			super(dm, Constants.Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
+			super(dm, Strings.ACTION_CLEAR, MaterialDesign.MDI_FORMAT_CLEAR);
 		}
 
 		@Override
@@ -1351,26 +1423,29 @@ public class DocumentWindow extends AbstractTextWindow
 			int mark = e.getMark();
 			int low = Math.min(dot, mark);
 			int high = Math.max(dot, mark);
-			if (dot == mark) {
-				// nothing is selected
 
-				setMessage("", 0);
-			} else {
-				// something is selected
+			MutableSet<Mention> mentions = Sets.mutable.empty();
+			if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
 
+				// nothing is selected: show all mentions cursor is part of
 				MutableSet<? extends Annotation> annotations = Sets.mutable
 						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
-				@SuppressWarnings("unchecked")
-				MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention)
-						.select(a -> a.getBegin() == low && a.getEnd() == high);
-				if (mentions.size() == 1) {
-					setMessage("Selected entity: " + mentions.iterator().next().getEntity().getLabel(), 0);
-				} else if (mentions.size() > 1) {
-					setMessage(mentions.size() + " entities selected.", 0);
-				} else {
-					setMessage("", 0);
+				mentions = annotations.selectInstancesOf(Mention.class);
+
+				// something is selected
+				if (dot != mark) {
+					ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentions(low, high)
+							.selectInstancesOf(Mention.class);
+					mentions.addAllIterable(ms);
 				}
+				setCollectionPanel(mentions.collect(m -> {
+					EntityPanel ep = new EntityPanel(getDocumentModel(), m.getEntity());
+					Annotator.app.getPreferences().addPreferenceChangeListener(ep);
+					getDocumentModel().getCoreferenceModel().addCoreferenceModelListener(ep);
+					return ep;
+				}));
 			}
+
 		}
 
 	}
@@ -1459,7 +1534,7 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 
 			if (selection) {
-				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES_CANDIDATES));
+				textPopupMenu.add(Annotator.getString(Strings.MENU_ENTITIES_CANDIDATES));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				textPopupMenu.add(actions.newEntityAction);
 				if (!candidates.isEmpty()) {
@@ -1479,7 +1554,7 @@ public class DocumentWindow extends AbstractTextWindow
 			if (!mentionActions.isEmpty()) {
 				if (selection)
 					textPopupMenu.addSeparator();
-				textPopupMenu.add(Annotator.getString(Constants.Strings.MENU_ENTITIES));
+				textPopupMenu.add(Annotator.getString(Strings.MENU_ENTITIES));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				mentionActions.forEach(mi -> {
 					textPopupMenu.add(mi);
@@ -1487,7 +1562,7 @@ public class DocumentWindow extends AbstractTextWindow
 			}
 			if (!exportActions.isEmpty()) {
 				textPopupMenu.addSeparator();
-				textPopupMenu.add(Annotator.getString(Constants.Strings.ACTION_EXPORT_EXAMPLE));
+				textPopupMenu.add(Annotator.getString(Strings.ACTION_EXPORT_EXAMPLE));
 				textPopupMenu.getComponent(textPopupMenu.getComponentCount() - 1).setEnabled(false);
 				exportActions.forEach(ea -> textPopupMenu.add(ea));
 			}
@@ -1509,11 +1584,15 @@ public class DocumentWindow extends AbstractTextWindow
 			b.append(m.getAddress());
 
 			String surf = m.getCoveredText();
+			surf = StringUtils.abbreviateMiddle(surf, "...", 20);
 
 			if (dmp != null)
 				surf += " [,] " + dmp.getCoveredText();
 			if (m.getEntity().getLabel() != null)
-				b.append(": ").append(m.getEntity().getLabel());
+				b.append(": ")
+						.append(StringUtils.abbreviateMiddle(
+								getDocumentModel().getCoreferenceModel().getLabel(m.getEntity()), "...",
+								Constants.UI_MAX_STRING_WIDTH_IN_MENU));
 
 			JMenu mentionMenu = new JMenu(b.toString());
 			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
@@ -1534,8 +1613,7 @@ public class DocumentWindow extends AbstractTextWindow
 		public void valueChanged(TreeSelectionEvent e) {
 			if (!isEnabled())
 				return;
-			TreeSelectionUtil tsu = new TreeSelectionUtil();
-			tsu.collectData(e);
+			TreeSelectionUtil tsu = new TreeSelectionUtil(e);
 
 			actions.changeKeyAction.setEnabled(tsu.isSingle() && tsu.isEntity());
 			actions.changeColorAction.setEnabled(tsu.isSingle() && tsu.isEntity());
@@ -1652,6 +1730,7 @@ public class DocumentWindow extends AbstractTextWindow
 
 	class ActionContainer {
 
+		MergeAdjacentMentions mergeMentions = new MergeAdjacentMentions(DocumentWindow.this);
 		AbstractAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();
 		AbstractAction changeColorAction;
@@ -1685,6 +1764,14 @@ public class DocumentWindow extends AbstractTextWindow
 		Entity[] entities = new Entity[tree.getSelectionPaths().length];
 		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
 			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getEntity();
+		}
+		return Sets.immutable.of(entities);
+	}
+
+	public ImmutableSet<Mention> getSelectedMentions() {
+		Mention[] entities = new Mention[tree.getSelectionPaths().length];
+		for (int i = 0; i < tree.getSelectionPaths().length; i++) {
+			entities[i] = ((CATreeNode) tree.getSelectionPaths()[i].getLastPathComponent()).getFeatureStructure();
 		}
 		return Sets.immutable.of(entities);
 	}

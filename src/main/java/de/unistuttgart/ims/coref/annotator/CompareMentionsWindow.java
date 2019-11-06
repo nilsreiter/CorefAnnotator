@@ -53,7 +53,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.Constants.Strings;
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -140,7 +139,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
 				JPopupMenu pMenu = new JPopupMenu();
-				int offset = textPane.viewToModel(e.getPoint());
+				int offset = textPane.viewToModel2D(e.getPoint());
 
 				for (int i = 0; i < models.size(); i++) {
 					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models.get(i).getMentions(offset));
@@ -346,38 +345,35 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			panel.setPreferredSize(new Dimension(200, 70));
 
 			JLabel desc;
-			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
-			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_TOTAL_TOOLTIP));
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_TOTAL_TOOLTIP));
 			panel.add(desc);
 			JLabel valueLabel = new BoundLabel(stats, "total", o -> o.toString(), stats.total());
 			panel.add(valueLabel);
 
-			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
-			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_TOOLTIP));
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_TOOLTIP));
 			panel.add(desc);
 			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()));
 
-			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL) + ":",
-					SwingConstants.RIGHT);
-			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
 			panel.add(desc);
 			JLabel percTotalLabel = new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
 					SwingConstants.RIGHT);
 
 			panel.add(percTotalLabel);
 
-			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL) + ":",
-					SwingConstants.RIGHT);
-			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
 			panel.add(desc);
 			JLabel percOvrLabel = new JLabel(
 					String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
 					SwingConstants.RIGHT);
 			panel.add(percOvrLabel);
 
-			desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED) + ":",
-					SwingConstants.RIGHT);
-			desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
+			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
+			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
 			panel.add(desc);
 			JLabel selectedAgreementLabel = new BoundLabel(stats, "agreementInSpan",
 					o -> String.format("%1$3.1f%%", o));
@@ -420,32 +416,32 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		JLabel desc;
 
 		// color
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_COLOR_TOOLTIP));
+		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_COLOR_TOOLTIP));
 		panel.add(desc);
 		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT));
 
 		// number of mentions
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_MENTIONS_TOOLTIP));
+		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_MENTIONS_TOOLTIP));
 		panel.add(desc);
 		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT));
 
 		// number of entities
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_ENTITIES_TOOLTIP));
+		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_ENTITIES_TOOLTIP));
 		panel.add(desc);
 		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT));
 
 		// annotation position
-		desc = new JLabel(Annotator.getString(Constants.Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
-		desc.setToolTipText(Annotator.getString(Constants.Strings.STAT_KEY_POSITION_TOOLTIP));
+		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
+		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_POSITION_TOOLTIP));
 		panel.add(desc);
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
 				SwingConstants.RIGHT));
 
-		panel.add(new JLabel(Annotator.getString(Constants.Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
+		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
 		panel.add(new JButton(open.get(index)));
 
 		return panel;
@@ -508,7 +504,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		textPane.setCaretPosition(0);
 		// mentionsTextPane.addMouseListener(new TextMouseListener());
 		textPane.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				copyAction);
 		textPane.addCaretListener(new TextCaretListener());
 
@@ -615,7 +611,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	public void setFiles(Iterable<File> files) {
 		this.files = Lists.mutable.withAll(files);
 		this.open = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
-		JMenu currentFilesMenu = new JMenu(Annotator.getString(Constants.Strings.ACTION_OPEN));
+		JMenu currentFilesMenu = new JMenu(Annotator.getString(Strings.ACTION_OPEN));
 		this.open.forEach(a -> currentFilesMenu.add(a));
 		fileMenu.add(currentFilesMenu, 1);
 	}

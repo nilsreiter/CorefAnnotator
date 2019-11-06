@@ -38,7 +38,7 @@ public class SearchDialog extends JDialog implements DocumentListener, SearchCon
 
 		// this allows closing by hitting command-w
 		InputMap inputMap = ((JPanel) this.getContentPane()).getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				ACTION_CLOSE);
 		ActionMap actionMap = ((JPanel) this.getContentPane()).getActionMap();
 		actionMap.put(ACTION_CLOSE, new AbstractAction() {
@@ -82,13 +82,13 @@ public class SearchDialog extends JDialog implements DocumentListener, SearchCon
 		addWindowListener(pane1);
 		addWindowListener(pane2);
 
-		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_TEXT), pane1);
-		tabbedPane.addTab(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TAB_STRUCTURE), pane2);
+		tabbedPane.addTab(Annotator.getString(Strings.SEARCH_WINDOW_TAB_TEXT), pane1);
+		tabbedPane.addTab(Annotator.getString(Strings.SEARCH_WINDOW_TAB_STRUCTURE), pane2);
 
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		setLocation(documentWindow.getLocation().x + documentWindow.getWidth(), documentWindow.getLocation().y);
 
-		setTitle(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TITLE));
+		setTitle(Annotator.getString(Strings.SEARCH_WINDOW_TITLE));
 		setMaximumSize(new Dimension(600, 800));
 		setLocationRelativeTo(documentWindow);
 		addWindowListener(new SearchDialogWindowListener());

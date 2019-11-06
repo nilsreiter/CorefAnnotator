@@ -12,16 +12,16 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 
 public class CloseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
 	public CloseAction() {
-		super(Annotator.getString(Constants.Strings.ACTION_CLOSE));
+		super(Annotator.getString(Strings.ACTION_CLOSE));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,9 +75,10 @@ public class PluginManager {
 			T p;
 			try {
 				Annotator.logger.info("Creating new instance of plugin {}", cl.getName());
-				p = cl.newInstance();
+				p = cl.getDeclaredConstructor().newInstance();
 				instances.put(cl, p);
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				Annotator.logger.catching(e);
 			}
 		}

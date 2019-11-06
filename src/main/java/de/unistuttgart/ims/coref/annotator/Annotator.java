@@ -71,9 +71,6 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
-	@Deprecated
-	JFileChooser openDialog;
-
 	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
@@ -87,6 +84,8 @@ public class Annotator {
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
 	public static Annotator app;
+
+	static Boolean javafx = null;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -113,7 +112,8 @@ public class Annotator {
 	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
 		logger.trace("Application startup. Version " + Version.get().toString());
-		new JFXPanel();
+		if (Annotator.javafx())
+			new JFXPanel();
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -135,9 +135,6 @@ public class Annotator {
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
-		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}
@@ -214,7 +211,7 @@ public class Annotator {
 		try {
 			if (updateCheck.checkForUpdate()) {
 				JButton button = new JButton();
-				button.setText(Annotator.getString(Constants.Strings.STATUS_NOW_AVAILABLE) + ": "
+				button.setText(Annotator.getString(Strings.STATUS_NOW_AVAILABLE) + ": "
 						+ updateCheck.getRemoteVersion().toString());
 				button.setIcon(FontIcon.of(MaterialDesign.MDI_NEW_BOX));
 				button.addActionListener(new ActionListener() {
@@ -315,22 +312,42 @@ public class Annotator {
 	}
 
 	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
-				fileChooser.setInitialDirectory(getCurrentDirectory());
-				// fileChooser.getExtensionFilters().clear();
-				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
-				File file = fileChooser.showOpenDialog(null);
-				if (file != null)
-					open(file, flavor, Constants.X_UNSPECIFIED);
-				else
-					showOpening();
+		if (Annotator.javafx()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+					fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+					fileChooser.setInitialDirectory(getCurrentDirectory());
+					// fileChooser.getExtensionFilters().clear();
+					fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
+					File file = fileChooser.showOpenDialog(null);
+					if (file != null)
+						open(file, flavor, Constants.X_UNSPECIFIED);
+					else
+						showOpening();
+				}
+			});
+		} else {
+			JFileChooser openDialog;
+			openDialog = new JFileChooser();
+			openDialog.setMultiSelectionEnabled(true);
+			openDialog.setFileFilter(FileFilters.xmi_gz);
+			openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
+			openDialog.setFileFilter(flavor.getFileFilter());
+			openDialog.setCurrentDirectory(getCurrentDirectory());
+			int r = openDialog.showOpenDialog(parent);
+			switch (r) {
+			case JFileChooser.APPROVE_OPTION:
+				for (File f : openDialog.getSelectedFiles()) {
+					setCurrentDirectory(f.getParentFile());
+					open(f, flavor, Constants.X_UNSPECIFIED);
+				}
+				break;
+			default:
+				showOpening();
 			}
-		});
-
+		}
 	}
 
 	public static String getString(String key) {
@@ -419,7 +436,10 @@ public class Annotator {
 	}
 
 	public File getCurrentDirectory() {
-		return new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, System.getProperty("user.home")));
+		File f = new File(preferences.get(Constants.CFG_CURRENT_DIRECTORY, System.getProperty("user.home")));
+		if (!f.isDirectory())
+			f = new File(System.getProperty("user.home"));
+		return f;
 	}
 
 	public void setCurrentDirectory(File f) {
@@ -431,4 +451,16 @@ public class Annotator {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	public static boolean javafx() {
+		if (javafx == null)
+			try {
+				Class.forName("javafx.embed.swing.JFXPanel");
+				new JFXPanel();
+				javafx = true;
+			} catch (Exception e) {
+				javafx = false;
+			}
+		return javafx;
+	}
 }

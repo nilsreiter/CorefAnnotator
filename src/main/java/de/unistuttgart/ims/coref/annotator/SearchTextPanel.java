@@ -46,9 +46,9 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
+			super(Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
 			putValue(Action.SHORT_DESCRIPTION,
-					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
+					Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			// this.addIkon(MaterialDesign.MDI_ACCOUNT);
 		}
 
@@ -68,9 +68,9 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindingsAsNewEntity() {
-			super(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
+			super(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION,
-					Annotator.getString(Constants.Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
+					Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
 		}
 
 		@Override
@@ -91,8 +91,14 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 			@SuppressWarnings("unchecked")
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
-			return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
-					Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)) {
+				return new AnnotationTransfer(Lists.immutable.ofAll(list.getSelectedValuesList())
+						.collect(sr -> sr.getSpan()).flatCollect(span -> searchContainer.getDocumentWindow()
+								.getDocumentModel().getCoreferenceModel().getMentions(span.begin, span.end)));
+
+			} else
+				return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
+						Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan()));
 		}
 
 		@Override
@@ -106,7 +112,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		private static final long serialVersionUID = 1L;
 
 		public RunSearch() {
-			super(Constants.Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
+			super(Strings.ACTION_SEARCH, MaterialDesign.MDI_FILE_FIND);
 			setEnabled(false);
 		}
 
@@ -148,7 +154,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
-				selectedEntityLabel.setText(Annotator.getString(Constants.Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
+				selectedEntityLabel.setText(Annotator.getString(Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
 						+ getEntity(0).getLabel());
 			else
 				selectedEntityLabel.setText("");
@@ -174,10 +180,10 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		annotateSelectedFindings.setEnabled(false);
 
 		textField = new JTextField(20);
-		textField.setToolTipText(Annotator.getString(Constants.Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
+		textField.setToolTipText(Annotator.getString(Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
 		textField.getDocument().addDocumentListener(this);
 
-		restrictToMentions = new JCheckBox(Annotator.getString(Constants.Strings.SEARCH_WINDOW_RESTRICT_TO_MENTIONS));
+		restrictToMentions = new JCheckBox(Annotator.getString(Strings.SEARCH_WINDOW_RESTRICT_TO_MENTIONS));
 		restrictToMentions.addItemListener(new ItemListener() {
 
 			@Override

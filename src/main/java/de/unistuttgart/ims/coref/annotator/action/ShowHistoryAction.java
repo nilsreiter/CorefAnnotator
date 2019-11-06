@@ -9,8 +9,8 @@ import javax.swing.JList;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 
 public class ShowHistoryAction extends DocumentWindowAction {
@@ -18,7 +18,7 @@ public class ShowHistoryAction extends DocumentWindowAction {
 	private static final long serialVersionUID = 1L;
 
 	public ShowHistoryAction(DocumentWindow dw) {
-		super(dw, Constants.Strings.ACTION_SHOW_HISTORY, MaterialDesign.MDI_HISTORY);
+		super(dw, Strings.ACTION_SHOW_HISTORY, MaterialDesign.MDI_HISTORY);
 	}
 
 	@Override
