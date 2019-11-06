@@ -112,6 +112,8 @@ public class Strings {
 	public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
 	public static final String DIALOG_CHANGE_KEY_OK = "dialog.change_key.ok";
 	public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
+	public static final String DIALOG_EXPORT_OPTIONS_OK = "dialog.export_options.ok";
+	public static final String DIALOG_EXPORT_OPTIONS_TITLE = "dialog.export_options.title";
 	public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
 	public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 	public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";

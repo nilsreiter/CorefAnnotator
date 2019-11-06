@@ -9,7 +9,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   files at once. #242
 - Added a SFB1391 specific importer than interprets `<lb>` tags 
   properly #255
-- 
+- Export mention statistics now has some configuration options. 
+  Import and export plugins can have that as well now. #76
 
 ## 1.11.2
 
