@@ -21,7 +21,7 @@ public class CloseAction extends AbstractAction {
 	public CloseAction() {
 		super(Annotator.getString(Strings.ACTION_CLOSE));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

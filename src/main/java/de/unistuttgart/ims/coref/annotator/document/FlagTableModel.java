@@ -95,7 +95,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		Annotator.logger.entry(aValue, rowIndex, columnIndex);
+		Annotator.logger.traceEntry();
 		Flag f = documentModel.getFlagModel().getFlags().get(rowIndex);
 		UpdateFlag.FlagProperty property = null;
 		Object value = null;
@@ -134,7 +134,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 
 	@Override
 	public void flagEvent(FeatureStructureEvent event) {
-		Annotator.logger.entry(event);
+		Annotator.logger.traceEntry();
 
 		TableModelEvent tme = null;
 		switch (event.getType()) {

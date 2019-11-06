@@ -23,7 +23,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
 		putValue(Action.NAME, Annotator.getString("action.save"));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

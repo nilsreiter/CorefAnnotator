@@ -25,7 +25,7 @@ public class RenameEntityAction extends DocumentWindowAction implements TreeSele
 		super(dw, Strings.ACTION_RENAME, MaterialDesign.MDI_RENAME_BOX);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_RENAME_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
 	}
 

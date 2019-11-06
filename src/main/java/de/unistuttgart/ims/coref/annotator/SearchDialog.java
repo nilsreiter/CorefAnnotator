@@ -38,7 +38,7 @@ public class SearchDialog extends JDialog implements DocumentListener, SearchCon
 
 		// this allows closing by hitting command-w
 		InputMap inputMap = ((JPanel) this.getContentPane()).getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
-		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				ACTION_CLOSE);
 		ActionMap actionMap = ((JPanel) this.getContentPane()).getActionMap();
 		actionMap.put(ACTION_CLOSE, new AbstractAction() {

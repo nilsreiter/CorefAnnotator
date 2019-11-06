@@ -432,6 +432,7 @@ public class Annotator {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public static boolean javafx() {
 		if (javafx == null)
 			try {

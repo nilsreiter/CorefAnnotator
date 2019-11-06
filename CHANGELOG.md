@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.12.0
+
+- The app now includes a command line tool to convert multiple 
+  files at once. #242
+
 ## 1.11.2
 
 - Using the QuaDramA/TEI importer no longer generates files in the

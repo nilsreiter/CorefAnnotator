@@ -21,7 +21,7 @@ public class CopyAction extends TargetedIkonAction<HasTextView> {
 	public CopyAction(HasTextView dw) {
 		super(dw, Strings.ACTION_COPY, MaterialDesign.MDI_CONTENT_COPY);
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override
