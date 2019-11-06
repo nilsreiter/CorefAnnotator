@@ -2,17 +2,17 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import org.kordamp.ikonli.Ikon;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.HasDocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 
-public abstract class TargetedOperationIkonAction<T extends DocumentWindow> extends TargetedIkonAction<T>
+public abstract class TargetedOperationIkonAction<T extends HasDocumentModel> extends TargetedIkonAction<T>
 		implements OperationAction {
 
 	private static final long serialVersionUID = 1L;
 
 	boolean actionEnabled = true;
 
-	Class<? extends Operation> operationClass;
+	protected Class<? extends Operation> operationClass;
 
 	public TargetedOperationIkonAction(T dw, Ikon ikon) {
 		super(dw, ikon);

@@ -187,8 +187,8 @@ import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
-public class DocumentWindow extends AbstractTextWindow
-		implements CaretListener, CoreferenceModelListener, HasTextView, DocumentStateListener, HasTreeView {
+public class DocumentWindow extends AbstractTextWindow implements CaretListener, CoreferenceModelListener, HasTextView,
+		DocumentStateListener, HasTreeView, HasDocumentModel {
 
 	private static final long serialVersionUID = 1L;
 

@@ -9,9 +9,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Sets;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
@@ -62,8 +60,6 @@ public class DocumentModel implements Model {
 
 	Profile profile;
 
-	MutableSet<Class<? extends Operation>> blockedOperations = Sets.mutable.empty();
-
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 		this.preferences = preferences;
@@ -76,7 +72,7 @@ public class DocumentModel implements Model {
 	public void edit(Operation operation) {
 		Annotator.logger.trace(operation);
 
-		if (blockedOperations.contains(operation.getClass())) {
+		if (isBlocked(operation.getClass())) {
 			Annotator.logger.info("Operation {} blocked.", operation.getClass().getCanonicalName());
 			return;
 		}
@@ -340,6 +336,8 @@ public class DocumentModel implements Model {
 	}
 
 	public boolean isBlocked(Class<? extends Operation> o, Class<?> target) {
+		if (profile == null)
+			return false;
 		return Lists.immutable.withAll(profile.getForbidden().getOperation()).collect(op -> {
 			try {
 				return Class.forName(op.getClazz());
