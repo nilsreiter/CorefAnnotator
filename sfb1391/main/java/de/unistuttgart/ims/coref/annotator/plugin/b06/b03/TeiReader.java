@@ -82,9 +82,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
 		gxr.addRule("lg", Segment.class);
-		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> {
-			lineBreak.setN(element.attr("n"));
-		});
+		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> ms.setN(element.attr("n")));
 
 		Resource res = nextFile();
@@ -117,6 +115,16 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
 				line.setNumber(Integer.valueOf(lb.getN()));
 			}
+		}
+		for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+			Milestone nextMilestone = null;
+			nextMilestone = JCasUtil.selectFollowing(Milestone.class, ms, 1).get(0);
+			if (nextMilestone != null) {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMilestone.getBegin(),
+						Segment.class);
+				seg.setLabel(ms.getN());
+			}
+
 		}
 	}
 
