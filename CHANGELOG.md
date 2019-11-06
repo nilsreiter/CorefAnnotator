@@ -7,6 +7,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 - The app now includes a command line tool to convert multiple 
   files at once. #242
+- Added a SFB1391 specific importer than interprets `<lb>` tags 
+  properly #255
+- 
 
 ## 1.11.2
 
