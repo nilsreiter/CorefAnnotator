@@ -84,12 +84,14 @@ public class FlagEditor extends AbstractWindow {
 		this.table = new JTable(new FlagTableModel(documentModel));
 
 		// Actions
-		AbstractAction addEntityFlagAction = AddFlagAction.getAddEntityFlagAction(documentWindow);
-		AbstractAction addMentionFlagAction = AddFlagAction.getAddMentionFlagAction(documentWindow);
+		AddFlagAction addEntityFlagAction = AddFlagAction.getAddEntityFlagAction(documentWindow);
+		AddFlagAction addMentionFlagAction = AddFlagAction.getAddMentionFlagAction(documentWindow);
 		DeleteFlagAction deleteFlagAction = new DeleteFlagAction(documentWindow, table);
 		AbstractAction undoAction = new UndoAction(documentWindow);
 
 		deleteFlagAction.setEnabled(false);
+		addEntityFlagAction.setEnabled();
+		addMentionFlagAction.setEnabled();
 
 		// Menu
 		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
