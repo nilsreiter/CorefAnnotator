@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
@@ -22,6 +23,8 @@ import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
+import de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak;
+import de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -78,12 +81,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
 		gxr.addRule("lg", Segment.class);
-		gxr.addRule("lb", Line.class, (line, element) -> {
-			String nAttr = element.attr("n");
-
+		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> {
+			lineBreak.setN(element.attr("n"));
 		});
-		gxr.addRule("l", Line.class,
-				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
+		gxr.addRule("milestone", Milestone.class, (ms, element) -> ms.setN(element.attr("n")));
 
 		Resource res = nextFile();
 
@@ -101,10 +102,20 @@ public class TeiReader extends ResourceCollectionReaderBase {
 
 		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
-		// TODO: Remove <rs> elements
+
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs"))
 				element.removeFromIndexes();
+		}
+
+		// fix lines
+		for (LineBreak lb : JCasUtil.select(jcas, LineBreak.class)) {
+			Milestone nextMilestone = null;
+			nextMilestone = JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
+			if (nextMilestone != null) {
+				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
+				line.setNumber(Integer.valueOf(lb.getN()));
+			}
 		}
 	}
 
