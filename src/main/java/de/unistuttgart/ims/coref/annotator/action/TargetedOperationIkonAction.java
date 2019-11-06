@@ -28,13 +28,9 @@ public abstract class TargetedOperationIkonAction<T extends DocumentWindow> exte
 
 	@Override
 	public void setEnabled(boolean state) {
-		super.setEnabled(actionEnabled && state);
-	}
-
-	public void setEnabled() {
 		if (getTarget().getDocumentModel() != null)
 			actionEnabled = !getTarget().getDocumentModel().isBlocked(getOperationClass());
-		setEnabled(true);
+		super.setEnabled(actionEnabled && state);
 	}
 
 	@Override

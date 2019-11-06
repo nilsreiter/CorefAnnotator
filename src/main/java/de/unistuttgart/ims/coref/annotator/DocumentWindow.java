@@ -117,6 +117,7 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FormEntityGroup;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.MergeAdjacentMentions;
+import de.unistuttgart.ims.coref.annotator.action.MergeSelectedEntities;
 import de.unistuttgart.ims.coref.annotator.action.NewEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.RemoveDuplicatesAction;
@@ -167,12 +168,12 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
-import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
@@ -769,9 +770,9 @@ public class DocumentWindow extends AbstractTextWindow
 		model.addDocumentStateListener(this);
 
 		actions.lineNumberStyleFixed.setEnabled(model.hasLineNumbers());
-		actions.newEntityAction.setEnabled();
-		actions.changeColorAction.setEnabled();
-		actions.changeKeyAction.setEnabled();
+		actions.newEntityAction.setEnabled(true);
+		actions.changeColorAction.setEnabled(true);
+		actions.changeKeyAction.setEnabled(true);
 
 		// listeners to the coref model
 		model.getCoreferenceModel().addCoreferenceModelListener(this);
@@ -1094,7 +1095,7 @@ public class DocumentWindow extends AbstractTextWindow
 		@Override
 		public boolean isCellEditable(EventObject e) {
 			CATreeNode node = (CATreeNode) lastPath.getLastPathComponent();
-			return super.isCellEditable(e) && node.isEntity();
+			return super.isCellEditable(e) && node.isEntity() && !getDocumentModel().isBlocked(UpdateEntityName.class);
 		}
 	}
 
@@ -1368,23 +1369,6 @@ public class DocumentWindow extends AbstractTextWindow
 			for (Entity e : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)))
 				documentModel.edit(new RemoveEntities(e));
 			documentModel.getHistory().clear();
-		}
-
-	}
-
-	class MergeSelectedEntities extends IkonAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public MergeSelectedEntities() {
-			super(Strings.ACTION_MERGE, MaterialDesign.MDI_CALL_MERGE);
-			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_MERGE_TOOLTIP));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			documentModel.edit(new MergeEntities(getSelectedEntities()));
-
 		}
 
 	}
@@ -1762,7 +1746,7 @@ public class DocumentWindow extends AbstractTextWindow
 		AbstractAction sortByMentions;
 		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
-		AbstractAction mergeSelectedEntitiesAction = new MergeSelectedEntities();
+		MergeSelectedEntities mergeSelectedEntitiesAction = new MergeSelectedEntities(DocumentWindow.this);
 		NewEntityAction newEntityAction;
 		RenameEntityAction renameAction;
 		RemoveDuplicatesAction removeDuplicatesAction;

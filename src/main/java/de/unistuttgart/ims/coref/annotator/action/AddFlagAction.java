@@ -43,7 +43,6 @@ public class AddFlagAction extends TargetedOperationIkonAction<DocumentWindow> {
 		AddFlagAction afa = new AddFlagAction(dw, Entity.class);
 		afa.putValue(Action.NAME, Annotator.getString(Strings.ACTION_ADD_ENTITY_FLAG));
 		afa.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_ENTITY_FLAG_TOOLTIP));
-		afa.setEnabled();
 		return afa;
 	}
 
@@ -51,7 +50,6 @@ public class AddFlagAction extends TargetedOperationIkonAction<DocumentWindow> {
 		AddFlagAction afa = new AddFlagAction(dw, Mention.class);
 		afa.putValue(Action.NAME, Annotator.getString(Strings.ACTION_ADD_MENTION_FLAG));
 		afa.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_MENTION_FLAG_TOOLTIP));
-		afa.setEnabled();
 		return afa;
 	}
 }

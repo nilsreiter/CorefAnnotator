@@ -27,7 +27,7 @@ public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow
 		this.table = table;
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_FLAG_TOOLTIP));
 		this.operationClass = DeleteFlag.class;
-		setEnabled();
+		setEnabled(true);
 	}
 
 	@Override

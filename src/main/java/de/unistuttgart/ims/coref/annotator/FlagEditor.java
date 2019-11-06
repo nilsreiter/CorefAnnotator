@@ -90,8 +90,8 @@ public class FlagEditor extends AbstractWindow {
 		AbstractAction undoAction = new UndoAction(documentWindow);
 
 		deleteFlagAction.setEnabled(false);
-		addEntityFlagAction.setEnabled();
-		addMentionFlagAction.setEnabled();
+		addEntityFlagAction.setEnabled(true);
+		addMentionFlagAction.setEnabled(true);
 
 		// Menu
 		JMenu fileMenu = new JMenu(Annotator.getString(Strings.MENU_FILE));
