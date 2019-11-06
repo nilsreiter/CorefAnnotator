@@ -41,7 +41,8 @@ public class HelpWindow extends JFrame {
 				new HelpTopic("Compare annotations", new JScrollPane(load("docs/compare"))),
 				new HelpTopic("Automatic processing", new JScrollPane(load("docs/processing"))),
 				new HelpTopic("Flag editing", new JScrollPane(load("docs/flags"))),
-				new HelpTopic("Input/Output", new JScrollPane(loadIOPlugins())) };
+				new HelpTopic("Input/Output", new JScrollPane(loadIOPlugins())),
+				new HelpTopic("Search", new JScrollPane(load("docs/search"))) };
 
 		JPanel topicArea = new JPanel();
 
