@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
@@ -11,6 +12,7 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
@@ -22,6 +24,11 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
+		try {
+			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+		}
 		return "";
 	}
 
