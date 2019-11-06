@@ -10,7 +10,7 @@ public abstract class TargetedOperationIkonAction<T extends DocumentWindow> exte
 
 	private static final long serialVersionUID = 1L;
 
-	boolean enabled = true;
+	boolean actionEnabled = true;
 
 	Class<? extends Operation> operationClass;
 
@@ -28,12 +28,13 @@ public abstract class TargetedOperationIkonAction<T extends DocumentWindow> exte
 
 	@Override
 	public void setEnabled(boolean state) {
-		super.setEnabled(enabled && state);
+		super.setEnabled(actionEnabled && state);
 	}
 
 	public void setEnabled() {
 		if (getTarget().getDocumentModel() != null)
-			enabled = !getTarget().getDocumentModel().isBlocked(getOperationClass());
+			actionEnabled = !getTarget().getDocumentModel().isBlocked(getOperationClass());
+		setEnabled(true);
 	}
 
 	@Override
