@@ -1,18 +1,26 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.io.IOUtils;
 
@@ -23,18 +31,41 @@ public class HelpWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private static HelpWindow window = null;
+	HelpTopic[] topics;
 
-	JTabbedPane tabbedPane;
+	JList<String> topicList;
 
 	protected HelpWindow() {
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
-		tabbedPane.addTab("Index", new JScrollPane(load("docs/index")));
-		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto")));
-		tabbedPane.addTab("Compare annotations", new JScrollPane(load("docs/compare")));
-		tabbedPane.addTab("Automatic processing", new JScrollPane(load("docs/processing")));
-		tabbedPane.addTab("Flag editing", new JScrollPane(load("docs/flags")));
-		tabbedPane.addTab("Input/Output", new JScrollPane(loadIOPlugins()));
-		this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		topics = new HelpTopic[] { new HelpTopic("Index", new JScrollPane(load("docs/index"))),
+				new HelpTopic("How to annotate", new JScrollPane(load("docs/howto"))),
+				new HelpTopic("Compare annotations", new JScrollPane(load("docs/compare"))),
+				new HelpTopic("Automatic processing", new JScrollPane(load("docs/processing"))),
+				new HelpTopic("Flag editing", new JScrollPane(load("docs/flags"))),
+				new HelpTopic("Input/Output", new JScrollPane(loadIOPlugins())) };
+
+		JPanel topicArea = new JPanel();
+
+		DefaultListModel<String> topicListModel = new DefaultListModel<String>();
+		for (HelpTopic ht : topics)
+			topicListModel.addElement(ht.getTitle());
+
+		topicList = new JList<String>(topicListModel);
+		topicList.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Topics"));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topicList, topicArea);
+		topicList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		topicList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					splitPane.setRightComponent(topics[topicList.getSelectedIndex()].getPanel());
+				}
+			}
+
+		});
+
+		this.getContentPane().add(splitPane, BorderLayout.CENTER);
+		topicList.setSelectedIndex(0);
 		this.pack();
 		this.setLocationRelativeTo(null);
 
@@ -117,11 +148,31 @@ public class HelpWindow extends JFrame {
 		HelpWindow hw = getHelpWindow();
 		hw.setVisible(true);
 		if (key.equalsIgnoreCase("index"))
-			hw.tabbedPane.setSelectedIndex(0);
+			hw.topicList.setSelectedIndex(0);
 		else
-			for (int i = 0; i < hw.tabbedPane.getTabCount(); i++)
-				if (hw.tabbedPane.getTitleAt(i).equalsIgnoreCase(key))
-					hw.tabbedPane.setSelectedIndex(i);
+			for (int i = 0; i < hw.topics.length; i++)
+				if (hw.topics[i].getTitle().equalsIgnoreCase(key))
+					hw.topicList.setSelectedIndex(i);
 		return hw;
+	}
+
+	public static class HelpTopic {
+		String title;
+		Component panel;
+
+		public HelpTopic(String title, Component panel) {
+			super();
+			this.title = title;
+			this.panel = panel;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public Component getPanel() {
+			return panel;
+		}
+
 	}
 }
