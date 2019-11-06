@@ -33,7 +33,6 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 	}
 
 	// TODO: Verify that entities / flags are not doubled
-	// TODO: read only mode
 	// TODO: Don't pollute the undo list
 	protected DocumentModel load(Preferences preferences) {
 		Annotator.logger.debug("Starting loading of coreference model");
