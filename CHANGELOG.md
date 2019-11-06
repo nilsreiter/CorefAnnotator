@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.11.2
+
+- Using the QuaDramA/TEI importer no longer generates files in the
+  old format #246
+- Flags can now be deleted properly #247
+
 ## 1.11.1
 
 - Entities in tree are now sortable again #241
