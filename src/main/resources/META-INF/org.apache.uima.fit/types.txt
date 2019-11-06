@@ -3,3 +3,4 @@ classpath*:types-meta.xml
 classpath*:types-v1.xml
 classpath*:types-format.xml
 classpath*:creta-coref.xml
+classpath*:sfb1391-types.xml
