@@ -35,6 +35,7 @@ import javax.swing.text.BadLocationException;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -47,8 +48,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 		public AnnotateSelectedFindings() {
 			super(Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
-			putValue(Action.SHORT_DESCRIPTION,
-					Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			// this.addIkon(MaterialDesign.MDI_ACCOUNT);
 		}
 
@@ -69,8 +69,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 
 		public AnnotateSelectedFindingsAsNewEntity() {
 			super(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
-			putValue(Action.SHORT_DESCRIPTION,
-					Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
+			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
 		}
 
 		@Override
@@ -154,8 +153,8 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
-				selectedEntityLabel.setText(Annotator.getString(Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
-						+ getEntity(0).getLabel());
+				selectedEntityLabel.setText(
+						Annotator.getString(Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": " + getEntity(0).getLabel());
 			else
 				selectedEntityLabel.setText("");
 		}
@@ -195,7 +194,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
-		behaviourBar.add(HelpWindow.getAction("search"));
+		behaviourBar.add(new HelpAction(HelpWindow.Topic.SEARCH));
 		behaviourBar.add(restrictToMentions);
 
 		JToolBar actionBar = new JToolBar();
