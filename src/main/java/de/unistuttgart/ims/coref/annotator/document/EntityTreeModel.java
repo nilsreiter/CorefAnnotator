@@ -46,6 +46,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	String currentSearchString = null;
 
+	MutableList<EntitySortOrderListener> entitySortOrderListeners = Lists.mutable.empty();
+
 	public EntityTreeModel(CoreferenceModel docMod) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
 		this.coreferenceModel = docMod;
@@ -304,11 +306,16 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
 		this.entitySortOrder = entitySortOrder;
+		entitySortOrderListeners.forEach(l -> l.entitySortEvent(entitySortOrder, entitySortOrder.descending));
 	}
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
 		coreferenceModel.getDocumentModel()
 				.edit(new UpdateEntityName(((CATreeNode) path.getLastPathComponent()).getEntity(), (String) newValue));
+	}
+
+	public boolean addEntitySortOrderListener(EntitySortOrderListener e) {
+		return entitySortOrderListeners.add(e);
 	}
 }

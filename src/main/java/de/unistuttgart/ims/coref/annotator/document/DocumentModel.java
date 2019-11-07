@@ -394,14 +394,18 @@ public class DocumentModel implements Model {
 	public boolean isBlocked(Class<? extends Operation> o, Class<?> target) {
 		if (profile == null)
 			return false;
-		return Lists.immutable.withAll(profile.getForbidden().getOperation()).collect(op -> {
-			try {
-				return Class.forName(op.getClazz());
-			} catch (ClassNotFoundException e1) {
-				Annotator.logger.catching(e1);
-			}
-			return null;
-		}).reject(c -> c == null).contains(o);
+		try {
+			return Lists.immutable.withAll(profile.getForbidden().getOperation()).collect(op -> {
+				try {
+					return Class.forName(op.getClazz());
+				} catch (ClassNotFoundException e1) {
+					Annotator.logger.catching(e1);
+				}
+				return null;
+			}).reject(c -> c == null).contains(o);
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	public Profile getProfile() {

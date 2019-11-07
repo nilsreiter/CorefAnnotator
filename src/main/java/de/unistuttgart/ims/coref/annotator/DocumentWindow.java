@@ -132,6 +132,7 @@ import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
+import de.unistuttgart.ims.coref.annotator.action.SortTree;
 import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
@@ -414,8 +415,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.actions.changeColorAction = new ChangeColorForEntity(this);
 		this.actions.changeKeyAction = new ChangeKeyForEntityAction(this);
 		this.actions.deleteAction = new DeleteAction(this);
-		this.actions.sortByAlpha = new SortTreeByAlpha();
-		this.actions.sortByMentions = new SortTreeByMentions();
+		this.actions.sortByAlpha = SortTree.getSortByAlphabet(this);
+		this.actions.sortByMentions = SortTree.getSortByMention(this);
 		this.actions.fileSaveAction = new FileSaveAction(this);
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
 		this.actions.copyAction = new CopyAction(this);
@@ -682,6 +683,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Deprecated
 	class SortTreeByAlpha extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -701,6 +703,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Deprecated
 	class SortTreeByMentions extends IkonAction {
 
 		private static final long serialVersionUID = 1L;
@@ -780,6 +783,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// listeners to the tree model
 		model.getTreeModel().addTreeModelListener((TreeModelListener) modelHandler);
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
+		model.getTreeModel().addEntitySortOrderListener(actions.sortByAlpha);
+		model.getTreeModel().addEntitySortOrderListener(actions.sortByMentions);
+		model.getTreeModel().addEntitySortOrderListener(actions.sortDescending);
 
 		// listeners to the flag model
 		model.getFlagModel().addFlagModelListener(entityFlagsInMenuBar);
@@ -811,6 +817,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			}
 
 		}
+
+		// set sorting of tree
+		EntitySortOrder eso = EntitySortOrder.valueOf(documentModel.getPreferences()
+				.get(Constants.CFG_ENTITY_SORT_ORDER, Defaults.CFG_ENTITY_SORT_ORDER.toString()));
+		eso.descending = documentModel.getPreferences().getBoolean(Constants.CFG_ENTITY_SORT_DESCENDING,
+				Defaults.CFG_ENTITY_SORT_DESCENDING);
+		documentModel.getTreeModel().setEntitySortOrder(eso);
+		documentModel.getTreeModel().resort();
 
 		// UI
 		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
@@ -1742,9 +1756,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		UndoAction undoAction;
 		AbstractAction setDocumentLanguageAction = new SetLanguageAction(DocumentWindow.this);
 		AbstractAction showSearchPanelAction;
-		AbstractAction sortByAlpha;
-		AbstractAction sortByMentions;
-		AbstractAction sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
+		SortTree sortByAlpha;
+		SortTree sortByMentions;
+		ToggleEntitySortOrder sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		MergeSelectedEntities mergeSelectedEntitiesAction = new MergeSelectedEntities(DocumentWindow.this);
 		NewEntityAction newEntityAction;
