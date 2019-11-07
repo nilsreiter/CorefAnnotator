@@ -86,7 +86,7 @@ public class HelpWindow extends JFrame {
 			if (!path.endsWith(".html"))
 				path += ".html";
 
-			URL url = System.class.getClassLoader().getResource(path);
+			URL url = HelpWindow.class.getClassLoader().getResource(path);
 			textArea = new JEditorPane(url);
 			textArea.setContentType("text/html");
 			textArea.setEditable(false);
@@ -121,7 +121,7 @@ public class HelpWindow extends JFrame {
 		StringBuilder b = new StringBuilder();
 
 		try {
-			b.append(IOUtils.toString(System.class.getResourceAsStream("/docs/io-plugins.txt"), "UTF-8"));
+			b.append(IOUtils.toString(HelpWindow.class.getResourceAsStream("/docs/io-plugins.txt"), "UTF-8"));
 		} catch (IOException e) {
 			b.append("<html><head><title>Input/Output</title></head>");
 			b.append("<body style=\"font-family:sans-serif;font-size:12pt;\"><h1>Input/Output</h1>");
