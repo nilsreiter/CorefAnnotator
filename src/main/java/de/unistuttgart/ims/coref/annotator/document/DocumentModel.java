@@ -35,6 +35,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.EntityType;
 import de.unistuttgart.ims.coref.annotator.profile.FlagType;
+import de.unistuttgart.ims.coref.annotator.profile.PreferenceType;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 
 /**
@@ -240,6 +241,13 @@ public class DocumentModel implements Model {
 			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
 			edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
 			edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
+		}
+
+		for (PreferenceType pt : profile.getPreferences().getPreference()) {
+			if (pt.getKey() != null && pt.getValue() != null) {
+				Annotator.logger.debug("Setting property {} to {}.", pt.getKey(), pt.getValue());
+				getPreferences().put(pt.getKey(), pt.getValue());
+			}
 		}
 
 		setProfile(profile);

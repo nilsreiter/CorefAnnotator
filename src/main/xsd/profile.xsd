@@ -32,6 +32,14 @@
     					</sequence>
     				</complexType>
     			</element>
+    			<element name="preferences" maxOccurs="1" minOccurs="0">
+    				<complexType>
+    					<sequence>
+    						<element name="preference"
+    							type="Q1:preferenceType" maxOccurs="unbounded" minOccurs="0">
+    						</element>
+    					</sequence>
+    				</complexType></element>
     		</all>
     	</complexType>
     </element>
@@ -73,5 +81,10 @@
     		</element>
     	</sequence>
     	<attribute name="class" type="string"></attribute>
+    </complexType>
+
+    <complexType name="preferenceType">
+    	<attribute name="key" type="string"></attribute>
+    	<attribute name="value" type="string"></attribute>
     </complexType>
 </schema>
