@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.plugin.tei;
+package de.unistuttgart.ims.coref.annotator.plugin.b06.b03;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
@@ -17,29 +18,27 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
+import de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak;
+import de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class TeiReader extends ResourceCollectionReaderBase {
 
 	public static final String PARAM_DOCUMENT_ID = "Document Id";
-	public static final String PARAM_TEXT_ROOT_SELECTOR = "Root Selector";
 
 	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
 	String documentId = null;
-
-	@ConfigurationParameter(name = PARAM_TEXT_ROOT_SELECTOR, mandatory = false, defaultValue = "")
-	String rootSelector = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -56,14 +55,13 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
-		gxr.setTextRootSelector(rootSelector.isEmpty() ? null : rootSelector);
+		gxr.setTextRootSelector(null);
 		gxr.setPreserveWhitespace(true);
 
 		// set the document title
 		gxr.addGlobalRule("titleStmt > title", (d, e) -> d.setDocumentTitle(e.text()));
 
-		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
-			gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
+		gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
 
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
@@ -84,12 +82,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
 		gxr.addRule("lg", Segment.class);
-		gxr.addRule("div", Segment.class, (s, e) -> {
-			if (e.selectFirst("head") != null)
-				s.setLabel(e.selectFirst("head").text());
-		});
-		gxr.addRule("l", Line.class,
-				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
+		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
+		gxr.addRule("milestone", Milestone.class, (ms, element) -> ms.setN(element.attr("n")));
 
 		Resource res = nextFile();
 
@@ -105,12 +99,32 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
+		Util.getMeta(jcas).setStylePlugin(DefaultStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
-		// TODO: Remove <rs> elements
+
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs"))
 				element.removeFromIndexes();
+		}
+
+		// fix lines
+		for (LineBreak lb : JCasUtil.select(jcas, LineBreak.class)) {
+			Milestone nextMilestone = null;
+			nextMilestone = JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
+			if (nextMilestone != null) {
+				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
+				line.setNumber(Integer.valueOf(lb.getN()));
+			}
+		}
+		for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+			Milestone nextMilestone = null;
+			nextMilestone = JCasUtil.selectFollowing(Milestone.class, ms, 1).get(0);
+			if (nextMilestone != null) {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMilestone.getBegin(),
+						Segment.class);
+				seg.setLabel(ms.getN());
+			}
+
 		}
 	}
 

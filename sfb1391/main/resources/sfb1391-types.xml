@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<typeSystemDescription
+	xmlns="http://uima.apache.org/resourceSpecifier">
+	<name>B06 utility types</name>
+	<description />
+	<version>1.0</version>
+	<vendor>Nils Reiter</vendor>
+	<types>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone</supertypeName>
+			<features>
+			</features>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone</name>
+			<description />
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<features>
+				<featureDescription>
+					<name>n</name>
+					<description />
+					<rangeTypeName>uima.cas.String</rangeTypeName>
+				</featureDescription>
+			</features>
+		</typeDescription>
+	</types>
+</typeSystemDescription>

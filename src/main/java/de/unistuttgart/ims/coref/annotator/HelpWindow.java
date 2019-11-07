@@ -27,15 +27,13 @@ public class HelpWindow extends JFrame {
 	JTabbedPane tabbedPane;
 
 	protected HelpWindow() {
-
-		tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 		tabbedPane.addTab("Index", new JScrollPane(load("docs/index")));
 		tabbedPane.addTab("How to annotate", new JScrollPane(load("docs/howto")));
 		tabbedPane.addTab("Compare annotations", new JScrollPane(load("docs/compare")));
 		tabbedPane.addTab("Automatic processing", new JScrollPane(load("docs/processing")));
 		tabbedPane.addTab("Flag editing", new JScrollPane(load("docs/flags")));
 		tabbedPane.addTab("Input/Output", new JScrollPane(loadIOPlugins()));
-
 		this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		this.pack();
 		this.setLocationRelativeTo(null);
@@ -120,6 +118,10 @@ public class HelpWindow extends JFrame {
 		hw.setVisible(true);
 		if (key.equalsIgnoreCase("index"))
 			hw.tabbedPane.setSelectedIndex(0);
+		else
+			for (int i = 0; i < hw.tabbedPane.getTabCount(); i++)
+				if (hw.tabbedPane.getTitleAt(i).equalsIgnoreCase(key))
+					hw.tabbedPane.setSelectedIndex(i);
 		return hw;
 	}
 }

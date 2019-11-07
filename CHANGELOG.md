@@ -7,6 +7,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 - The app now includes a command line tool to convert multiple 
   files at once. #242
+- Added a SFB1391 specific importer than interprets `<lb>` tags 
+  properly #255
+- Export mention statistics now has some configuration options. 
+  Import and export plugins can have that as well now. #76
+- Sorting of entities in the tree is now case insensitive #257
 
 ## 1.11.2
 
