@@ -195,6 +195,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
+		behaviourBar.add(HelpWindow.getAction("search"));
 		behaviourBar.add(restrictToMentions);
 
 		JToolBar actionBar = new JToolBar();
