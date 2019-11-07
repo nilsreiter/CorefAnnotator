@@ -14,11 +14,11 @@ public class HelpAction extends IkonAction {
 	HelpTopic helpTopic = HelpWindow.Topic.INDEX;
 
 	public HelpAction() {
-		super("action.help", MaterialDesign.MDI_HELP);
+		super("action.help", MaterialDesign.MDI_HELP_CIRCLE);
 	}
 
 	public HelpAction(HelpTopic topic) {
-		super("action.help", MaterialDesign.MDI_HELP);
+		super("action.help", MaterialDesign.MDI_HELP_CIRCLE);
 		this.helpTopic = topic;
 	}
 
