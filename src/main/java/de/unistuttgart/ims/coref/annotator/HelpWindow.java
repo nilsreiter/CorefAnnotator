@@ -4,10 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JEditorPane;
@@ -23,6 +26,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.io.IOUtils;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -175,5 +180,21 @@ public class HelpWindow extends JFrame {
 			return panel;
 		}
 
+	}
+
+	public static javax.swing.Action getAction(String topic) {
+		AbstractAction aa = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HelpWindow.show(topic);
+			}
+
+		};
+		aa.putValue(Action.NAME, "?");
+		aa.putValue(Action.SMALL_ICON, FontIcon.of(MaterialDesign.MDI_HELP_CIRCLE));
+		return aa;
 	}
 }
