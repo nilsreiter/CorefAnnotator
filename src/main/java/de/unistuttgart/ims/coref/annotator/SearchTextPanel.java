@@ -35,6 +35,7 @@ import javax.swing.text.BadLocationException;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.TargetedOperationIkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -198,6 +199,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
+		behaviourBar.add(new HelpAction(HelpWindow.Topic.SEARCH));
 		behaviourBar.add(restrictToMentions);
 
 		JToolBar actionBar = new JToolBar();
