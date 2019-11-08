@@ -131,6 +131,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		return m;
 	}
 
+	@Deprecated
 	private Mention add(Span selection) {
 		return add(selection.begin, selection.end);
 	}
@@ -326,13 +327,13 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
 			MutableList<Mention> ms = Lists.mutable.empty();
+			op.setEntity(createEntity(""));
 			for (Span span : op.getSpans()) {
-				if (op.getEntity() == null) {
-					Mention fst = add(span);
-					ms.add(fst);
-					op.setEntity(fst.getEntity());
-				} else
-					ms.add(addTo(op.getEntity(), span));
+				Mention fst = addTo(op.getEntity(), span);
+				ms.add(fst);
+				if (op.getEntity().getLabel() == "") {
+					op.getEntity().setLabel(fst.getCoveredText());
+				}
 			}
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), ms.toImmutable()));

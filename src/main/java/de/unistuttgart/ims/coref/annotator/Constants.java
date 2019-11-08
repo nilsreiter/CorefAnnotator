@@ -88,6 +88,8 @@ public class Constants {
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
+	public static final String CFG_ENTITY_SORT_ORDER = "CFG_ENTITY_SORT_ORDER";
+	public static final String CFG_ENTITY_SORT_DESCENDING = "CFG_ENTITY_SORT_DESCENDING";
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";

@@ -16,8 +16,9 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 
-public class RenameEntityAction extends DocumentWindowAction implements TreeSelectionListener {
+public class RenameEntityAction extends TargetedOperationIkonAction<DocumentWindow> implements TreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +27,7 @@ public class RenameEntityAction extends DocumentWindowAction implements TreeSele
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_RENAME_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
-
+		operationClass = UpdateEntityName.class;
 	}
 
 	@Override

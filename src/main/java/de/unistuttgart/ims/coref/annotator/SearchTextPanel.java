@@ -37,19 +37,23 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
+import de.unistuttgart.ims.coref.annotator.action.TargetedOperationIkonAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
-public class SearchTextPanel extends SearchPanel<SearchResult> implements DocumentListener, WindowListener {
-	class AnnotateSelectedFindings extends IkonAction {
+public class SearchTextPanel extends SearchPanel<SearchResult>
+		implements DocumentListener, WindowListener, HasDocumentModel {
+	class AnnotateSelectedFindings extends TargetedOperationIkonAction<SearchTextPanel> {
 
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindings() {
-			super(Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
+			super(SearchTextPanel.this, Strings.ACTION_ADD_FINDINGS_TO_ENTITY, MaterialDesign.MDI_ACCOUNT);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_ENTITY_TOOLTIP));
 			// this.addIkon(MaterialDesign.MDI_ACCOUNT);
+			operationClass = AddMentionsToEntity.class;
 		}
 
 		@Override
@@ -64,12 +68,13 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 		}
 	}
 
-	class AnnotateSelectedFindingsAsNewEntity extends IkonAction {
+	class AnnotateSelectedFindingsAsNewEntity extends TargetedOperationIkonAction<SearchTextPanel> {
 		private static final long serialVersionUID = 1L;
 
 		public AnnotateSelectedFindingsAsNewEntity() {
-			super(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
+			super(SearchTextPanel.this, Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY, MaterialDesign.MDI_ACCOUNT_PLUS);
 			putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_ADD_FINDINGS_TO_NEW_ENTITY_TOOLTIP));
+			operationClass = AddMentionsToNewEntity.class;
 		}
 
 		@Override
@@ -356,6 +361,11 @@ public class SearchTextPanel extends SearchPanel<SearchResult> implements Docume
 			searchContainer.pack();
 		}
 
+	}
+
+	@Override
+	public DocumentModel getDocumentModel() {
+		return searchContainer.getDocumentWindow().getDocumentModel();
 	}
 
 }
