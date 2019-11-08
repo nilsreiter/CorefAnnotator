@@ -106,6 +106,8 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 	public void actionPerformed(ActionEvent e) {
 		if (plugin instanceof ConfigurableExportPlugin) {
 			((ConfigurableExportPlugin) plugin).showExportConfigurationDialog(getTarget(), p -> chooseFileAndSave());
+		} else {
+			this.chooseFileAndSave();
 		}
 
 	}
