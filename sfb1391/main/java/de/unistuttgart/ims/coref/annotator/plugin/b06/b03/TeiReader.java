@@ -81,7 +81,6 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("emph", Italic.class);
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
-		gxr.addRule("lg", Segment.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> ms.setN(element.attr("n")));
 
