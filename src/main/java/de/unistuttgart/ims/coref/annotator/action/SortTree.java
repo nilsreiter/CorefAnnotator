@@ -7,8 +7,10 @@ import javax.swing.Action;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.EntitySortOrderListener;
 
 public class SortTree extends TargetedIkonAction<DocumentWindow> implements EntitySortOrderListener {
@@ -32,11 +34,17 @@ public class SortTree extends TargetedIkonAction<DocumentWindow> implements Enti
 	}
 
 	public static SortTree getSortByAlphabet(DocumentWindow win) {
-		return new SortTree(win, MaterialDesign.MDI_SORT_ALPHABETICAL, EntitySortOrder.Alphabet, false);
+		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_ALPHABETICAL, EntitySortOrder.Alphabet, false);
+		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_ALPHA));
+		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_ALPHA_TOOLTIP));
+		return st;
 	}
 
 	public static SortTree getSortByMention(DocumentWindow win) {
-		return new SortTree(win, MaterialDesign.MDI_SORT_NUMERIC, EntitySortOrder.Mentions, true);
+		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_NUMERIC, EntitySortOrder.Mentions, true);
+		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_MENTIONS));
+		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_MENTIONS_TOOLTIP));
+		return st;
 	}
 
 	@Override
