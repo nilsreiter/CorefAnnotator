@@ -772,7 +772,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
 
-		actions.lineNumberStyleFixed.setEnabled(model.hasLineNumbers());
+		if (model.hasLineNumbers()) {
+			actions.lineNumberStyleFixed.setEnabled(true);
+			this.setLineNumberStyle(actions.lineNumberStyleFixed.getStyle());
+		}
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
 		actions.changeKeyAction.setEnabled(true);
@@ -1765,9 +1768,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		RenameEntityAction renameAction;
 		RemoveDuplicatesAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
-		AbstractAction lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.NONE);
-		AbstractAction lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this, LineNumberStyle.FIXED);
-		AbstractAction lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
+		ViewSetLineNumberStyle lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.NONE);
+		ViewSetLineNumberStyle lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.FIXED);
+		ViewSetLineNumberStyle lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
 				LineNumberStyle.DYNAMIC);
 
 	}
