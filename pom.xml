@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.12.0-SNAPSHOT</version>
+	<version>1.13.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
