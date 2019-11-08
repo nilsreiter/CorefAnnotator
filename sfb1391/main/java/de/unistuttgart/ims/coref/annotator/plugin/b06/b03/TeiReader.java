@@ -115,16 +115,19 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				line.setNumber(Integer.valueOf(lb.getN()));
 			}
 		}
-		for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
-			Milestone nextMilestone = null;
-			nextMilestone = JCasUtil.selectFollowing(Milestone.class, ms, 1).get(0);
-			if (nextMilestone != null) {
-				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMilestone.getBegin(),
-						Segment.class);
-				seg.setLabel(ms.getN());
-			}
 
-		}
+		// We skip this for now
+		// TODO: need a new way to display many small segments
+		if (false)
+			for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+				Milestone nextMilestone = null;
+				nextMilestone = JCasUtil.selectFollowing(Milestone.class, ms, 1).get(0);
+				if (nextMilestone != null) {
+					Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMilestone.getBegin(),
+							Segment.class);
+					seg.setLabel(ms.getN());
+				}
+			}
 	}
 
 }
