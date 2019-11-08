@@ -12,6 +12,13 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Export mention statistics now has some configuration options. 
   Import and export plugins can have that as well now. #76
 - Sorting of entities in the tree is now case insensitive #257
+- We can now specify a profile when loading the application #249. 
+  The profile is stored in an XML file called `profile.xml` in the same
+  directory as the XMI file to be loaded. The profile can
+  - pre-define flags and entities
+  - disallow operations
+  - set configuration options
+  
 
 ## 1.11.2
 
