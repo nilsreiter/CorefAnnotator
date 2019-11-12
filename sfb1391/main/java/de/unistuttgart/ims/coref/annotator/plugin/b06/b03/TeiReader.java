@@ -41,6 +41,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 	String documentId = null;
 
 	private static final String CHAPTER = "chapter";
+	private static final String TYPE = "type";
+	private static final String N = "n";
+	private static final String RS = "rs";
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -85,8 +88,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=italic]", Italic.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
-			ms.setN(element.attr("n"));
-			ms.setMilestoneType(element.attr("type"));
+			ms.setN(element.attr(N));
+			ms.setMilestoneType(element.attr(TYPE));
 		});
 
 		Resource res = nextFile();
@@ -107,7 +110,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
-			if (element.getTag().equalsIgnoreCase("rs"))
+			if (element.getTag().equalsIgnoreCase(RS))
 				element.removeFromIndexes();
 		}
 
