@@ -129,6 +129,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			if (nextMS != null) {
 				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMS.getBegin(), Segment.class);
 				seg.setLabel(ms.getN());
+			} else {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), jcas.getDocumentText().length(),
+						Segment.class);
+				seg.setLabel(ms.getN());
 			}
 		}
 
