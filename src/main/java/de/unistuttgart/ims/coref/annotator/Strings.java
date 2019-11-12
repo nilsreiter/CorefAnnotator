@@ -209,6 +209,7 @@ public class Strings {
 	public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 	public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 	public static final String STATUS_STYLE = "status.style";
+	public static final String STATUS_PROFILE = "status.profile";
 	public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 	public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 

@@ -33,6 +33,7 @@ public abstract class AbstractWindow extends JFrame {
 	JProgressBar progressBar = new JProgressBar();
 	JLabel messageLabel = new JLabel();
 	JLabel miscLabel = new JLabel();
+	JLabel miscLabel2 = new JLabel();
 	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
 	JMenuBar menuBar = new JMenuBar();
@@ -53,6 +54,7 @@ public abstract class AbstractWindow extends JFrame {
 
 		statusBar.add(progressBar);
 		statusBar.add(miscLabel);
+		statusBar.add(miscLabel2);
 
 		messageLabel = new JLabel();
 		messageLabel.setSize(new Dimension(1, 20));
@@ -72,6 +74,7 @@ public abstract class AbstractWindow extends JFrame {
 		// from east
 		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
 		springs.putConstraint(SpringLayout.EAST, miscLabel, 10, SpringLayout.WEST, versionLabel);
+		springs.putConstraint(SpringLayout.EAST, miscLabel2, -10, SpringLayout.WEST, miscLabel);
 
 		// from west
 		springs.putConstraint(SpringLayout.WEST, messageLabel, 10, SpringLayout.WEST, statusBar);

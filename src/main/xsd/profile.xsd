@@ -32,15 +32,19 @@
     					</sequence>
     				</complexType>
     			</element>
-    			<element name="preferences" maxOccurs="1" minOccurs="0">
+    			<element name="preferences" maxOccurs="1"
+    				minOccurs="0">
     				<complexType>
     					<sequence>
     						<element name="preference"
-    							type="Q1:preferenceType" maxOccurs="unbounded" minOccurs="0">
+    							type="Q1:preferenceType" maxOccurs="unbounded"
+    							minOccurs="0">
     						</element>
     					</sequence>
-    				</complexType></element>
+    				</complexType>
+    			</element>
     		</all>
+    		<attribute name="name" type="string" use="required"></attribute>
     	</complexType>
     </element>
 
