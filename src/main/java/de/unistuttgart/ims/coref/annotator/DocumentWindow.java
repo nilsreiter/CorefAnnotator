@@ -337,6 +337,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
 		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
 		getMiscLabel().setPreferredSize(new Dimension(150, 20));
+		miscLabel2.setPreferredSize(new Dimension(150, 20));
 
 		// initialise text view
 		Caret caret = new Caret();
@@ -848,9 +849,17 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
 		switchStyle(sPlugin);
 
+		// show profile, if needed
+		if (model.getProfile() != null)
+			if (model.getProfile().getName() != null)
+				miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + model.getProfile().getName());
+			else
+				miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + "Unknown");
+		miscLabel2.repaint();
+
 		// final
 		setMessage("");
-
+		pack();
 		documentModel.signal();
 		Annotator.logger.info("Document model has been loaded.");
 
