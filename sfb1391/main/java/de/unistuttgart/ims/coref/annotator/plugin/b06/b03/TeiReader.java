@@ -40,6 +40,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
 	String documentId = null;
 
+	private static final String CHAPTER = "chapter";
+
 	@Override
 	public void getNext(CAS aCAS) {
 		ColorProvider colorProvider = new ColorProvider();
@@ -82,7 +84,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
-		gxr.addRule("milestone", Milestone.class, (ms, element) -> ms.setN(element.attr("n")));
+		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
+			ms.setN(element.attr("n"));
+			ms.setMilestoneType(element.attr("type"));
+		});
 
 		Resource res = nextFile();
 
@@ -116,6 +121,17 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			}
 		}
 
+		// create segment annotations
+		for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+			if (ms.getMilestoneType() == null || !ms.getMilestoneType().equalsIgnoreCase(CHAPTER))
+				continue;
+			Milestone nextMS = getNextMilestone(ms, CHAPTER);
+			if (nextMS != null) {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMS.getBegin(), Segment.class);
+				seg.setLabel(ms.getN());
+			}
+		}
+
 		// We skip this for now
 		// TODO: need a new way to display many small segments
 		if (false)
@@ -128,6 +144,16 @@ public class TeiReader extends ResourceCollectionReaderBase {
 					seg.setLabel(ms.getN());
 				}
 			}
+	}
+
+	Milestone getNextMilestone(Milestone current, String type) {
+		for (Milestone ms : JCasUtil.selectFollowing(Milestone.class, current, Integer.MAX_VALUE)) {
+			if (ms != current && ms.getMilestoneType() != null && ms.getMilestoneType().equalsIgnoreCase(type))
+				return ms;
+		}
+
+		return null;
+
 	}
 
 }
