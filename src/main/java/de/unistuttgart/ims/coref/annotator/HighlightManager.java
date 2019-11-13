@@ -122,7 +122,7 @@ class HighlightManager {
 				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
 			if (documentModel != null && documentModel.getCoreferenceModel().getMentions(m.getEntity()).size() == 1) {
 				color = Color.LIGHT_GRAY;
-				dotted = true;
+				dotted = false;
 			}
 		}
 		underline(m, color, dotted, true);
