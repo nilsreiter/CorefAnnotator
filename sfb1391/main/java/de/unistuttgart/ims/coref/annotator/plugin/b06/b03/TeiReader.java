@@ -120,7 +120,12 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			nextMilestone = JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
 			if (nextMilestone != null) {
 				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
-				line.setNumber(Integer.valueOf(lb.getN()));
+				try {
+					line.setNumber(Integer.valueOf(lb.getN()));
+				} catch (NumberFormatException e) {
+					line.setNumber(Integer.MIN_VALUE);
+					// catch silently
+				}
 			}
 		}
 
