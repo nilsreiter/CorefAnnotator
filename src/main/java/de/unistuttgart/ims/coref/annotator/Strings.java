@@ -99,6 +99,8 @@ public class Strings {
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
+	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY = "action.toggle.underline_singletons_in_gray";
+	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP = "action.toggle.underline_singletons_in_gray.tooltip";
 	public static final String ACTION_UNDO = "action.undo";
 	public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 	public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";

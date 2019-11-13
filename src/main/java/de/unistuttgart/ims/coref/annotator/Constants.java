@@ -90,6 +90,7 @@ public class Constants {
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 	public static final String CFG_ENTITY_SORT_ORDER = "CFG_ENTITY_SORT_ORDER";
 	public static final String CFG_ENTITY_SORT_DESCENDING = "CFG_ENTITY_SORT_DESCENDING";
+	public static final String CFG_UNDERLINE_SINGLETONS_IN_GRAY = "CFG_UNDERLINE_SINGLETONS_IN_GRAY";
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
@@ -146,6 +147,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_REPLACE_MENTION = new Setting<Boolean>(CFG_REPLACE_MENTION,
 			Strings.ACTION_TOGGLE_REPLACE_MENTION, Strings.ACTION_TOGGLE_REPLACE_MENTION_TOOLTIP, false,
 			MaterialDesign.MDI_DIRECTIONS_FORK);
+
+	public static final Setting<Boolean> SETTING_UNDERLINE_SINGLETONS_IN_GRAY = new Setting<Boolean>(
+			CFG_UNDERLINE_SINGLETONS_IN_GRAY, Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY,
+			Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };

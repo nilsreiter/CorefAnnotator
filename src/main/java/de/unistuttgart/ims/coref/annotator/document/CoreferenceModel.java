@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -72,7 +74,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel extends SubModel implements Model {
+public class CoreferenceModel extends SubModel implements Model, PreferenceChangeListener {
 
 	public static enum EntitySorter {
 		LABEL, CHILDREN, COLOR
@@ -110,6 +112,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	public CoreferenceModel(DocumentModel documentModel) {
 		super(documentModel);
 		this.jcas = documentModel.getJcas();
+		documentModel.getPreferences().addPreferenceChangeListener(this);
 	}
 
 	/**
@@ -552,6 +555,11 @@ public class CoreferenceModel extends SubModel implements Model {
 	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
+	}
+
+	public ImmutableList<Entity> getSingletons() {
+		return Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class)).select(e -> getMentions(e).size() == 1)
+				.toList().toImmutable();
 	}
 
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
@@ -1019,6 +1027,14 @@ public class CoreferenceModel extends SubModel implements Model {
 		entityGroup.setLabel(createEntityGroupLabel(
 				Lists.immutable.ofAll(entityGroup.getMembers()).selectInstancesOf(Entity.class)));
 
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (evt.getKey().equalsIgnoreCase(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			ImmutableList<Mention> mentions = getSingletons().collect(e -> getMentions(e).getOnly());
+			fireEvent(Event.get(this, Event.Type.Update, mentions));
+		}
 	}
 
 }
