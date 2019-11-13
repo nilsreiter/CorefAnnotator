@@ -23,10 +23,13 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 	MutableSet<String> ids = null;
 
+	private static final String E = "e";
+	private static final String RS = "rs";
+
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 		ids = Sets.mutable.empty();
-		ids.add("e");
+		ids.add(E);
 		MutableMap<String, XMLElement> idMap = Maps.mutable.empty();
 
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
@@ -43,7 +46,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			String xid = toXmlId(e);
 			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
 					XMLElement.class);
-			newElement.setTag("rs");
+			newElement.setTag(RS);
 			newElement.setAttributes(" ref=\"#" + xid + "\"");
 		}
 	}
@@ -62,10 +65,10 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 				// TODO: Really check whether this is a legal NCNAME
 				baseId = entity.getLabel().replaceAll("\\s", "-");
 			} else {
-				baseId = "e";
+				baseId = E;
 			}
 			if (ids.contains(baseId)) {
-				int counter = (baseId == "e" ? 0 : 1);
+				int counter = (baseId == E ? 0 : 1);
 				do {
 					counter++;
 					id = baseId + String.valueOf(counter);

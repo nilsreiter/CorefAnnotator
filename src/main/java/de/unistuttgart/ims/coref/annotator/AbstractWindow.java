@@ -191,6 +191,8 @@ public abstract class AbstractWindow extends JFrame {
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_UNDERLINE_SINGLETONS_IN_GRAY)));
 		return menu_settings;
 
 	}

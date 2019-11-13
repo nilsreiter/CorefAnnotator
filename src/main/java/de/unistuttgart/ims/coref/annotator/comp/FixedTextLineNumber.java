@@ -15,7 +15,7 @@ public class FixedTextLineNumber extends TextLineNumber {
 	protected String getTextLineNumber(int rowStartOffset, int rowEndOffset) {
 
 		Integer n = textWindow.getDocumentModel().getLineNumber(new Span(rowStartOffset, rowEndOffset));
-		if (n != null)
+		if (n != null && n.intValue() != Integer.MIN_VALUE)
 			return n.toString();
 		else
 			return "";

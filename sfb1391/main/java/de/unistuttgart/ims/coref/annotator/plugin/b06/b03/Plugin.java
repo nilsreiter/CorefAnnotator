@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
@@ -22,19 +23,25 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Plugin implements IOPlugin {
 
+	private static final String NAME = "B06: TEI for B03";
+	private static final String DE = "de";
+	private static final String XML = ".xml";
+	private static final String DESCRIPTION = "/description.txt";
+	private static final String UTF8 = "UTF-8";
+
 	@Override
 	public String getDescription() {
 		try {
-			return IOUtils.toString(getClass().getResourceAsStream("description.txt"), "UTF-8");
+			return IOUtils.toString(getClass().getResourceAsStream(DESCRIPTION), UTF8);
 		} catch (Exception e) {
 			Annotator.logger.catching(e);
 		}
-		return "";
+		return StringUtils.EMPTY;
 	}
 
 	@Override
 	public String getName() {
-		return "B06: TEI for B03";
+		return NAME;
 	}
 
 	@Override
@@ -52,7 +59,7 @@ public class Plugin implements IOPlugin {
 	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TeiReader.class, TeiReader.PARAM_SOURCE_LOCATION,
-				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, "de", TeiReader.PARAM_DOCUMENT_ID, f.getName());
+				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, DE, TeiReader.PARAM_DOCUMENT_ID, f.getName());
 	}
 
 	@Override
@@ -73,7 +80,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getSuffix() {
-		return ".xml";
+		return XML;
 	}
 
 	@Override
