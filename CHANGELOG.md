@@ -19,6 +19,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   - pre-define flags and entities
   - disallow operations
   - set configuration options
+- Singletons can now be displayed in light gray #177
   
 
 ## 1.11.2
