@@ -16,6 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 class HighlightManager {
 	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
@@ -24,6 +25,7 @@ class HighlightManager {
 
 	RangedCounter spanCounter = new RangedCounter();
 	JTextComponent textComponent;
+	DocumentModel documentModel;
 
 	public HighlightManager(JTextComponent component) {
 		hilit = new DefaultHighlighter();
@@ -114,7 +116,16 @@ class HighlightManager {
 
 	public void underline(Mention m) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, new Color(m.getEntity().getColor()), false, true);
+		Color color = new Color(m.getEntity().getColor());
+		boolean dotted = false;
+		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
+				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			if (documentModel != null && documentModel.getCoreferenceModel().getMentions(m.getEntity()).size() == 1) {
+				color = Color.LIGHT_GRAY;
+				dotted = true;
+			}
+		}
+		underline(m, color, dotted, true);
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
@@ -175,6 +186,14 @@ class HighlightManager {
 			spanCounter.subtract(span, hi);
 		if (hi != null)
 			hilit.removeHighlight(hi);
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
+	public void setDocumentModel(DocumentModel documentModel) {
+		this.documentModel = documentModel;
 	}
 
 }

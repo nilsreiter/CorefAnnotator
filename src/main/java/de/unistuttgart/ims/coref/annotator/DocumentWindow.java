@@ -437,7 +437,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		actions.entityStatisticsAction.setEnabled(false);
 		actions.fileSaveAction.setEnabled(false);
 
-		//
+		// connect listeners
 		documentStateListeners.add(actions.undoAction);
 		documentStateListeners.add(actions.fileSaveAction);
 
@@ -628,6 +628,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		menuBar.add(initialiseMenuView());
 		menuBar.add(initialiseMenuTools());
 		menuBar.add(initialiseMenuSettings());
+
 		// if (segmentAnnotation != null)
 		// menuBar.add(documentMenu);
 		// menuBar.add(windowsMenu);
@@ -780,6 +781,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
 		actions.changeKeyAction.setEnabled(true);
+		highlightManager.setDocumentModel(model);
 
 		// listeners to the coref model
 		model.getCoreferenceModel().addCoreferenceModelListener(this);
