@@ -239,8 +239,12 @@ public class DocumentModel implements Model {
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity();
 			edit(op, false);
 			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
-			edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
-			edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
+			if (et.getColor() != null)
+				edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
+			else
+				edit(new UpdateEntityColor(op.getEntity(), 0), false);
+			if (et.getShortcut() != null)
+				edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
 		}
 
 		for (PreferenceType pt : profile.getPreferences().getPreference()) {
