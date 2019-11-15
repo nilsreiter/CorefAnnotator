@@ -91,6 +91,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			ms.setN(element.attr(N));
 			ms.setMilestoneType(element.attr(TYPE));
 		});
+		gxr.addRule("teiCorpus > TEI", Segment.class, (segment, element) -> {
+			segment.setLabel(element.select("teiHeader > fileDesc > title").text());
+		});
 
 		Resource res = nextFile();
 
