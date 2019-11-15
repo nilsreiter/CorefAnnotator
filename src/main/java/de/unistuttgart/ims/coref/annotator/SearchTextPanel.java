@@ -30,6 +30,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.BadLocationException;
 
 import org.eclipse.collections.impl.factory.Lists;
@@ -45,6 +46,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
 public class SearchTextPanel extends SearchPanel<SearchResult>
 		implements DocumentListener, WindowListener, HasDocumentModel {
+
 	class AnnotateSelectedFindings extends TargetedOperationIkonAction<SearchTextPanel> {
 
 		private static final long serialVersionUID = 1L;
@@ -127,14 +129,15 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 
 	}
 
-	class TSL extends CAAbstractTreeSelectionListener implements ListSelectionListener {
+	class TSL implements ListSelectionListener, TreeSelectionListener {
 
 		boolean treeCondition = false;
 
 		boolean listCondition = false;
 
 		public TSL(JTree tree) {
-			super(tree);
+			super();
+			tree.addTreeSelectionListener(this);
 		}
 
 		@Override
@@ -154,14 +157,19 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			treeCondition = (isSingle() && isEntity());
+			TreeSelectionUtil tsu = new TreeSelectionUtil(e);
+			treeCondition = (tsu.isSingle() && tsu.isEntity());
 			Annotator.logger.debug("Setting treeCondition to {}", treeCondition);
 			annotateSelectedFindings.setEnabled(treeCondition && listCondition);
 			if (treeCondition)
-				selectedEntityLabel.setText(
-						Annotator.getString(Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": " + getEntity(0).getLabel());
+				selectedEntityLabel.setText(Annotator.getString(Strings.STATUS_SEARCH_SELECTED_ENTITY) + ": "
+						+ tsu.getEntity(0).getLabel());
 			else
 				selectedEntityLabel.setText("");
+		}
+
+		public void setTreeCondition(boolean treeCondition) {
+			this.treeCondition = treeCondition;
 		}
 
 	}
@@ -180,8 +188,10 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 	public SearchTextPanel(SearchContainer sd) {
 		super(sd);
 
-		tsl = new TSL(searchContainer.getDocumentWindow().tree);
+		tsl = new TSL(searchContainer.getDocumentWindow().getTree());
+		tsl.setTreeCondition(!searchContainer.getDocumentWindow().getTree().isSelectionEmpty());
 		annotateSelectedFindings.setEnabled(false);
+		annotateSelectedFindingsAsNew.setEnabled(false);
 
 		textField = new JTextField(20);
 		textField.setToolTipText(Annotator.getString(Strings.SEARCH_WINDOW_TEXT_TOOLTIP));
