@@ -14,6 +14,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
+import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
 import javafx.application.Platform;
@@ -33,8 +34,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
+	protected void chooseFileAndSave() {
 		if (Annotator.javafx()) {
 
 			Platform.runLater(new Runnable() {
@@ -99,6 +99,15 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 				});
 				worker.execute();
 			}
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (plugin instanceof ConfigurableExportPlugin) {
+			((ConfigurableExportPlugin) plugin).showExportConfigurationDialog(getTarget(), p -> chooseFileAndSave());
+		} else {
+			this.chooseFileAndSave();
 		}
 
 	}

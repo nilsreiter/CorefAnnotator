@@ -5,11 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceLink;
@@ -19,12 +21,22 @@ import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
+import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
+import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
+import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.profile.EntityType;
+import de.unistuttgart.ims.coref.annotator.profile.FlagType;
+import de.unistuttgart.ims.coref.annotator.profile.PreferenceType;
+import de.unistuttgart.ims.coref.annotator.profile.Profile;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -57,6 +69,8 @@ public class DocumentModel implements Model {
 
 	Preferences preferences;
 
+	Profile profile;
+
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 		this.preferences = preferences;
@@ -68,13 +82,25 @@ public class DocumentModel implements Model {
 
 	public void edit(Operation operation) {
 		Annotator.logger.trace(operation);
+		edit(operation, true);
+	}
+
+	private void edit(Operation operation, boolean addToHistory) {
+
+		if (isBlocked(operation.getClass())) {
+			Annotator.logger.info("Operation {} blocked.", operation.getClass().getCanonicalName());
+			return;
+		}
+
 		if (operation instanceof DocumentModelOperation)
 			edit((DocumentModelOperation) operation);
 		if (operation instanceof CoreferenceModelOperation)
 			coreferenceModel.edit((CoreferenceModelOperation) operation);
 		if (operation instanceof FlagModelOperation)
 			flagModel.edit((FlagModelOperation) operation);
-		history.push(operation);
+
+		if (addToHistory)
+			history.push(operation);
 		fireDocumentChangedEvent();
 	}
 
@@ -186,6 +212,49 @@ public class DocumentModel implements Model {
 
 	public boolean isSavable() {
 		return hasUnsavedChanges() || getHistory().size() > 0;
+	}
+
+	public void loadProfile(Profile profile) {
+		Annotator.logger.debug("Processing profile {}.", profile);
+		for (FlagType ft : profile.getFlags().getFlag()) {
+			if (getFlagModel().getFlag(ft.getUuid()) != null)
+				continue;
+			try {
+				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v1." + ft.getTargetClass().value();
+
+				Class<?> tClass = Class.forName(targetClassName);
+				@SuppressWarnings("unchecked")
+				AddFlag af = new AddFlag(ft.getUuid(), ft.getLabel(), MaterialDesign.valueOf(ft.getIcon()),
+						(Class<? extends FeatureStructure>) tClass);
+				edit(af, false);
+			} catch (ClassNotFoundException e) {
+				Annotator.logger.catching(e);
+			}
+		}
+
+		for (EntityType et : profile.getEntities().getEntity()) {
+			if (getCoreferenceModel().getEntities(EntitySorter.CHILDREN).collect(e -> e.getLabel())
+					.contains(et.getLabel()))
+				continue;
+			AddMentionsToNewEntity op = new AddMentionsToNewEntity();
+			edit(op, false);
+			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
+			if (et.getColor() != null)
+				edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
+			else
+				edit(new UpdateEntityColor(op.getEntity(), 0), false);
+			if (et.getShortcut() != null)
+				edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
+		}
+
+		for (PreferenceType pt : profile.getPreferences().getPreference()) {
+			if (pt.getKey() != null && pt.getValue() != null) {
+				Annotator.logger.debug("Setting property {} to {}.", pt.getKey(), pt.getValue());
+				getPreferences().put(pt.getKey(), pt.getValue());
+			}
+		}
+
+		setProfile(profile);
 	}
 
 	/**
@@ -320,5 +389,34 @@ public class DocumentModel implements Model {
 		public int getMaximum() {
 			return maximum;
 		}
+	}
+
+	public boolean isBlocked(Class<? extends Operation> o) {
+		return isBlocked(o, null);
+	}
+
+	public boolean isBlocked(Class<? extends Operation> o, Class<?> target) {
+		if (profile == null)
+			return false;
+		try {
+			return Lists.immutable.withAll(profile.getForbidden().getOperation()).collect(op -> {
+				try {
+					return Class.forName(op.getClazz());
+				} catch (ClassNotFoundException e1) {
+					Annotator.logger.catching(e1);
+				}
+				return null;
+			}).reject(c -> c == null).contains(o);
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
+
+	public Profile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(Profile profile) {
+		this.profile = profile;
 	}
 }

@@ -6,7 +6,7 @@ public class UpdateEntityColor extends UpdateOperation<Entity> implements Corefe
 	int oldColor;
 	int newColor;
 
-	public UpdateEntityColor(int newColor, Entity entity) {
+	public UpdateEntityColor(Entity entity, int newColor) {
 		super(entity);
 		this.newColor = newColor;
 		this.oldColor = entity.getColor();

@@ -80,6 +80,7 @@ public class Strings {
 	public static final String ACTION_SHOW_LOG = "action.show.log";
 	public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
 	public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
+	public static final String ACTION_SORT_ALPHA_TOOLTIP = "action.sort_alpha.tooltip";
 	public static final String ACTION_SORT_MENTIONS = "action.sort_mentions";
 	public static final String ACTION_SORT_MENTIONS_TOOLTIP = "action.sort_mentions.tooltip";
 	public static final String ACTION_SORT_REVERT = "action.sort_revert";
@@ -98,6 +99,8 @@ public class Strings {
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
+	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY = "action.toggle.underline_singletons_in_gray";
+	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP = "action.toggle.underline_singletons_in_gray.tooltip";
 	public static final String ACTION_UNDO = "action.undo";
 	public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 	public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
@@ -112,6 +115,8 @@ public class Strings {
 	public static final String DIALOG_CHANGE_KEY_INVALID_STRING_TITLE = "dialog.change_key.invalid_string.title";
 	public static final String DIALOG_CHANGE_KEY_OK = "dialog.change_key.ok";
 	public static final String DIALOG_CHANGE_KEY_PROMPT = "dialog.change_key.prompt";
+	public static final String DIALOG_EXPORT_OPTIONS_OK = "dialog.export_options.ok";
+	public static final String DIALOG_EXPORT_OPTIONS_TITLE = "dialog.export_options.title";
 	public static final String DIALOG_EXPORT_AS_TITLE = "dialog.export_as.title";
 	public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 	public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
@@ -206,6 +211,7 @@ public class Strings {
 	public static final String STATUS_SEARCH_RESULTS_MORE_THAN = "status.search.more_than";
 	public static final String STATUS_SEARCH_SELECTED_ENTITY = "status.search.selected_entity";
 	public static final String STATUS_STYLE = "status.style";
+	public static final String STATUS_PROFILE = "status.profile";
 	public static final String WINDOWTITLE_EDITED = "windowtitle.edited";
 	public static final String WINDOWTITLE_NEW_FILE = "windowtitle.new_file";
 

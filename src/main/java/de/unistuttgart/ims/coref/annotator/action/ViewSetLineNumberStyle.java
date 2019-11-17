@@ -27,4 +27,12 @@ public class ViewSetLineNumberStyle extends TargetedIkonAction<DocumentWindow> {
 		getTarget().setLineNumberStyle(style);
 	}
 
+	public LineNumberStyle getStyle() {
+		return style;
+	}
+
+	public void setStyle(LineNumberStyle style) {
+		this.style = style;
+	}
+
 }

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.11.2</version>
+	<version>1.12.0</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
@@ -145,6 +145,23 @@
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
+				<configuration>
+					<schemaDirectory>src/main/xsd</schemaDirectory>
+					<generatePackage>de.unistuttgart.ims.coref.annotator.profile</generatePackage>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<resources>
@@ -335,6 +352,90 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>sfb1391</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>sfb1391-add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>sfb1391/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sfb1391-add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>sfb1391/test/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sfb1391-add-resource</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>add-resource</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>sfb1391/main/resources</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.uima</groupId>
+						<artifactId>jcasgen-maven-plugin</artifactId>
+						<version>2.8.1</version>  <!-- change this to the latest version -->
+						<executions>
+							<execution>
+								<id>3</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>  <!-- this is the only goal -->
+								<!-- runs in phase process-resources by default -->
+								<configuration>
+									<!-- REQUIRED -->
+									<typeSystemIncludes>
+										<!-- one or more ant-like file patterns identifying top level descriptors -->
+										<typeSystemInclude>sfb1391/main/resources/sfb1391-types.xml</typeSystemInclude>
+									</typeSystemIncludes>
+									<!-- true or false, default = false -->
+									<!-- if true, then although the complete merged type system will 
+										be created internally, only those types whose definition is contained within 
+										this maven project will be generated. The others will be presumed to be available 
+										via other projects. -->
+									<!-- OPTIONAL -->
+									<limitToProject>true</limitToProject>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -489,14 +590,19 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>${version.javafx}</version>
-		</dependency>
+      		<groupId>org.openjfx</groupId>
+      		<artifactId>javafx-controls</artifactId>
+      		<version>${version.javafx}</version>
+    	</dependency>
 		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-swing</artifactId>
-			<version>${version.javafx}</version>
+      		<groupId>org.openjfx</groupId>
+      		<artifactId>javafx-swing</artifactId>
+      		<version>${version.javafx}</version>
+    	</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.2</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

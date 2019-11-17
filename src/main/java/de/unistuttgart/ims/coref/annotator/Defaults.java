@@ -4,6 +4,7 @@ public class Defaults {
 	public static final String CFG_ANNOTATOR_ID = "Unknown annotator";
 	public static final boolean CFG_DELETE_EMPTY_ENTITIES = false;
 	public static final EntitySortOrder CFG_ENTITY_SORT_ORDER = EntitySortOrder.Mentions;
+	public static final boolean CFG_ENTITY_SORT_DESCENDING = true;
 	public static final boolean CFG_FULL_TOKENS = true;
 	public static final boolean CFG_KEEP_TREE_SORTED = true;
 	public static final int CFG_SEARCH_RESULTS_CONTEXT = 50;
@@ -11,5 +12,6 @@ public class Defaults {
 	public static final boolean CFG_TRIM_WHITESPACE = true;
 	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;
 	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
+	public static final boolean CFG_UNDERLINE_SINGLETONS_IN_GRAY = false;
 
 }

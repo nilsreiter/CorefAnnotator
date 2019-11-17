@@ -2,6 +2,8 @@ package de.unistuttgart.ims.coref.annotator.document;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -72,7 +74,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel extends SubModel implements Model {
+public class CoreferenceModel extends SubModel implements Model, PreferenceChangeListener {
 
 	public static enum EntitySorter {
 		LABEL, CHILDREN, COLOR
@@ -110,6 +112,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	public CoreferenceModel(DocumentModel documentModel) {
 		super(documentModel);
 		this.jcas = documentModel.getJcas();
+		documentModel.getPreferences().addPreferenceChangeListener(this);
 	}
 
 	/**
@@ -121,7 +124,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @return The new mention
 	 */
 	private Mention add(int begin, int end) {
-		Annotator.logger.entry(begin, end);
+		Annotator.logger.traceEntry();
 		// document model
 		Mention m = createMention(begin, end);
 		Entity e = createEntity(m.getCoveredText());
@@ -131,6 +134,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		return m;
 	}
 
+	@Deprecated
 	private Mention add(Span selection) {
 		return add(selection.begin, selection.end);
 	}
@@ -271,7 +275,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected synchronized void edit(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getNewLabel());
@@ -326,13 +330,13 @@ public class CoreferenceModel extends SubModel implements Model {
 		} else if (operation instanceof AddMentionsToNewEntity) {
 			AddMentionsToNewEntity op = (AddMentionsToNewEntity) operation;
 			MutableList<Mention> ms = Lists.mutable.empty();
+			op.setEntity(createEntity(""));
 			for (Span span : op.getSpans()) {
-				if (op.getEntity() == null) {
-					Mention fst = add(span);
-					ms.add(fst);
-					op.setEntity(fst.getEntity());
-				} else
-					ms.add(addTo(op.getEntity(), span));
+				Mention fst = addTo(op.getEntity(), span);
+				ms.add(fst);
+				if (op.getEntity().getLabel() == "") {
+					op.getEntity().setLabel(fst.getCoveredText());
+				}
 			}
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), ms.toImmutable()));
@@ -553,6 +557,11 @@ public class CoreferenceModel extends SubModel implements Model {
 		return documentModel;
 	}
 
+	public ImmutableList<Entity> getSingletons() {
+		return Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class)).select(e -> getMentions(e).size() == 1)
+				.toList().toImmutable();
+	}
+
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
 
 		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
@@ -661,7 +670,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	protected void initializeOnce() {
 		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			if (entity.getKey() != null)
-				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
+				keyMap.put(Character.valueOf(entity.getKey().charAt(0)), entity);
 		}
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
@@ -759,7 +768,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	 * @param entity
 	 */
 	private void remove(Entity entity) {
-		Annotator.logger.entry(entity);
+		Annotator.logger.traceEntry();
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
 			characterPosition2AnnotationMap.remove(m);
@@ -777,7 +786,7 @@ public class CoreferenceModel extends SubModel implements Model {
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
 		entity.removeFromIndexes();
-		Annotator.logger.exit();
+		Annotator.logger.traceExit();
 	}
 
 	private void remove(Mention m, boolean autoRemove) {
@@ -819,7 +828,7 @@ public class CoreferenceModel extends SubModel implements Model {
 	}
 
 	protected void undo(CoreferenceModelOperation operation) {
-		Annotator.logger.entry(operation);
+		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
 			UpdateEntityName op = (UpdateEntityName) operation;
 			op.getEntity().setLabel(op.getOldLabel());
@@ -1018,6 +1027,14 @@ public class CoreferenceModel extends SubModel implements Model {
 		entityGroup.setLabel(createEntityGroupLabel(
 				Lists.immutable.ofAll(entityGroup.getMembers()).selectInstancesOf(Entity.class)));
 
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (evt.getKey().equalsIgnoreCase(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			ImmutableList<Mention> mentions = getSingletons().collect(e -> getMentions(e).getOnly());
+			fireEvent(Event.get(this, Event.Type.Update, mentions));
+		}
 	}
 
 }

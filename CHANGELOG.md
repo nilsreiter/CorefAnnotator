@@ -3,6 +3,25 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.12.0
+
+- The app now includes a command line tool to convert multiple 
+  files at once. #242
+- Added a SFB1391 specific importer than interprets `<lb>` tags 
+  properly #255
+- Export mention statistics now has some configuration options. 
+  Import and export plugins can have that as well now. #76
+- Sorting of entities in the tree is now case insensitive #257
+- Shortcut keys are now displayed in brackets #256
+- We can now specify a profile when loading the application #249. 
+  The profile is stored in an XML file called `profile.xml` in the same
+  directory as the XMI file to be loaded. The profile can
+  - pre-define flags and entities
+  - disallow operations
+  - set configuration options
+- Singletons can now be displayed in light gray #177
+  
+
 ## 1.11.2
 
 - Using the QuaDramA/TEI importer no longer generates files in the

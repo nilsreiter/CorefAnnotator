@@ -38,7 +38,7 @@ public class RangedCounter {
 		MutableSet<Integer> range = Interval.fromTo(from, to).toSet();
 		for (int i = span.begin; i < span.end; i++) {
 			range = range.rejectWith((Integer j, Integer k) -> map.get(k) != null && map.get(k).containsKey(j),
-					new Integer(i));
+					Integer.valueOf(i));
 		}
 
 		if (range.isEmpty()) {

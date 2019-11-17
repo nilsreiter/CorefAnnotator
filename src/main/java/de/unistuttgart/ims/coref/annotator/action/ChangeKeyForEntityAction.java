@@ -20,7 +20,7 @@ import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 
-public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow> {
+public class ChangeKeyForEntityAction extends TargetedOperationIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,8 +28,9 @@ public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow>
 		super(documentWindow, Strings.ACTION_SET_SHORTCUT, MaterialDesign.MDI_KEYBOARD);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SET_SHORTCUT_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
+		operationClass = UpdateEntityKey.class;
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class ChangeKeyForEntityAction extends TargetedIkonAction<DocumentWindow>
 			// for setting a new key
 			if (newKey.length() == 1) {
 				Character newChar = newKey.charAt(0);
-				getTarget().getDocumentModel().edit(new UpdateEntityKey(newChar, entity));
+				getTarget().getDocumentModel().edit(new UpdateEntityKey(entity, newChar));
 			} else {
 				JOptionPane.showMessageDialog(getTarget(),
 						Annotator.getString(Strings.DIALOG_CHANGE_KEY_INVALID_STRING_MESSAGE),
