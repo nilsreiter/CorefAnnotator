@@ -50,6 +50,9 @@ public class CSVWriter extends SingleFileWriter {
 		ImmutableList<Flag> entityFlags = allFlags
 				.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
+		if (entities == null)
+			entities = JCasUtil.select(jcas, Entity.class);
+
 		try (CSVPrinter p = new CSVPrinter(os, CSVFormat.EXCEL)) {
 			// this is the header row
 			p.print(BEGIN);
@@ -72,7 +75,7 @@ public class CSVWriter extends SingleFileWriter {
 			}
 			p.println();
 			int entityNum = 0;
-			for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+			for (Entity entity : entities) {
 				for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
 					String surface = mention.getCoveredText();
 					if (mention.getDiscontinuous() != null)
