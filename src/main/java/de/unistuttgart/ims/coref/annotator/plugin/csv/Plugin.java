@@ -196,4 +196,28 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 		return lab;
 	}
 
+	public int getOptionContextWidth() {
+		return optionContextWidth;
+	}
+
+	public void setOptionContextWidth(int optionContextWidth) {
+		this.optionContextWidth = optionContextWidth;
+	}
+
+	public boolean isOptionTrimWhitespace() {
+		return optionTrimWhitespace;
+	}
+
+	public void setOptionTrimWhitespace(boolean optionTrimWhitespace) {
+		this.optionTrimWhitespace = optionTrimWhitespace;
+	}
+
+	public boolean isOptionReplaceNewlines() {
+		return optionReplaceNewlines;
+	}
+
+	public void setOptionReplaceNewlines(boolean optionReplaceNewlines) {
+		this.optionReplaceNewlines = optionReplaceNewlines;
+	}
+
 }
