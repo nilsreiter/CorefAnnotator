@@ -6,6 +6,7 @@ import java.io.Writer;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -31,8 +32,16 @@ public class CSVWriter extends SingleFileWriter {
 	private static final String CONTEXT_LEFT = "leftContext";
 	private static final String CONTEXT_RIGHT = "rightContext";
 
+	public static final String PARAM_CONTEXTWIDTH = "context width";
+	@ConfigurationParameter(name = PARAM_CONTEXTWIDTH, defaultValue = "0", mandatory = false)
 	int optionContextWidth = 0;
+
+	public static final String PARAM_TRIM_WHITESPACE = "trim whitespace";
+	@ConfigurationParameter(name = PARAM_TRIM_WHITESPACE, defaultValue = "true", mandatory = false)
 	boolean optionTrimWhitespace = true;
+
+	public static final String PARAM_REPLACE_NEWLINES = "replace newlines";
+	@ConfigurationParameter(name = PARAM_REPLACE_NEWLINES, defaultValue = "true", mandatory = false)
 	boolean optionReplaceNewlines = true;
 
 	Iterable<Entity> entities = null;
