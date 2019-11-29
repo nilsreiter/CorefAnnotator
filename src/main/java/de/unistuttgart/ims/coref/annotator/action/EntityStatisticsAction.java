@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -22,10 +21,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -33,23 +28,9 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CSVWriter;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
-
-	private static final String ENTITY_GROUP = "entityGroup";
-	private static final String ENTITY_LABEL = "entityLabel";
-	private static final String ENTITY_NUM = "entityNum";
-	private static final String SURFACE = "surface";
-	private static final String END = "end";
-	private static final String BEGIN = "begin";
-	private static final String CONTEXT_LEFT = "leftContext";
-	private static final String CONTEXT_RIGHT = "rightContext";
 
 	private static final long serialVersionUID = 1L;
 
@@ -151,90 +132,20 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 				@Override
 				protected Object doInBackground() throws Exception {
+
 					getDocumentWindow().setMessage(Annotator.getString(Strings.ENTITY_STATISTICS_STATUS));
 					getDocumentWindow().setIndeterminateProgress();
-					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
-					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
-					ImmutableList<Flag> entityFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
-					String text = getDocumentWindow().getDocumentModel().getJcas().getDocumentText();
+					CSVWriter csvWriter = new CSVWriter();
+					csvWriter.setEntities(getDocumentWindow().getSelectedEntities());
+					csvWriter.setOptionContextWidth(optionContextWidth);
+					csvWriter.setOptionReplaceNewlines(optionReplaceNewlines);
+					csvWriter.setOptionTrimWhitespace(optionTrimWhitespace);
 
-					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
-						// this is the header row
-						p.print(BEGIN);
-						p.print(END);
-						if (optionContextWidth > 0) {
-							p.print(CONTEXT_LEFT);
-						}
-						p.print(SURFACE);
-						if (optionContextWidth > 0) {
-							p.print(CONTEXT_RIGHT);
-						}
-						p.print(ENTITY_NUM);
-						p.print(ENTITY_LABEL);
-						p.print(ENTITY_GROUP);
-						for (Flag flag : entityFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						for (Flag flag : mentionFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						p.println();
-						int entityNum = 0;
-						for (Entity entity : getDocumentWindow().getSelectedEntities()) {
-							for (Mention mention : getDocumentWindow().getDocumentModel().getCoreferenceModel()
-									.get(entity)) {
-								String surface = mention.getCoveredText();
-								if (mention.getDiscontinuous() != null)
-									surface += " " + mention.getDiscontinuous().getCoveredText();
-								if (optionReplaceNewlines)
-									surface = surface.replaceAll("[\n\r\f]", "");
-								p.print(mention.getBegin());
-								p.print(mention.getEnd());
-								if (optionContextWidth > 0) {
-									String contextString;
-									if (optionTrimWhitespace) {
-										contextString = StringUtils.right(text.substring(0, mention.getBegin()).trim(),
-												optionContextWidth);
-
-									} else {
-										contextString = StringUtils.right(text, optionContextWidth);
-									}
-									if (optionReplaceNewlines)
-										contextString = contextString.replaceAll("[\n\r\f]", " ");
-									p.print(contextString);
-								}
-								p.print((optionTrimWhitespace ? surface.trim() : surface));
-								if (optionContextWidth > 0) {
-									String contextString;
-									if (optionTrimWhitespace) {
-										contextString = StringUtils.left(text.substring(mention.getEnd()).trim(),
-												optionContextWidth);
-									} else {
-										contextString = StringUtils.left(text, optionContextWidth);
-									}
-									if (optionReplaceNewlines)
-										contextString = contextString.replaceAll("[\n\r\f]", " ");
-									p.print(contextString);
-								}
-								p.print(entityNum);
-								p.print(entity.getLabel());
-								p.print((entity instanceof EntityGroup));
-								for (Flag flag : entityFlags) {
-									p.print(Util.isX(entity, flag.getKey()));
-								}
-								for (Flag flag : mentionFlags) {
-									p.print(Util.isX(mention, flag.getKey()));
-								}
-								p.println();
-							}
-							entityNum++;
-						}
-					} catch (IOException e1) {
-						Annotator.logger.catching(e1);
+					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
+						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
 					}
+
 					return null;
 				}
 
