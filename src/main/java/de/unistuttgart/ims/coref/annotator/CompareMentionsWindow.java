@@ -53,6 +53,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
 import org.eclipse.collections.impl.factory.Sets;
 
+import com.google.common.base.Objects;
+
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -256,8 +258,17 @@ public class CompareMentionsWindow extends AbstractTextWindow
 						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
 						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
 					continue;
-				map1.add(new Span(m));
-				map.put(new Span(m), m);
+				// if
+				// (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
+				// Defaults.CFG_COMPARE_BY_ENTITY_NAME))
+				Span span;
+				if (true)
+					span = new ExtendedSpan(m);
+				else
+					span = new Span(m);
+
+				map1.add(span);
+				map.put(span, m);
 
 				if (m.getEnd() > annotatedRange.end)
 					annotatedRange.end = m.getEnd();
@@ -621,6 +632,30 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		if (evt.getKey() == Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING) {
 			highlightManager.hilit.removeAllHighlights();
 			drawAllAnnotations();
+		}
+	}
+
+	static class ExtendedSpan extends Span {
+
+		public String entityLabel;
+
+		public ExtendedSpan(Mention annotation) {
+			super(annotation);
+			this.entityLabel = annotation.getEntity().getLabel();
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(this.begin, this.end, this.entityLabel);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!this.getClass().equals(obj.getClass())) {
+				return false;
+			}
+			ExtendedSpan that = (ExtendedSpan) obj;
+			return this.begin == that.begin && this.end == that.end && this.entityLabel.contentEquals(that.entityLabel);
 		}
 	}
 

@@ -78,6 +78,7 @@ public class Constants {
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
 	public static final String CFG_ASK_BEFORE_FILE_OVERWRITE = "CFG_ASK_FILE_OVERWRITE";
 	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
+	public static final String CFG_COMPARE_BY_ENTITY_NAME = "CFG_COMPARE_BY_ENTITY_NAME";
 
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
@@ -151,6 +152,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_UNDERLINE_SINGLETONS_IN_GRAY = new Setting<Boolean>(
 			CFG_UNDERLINE_SINGLETONS_IN_GRAY, Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY,
 			Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
+
+	public static final Setting<Boolean> SETTING_COMPARE_BY_ENTITY_NAME = new Setting<Boolean>(
+			CFG_COMPARE_BY_ENTITY_NAME, Strings.ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME,
+			Strings.ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };
