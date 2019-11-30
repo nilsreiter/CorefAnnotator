@@ -44,9 +44,12 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
@@ -62,7 +65,6 @@ import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
@@ -149,31 +151,33 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				JPopupMenu pMenu = new JPopupMenu();
 				int offset = textPane.viewToModel2D(e.getPoint());
 
+				ImmutableSet<Mention> intersectMentions = ism.getIntersection(documentModels.getFirst());
+				intersectMentions = intersectMentions.select(m -> m.getBegin() <= offset && offset <= m.getEnd());
+
+				if (!intersectMentions.isEmpty()) {
+					pMenu.add("Intersection");
+					for (Mention m : intersectMentions) {
+						pMenu.add(new MentionPanel(m, null));
+					}
+				}
+
 				for (int i = 0; i < documentModels.size(); i++) {
-					DocumentModel current = documentModels.get(i);
-					JCas jcas = current.getJcas();
-					pMenu.add(files.get(i).getName());
+					DocumentModel dm = documentModels.get(i);
 
-					MutableList<Annotation> localAnnotations = Lists.mutable
-							.withAll(documentModels.get(i).getCoreferenceModel().getMentions(offset));
-					MutableList<Annotation> mentions = localAnnotations
-							.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
-
-					for (Annotation m : mentions) {
-						Mention mention = null;
-						if (m instanceof Mention) {
-							mention = (Mention) m;
-						} else if (m instanceof DetachedMentionPart) {
-							mention = ((DetachedMentionPart) m).getMention();
-						}
-						if (mention != null) {
-							pMenu.add(new MentionPanel(mention, current));
+					RichIterable<Mention> mentions = ism.spanMentionMap.get(dm)
+							.reject((s, m) -> ism.getSpanIntersection().contains(s))
+							.select((s, m) -> m.getBegin() <= offset && offset <= m.getEnd()).valuesView();
+					if (!mentions.isEmpty()) {
+						if (!intersectMentions.isEmpty())
+							pMenu.addSeparator();
+						pMenu.add(files.get(i).getName());
+						for (Mention m : mentions) {
+							pMenu.add(new MentionPanel(m, dm));
 						}
 					}
 
-					if (i < documentModels.size() - 1)
-						pMenu.addSeparator();
 				}
+
 				pMenu.show(e.getComponent(), e.getX(), e.getY());
 
 			}
@@ -226,6 +230,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	int size = 0;
 	Color[] colors;
 	JMenu fileMenu;
+	IntersectModel ism = new IntersectModel();
 
 	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
@@ -257,70 +262,39 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	protected void drawAllAnnotations() {
-		if (loadedJCas < size)
+		if (loadedCModels < size)
 			return;
-		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
-		MutableMap<Span, Mention> map = Maps.mutable.empty();
-		Span overlapping = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
-		int index = 0;
-		for (JCas jcas : jcas) {
-			MutableSet<Span> map1 = Sets.mutable.empty();
+		ism.documentModels = documentModels.toImmutable();
+		ism.calculateIntersection();
 
-			Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
-			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING,
-						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
-						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
-					continue;
-				Span span;
-				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
-						Defaults.CFG_COMPARE_BY_ENTITY_NAME))
-					span = new ExtendedSpan(m);
-				else
-					span = new Span(m);
+		Span overlapping = ism.getOverlappingPart();
 
-				map1.add(span);
-				map.put(span, m);
+		ImmutableSet<Span> intersection = ism.getSpanIntersection();
 
-				if (m.getEnd() > annotatedRange.end)
-					annotatedRange.end = m.getEnd();
-				if (m.getBegin() < annotatedRange.begin)
-					annotatedRange.begin = m.getBegin();
-			}
-			mapList.add(map1);
-			if (overlapping.begin < annotatedRange.begin)
-				overlapping.begin = annotatedRange.begin;
-			if (overlapping.end > annotatedRange.end)
-				overlapping.end = annotatedRange.end;
-			index++;
-		}
-
-		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
-		for (int i = 1; i < mapList.size(); i++) {
-			intersection = intersection.intersect(mapList.get(i));
-		}
-
-		for (Span s : intersection) {
-			highlightManager.underline(map.get(s), Color.gray.brighter());
+		for (Mention m : ism.getIntersection(documentModels.getFirst())) {
+			highlightManager.underline(m, Color.gray.brighter());
 		}
 		int agreed = intersection.size();
 		int total = agreed;
 		int totalInOverlappingPart = agreed;
-		for (int i = 0; i < mapList.size(); i++) {
-			Set<Span> spans = mapList.get(i);
+		int index = 0;
+		for (DocumentModel dm : documentModels) {
+			Set<Span> spans = ism.spanMentionMap.get(dm).keySet();
 			for (Span s : spans) {
 				if (!intersection.contains(s)) {
 					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
 							Defaults.CFG_COMPARE_BY_ENTITY_NAME))
-						highlightManager.underline(map.get(s));
+						highlightManager.underline(ism.spanMentionMap.get(dm).get(s));
 					else
-						highlightManager.underline(map.get(s), colors[i]);
+						highlightManager.underline(ism.spanMentionMap.get(dm).get(s), colors[index]);
 					total++;
 					if (overlapping.contains(s))
 						totalInOverlappingPart++;
 				}
 			}
+			index++;
 		}
+
 		stats.setTotal(total);
 		stats.setAgreed(agreed);
 		stats.setTotalInOverlappingPart(totalInOverlappingPart);
@@ -599,6 +573,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		documentModels.set(index, cm);
 		loadedCModels++;
 		finishLoading();
+		drawAllAnnotations();
 	}
 
 	public void setJCas(JCas jcas, String annotatorId, int index) {
@@ -616,7 +591,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		if (!textIsSet)
 			initialiseText(jcas);
 		mentionsInfoPane.add(getAnnotatorPanel(index), index);
-		drawAllAnnotations();
 		mentionsInfoPane.add(getAgreementPanel(), -1);
 
 		DocumentModelLoader dml = new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas);
@@ -734,7 +708,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			this.setOpaque(false);
 			// this.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
 			this.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-			this.setToolTipText(documentModel.getCoreferenceModel().getToolTipText(entity));
+			if (documentModel != null)
+				this.setToolTipText(documentModel.getCoreferenceModel().getToolTipText(entity));
 
 			initialize();
 
@@ -810,4 +785,70 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 		}
 	}
+
+	public static class IntersectModel {
+		ImmutableList<DocumentModel> documentModels;
+		MutableSet<Span> spanIntersection = null;
+		MutableMap<DocumentModel, MutableMap<Span, Mention>> spanMentionMap = Maps.mutable.empty();
+		Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
+		Span overlappingPart = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+		public void calculateIntersection() {
+			for (DocumentModel dm : documentModels) {
+				spanMentionMap.put(dm, Maps.mutable.empty());
+				JCas jcas = dm.getJcas();
+				MutableSet<Span> spans = Sets.mutable.empty();
+
+				for (Mention m : JCasUtil.select(jcas, Mention.class)) {
+					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING,
+							Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
+							&& dm.getCoreferenceModel().getSingletons().contains(m.getEntity()))
+						continue;
+					Span span;
+					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
+							Defaults.CFG_COMPARE_BY_ENTITY_NAME))
+						span = new ExtendedSpan(m);
+					else
+						span = new Span(m);
+
+					spanMentionMap.get(dm).put(span, m);
+					spans.add(span);
+
+					if (m.getEnd() > annotatedRange.end)
+						annotatedRange.end = m.getEnd();
+					if (m.getBegin() < annotatedRange.begin)
+						annotatedRange.begin = m.getBegin();
+
+				}
+				if (spanIntersection == null)
+					spanIntersection = Sets.mutable.withAll(spans);
+				else
+					spanIntersection = spanIntersection.intersect(spans);
+				if (overlappingPart.begin < annotatedRange.begin)
+					overlappingPart.begin = annotatedRange.begin;
+				if (overlappingPart.end > annotatedRange.end)
+					overlappingPart.end = annotatedRange.end;
+
+			}
+
+		}
+
+		public ImmutableSet<Mention> getIntersection(DocumentModel dm) {
+			return spanIntersection.collect(s -> spanMentionMap.get(dm).get(s)).toImmutable();
+		}
+
+		public ImmutableSet<Span> getSpanIntersection() {
+			return spanIntersection.toImmutable();
+		}
+
+		public Span getAnnotatedRange() {
+			return annotatedRange;
+		}
+
+		public Span getOverlappingPart() {
+			return overlappingPart;
+		}
+
+	}
+
 }
