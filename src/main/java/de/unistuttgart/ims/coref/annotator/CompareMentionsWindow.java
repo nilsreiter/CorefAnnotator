@@ -66,12 +66,13 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends AbstractTextWindow
@@ -144,7 +145,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				int offset = textPane.viewToModel2D(e.getPoint());
 
 				for (int i = 0; i < models.size(); i++) {
-					MutableList<Annotation> localAnnotations = Lists.mutable.withAll(models.get(i).getMentions(offset));
+					MutableList<Annotation> localAnnotations = Lists.mutable
+							.withAll(models.get(i).getCoreferenceModel().getMentions(offset));
 					MutableList<Annotation> mentions = localAnnotations
 							.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 					for (Annotation m : mentions) {
@@ -196,7 +198,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	JPanel mentionsInfoPane;
 	JPanel agreementPanel = null;
 
-	MutableList<CoreferenceModel> models;
+	MutableList<DocumentModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
 	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
 
@@ -476,7 +478,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		helpMenu.add(mainApplication.helpAction);
 
 		menuBar.add(initialiseMenuFile());
+		menuBar.add(initialiseMenuView());
 		menuBar.add(initialiseMenuSettings());
+
 		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
@@ -530,8 +534,10 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.add(Box.createVerticalGlue());
 		mentionsInfoPane.add(Box.createVerticalGlue());
 
-		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(textPane,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), mentionsInfoPane);
+		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textScrollPane, mentionsInfoPane);
 		mentionsPane.setDividerLocation(500);
 
 		// tabbedPane.add("Mentions", mentionsPane);
@@ -544,17 +550,47 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	private void finishLoading() {
 		if (loadedCModels >= files.size()) {
-			super.stopIndeterminateProgress();
+			// Style
+			StylePlugin sPlugin = null;
+			try {
+				sPlugin = Annotator.app.getPluginManager().getStylePlugin(models.getFirst().getStylePlugin());
+			} catch (ClassNotFoundException e1) {
+				Annotator.logger.catching(e1);
+			}
+
+			if (sPlugin == null)
+				sPlugin = Annotator.app.getPluginManager().getDefaultStylePlugin();
+
+			StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
+			switchStyle(sPlugin);
+
+			// show profile, if needed
+			if (models.getFirst().getProfile() != null)
+				if (models.getFirst().getProfile().getName() != null)
+					miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": "
+							+ models.getFirst().getProfile().getName());
+				else
+					miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + "Unknown");
+			miscLabel2.repaint();
+
+			stopIndeterminateProgress();
+
 		}
 	}
 
 	public void setCoreferenceModel(DocumentModel cm, int index) {
-		models.set(index, cm.getCoreferenceModel());
+		if (index == 0)
+			documentModel = cm;
+		models.set(index, cm);
 		loadedCModels++;
 		finishLoading();
 	}
 
 	public void setJCas(JCas jcas, String annotatorId, int index) {
+		setJCas(jcas, annotatorId, index, null);
+	}
+
+	public void setJCas(JCas jcas, String annotatorId, int index, Profile profile) {
 		this.jcas.set(index, jcas);
 		this.annotatorIds.set(index, annotatorId);
 		this.annotatorStats.set(index, new AnnotatorStatistics());
@@ -567,7 +603,10 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.add(getAnnotatorPanel(index), index);
 		drawAllAnnotations();
 		mentionsInfoPane.add(getAgreementPanel(), -1);
-		new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas).execute();
+
+		DocumentModelLoader dml = new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas);
+		dml.setProfile(profile);
+		dml.execute();
 		revalidate();
 	}
 
