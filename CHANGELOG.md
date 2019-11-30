@@ -8,6 +8,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - CSV export has been improved in multiple ways
   - Can now be done for the entire file
   - It's possible so specify lines as context #261
+- Line numbers in which mentions appear can now be shown 
+  in the tree #266
 
 ## 1.12.0
 
