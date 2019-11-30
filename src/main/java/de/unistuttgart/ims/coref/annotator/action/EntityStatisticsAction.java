@@ -75,6 +75,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 					csvWriter.setOptionContextUnit(ContextUnit.valueOf(Annotator.app.getPreferences()
 							.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
 
+					csvWriter.configure();
 					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
 						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
 					}

@@ -161,12 +161,12 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 			}
 		});
 
-		contextUnitBox.setSelectedItem(Annotator.getString("dialog.export_options.context_unit."
-				+ Annotator.app.getPreferences().get(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_UNIT), "CHARACTER")));
-		trimWhitespace
-				.setSelected(Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_TRIM), true));
-		replaceNewlineCharacters.setSelected(
-				Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_REPLACE_NEWLINES), false));
+		contextUnitBox.setSelectedItem(ContextUnit.valueOf(Annotator.app.getPreferences()
+				.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
+		trimWhitespace.setSelected(
+				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
+		replaceNewlineCharacters.setSelected(Annotator.app.getPreferences()
+				.getBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES, Defaults.CFG_OPTION_REPLACE_NEWLINES));
 
 		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
 

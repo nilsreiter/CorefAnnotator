@@ -58,14 +58,16 @@ public class CSVWriter extends SingleFileWriter {
 	@Override
 	public void initialize(final UimaContext context) throws ResourceInitializationException {
 		super.initialize(context);
+		configure();
+	}
+
+	public void configure() {
 		if (optionContextUnit == ContextUnit.LINE)
 			replacementForNewlines = " // ";
-
 	}
 
 	@Override
 	public void write(JCas jcas, Writer os) throws IOException {
-		String text = jcas.getDocumentText();
 
 		ImmutableList<Mention> allMentions = Lists.mutable.withAll(JCasUtil.select(jcas, Mention.class))
 				.sortThis(new AnnotationComparator()).toImmutable();
