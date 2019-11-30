@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugin.csv;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -9,11 +10,14 @@ import java.util.function.Consumer;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -25,12 +29,18 @@ import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.eclipse.collections.impl.factory.Lists;
 
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
+import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -42,9 +52,20 @@ import javafx.stage.FileChooser.ExtensionFilter;
  */
 public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 
-	int optionContextWidth = 0;
-	boolean optionTrimWhitespace = true;
-	boolean optionReplaceNewlines = true;
+	public static enum ContextUnit {
+		CHARACTER, TOKEN, LINE;
+
+		public boolean isPossible(JCas jcas) {
+			switch (this) {
+			case LINE:
+				return JCasUtil.exists(jcas, Line.class);
+			case TOKEN:
+				return JCasUtil.exists(jcas, Token.class);
+			default:
+				return true;
+			}
+		}
+	};
 
 	@Override
 	public String getDescription() {
@@ -70,8 +91,9 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
 		b.add(AnalysisEngineFactory.createEngineDescription(CSVWriter.class, CSVWriter.PARAM_FILE, f.getAbsolutePath(),
-				CSVWriter.PARAM_CONTEXTWIDTH, optionContextWidth, CSVWriter.PARAM_REPLACE_NEWLINES,
-				optionReplaceNewlines, CSVWriter.PARAM_TRIM_WHITESPACE, optionTrimWhitespace));
+				CSVWriter.PARAM_CONTEXTWIDTH, getOptionContextWidth(), CSVWriter.PARAM_REPLACE_NEWLINES,
+				isOptionReplaceNewlines(), CSVWriter.PARAM_TRIM_WHITESPACE, isOptionTrimWhitespace(),
+				CSVWriter.PARAM_CONTEXT_UNIT, getOptionContextUnit()));
 		return b.createAggregateDescription();
 	}
 
@@ -118,11 +140,33 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 	}
 
 	@Override
-	public void showExportConfigurationDialog(JFrame parent, Consumer<ConfigurableExportPlugin> callback) {
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(optionContextWidth, 0, 500, 25));
+	public void showExportConfigurationDialog(JFrame parent, DocumentModel documentModel,
+			Consumer<ConfigurableExportPlugin> callback) {
+
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(
+				Annotator.app.getPreferences().getInt(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_WIDTH), 0), 0, 500, 25));
 		JCheckBox trimWhitespace = new JCheckBox();
 		JCheckBox replaceNewlineCharacters = new JCheckBox();
-		trimWhitespace.setSelected(optionTrimWhitespace);
+		JComboBox<ContextUnit> contextUnitBox = new JComboBox<ContextUnit>(Lists.immutable.of(ContextUnit.values())
+				.select(cu -> cu.isPossible(documentModel.getJcas())).toArray(new ContextUnit[] {}));
+		contextUnitBox.setRenderer(new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				setText(Annotator.getString("dialog.export_options.context_unit." + value.toString()));
+				return this;
+			}
+		});
+
+		contextUnitBox.setSelectedItem(Annotator.getString("dialog.export_options.context_unit."
+				+ Annotator.app.getPreferences().get(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_UNIT), "CHARACTER")));
+		trimWhitespace
+				.setSelected(Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_TRIM), true));
+		replaceNewlineCharacters.setSelected(
+				Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_REPLACE_NEWLINES), false));
 
 		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
 
@@ -130,6 +174,10 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.context_width"),
 				Annotator.getString("dialog.export_options.context_width.tooltip")));
 		optionPanel.add(spinner);
+
+		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.context_unit"),
+				Annotator.getString("dialog.export_options.context_unit.tooltip")));
+		optionPanel.add(contextUnitBox);
 
 		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.trim_whitespace"),
 				Annotator.getString("dialog.export_options.trim_whitespace.tooltip")));
@@ -146,9 +194,13 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				optionContextWidth = ((SpinnerNumberModel) spinner.getModel()).getNumber().intValue();
-				optionTrimWhitespace = trimWhitespace.isSelected();
-				optionReplaceNewlines = replaceNewlineCharacters.isSelected();
+				Annotator.app.getPreferences().put(Constants.PLUGIN_CSV_CONTEXT_UNIT,
+						((ContextUnit) contextUnitBox.getSelectedItem()).name());
+				Annotator.app.getPreferences().putInt(Constants.PLUGIN_CSV_CONTEXT_WIDTH,
+						((SpinnerNumberModel) spinner.getModel()).getNumber().intValue());
+				Annotator.app.getPreferences().putBoolean(Constants.PLUGIN_CSV_TRIM, trimWhitespace.isSelected());
+				Annotator.app.getPreferences().putBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES,
+						replaceNewlineCharacters.isSelected());
 				dialog.dispose();
 				callback.accept(Plugin.this);
 			}
@@ -196,28 +248,26 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 		return lab;
 	}
 
-	public int getOptionContextWidth() {
-		return optionContextWidth;
+	@Deprecated
+	private String getPrefKey(String key) {
+		return key;
 	}
 
-	public void setOptionContextWidth(int optionContextWidth) {
-		this.optionContextWidth = optionContextWidth;
+	public int getOptionContextWidth() {
+		return Annotator.app.getPreferences().getInt(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_WIDTH), 30);
 	}
 
 	public boolean isOptionTrimWhitespace() {
-		return optionTrimWhitespace;
-	}
-
-	public void setOptionTrimWhitespace(boolean optionTrimWhitespace) {
-		this.optionTrimWhitespace = optionTrimWhitespace;
+		return Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_TRIM), true);
 	}
 
 	public boolean isOptionReplaceNewlines() {
-		return optionReplaceNewlines;
+		return Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_REPLACE_NEWLINES), true);
 	}
 
-	public void setOptionReplaceNewlines(boolean optionReplaceNewlines) {
-		this.optionReplaceNewlines = optionReplaceNewlines;
+	public ContextUnit getOptionContextUnit() {
+		return ContextUnit.valueOf(Annotator.app.getPreferences().get(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_UNIT),
+				ContextUnit.CHARACTER.name()));
 	}
 
 }

@@ -6,9 +6,11 @@ import java.io.Writer;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -17,7 +19,9 @@ import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
@@ -41,10 +45,23 @@ public class CSVWriter extends SingleFileWriter {
 	boolean optionTrimWhitespace = true;
 
 	public static final String PARAM_REPLACE_NEWLINES = "replace newlines";
-	@ConfigurationParameter(name = PARAM_REPLACE_NEWLINES, defaultValue = "true", mandatory = false)
-	boolean optionReplaceNewlines = true;
+	@ConfigurationParameter(name = PARAM_REPLACE_NEWLINES, defaultValue = "false", mandatory = false)
+	boolean optionReplaceNewlines = false;
+
+	public static final String PARAM_CONTEXT_UNIT = "PARAM_CONTEXT_UNIT";
+	@ConfigurationParameter(name = PARAM_CONTEXT_UNIT, defaultValue = "CHARACTER")
+	Plugin.ContextUnit optionContextUnit = ContextUnit.CHARACTER;
 
 	Iterable<Entity> entities = null;
+	String replacementForNewlines = " ";
+
+	@Override
+	public void initialize(final UimaContext context) throws ResourceInitializationException {
+		super.initialize(context);
+		if (optionContextUnit == ContextUnit.LINE)
+			replacementForNewlines = " // ";
+
+	}
 
 	@Override
 	public void write(JCas jcas, Writer os) throws IOException {
@@ -90,33 +107,20 @@ public class CSVWriter extends SingleFileWriter {
 					if (mention.getDiscontinuous() != null)
 						surface += " " + mention.getDiscontinuous().getCoveredText();
 					if (optionReplaceNewlines)
-						surface = surface.replaceAll("[\n\r\f]", "");
+						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 					p.print(mention.getBegin());
 					p.print(mention.getEnd());
 					if (optionContextWidth > 0) {
-						String contextString;
-						if (optionTrimWhitespace) {
-							contextString = StringUtils.right(text.substring(0, mention.getBegin()).trim(),
-									optionContextWidth);
-
-						} else {
-							contextString = StringUtils.right(text, optionContextWidth);
-						}
+						String contextString = getContext(jcas, mention, true);
 						if (optionReplaceNewlines)
-							contextString = contextString.replaceAll("[\n\r\f]", " ");
+							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 						p.print(contextString);
 					}
 					p.print((optionTrimWhitespace ? surface.trim() : surface));
 					if (optionContextWidth > 0) {
-						String contextString;
-						if (optionTrimWhitespace) {
-							contextString = StringUtils.left(text.substring(mention.getEnd()).trim(),
-									optionContextWidth);
-						} else {
-							contextString = StringUtils.left(text, optionContextWidth);
-						}
+						String contextString = getContext(jcas, mention, false);
 						if (optionReplaceNewlines)
-							contextString = contextString.replaceAll("[\n\r\f]", " ");
+							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 						p.print(contextString);
 					}
 					p.print(entityNum);
@@ -131,6 +135,44 @@ public class CSVWriter extends SingleFileWriter {
 					p.println();
 				}
 				entityNum++;
+			}
+		}
+	}
+
+	protected String getContext(JCas jcas, Mention mention, boolean backward) {
+		String text = jcas.getDocumentText();
+		switch (optionContextUnit) {
+		case LINE:
+			if (backward) {
+				int leftEnd = Lists.immutable.withAll(JCasUtil.selectPreceding(Line.class, mention, optionContextWidth))
+						.collect(l -> l.getBegin()).min();
+				if (optionTrimWhitespace) {
+					return text.substring(leftEnd, mention.getBegin()).trim();
+				} else {
+					return text.substring(leftEnd, mention.getBegin());
+				}
+			} else {
+				int rightEnd = Lists.immutable
+						.withAll(JCasUtil.selectFollowing(Line.class, mention, optionContextWidth))
+						.collect(l -> l.getEnd()).max();
+				if (optionTrimWhitespace) {
+					return text.substring(mention.getEnd(), rightEnd).trim();
+				} else {
+					return text.substring(mention.getEnd(), rightEnd);
+				}
+			}
+		default:
+			if (backward)
+				if (optionTrimWhitespace) {
+					return StringUtils.right(text.substring(0, mention.getBegin()).trim(), optionContextWidth);
+
+				} else {
+					return StringUtils.right(text, optionContextWidth);
+				}
+			else if (optionTrimWhitespace) {
+				return StringUtils.left(text.substring(mention.getEnd()).trim(), optionContextWidth);
+			} else {
+				return StringUtils.left(text, optionContextWidth);
 			}
 		}
 	}
@@ -165,6 +207,14 @@ public class CSVWriter extends SingleFileWriter {
 
 	public void setOptionReplaceNewlines(boolean optionReplaceNewlines) {
 		this.optionReplaceNewlines = optionReplaceNewlines;
+	}
+
+	public Plugin.ContextUnit getOptionContextUnit() {
+		return optionContextUnit;
+	}
+
+	public void setOptionContextUnit(Plugin.ContextUnit optionContextUnit) {
+		this.optionContextUnit = optionContextUnit;
 	}
 
 }

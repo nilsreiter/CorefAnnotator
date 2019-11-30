@@ -16,7 +16,10 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CSVWriter;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Constants;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Defaults;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
@@ -35,11 +38,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 		Plugin csvPlugin = Annotator.app.getPluginManager().getPlugin(Plugin.class);
 
-		csvPlugin.showExportConfigurationDialog(getTarget(), p -> {
-			Plugin plugin = (Plugin) p;
-			optionContextWidth = plugin.getOptionContextWidth();
-			optionReplaceNewlines = plugin.isOptionReplaceNewlines();
-			optionTrimWhitespace = plugin.isOptionTrimWhitespace();
+		csvPlugin.showExportConfigurationDialog(getTarget(), getTarget().getDocumentModel(), p -> {
 			callback.accept(EntityStatisticsAction.this);
 		});
 
@@ -67,9 +66,14 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 					CSVWriter csvWriter = new CSVWriter();
 					csvWriter.setEntities(getDocumentWindow().getSelectedEntities());
-					csvWriter.setOptionContextWidth(optionContextWidth);
-					csvWriter.setOptionReplaceNewlines(optionReplaceNewlines);
-					csvWriter.setOptionTrimWhitespace(optionTrimWhitespace);
+					csvWriter.setOptionContextWidth(Annotator.app.getPreferences()
+							.getInt(Constants.PLUGIN_CSV_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH));
+					csvWriter.setOptionReplaceNewlines(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES, Defaults.CFG_OPTION_REPLACE_NEWLINES));
+					csvWriter.setOptionTrimWhitespace(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
+					csvWriter.setOptionContextUnit(ContextUnit.valueOf(Annotator.app.getPreferences()
+							.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
 
 					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
 						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
