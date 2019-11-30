@@ -7,15 +7,15 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
 
-public class ViewFontFamilySelectAction extends DocumentWindowAction {
+public class ViewFontFamilySelectAction extends TargetedIkonAction<AbstractTextWindow> {
 
 	private static final long serialVersionUID = 1L;
 
 	String fontFamily;
 
-	public ViewFontFamilySelectAction(DocumentWindow documentWindow, String family) {
+	public ViewFontFamilySelectAction(AbstractTextWindow documentWindow, String family) {
 		super(documentWindow, MaterialDesign.MDI_FORMAT_TEXT);
 		putValue(Action.NAME, family);
 		this.fontFamily = family;
