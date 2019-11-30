@@ -1193,7 +1193,18 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			FlagModel fm = documentModel.getFlagModel();
-			lab1.setText(m.getCoveredText());
+
+			// constructing text
+			StringBuilder b = new StringBuilder();
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_LINE_NUMBER_IN_TREE,
+					Defaults.CFG_SHOW_LINE_NUMBER_IN_TREE)) {
+				Integer ln = documentModel.getLineNumber(m.getBegin());
+				if (ln != null)
+					b.append('(').append(ln).append(')').append(' ');
+			}
+			b.append(m.getCoveredText());
+
+			lab1.setText(b.toString());
 			if (m.getFlags() != null)
 				for (String flagKey : m.getFlags()) {
 					Flag flag = fm.getFlag(flagKey);
