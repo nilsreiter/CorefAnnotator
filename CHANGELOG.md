@@ -3,6 +3,12 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.13.0
+
+- CSV export has been improved in multiple ways
+  - Can now be done for the entire file
+  - It's possible so specify lines as context #261
+
 ## 1.12.0
 
 - The app now includes a command line tool to convert multiple 
