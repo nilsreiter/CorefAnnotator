@@ -22,7 +22,9 @@ import javax.swing.text.StyleContext;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -48,7 +50,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	private static final long serialVersionUID = 1L;
 
-	DocumentModel documentModel;
+	MutableList<DocumentModel> documentModels;
+
 	HighlightManager highlightManager;
 	JTextPane textPane;
 	JScrollPane textScrollPane;
@@ -86,7 +89,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	@Override
 	public JCas getJCas() {
-		return documentModel.getJcas();
+		return getDocumentModel().getJcas();
 	}
 
 	@Override
@@ -195,7 +198,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	public DocumentModel getDocumentModel() {
-		return documentModel;
+		return documentModels.getFirst();
 	}
 
 	public LineNumberStyle getLineNumberStyle() {
@@ -312,7 +315,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				getProgressBar().setValue(20);
 
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
-						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
+						.getSpanStyles(getDocumentModel().getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
 
 				for (Enumeration<?> e = baseStyle.getAttributeNames(); e.hasMoreElements();) {
@@ -324,11 +327,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
-						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,
+						StyleManager.style(getDocumentModel().getJcas(), textPane.getStyledDocument(), style,
 								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(documentModel.getJcas()).setStylePlugin(sv.getClass().getName());
+				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -348,5 +351,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		baseStyle.addAttribute(constant, value);
 		pcs.firePropertyChange(constant.toString(), oldValue, value);
 		switchStyle(currentStyle);
+	}
+
+	public void setDocumentModel(DocumentModel documentModel) {
+		if (this.documentModels == null)
+			this.documentModels = Lists.mutable.with(documentModel);
+		else
+			this.documentModels.set(0, documentModel);
 	}
 }

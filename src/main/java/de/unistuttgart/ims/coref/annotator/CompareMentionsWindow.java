@@ -579,8 +579,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	public void setCoreferenceModel(DocumentModel cm, int index) {
-		if (index == 0)
-			documentModel = cm;
 		models.set(index, cm);
 		loadedCModels++;
 		finishLoading();
