@@ -178,6 +178,8 @@ public abstract class AbstractWindow extends JFrame {
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TEXT_LABELS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_LINE_NUMBER_IN_TREE)));
 		menu_settings.add(
 				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
 		menu_settings.add(new JCheckBoxMenuItem(

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -24,7 +25,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.prefs.PreferenceChangeEvent;
@@ -68,9 +72,12 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -130,6 +137,12 @@ import de.unistuttgart.ims.coref.annotator.action.TargetedIkonAction;
 import de.unistuttgart.ims.coref.annotator.action.ToggleEntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -137,10 +150,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
+import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
@@ -190,12 +205,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	// Window components
 	JTree tree;
+	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
 	JTextField treeSearchField;
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
+	JScrollPane textScrollPane;
 
 	// Menu components
 	JMenu documentMenu;
@@ -203,7 +220,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	JMenu windowsMenu;
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
+	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
 	FlagMenu mentionFlagsInTreePopup, entityFlagsInTreePopup, mentionFlagsInMenuBar, entityFlagsInMenuBar;
+
+	// Settings
+	StylePlugin currentStyle;
 
 	// sub windows
 	SearchDialog searchPanel;
@@ -424,6 +445,81 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Override
+	protected JMenu initialiseMenuView() {
+		JRadioButtonMenuItem radio;
+		JMenu viewMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW));
+		viewMenu.add(new ViewFontSizeDecreaseAction(this));
+		viewMenu.add(new ViewFontSizeIncreaseAction(this));
+
+		ButtonGroup grp = new ButtonGroup();
+
+		JMenu lineSpacingMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_SPACING));
+		lineSpacingMenu.setIcon(FontIcon.of(MaterialDesign.MDI_FORMAT_LINE_SPACING));
+		for (int i = 0; i < 10; i++) {
+			ViewSetLineSpacingAction action = new ViewSetLineSpacingAction(this, i * 0.5f);
+			radio = new JRadioButtonMenuItem(action);
+			grp.add(radio);
+			lineSpacingMenu.add(radio);
+			this.addStyleChangeListener(action);
+		}
+
+		viewMenu.add(lineSpacingMenu);
+
+		JMenu fontFamilyMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_FONTFAMILY));
+		String[] fontFamilies = new String[] { Font.SANS_SERIF, Font.SERIF, Font.MONOSPACED };
+		grp = new ButtonGroup();
+		for (String s : fontFamilies) {
+			AbstractAction a = new ViewFontFamilySelectAction(this, s);
+			radio = new JRadioButtonMenuItem(a);
+			fontFamilyMenu.add(radio);
+			grp.add(radio);
+		}
+		// TODO: Disabled for the moment
+		// viewMenu.add(fontFamilyMenu);
+
+		grp = new ButtonGroup();
+		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
+		radio.setSelected(true);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleFixed);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		radio = new JRadioButtonMenuItem(actions.lineNumberStyleDynamic);
+		grp.add(radio);
+		lineNumbersMenu.add(radio);
+
+		viewMenu.add(lineNumbersMenu);
+		viewMenu.addSeparator();
+
+		PluginManager pm = Annotator.app.getPluginManager();
+
+		JMenu viewStyleMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_STYLE));
+		grp = new ButtonGroup();
+		StylePlugin pl = pm.getDefaultStylePlugin();
+		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(
+				new ViewStyleSelectAction(this, pm.getDefaultStylePlugin()));
+		radio1.setSelected(true);
+		viewStyleMenu.add(radio1);
+		styleMenuItem.put(pl, radio1);
+		grp.add(radio1);
+		for (Class<? extends StylePlugin> plugin : pm.getStylePlugins()) {
+			pl = pm.getStylePlugin(plugin);
+			radio1 = new JRadioButtonMenuItem(new ViewStyleSelectAction(this, pl));
+			viewStyleMenu.add(radio1);
+			styleMenuItem.put(pl, radio1);
+			grp.add(radio1);
+
+		}
+		viewMenu.add(viewStyleMenu);
+		return viewMenu;
+
+	}
+
 	protected JMenu initialiseMenuTools() {
 
 		JMenu procMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS_PROC));
@@ -631,6 +727,25 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Override
+	public void setLineNumberStyle(LineNumberStyle lns) {
+		TextLineNumber tln;
+		switch (lns) {
+		case FIXED:
+			tln = new FixedTextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
+			break;
+		case DYNAMIC:
+			tln = new TextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
+			break;
+		default:
+			tln = null;
+		}
+		textScrollPane.setRowHeaderView(tln);
+		super.setLineNumberStyle(lns);
+	}
+
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 
@@ -664,8 +779,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.addDocumentStateListener(this);
 
 		if (model.hasLineNumbers()) {
-			lineNumberStyleFixed.setEnabled(true);
-			setLineNumberStyle(lineNumberStyleFixed.getStyle());
+			actions.lineNumberStyleFixed.setEnabled(true);
+			this.setLineNumberStyle(actions.lineNumberStyleFixed.getStyle());
 		}
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
@@ -777,6 +892,63 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	public void caretUpdate(CaretEvent e) {
 		actions.newEntityAction.setEnabled(
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
+	}
+
+	@Override
+	public void updateStyle(Object constant, Object value) {
+		MutableAttributeSet baseStyle = currentStyle.getBaseStyle();
+		Object oldValue = baseStyle.getAttribute(constant);
+		baseStyle.addAttribute(constant, value);
+		pcs.firePropertyChange(constant.toString(), oldValue, value);
+		switchStyle(currentStyle);
+	}
+
+	@Override
+	public void switchStyle(StylePlugin sv) {
+		switchStyle(sv, sv.getBaseStyle());
+	}
+
+	@Override
+	public void switchStyle(StylePlugin sv, AttributeSet baseStyle) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				getProgressBar().setValue(0);
+				getProgressBar().setVisible(true);
+				Annotator.logger.debug("Activating style {}", sv.getClass().getName());
+
+				getProgressBar().setValue(20);
+
+				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
+						.getSpanStyles(getDocumentModel().getJcas().getTypeSystem(), styleContext, baseStyle);
+				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
+
+				for (Enumeration<?> e = baseStyle.getAttributeNames(); e.hasMoreElements();) {
+					Object aName = e.nextElement();
+					pcs.firePropertyChange(aName.toString(), null, baseStyle.getAttribute(aName));
+				}
+				textPane.getStyledDocument().setParagraphAttributes(0, textPane.getDocument().getLength(), baseStyle,
+						true);
+
+				if (styles != null)
+					for (AttributeSet style : styles.keySet()) {
+						StyleManager.style(getDocumentModel().getJcas(), textPane.getStyledDocument(), style,
+								styles.get(style));
+						getProgressBar().setValue(getProgressBar().getValue() + 10);
+					}
+				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
+				currentStyle = sv;
+				styleMenuItem.get(sv).setSelected(true);
+				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
+				getMiscLabel().setToolTipText(sv.getDescription());
+				getMiscLabel().repaint();
+				progressBar.setValue(100);
+				progressBar.setVisible(false);
+			}
+
+		});
+
 	}
 
 	public void annotationSelected(Annotation m) {
@@ -1026,7 +1198,18 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
 			FlagModel fm = getDocumentModel().getFlagModel();
-			lab1.setText(m.getCoveredText());
+
+			// constructing text
+			StringBuilder b = new StringBuilder();
+			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_LINE_NUMBER_IN_TREE,
+					Defaults.CFG_SHOW_LINE_NUMBER_IN_TREE)) {
+				Integer ln = getDocumentModel().getLineNumber(m.getBegin());
+				if (ln != null)
+					b.append('(').append(ln).append(')').append(' ');
+			}
+			b.append(m.getCoveredText());
+
+			lab1.setText(b.toString());
 			if (m.getFlags() != null)
 				for (String flagKey : m.getFlags()) {
 					Flag flag = fm.getFlag(flagKey);
@@ -1563,6 +1746,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	@Override
+	public StylePlugin getCurrentStyle() {
+		return currentStyle;
+	}
+
+	@Override
 	public String getText() {
 		return textPane.getText();
 	}
@@ -1610,6 +1798,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		RenameEntityAction renameAction;
 		RemoveDuplicatesAction removeDuplicatesAction;
 		EntityStatisticsAction entityStatisticsAction;
+		ViewSetLineNumberStyle lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.NONE);
+		ViewSetLineNumberStyle lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.FIXED);
+		ViewSetLineNumberStyle lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.DYNAMIC);
 
 	}
 
