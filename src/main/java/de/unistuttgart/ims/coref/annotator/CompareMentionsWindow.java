@@ -144,9 +144,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				JPopupMenu pMenu = new JPopupMenu();
 				int offset = textPane.viewToModel2D(e.getPoint());
 
-				for (int i = 0; i < models.size(); i++) {
+				for (int i = 0; i < documentModels.size(); i++) {
 					MutableList<Annotation> localAnnotations = Lists.mutable
-							.withAll(models.get(i).getCoreferenceModel().getMentions(offset));
+							.withAll(documentModels.get(i).getCoreferenceModel().getMentions(offset));
 					MutableList<Annotation> mentions = localAnnotations
 							.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
 					for (Annotation m : mentions) {
@@ -198,7 +198,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	JPanel mentionsInfoPane;
 	JPanel agreementPanel = null;
 
-	MutableList<DocumentModel> models;
 	MutableList<AnnotatorStatistics> annotatorStats;
 	MutableList<MutableSetMultimap<Entity, Mention>> entityMentionMaps;
 
@@ -222,7 +221,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		this.annotatorIds = Lists.mutable.withNValues(size, () -> null);
 		this.open = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
-		this.models = Lists.mutable.withNValues(size, () -> null);
+		this.documentModels = Lists.mutable.withNValues(size, () -> null);
 		this.entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
 		this.colors = new Color[size];
 		ColorProvider cp = new ColorProvider();
@@ -553,7 +552,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			// Style
 			StylePlugin sPlugin = null;
 			try {
-				sPlugin = Annotator.app.getPluginManager().getStylePlugin(models.getFirst().getStylePlugin());
+				sPlugin = Annotator.app.getPluginManager().getStylePlugin(getDocumentModel().getStylePlugin());
 			} catch (ClassNotFoundException e1) {
 				Annotator.logger.catching(e1);
 			}
@@ -565,10 +564,10 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			switchStyle(sPlugin);
 
 			// show profile, if needed
-			if (models.getFirst().getProfile() != null)
-				if (models.getFirst().getProfile().getName() != null)
+			if (getDocumentModel().getProfile() != null)
+				if (getDocumentModel().getProfile().getName() != null)
 					miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": "
-							+ models.getFirst().getProfile().getName());
+							+ getDocumentModel().getProfile().getName());
 				else
 					miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + "Unknown");
 			miscLabel2.repaint();
@@ -579,7 +578,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	public void setCoreferenceModel(DocumentModel cm, int index) {
-		models.set(index, cm);
+		documentModels.set(index, cm);
 		loadedCModels++;
 		finishLoading();
 	}
