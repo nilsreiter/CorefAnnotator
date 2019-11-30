@@ -198,6 +198,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	public DocumentModel getDocumentModel() {
+		if (documentModels == null || documentModels.isEmpty())
+			return null;
 		return documentModels.getFirst();
 	}
 
