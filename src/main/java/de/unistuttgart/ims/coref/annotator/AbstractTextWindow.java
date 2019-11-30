@@ -39,11 +39,11 @@ import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
-import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.ICoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public abstract class AbstractTextWindow extends AbstractWindow implements HasTextView, CoreferenceModelListener {
@@ -177,11 +177,13 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	protected void entityEventInit(FeatureStructureEvent event) {
-		CoreferenceModel cm = (CoreferenceModel) event.getSource();
-		for (Mention m : cm.getMentions()) {
-			highlightManager.underline(m);
-			if (m.getDiscontinuous() != null)
-				highlightManager.underline(m.getDiscontinuous());
+		if (event.getSource() instanceof ICoreferenceModel) {
+			ICoreferenceModel cm = (ICoreferenceModel) event.getSource();
+			for (Mention m : cm.getMentions()) {
+				highlightManager.underline(m);
+				if (m.getDiscontinuous() != null)
+					highlightManager.underline(m.getDiscontinuous());
+			}
 		}
 	}
 

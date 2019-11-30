@@ -4,6 +4,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import com.google.common.base.Objects;
 
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+
 public class Span {
 
 	public int end;
@@ -43,4 +45,27 @@ public class Span {
 		return (other.begin >= begin && other.end <= end);
 	}
 
+	public static class ExtendedSpan extends Span {
+
+		public String entityLabel;
+
+		public ExtendedSpan(Mention annotation) {
+			super(annotation);
+			this.entityLabel = annotation.getEntity().getLabel();
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(this.begin, this.end, this.entityLabel);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!this.getClass().equals(obj.getClass())) {
+				return false;
+			}
+			ExtendedSpan that = (ExtendedSpan) obj;
+			return this.begin == that.begin && this.end == that.end && this.entityLabel.contentEquals(that.entityLabel);
+		}
+	}
 }

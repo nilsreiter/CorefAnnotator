@@ -74,7 +74,7 @@ import de.unistuttgart.ims.uimautil.AnnotationUtil;
  * 
  *
  */
-public class CoreferenceModel extends SubModel implements Model, PreferenceChangeListener {
+public class CoreferenceModel extends SubModel implements Model, PreferenceChangeListener, ICoreferenceModel {
 
 	public static enum EntitySorter {
 		LABEL, CHILDREN, COLOR
@@ -597,6 +597,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
 	}
 
+	@Override
 	public ImmutableSortedSet<Mention> getMentions() {
 		return SortedSets.immutable.withAll(new AnnotationComparator(), JCasUtil.select(getJCas(), Mention.class));
 	}

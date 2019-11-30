@@ -3,6 +3,7 @@ package de.unistuttgart.ims.coref.annotator.action;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -10,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.apache.uima.UIMAException;
+import org.apache.uima.jcas.JCas;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -19,6 +21,7 @@ import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.profile.Parser;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
+import de.unistuttgart.ims.coref.annotator.worker.MultiDocumentModelLoader;
 
 public class FileCompareOpenAction extends IkonAction {
 
@@ -55,25 +58,39 @@ public class FileCompareOpenAction extends IkonAction {
 					CompareMentionsWindow cmw;
 
 					try {
+
 						cmw = new CompareMentionsWindow(Annotator.app, stf.getFiles().size());
 						cmw.setIndeterminateProgress();
 						cmw.setVisible(true);
 						cmw.setFiles(stf.getFiles());
+						JCas[] jcass = new JCas[stf.getFiles().size()];
 
 						for (int i = 0; i < stf.getFiles().size(); i++) {
 							final int j = i;
 							File profileFile = new File(stf.getFiles().get(i).getParentFile(), "profile.xml");
 							final Profile profile = new Parser().getProfileOrNull(profileFile);
 
-							new JCasLoader(stf.getFiles().get(i), jcas -> {
-								cmw.setJCas(jcas, stf.getNames().get(j), j);
+							JCasLoader jcasLoader = new JCasLoader(stf.getFiles().get(i), jcas -> {
+								// cmw.setJCas(jcas, stf.getNames().get(j), j);
 							}, ex -> {
 								cmw.setVisible(false);
 								cmw.dispose();
 								Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
-							}).execute();
+							});
+							jcasLoader.execute();
+							try {
+								jcass[i] = jcasLoader.get();
+							} catch (InterruptedException | ExecutionException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 
 						}
+
+						MultiDocumentModelLoader mdl = new MultiDocumentModelLoader(
+								model -> cmw.setMultiDocumentModel(model), jcass);
+						mdl.execute();
+
 						cmw.setVisible(true);
 						cmw.pack();
 						SwingUtilities.getWindowAncestor((Component) e.getSource()).setVisible(false);

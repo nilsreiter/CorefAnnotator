@@ -57,6 +57,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import com.google.common.base.Objects;
 
+import de.unistuttgart.ims.coref.annotator.Span.ExtendedSpan;
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
@@ -74,6 +75,7 @@ import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.document.MultiDocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -200,6 +202,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	private static final long serialVersionUID = 1L;
 	MutableList<String> annotatorIds;
 	MutableList<Action> open;
+	MultiDocumentModel multiDocumentModel;
 
 	AbstractAction copyAction;
 
@@ -601,10 +604,12 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		finishLoading();
 	}
 
+	@Deprecated
 	public void setJCas(JCas jcas, String annotatorId, int index) {
 		setJCas(jcas, annotatorId, index, null);
 	}
 
+	@Deprecated
 	public void setJCas(JCas jcas, String annotatorId, int index, Profile profile) {
 		this.jcas.set(index, jcas);
 		this.annotatorIds.set(index, annotatorId);
@@ -809,5 +814,14 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			}
 
 		}
+	}
+
+	public MultiDocumentModel getMultiDocumentModel() {
+		return multiDocumentModel;
+	}
+
+	public void setMultiDocumentModel(MultiDocumentModel multiDocumentModel) {
+		this.multiDocumentModel = multiDocumentModel;
+		multiDocumentModel.addCoreferenceModelListener(this);
 	}
 }
