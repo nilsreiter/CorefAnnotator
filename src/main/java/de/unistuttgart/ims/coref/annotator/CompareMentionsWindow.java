@@ -258,11 +258,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
 						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
 					continue;
-				// if
-				// (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
-				// Defaults.CFG_COMPARE_BY_ENTITY_NAME))
 				Span span;
-				if (true)
+				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
+						Defaults.CFG_COMPARE_BY_ENTITY_NAME))
 					span = new ExtendedSpan(m);
 				else
 					span = new Span(m);
