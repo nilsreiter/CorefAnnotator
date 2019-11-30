@@ -213,9 +213,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		switch (lns) {
 		case FIXED:
 			tln = new FixedTextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
 			break;
 		case DYNAMIC:
 			tln = new TextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
 			break;
 		default:
 			tln = null;

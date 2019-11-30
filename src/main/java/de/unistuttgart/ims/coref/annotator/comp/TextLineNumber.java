@@ -73,6 +73,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 	private int lastHeight;
 	private int lastLine;
 
+	int lineSpacingCorrection = 8;
+
 	private HashMap<String, FontMetrics> fonts;
 
 	/**
@@ -364,7 +366,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 			}
 		}
 
-		return y - descent - 8;
+		return y - descent - lineSpacingCorrection;
 	}
 
 	//
@@ -444,6 +446,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 			} else {
 				repaint();
 			}
+		} else if (evt.getPropertyName().equalsIgnoreCase(StyleConstants.LineSpacing.toString())) {
+			lineSpacingCorrection = (int) (16 * ((Float) evt.getNewValue()).floatValue());
 		}
 	}
 }
