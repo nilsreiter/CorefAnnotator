@@ -260,7 +260,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	}
 
-	protected void initialiseWindow() {
+	@Override
+	protected void initializeWindow() {
 		super.initializeWindow();
 
 		textPane = new JTextPane();

@@ -242,12 +242,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	public void initialise() {
 		this.initialiseActions();
 		this.initialiseMenu();
-		this.initialiseWindow();
+		this.initializeWindow();
 		this.setVisible(true);
 	}
 
 	@Override
-	protected void initialiseWindow() {
+	protected void initializeWindow() {
 		super.initializeWindow();
 
 		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
