@@ -63,7 +63,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 					textPane.scrollRectToVisible(rect.getBounds());
 				} catch (BadLocationException e1) {
-					e1.printStackTrace();
+					Annotator.logger.catching(e1);
 				}
 			}
 		}
