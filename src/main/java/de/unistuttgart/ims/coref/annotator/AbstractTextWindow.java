@@ -294,7 +294,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		tableOfContents.setRootVisible(false);
 		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
 		tableOfContents.setToggleClickCount(2);
-		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 6));
 
 		textPanel = new JPanel(new BorderLayout());
 		textPanel.add(textScrollPane, BorderLayout.CENTER);
