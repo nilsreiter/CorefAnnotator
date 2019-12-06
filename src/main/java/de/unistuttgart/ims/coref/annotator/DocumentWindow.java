@@ -54,7 +54,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -212,8 +211,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
-	JScrollPane textScrollPane;
-
 	// Menu components
 	JMenu documentMenu;
 	JMenu recentMenu;
@@ -249,6 +246,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.setVisible(true);
 	}
 
+	@Override
 	protected void initialiseWindow() {
 		super.initializeWindow();
 
@@ -343,7 +341,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Caret caret = new Caret();
 		JPanel leftPanel = new JPanel(new BorderLayout());
 		TextMouseListener textMouseListener = new TextMouseListener();
-		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
@@ -378,10 +375,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		highlightManager = new HighlightManager(textPane);
 
-		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		// scrollPane.setRowHeaderView(segmentIndicator);
 		leftPanel.add(textScrollPane, BorderLayout.CENTER);
+		leftPanel.add(new JScrollPane(tableOfContents), BorderLayout.WEST);
+
 		segmentIndicator = new SegmentedScrollBar<Segment>(textScrollPane);
 
 		textScrollPane.setVerticalScrollBar(segmentIndicator);
@@ -774,6 +771,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
 		tree.setModel(model.getTreeModel());
+		tableOfContents.setModel(model.getSegmentModel());
 		model.addDocumentStateListener(this);
 
 		if (model.hasLineNumbers()) {
@@ -1484,6 +1482,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					return ep;
 				}));
 			}
+			if (getDocumentModel() != null)
+				highlightSegmentInTOC(dot);
 
 		}
 
