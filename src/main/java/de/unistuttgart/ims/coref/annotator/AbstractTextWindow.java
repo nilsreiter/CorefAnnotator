@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
@@ -26,6 +27,7 @@ import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.MutableSet;
+import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -71,7 +73,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	}
 
-	public class TableOfContentsRenderer extends DefaultTreeCellRenderer {
+	public class TOCRenderer extends DefaultTreeCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
@@ -85,6 +87,10 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			}
 			if (leaf)
 				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS));
+			else if (expanded)
+				setIcon(FontIcon.of(FontAwesome.FOLDER_OPEN_O));
+			else
+				setIcon(FontIcon.of(FontAwesome.FOLDER_O));
 			return this;
 		}
 
@@ -282,10 +288,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		});
 		tableOfContents = new JTree();
 		tableOfContents.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		tableOfContents.setCellRenderer(new TableOfContentsRenderer());
+		tableOfContents.setCellRenderer(new TOCRenderer());
 		tableOfContents.setRootVisible(false);
 		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
 		tableOfContents.setToggleClickCount(2);
+		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 	}
 
