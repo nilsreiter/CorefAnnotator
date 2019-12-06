@@ -284,7 +284,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		tableOfContents.setCellRenderer(new TableOfContentsRenderer());
 		tableOfContents.setRootVisible(false);
 		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
-		tableOfContents.setToggleClickCount(1);
+		tableOfContents.setToggleClickCount(2);
 
 	}
 
