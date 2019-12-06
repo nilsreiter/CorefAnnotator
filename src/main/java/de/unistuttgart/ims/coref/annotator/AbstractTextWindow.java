@@ -100,7 +100,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-	protected JScrollPane textScrollPane;
+	JScrollPane textScrollPane;
 
 	public void addStyleChangeListener(PropertyChangeListener listener) {
 		this.pcs.addPropertyChangeListener(listener);
