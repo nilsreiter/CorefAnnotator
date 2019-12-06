@@ -801,8 +801,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getFlagModel().addFlagModelListener(modelHandler);
 
 		// listeners to the segment model
-		model.getSegmentModel().addListDataListener(segmentIndicator);
-		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
+		if (model.getSegmentModel().getTopLevelSegments().size() <= Constants.MAX_SEGMENTS_IN_SCROLLBAR) {
+			model.getSegmentModel().addListDataListener(segmentIndicator);
+			segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
+		}
 
 		for (Flag f : model.getFlagModel().getFlags()) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);

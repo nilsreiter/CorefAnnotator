@@ -97,6 +97,8 @@ public class Constants {
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
 
+	public static final int MAX_SEGMENTS_IN_SCROLLBAR = 15;
+
 	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
 			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
 			new AddFlag("male", "Male", MaterialDesign.MDI_GENDER_MALE, Entity.class),
