@@ -61,7 +61,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 					// this is a bit experimental
 					rect.height = rect.height * 2;// (textPane.getParent().getHeight() / 2);
 
-					textPane.scrollRectToVisible(rect.getBounds());
+					textScrollPane.getViewport().setViewPosition(rect.getLocation());
+
 				} catch (BadLocationException e1) {
 					Annotator.logger.catching(e1);
 				}
