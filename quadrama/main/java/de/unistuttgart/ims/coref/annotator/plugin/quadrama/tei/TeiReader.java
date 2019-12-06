@@ -131,6 +131,13 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			if (titleElement != null)
 				s.setLabel(titleElement.text());
 		});
+		gxr.addRule("[type=scene]", Segment.class, (s, e) -> {
+			Element titleElement = e.selectFirst("div > desc > title");
+			if (titleElement == null)
+				titleElement = e.selectFirst("head");
+			if (titleElement != null)
+				s.setLabel(titleElement.text());
+		});
 
 		Resource res = nextFile();
 
