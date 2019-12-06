@@ -339,7 +339,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		// initialise text view
 		Caret caret = new Caret();
-		JPanel leftPanel = new JPanel(new BorderLayout());
 		TextMouseListener textMouseListener = new TextMouseListener();
 		textPane.setPreferredSize(new Dimension(500, 800));
 		textPane.setDragEnabled(true);
@@ -376,8 +375,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		highlightManager = new HighlightManager(textPane);
 
 		// scrollPane.setRowHeaderView(segmentIndicator);
-		leftPanel.add(textScrollPane, BorderLayout.CENTER);
-		leftPanel.add(new JScrollPane(tableOfContents), BorderLayout.WEST);
 
 		segmentIndicator = new SegmentedScrollBar<Segment>(textScrollPane);
 
@@ -386,7 +383,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		// split pane
 		if (false) {
-			getContentPane().add(leftPanel);
+			getContentPane().add(textPanel);
 			setPreferredSize(new Dimension(600, 800));
 			setLocationRelativeTo(Annotator.app.opening);
 			JFrame treeFrame = new JFrame();
@@ -396,7 +393,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			treeFrame.setLocation(this.getLocation().x + 600, this.getLocation().y);
 			treeFrame.setVisible(true);
 		} else {
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, rightPanel);
 			splitPane.setVisible(true);
 			splitPane.setDividerLocation(500);
 			setPreferredSize(new Dimension(800, 800));

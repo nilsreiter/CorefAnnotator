@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -8,6 +9,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
@@ -102,12 +104,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	HighlightManager highlightManager;
 	JTextPane textPane;
 	JTree tableOfContents;
+	JScrollPane textScrollPane;
+	JPanel textPanel;
 
 	LineNumberStyle lineNumberStyle;
 
 	PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
-	JScrollPane textScrollPane;
 
 	public void addStyleChangeListener(PropertyChangeListener listener) {
 		this.pcs.addPropertyChangeListener(listener);
@@ -293,6 +295,10 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
 		tableOfContents.setToggleClickCount(2);
 		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+		textPanel = new JPanel(new BorderLayout());
+		textPanel.add(textScrollPane, BorderLayout.CENTER);
+		textPanel.add(new JScrollPane(tableOfContents), BorderLayout.WEST);
 
 	}
 
