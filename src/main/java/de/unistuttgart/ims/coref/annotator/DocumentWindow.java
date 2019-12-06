@@ -340,7 +340,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// initialise text view
 		Caret caret = new Caret();
 		TextMouseListener textMouseListener = new TextMouseListener();
-		textPane.setPreferredSize(new Dimension(500, 800));
+		textPane.setPreferredSize(new Dimension(600, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
@@ -396,7 +396,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, rightPanel);
 			splitPane.setVisible(true);
 			splitPane.setDividerLocation(500);
-			setPreferredSize(new Dimension(800, 800));
+			setPreferredSize(new Dimension(900, 800));
 			setLocationRelativeTo(Annotator.app.opening);
 			getContentPane().add(splitPane);
 		}

@@ -288,7 +288,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			}
 
 		});
-		tableOfContents = new JTree();
+		tableOfContents = new JTree(new Object[] {});
 		tableOfContents.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tableOfContents.setCellRenderer(new TOCRenderer());
 		tableOfContents.setRootVisible(false);
