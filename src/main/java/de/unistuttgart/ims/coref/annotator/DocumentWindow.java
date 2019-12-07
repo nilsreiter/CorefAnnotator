@@ -732,9 +732,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		switch (lns) {
 		case FIXED:
 			tln = new FixedTextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
 			break;
 		case DYNAMIC:
 			tln = new TextLineNumber(this, 5);
+			pcs.addPropertyChangeListener(tln);
 			break;
 		default:
 			tln = null;
