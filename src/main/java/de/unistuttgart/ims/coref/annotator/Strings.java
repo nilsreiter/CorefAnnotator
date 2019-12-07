@@ -101,6 +101,8 @@ public class Strings {
 	public static final String ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE_TOOLTIP = "action.toggle.show_line_number_in_tree.tooltip";
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS = "action.toggle.show_text_labels";
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
+	public static final String ACTION_TOGGLE_SHOW_TOC = "action.toggle.show_toc";
+	public static final String ACTION_TOGGLE_SHOW_TOC_TOOLTIP = "action.toggle.show_toc.tooltip";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY = "action.toggle.underline_singletons_in_gray";

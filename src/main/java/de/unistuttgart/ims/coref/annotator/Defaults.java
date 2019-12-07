@@ -10,6 +10,7 @@ public class Defaults {
 	public static final boolean CFG_KEEP_TREE_SORTED = true;
 	public static final int CFG_SEARCH_RESULTS_CONTEXT = 50;
 	public static final boolean CFG_SHOW_TEXT_LABELS = true;
+	public static final boolean CFG_SHOW_TOC = true;
 	public static final boolean CFG_SHOW_LINE_NUMBER_IN_TREE = true;
 	public static final boolean CFG_TRIM_WHITESPACE = true;
 	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;

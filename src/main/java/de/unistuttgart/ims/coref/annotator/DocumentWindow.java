@@ -54,7 +54,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -212,8 +211,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	MyTreeSelectionListener treeSelectionListener;
 	MutableSet<DocumentStateListener> documentStateListeners = Sets.mutable.empty();
 	SegmentedScrollBar<Segment> segmentIndicator;
-	JScrollPane textScrollPane;
-
 	// Menu components
 	JMenu documentMenu;
 	JMenu recentMenu;
@@ -245,11 +242,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	public void initialise() {
 		this.initialiseActions();
 		this.initialiseMenu();
-		this.initialiseWindow();
+		this.initializeWindow();
 		this.setVisible(true);
 	}
 
-	protected void initialiseWindow() {
+	@Override
+	protected void initializeWindow() {
 		super.initializeWindow();
 
 		mentionFlagsInTreePopup = new FlagMenu(Annotator.getString(Strings.MENU_FLAGS), this, Mention.class);
@@ -341,10 +339,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		// initialise text view
 		Caret caret = new Caret();
-		JPanel leftPanel = new JPanel(new BorderLayout());
 		TextMouseListener textMouseListener = new TextMouseListener();
-		textPane = new JTextPane();
-		textPane.setPreferredSize(new Dimension(500, 800));
+		textPane.setPreferredSize(new Dimension(600, 800));
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
@@ -378,10 +374,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		highlightManager = new HighlightManager(textPane);
 
-		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		// scrollPane.setRowHeaderView(segmentIndicator);
-		leftPanel.add(textScrollPane, BorderLayout.CENTER);
+
 		segmentIndicator = new SegmentedScrollBar<Segment>(textScrollPane);
 
 		textScrollPane.setVerticalScrollBar(segmentIndicator);
@@ -389,7 +383,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		// split pane
 		if (false) {
-			getContentPane().add(leftPanel);
+			getContentPane().add(textPanel);
 			setPreferredSize(new Dimension(600, 800));
 			setLocationRelativeTo(Annotator.app.opening);
 			JFrame treeFrame = new JFrame();
@@ -399,10 +393,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			treeFrame.setLocation(this.getLocation().x + 600, this.getLocation().y);
 			treeFrame.setVisible(true);
 		} else {
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, rightPanel);
 			splitPane.setVisible(true);
 			splitPane.setDividerLocation(500);
-			setPreferredSize(new Dimension(800, 800));
+			setPreferredSize(new Dimension(900, 800));
 			setLocationRelativeTo(Annotator.app.opening);
 			getContentPane().add(splitPane);
 		}
@@ -777,6 +771,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		tree.setModel(model.getTreeModel());
 		model.addDocumentStateListener(this);
+		if (tableOfContents != null)
+			tableOfContents.setModel(model.getSegmentModel());
 
 		if (model.hasLineNumbers()) {
 			actions.lineNumberStyleFixed.setEnabled(true);
@@ -805,8 +801,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getFlagModel().addFlagModelListener(modelHandler);
 
 		// listeners to the segment model
-		model.getSegmentModel().addListDataListener(segmentIndicator);
-		segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
+		if (model.getSegmentModel().getTopLevelSegments().size() <= Constants.MAX_SEGMENTS_IN_SCROLLBAR) {
+			model.getSegmentModel().addListDataListener(segmentIndicator);
+			segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
+		}
 
 		for (Flag f : model.getFlagModel().getFlags()) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
@@ -1489,6 +1487,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					return ep;
 				}));
 			}
+			if (getDocumentModel() != null)
+				highlightSegmentInTOC(dot);
 
 		}
 
