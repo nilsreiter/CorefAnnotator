@@ -162,7 +162,7 @@ public class Constants {
 
 	public static final Setting<Boolean> SETTING_SHOW_TOC = new Setting<Boolean>(CFG_SHOW_TOC,
 			Strings.ACTION_TOGGLE_SHOW_TOC, Strings.ACTION_TOGGLE_SHOW_TOC_TOOLTIP, Defaults.CFG_SHOW_TOC,
-			MaterialDesign.MDI_FORMAT_UNDERLINE);
+			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };
