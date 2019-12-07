@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -15,6 +16,8 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
+import de.unistuttgart.ims.coref.annotator.profile.Parser;
+import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class FileCompareOpenAction extends IkonAction {
@@ -59,6 +62,9 @@ public class FileCompareOpenAction extends IkonAction {
 
 						for (int i = 0; i < stf.getFiles().size(); i++) {
 							final int j = i;
+							File profileFile = new File(stf.getFiles().get(i).getParentFile(), "profile.xml");
+							final Profile profile = new Parser().getProfileOrNull(profileFile);
+
 							new JCasLoader(stf.getFiles().get(i), jcas -> {
 								cmw.setJCas(jcas, stf.getNames().get(j), j);
 							}, ex -> {

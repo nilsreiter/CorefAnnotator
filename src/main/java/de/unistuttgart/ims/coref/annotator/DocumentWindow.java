@@ -341,8 +341,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Caret caret = new Caret();
 		TextMouseListener textMouseListener = new TextMouseListener();
 		textPane.setPreferredSize(new Dimension(600, 800));
-		textPane.setDragEnabled(true);
-		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.addMouseListener(textMouseListener);
 		textPane.addMouseMotionListener(textMouseListener);
@@ -439,6 +437,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
+	@Override
 	protected JMenu initialiseMenuView() {
 		JRadioButtonMenuItem radio;
 		JMenu viewMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW));
@@ -634,7 +633,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	protected void closeWindow(boolean quit) {
-		if (documentModel.isSavable()) {
+		if (getDocumentModel().isSavable()) {
 			Annotator.logger.warn("Closing window with unsaved changes");
 		}
 		if (searchPanel != null) {
@@ -691,9 +690,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Alphabet);
-			documentModel.getTreeModel().getEntitySortOrder().descending = false;
-			documentModel.getTreeModel().resort();
+			getDocumentModel().getTreeModel().setEntitySortOrder(EntitySortOrder.Alphabet);
+			getDocumentModel().getTreeModel().getEntitySortOrder().descending = false;
+			getDocumentModel().getTreeModel().resort();
 			actions.sortDescending.putValue(Action.SELECTED_KEY, false);
 		}
 
@@ -712,9 +711,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			documentModel.getTreeModel().setEntitySortOrder(EntitySortOrder.Mentions);
-			documentModel.getTreeModel().getEntitySortOrder().descending = true;
-			documentModel.getTreeModel().resort();
+			getDocumentModel().getTreeModel().setEntitySortOrder(EntitySortOrder.Mentions);
+			getDocumentModel().getTreeModel().getEntitySortOrder().descending = true;
+			getDocumentModel().getTreeModel().resort();
 			actions.sortDescending.putValue(Action.SELECTED_KEY, true);
 		}
 
@@ -742,8 +741,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 
-		setTitle(documentModel.getDocumentTitle() + " (" + fileName + ")"
-				+ (documentModel.isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
+		setTitle(getDocumentModel().getDocumentTitle() + " (" + fileName + ")"
+				+ (getDocumentModel().isSavable() ? " -- " + Annotator.getString(Strings.WINDOWTITLE_EDITED) : ""));
 	}
 
 	public void showSearch() {
@@ -762,8 +761,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			}
 	}
 
+	@Override
 	public void setDocumentModel(DocumentModel model) {
-		documentModel = model;
+		super.setDocumentModel(model);
 
 		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
@@ -825,15 +825,15 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		}
 
 		// set sorting of tree
-		EntitySortOrder eso = EntitySortOrder.valueOf(documentModel.getPreferences()
+		EntitySortOrder eso = EntitySortOrder.valueOf(getDocumentModel().getPreferences()
 				.get(Constants.CFG_ENTITY_SORT_ORDER, Defaults.CFG_ENTITY_SORT_ORDER.toString()));
-		eso.descending = documentModel.getPreferences().getBoolean(Constants.CFG_ENTITY_SORT_DESCENDING,
+		eso.descending = getDocumentModel().getPreferences().getBoolean(Constants.CFG_ENTITY_SORT_DESCENDING,
 				Defaults.CFG_ENTITY_SORT_DESCENDING);
-		documentModel.getTreeModel().setEntitySortOrder(eso);
-		documentModel.getTreeModel().resort();
+		getDocumentModel().getTreeModel().setEntitySortOrder(eso);
+		getDocumentModel().getTreeModel().resort();
 
 		// UI
-		documentStateListeners.forEach(dsl -> documentModel.addDocumentStateListener(dsl));
+		documentStateListeners.forEach(dsl -> getDocumentModel().addDocumentStateListener(dsl));
 		stopIndeterminateProgress();
 		Annotator.logger.debug("Setting loading progress to {}", 100);
 
@@ -862,7 +862,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// final
 		setMessage("");
 		pack();
-		documentModel.signal();
+		getDocumentModel().signal();
 		Annotator.logger.info("Document model has been loaded.");
 
 	}
@@ -890,6 +890,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				!(textPane.getSelectedText() == null || textPane.getSelectionStart() == textPane.getSelectionEnd()));
 	}
 
+	@Override
 	public void updateStyle(Object constant, Object value) {
 		MutableAttributeSet baseStyle = currentStyle.getBaseStyle();
 		Object oldValue = baseStyle.getAttribute(constant);
@@ -898,10 +899,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		switchStyle(currentStyle);
 	}
 
+	@Override
 	public void switchStyle(StylePlugin sv) {
 		switchStyle(sv, sv.getBaseStyle());
 	}
 
+	@Override
 	public void switchStyle(StylePlugin sv, AttributeSet baseStyle) {
 		SwingUtilities.invokeLater(new Runnable() {
 
@@ -914,7 +917,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				getProgressBar().setValue(20);
 
 				Map<AttributeSet, org.apache.uima.cas.Type> styles = sv
-						.getSpanStyles(documentModel.getJcas().getTypeSystem(), styleContext, baseStyle);
+						.getSpanStyles(getDocumentModel().getJcas().getTypeSystem(), styleContext, baseStyle);
 				StyleManager.styleCharacter(textPane.getStyledDocument(), baseStyle);
 
 				for (Enumeration<?> e = baseStyle.getAttributeNames(); e.hasMoreElements();) {
@@ -926,11 +929,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 				if (styles != null)
 					for (AttributeSet style : styles.keySet()) {
-						StyleManager.style(documentModel.getJcas(), textPane.getStyledDocument(), style,
+						StyleManager.style(getDocumentModel().getJcas(), textPane.getStyledDocument(), style,
 								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(documentModel.getJcas()).setStylePlugin(sv.getClass().getName());
+				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -1028,7 +1031,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
 					if (operation != null) {
-						documentModel.edit(operation);
+						getDocumentModel().edit(operation);
 					}
 
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -1071,7 +1074,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 									.collect(n -> n.getFeatureStructure()));
 				}
 				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Mention))
-					documentModel.edit(new MoveMentionsToEntity((Entity) targetFS,
+					getDocumentModel().edit(new MoveMentionsToEntity((Entity) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Mention)
 									.collect(n -> n.getFeatureStructure())));
 			} else if (targetFS instanceof Mention)
@@ -1079,7 +1082,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			else
 				return false;
 			if (operation != null)
-				documentModel.edit(operation);
+				getDocumentModel().edit(operation);
 			return true;
 		}
 
@@ -1190,13 +1193,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
-			FlagModel fm = documentModel.getFlagModel();
+			FlagModel fm = getDocumentModel().getFlagModel();
 
 			// constructing text
 			StringBuilder b = new StringBuilder();
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_LINE_NUMBER_IN_TREE,
 					Defaults.CFG_SHOW_LINE_NUMBER_IN_TREE)) {
-				Integer ln = documentModel.getLineNumber(m.getBegin());
+				Integer ln = getDocumentModel().getLineNumber(m.getBegin());
 				if (ln != null)
 					b.append('(').append(ln).append(')').append(' ');
 			}
@@ -1241,10 +1244,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				return handleEntity(panel, mainLabel, treeNode.getEntity());
 			else if (treeNode.isMention()) {
 				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
-			} else if (documentModel != null && documentModel.getCoreferenceModel() != null
+			} else if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null
 					&& treeNode == tree.getModel().getRoot())
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
-			else if (documentModel != null && documentModel.getCoreferenceModel() != null
+			else if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null
 					&& treeNode.getFeatureStructure() instanceof DetachedMentionPart)
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
@@ -1334,7 +1337,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
 					&& getSelectedAnnotations(Mention.class).size() == 1) {
 				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
-				return new AnnotationTransfer(mention, documentModel.getTreeModel().get(mention));
+				return new AnnotationTransfer(mention, getDocumentModel().getTreeModel().get(mention));
 			} else
 				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
@@ -1344,7 +1347,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 				JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-				Collection<Annotation> mentions = documentModel.getCoreferenceModel().getMentions(dl.getIndex());
+				Collection<Annotation> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
 				if (mentions.size() > 0)
 					return true;
 			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
@@ -1366,7 +1369,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				return false;
 			}
 			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-			Collection<Annotation> mentions = documentModel.getCoreferenceModel().getMentions(dl.getIndex());
+			Collection<Annotation> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
 			for (Annotation a : mentions) {
 				if (a instanceof Mention) {
 					try {
@@ -1376,11 +1379,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							@SuppressWarnings("unchecked")
 							ImmutableList<Span> spans = (ImmutableList<Span>) pat
 									.getTransferData(PotentialAnnotationTransfer.dataFlavor);
-							documentModel.edit(new AddMentionsToEntity(m.getEntity(), spans));
+							getDocumentModel().edit(new AddMentionsToEntity(m.getEntity(), spans));
 						} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
 							Object annotationList = pat.getTransferData(AnnotationTransfer.dataFlavor);
 							if (annotationList instanceof ImmutableList<?>)
-								documentModel.edit(new MoveMentionsToEntity(m.getEntity(),
+								getDocumentModel().edit(new MoveMentionsToEntity(m.getEntity(),
 										((ImmutableList<?>) annotationList).selectInstancesOf(Mention.class)));
 						}
 					} catch (UnsupportedFlavorException | IOException e) {
@@ -1403,11 +1406,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			// TODO: New operation for clearing
-			for (Mention m : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Mention.class)))
-				documentModel.edit(new RemoveMention(m));
-			for (Entity e : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class)))
-				documentModel.edit(new RemoveEntities(e));
-			documentModel.getHistory().clear();
+			for (Mention m : Lists.immutable.withAll(JCasUtil.select(getDocumentModel().getJcas(), Mention.class)))
+				getDocumentModel().edit(new RemoveMention(m));
+			for (Entity e : Lists.immutable.withAll(JCasUtil.select(getDocumentModel().getJcas(), Entity.class)))
+				getDocumentModel().edit(new RemoveEntities(e));
+			getDocumentModel().getHistory().clear();
 		}
 
 	}
@@ -1545,11 +1548,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			}
 
 			MutableSet<Annotation> localAnnotations = Sets.mutable
-					.withAll(documentModel.getCoreferenceModel().getMentions(offset));
+					.withAll(getDocumentModel().getCoreferenceModel().getMentions(offset));
 
 			if (selection)
 				for (int i = textPane.getSelectionStart(); i <= textPane.getSelectionEnd(); i++)
-					localAnnotations.addAll(documentModel.getCoreferenceModel().getMentions(i));
+					localAnnotations.addAll(getDocumentModel().getCoreferenceModel().getMentions(i));
 
 			MutableSet<Annotation> mentions = localAnnotations
 					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
@@ -1582,7 +1585,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						mi.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								documentModel.edit(new AddMentionsToEntity(entity, getSelection()));
+								getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
 							}
 						});
 						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
@@ -1667,7 +1670,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				annotationSelected(tsu.getAnnotation(0));
 			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();
-				documentModel.getCoreferenceModel().getMentions(tsu.getEntity(0))
+				getDocumentModel().getCoreferenceModel().getMentions(tsu.getEntity(0))
 						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
 			} else
 				annotationSelected(null);
@@ -1693,7 +1696,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		public void filter(String s) {
 			tree.scrollRowToVisible(0);
-			documentModel.getTreeModel().rankBySearchString(s);
+			getDocumentModel().getTreeModel().rankBySearchString(s);
 		}
 
 		@Override
@@ -1737,9 +1740,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	public CoreferenceModel getCoreferenceModel() {
-		return documentModel.getCoreferenceModel();
+		return getDocumentModel().getCoreferenceModel();
 	}
 
+	@Override
 	public StylePlugin getCurrentStyle() {
 		return currentStyle;
 	}
@@ -1878,7 +1882,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	class DocumentWindowWindowListener extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent ev) {
-			if (documentModel.isSavable()) {
+			if (getDocumentModel().isSavable()) {
 				Object[] options = new String[] { Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE),
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_SAVE),
 						Annotator.getString(Strings.DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL) };

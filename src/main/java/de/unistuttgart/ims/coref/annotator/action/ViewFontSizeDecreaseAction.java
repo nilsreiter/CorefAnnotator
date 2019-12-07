@@ -10,14 +10,14 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 
-public class ViewFontSizeDecreaseAction extends DocumentWindowAction {
+public class ViewFontSizeDecreaseAction extends TargetedIkonAction<AbstractTextWindow> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ViewFontSizeDecreaseAction(DocumentWindow documentWindow) {
+	public ViewFontSizeDecreaseAction(AbstractTextWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_VIEW_DECREASE_FONT_SIZE, MaterialDesign.MDI_FORMAT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));

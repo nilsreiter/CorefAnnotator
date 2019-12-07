@@ -31,7 +31,7 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 
 	private static final long serialVersionUID = 1L;
 	JPanel statusBar = new JPanel();
-	JProgressBar progressBar = new JProgressBar();
+	protected JProgressBar progressBar = new JProgressBar();
 	JLabel messageLabel = new JLabel();
 	JLabel miscLabel = new JLabel();
 	JLabel miscLabel2 = new JLabel();

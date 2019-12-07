@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 public class Defaults {
 	public static final String CFG_ANNOTATOR_ID = "Unknown annotator";
+	public static final boolean CFG_COMPARE_BY_ENTITY_NAME = true;
 	public static final boolean CFG_DELETE_EMPTY_ENTITIES = false;
 	public static final EntitySortOrder CFG_ENTITY_SORT_ORDER = EntitySortOrder.Mentions;
 	public static final boolean CFG_ENTITY_SORT_DESCENDING = true;
