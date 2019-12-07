@@ -8,8 +8,13 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - CSV export has been improved in multiple ways
   - Can now be done for the entire file
   - It's possible so specify lines as context #261
+  - Line numbers can be included in the export #268
 - Line numbers in which mentions appear can now be shown 
   in the tree #266
+- Segment annotations (e.g., stanzas or chapters) can now be 
+  displayed as a table of contents on the left of the text. 
+  The TOC is fully interactive and can be used to navigate in 
+  long texts i#263
 
 ## 1.12.0
 
