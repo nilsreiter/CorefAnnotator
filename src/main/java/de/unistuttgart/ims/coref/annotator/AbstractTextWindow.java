@@ -251,7 +251,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	protected void highlightSegmentInTOC(int textPosition) {
-		if (documentModel != null && textPosition >= 0) {
+		if (documentModel != null && textPosition >= 0 && tableOfContents != null) {
 			Segment segment = documentModel.getSegmentModel().getSegmentAt(textPosition);
 			if (segment != null) {
 				TreePath tp = documentModel.getSegmentModel().getPathTo(segment);
