@@ -507,6 +507,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-fontawesome-pack</artifactId>
+			<version>${version.ikonli}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-swing</artifactId>
 			<version>${version.ikonli}</version>
 		</dependency>
@@ -591,15 +596,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-controls</artifactId>
-      		<version>${version.javafx}</version>
-    	</dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
 		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-swing</artifactId>
-      		<version>${version.javafx}</version>
-    	</dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>

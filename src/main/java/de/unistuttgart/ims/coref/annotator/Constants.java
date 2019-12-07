@@ -87,6 +87,7 @@ public class Constants {
 	public static final String CFG_REPLACE_MENTION = "CFG_REPLACE_MENTION";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
+	public static final String CFG_SHOW_TOC = "CFG_SHOW_TOC";
 	public static final String CFG_SHOW_LINE_NUMBER_IN_TREE = "CFG_SHOW_LINE_NUMBER_IN_TREE";
 
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
@@ -96,6 +97,8 @@ public class Constants {
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
+
+	public static final int MAX_SEGMENTS_IN_SCROLLBAR = 15;
 
 	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
 			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
@@ -156,6 +159,10 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_UNDERLINE_SINGLETONS_IN_GRAY = new Setting<Boolean>(
 			CFG_UNDERLINE_SINGLETONS_IN_GRAY, Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY,
 			Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
+
+	public static final Setting<Boolean> SETTING_SHOW_TOC = new Setting<Boolean>(CFG_SHOW_TOC,
+			Strings.ACTION_TOGGLE_SHOW_TOC, Strings.ACTION_TOGGLE_SHOW_TOC_TOOLTIP, Defaults.CFG_SHOW_TOC,
+			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };

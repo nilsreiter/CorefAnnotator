@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -35,5 +36,14 @@ public class UimaUtil {
 		JCas jcas = JCasFactory.createJCas();
 		XmiCasDeserializer.deserialize(is, jcas.getCas(), true);
 		return jcas;
+	}
+
+	public static int nextCharacter(JCas jcas, int pos, Predicate<Character> pred) {
+		char[] txt = jcas.getDocumentText().toCharArray();
+		for (int i = pos; i < txt.length; i++) {
+			if (pred.test(txt[i]))
+				return i;
+		}
+		return -1;
 	}
 }
