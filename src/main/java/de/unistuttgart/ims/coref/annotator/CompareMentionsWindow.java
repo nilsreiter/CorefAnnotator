@@ -27,9 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -247,9 +245,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			this.colors[i] = cp.getNextColor();
 		}
 		this.size = size;
-		Annotator.app.getPreferences().addPreferenceChangeListener(this);
 		this.initialiseMenu();
-		this.initialiseWindow();
+		this.initializeWindow();
 		this.targetJCas = JCasFactory.createJCas();
 	}
 
@@ -491,16 +488,13 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		drawAllAnnotations();
 	}
 
-	protected void initialiseWindow() {
+	@Override
+	protected void initializeWindow() {
 
 		super.initializeWindow();
 		Caret caret = new Caret();
 
-		// JTabbedPane tabbedPane = new JTabbedPane();
-		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(500, 800));
-		textPane.setDragEnabled(false);
-		textPane.setEditable(false);
 		textPane.setCaret(caret);
 		textPane.getCaret().setVisible(true);
 		textPane.addFocusListener(caret);
@@ -525,10 +519,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.add(Box.createVerticalGlue());
 		mentionsInfoPane.add(Box.createVerticalGlue());
 
-		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textScrollPane, mentionsInfoPane);
+		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, mentionsInfoPane);
 		mentionsPane.setDividerLocation(500);
 
 		// tabbedPane.add("Mentions", mentionsPane);
@@ -571,6 +562,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	public void setCoreferenceModel(DocumentModel cm, int index) {
 		documentModels.set(index, cm);
+		if (tableOfContents != null)
+			tableOfContents.setModel(cm.getSegmentModel());
 		loadedCModels++;
 		finishLoading();
 		drawAllAnnotations();
@@ -658,7 +651,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		if (evt.getKey() == Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING) {
 			highlightManager.hilit.removeAllHighlights();
 			drawAllAnnotations();
-		}
+		} else
+			super.preferenceChange(evt);
 	}
 
 	static class ExtendedSpan extends Span {

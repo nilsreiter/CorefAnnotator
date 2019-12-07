@@ -341,8 +341,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Caret caret = new Caret();
 		TextMouseListener textMouseListener = new TextMouseListener();
 		textPane.setPreferredSize(new Dimension(600, 800));
-		textPane.setDragEnabled(true);
-		textPane.setEditable(false);
 		textPane.setTransferHandler(new TextViewTransferHandler());
 		textPane.addMouseListener(textMouseListener);
 		textPane.addMouseMotionListener(textMouseListener);

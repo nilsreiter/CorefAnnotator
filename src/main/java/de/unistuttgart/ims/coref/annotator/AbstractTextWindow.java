@@ -481,6 +481,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			initializeTOC();
 
 		textPane = new JTextPane();
+		textPane.setDragEnabled(true);
+		textPane.setEditable(false);
 
 		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -515,7 +517,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				textPanel.repaint();
 			} else {
 				textPanel.remove(tocScrollPane);
-				tocScrollPane.remove(tableOfContents);
+				tocScrollPane.removeAll();
 				tocScrollPane = null;
 				tableOfContents = null;
 				textPanel.revalidate();
