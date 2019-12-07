@@ -768,8 +768,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
 		tree.setModel(model.getTreeModel());
-		tableOfContents.setModel(model.getSegmentModel());
 		model.addDocumentStateListener(this);
+		if (tableOfContents != null)
+			tableOfContents.setModel(model.getSegmentModel());
 
 		if (model.hasLineNumbers()) {
 			actions.lineNumberStyleFixed.setEnabled(true);

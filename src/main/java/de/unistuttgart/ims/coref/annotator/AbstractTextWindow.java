@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
+import java.util.prefs.PreferenceChangeEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -104,6 +105,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	HighlightManager highlightManager;
 	JTextPane textPane;
 	JTree tableOfContents;
+	JScrollPane tocScrollPane;
 	JScrollPane textScrollPane;
 	JPanel textPanel;
 
@@ -269,9 +271,24 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 	}
 
+	protected void initializeTOC() {
+		tableOfContents = new JTree(new Object[] {});
+		tableOfContents.setRootVisible(false);
+		tableOfContents.setToggleClickCount(2);
+		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 6));
+		tableOfContents.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tableOfContents.setCellRenderer(new TOCRenderer());
+		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
+
+		tocScrollPane = new JScrollPane(tableOfContents);
+	}
+
 	@Override
 	protected void initializeWindow() {
 		super.initializeWindow();
+
+		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_TOC, Defaults.CFG_SHOW_TOC))
+			initializeTOC();
 
 		textPane = new JTextPane();
 
@@ -288,18 +305,35 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			}
 
 		});
-		tableOfContents = new JTree(new Object[] {});
-		tableOfContents.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		tableOfContents.setCellRenderer(new TOCRenderer());
-		tableOfContents.setRootVisible(false);
-		tableOfContents.addTreeSelectionListener(new TOCSelectionListener());
-		tableOfContents.setToggleClickCount(2);
-		tableOfContents.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 6));
 
 		textPanel = new JPanel(new BorderLayout());
 		textPanel.add(textScrollPane, BorderLayout.CENTER);
-		textPanel.add(new JScrollPane(tableOfContents), BorderLayout.WEST);
+		if (tableOfContents != null)
+			textPanel.add(tocScrollPane, BorderLayout.WEST);
 
 	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (evt.getKey().equalsIgnoreCase(Constants.CFG_SHOW_TOC)) {
+			boolean b = Boolean.valueOf(evt.getNewValue());
+			if (b) {
+				initializeTOC();
+				tableOfContents.setModel(getDocumentModel().getSegmentModel());
+				textPanel.add(tocScrollPane, BorderLayout.WEST);
+				textPanel.revalidate();
+				textPanel.repaint();
+			} else {
+				textPanel.remove(tocScrollPane);
+				tocScrollPane.remove(tableOfContents);
+				tocScrollPane = null;
+				tableOfContents = null;
+				textPanel.revalidate();
+				textPanel.repaint();
+			}
+		} else {
+			super.preferenceChange(evt);
+		}
+	};
 
 }
