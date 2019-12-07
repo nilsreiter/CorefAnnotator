@@ -3,6 +3,10 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.12.1
+
+- Line numbers are now in sync with the lines they number #273
+
 ## 1.12.0
 
 - The app now includes a command line tool to convert multiple 
