@@ -15,6 +15,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   displayed as a table of contents on the left of the text. 
   The TOC is fully interactive and can be used to navigate in 
   long texts i#263
+- Compare view now supports comparing the actual entity assignment.
+  This behavior can be enabled via the settings menu is only 
+  available if both files are loaded with the same profile, which 
+  also means they have to be in the same directory.
+  #272 #267
 
 ## 1.12.0
 
