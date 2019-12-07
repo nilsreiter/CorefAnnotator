@@ -85,6 +85,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				boolean leaf, int row, boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 			if (value instanceof AnnotationTreeNode) {
+				@SuppressWarnings("unchecked")
 				AnnotationTreeNode<Segment> atn = (AnnotationTreeNode<Segment>) value;
 				setText(atn.get().getLabel());
 			}
