@@ -93,7 +93,9 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 		b.add(AnalysisEngineFactory.createEngineDescription(CSVWriter.class, CSVWriter.PARAM_FILE, f.getAbsolutePath(),
 				CSVWriter.PARAM_CONTEXTWIDTH, getOptionContextWidth(), CSVWriter.PARAM_REPLACE_NEWLINES,
 				isOptionReplaceNewlines(), CSVWriter.PARAM_TRIM_WHITESPACE, isOptionTrimWhitespace(),
-				CSVWriter.PARAM_CONTEXT_UNIT, getOptionContextUnit()));
+				CSVWriter.PARAM_CONTEXT_UNIT, getOptionContextUnit(), CSVWriter.PARAM_INCLUDE_LINE_NUMBERS,
+				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS,
+						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS)));
 		return b.createAggregateDescription();
 	}
 
@@ -147,6 +149,7 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				Annotator.app.getPreferences().getInt(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_WIDTH), 0), 0, 500, 25));
 		JCheckBox trimWhitespace = new JCheckBox();
 		JCheckBox replaceNewlineCharacters = new JCheckBox();
+		JCheckBox includeLineNumbers = new JCheckBox();
 		JComboBox<ContextUnit> contextUnitBox = new JComboBox<ContextUnit>(Lists.immutable.of(ContextUnit.values())
 				.select(cu -> cu.isPossible(documentModel.getJcas())).toArray(new ContextUnit[] {}));
 		contextUnitBox.setRenderer(new DefaultListCellRenderer() {
@@ -167,6 +170,8 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
 		replaceNewlineCharacters.setSelected(Annotator.app.getPreferences()
 				.getBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES, Defaults.CFG_OPTION_REPLACE_NEWLINES));
+		includeLineNumbers.setSelected(Annotator.app.getPreferences()
+				.getBoolean(Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS));
 
 		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
 
@@ -187,6 +192,10 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				Annotator.getString("dialog.export_options.replace_newline.tooltip")));
 		optionPanel.add(replaceNewlineCharacters);
 
+		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.include_line_numbers"),
+				Annotator.getString("dialog.export_options.include_line_numbers.tooltip")));
+		optionPanel.add(includeLineNumbers);
+
 		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
 		Action okAction = new AbstractAction(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_OK)) {
@@ -201,6 +210,8 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				Annotator.app.getPreferences().putBoolean(Constants.PLUGIN_CSV_TRIM, trimWhitespace.isSelected());
 				Annotator.app.getPreferences().putBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES,
 						replaceNewlineCharacters.isSelected());
+				Annotator.app.getPreferences().putBoolean(Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS,
+						includeLineNumbers.isSelected());
 				dialog.dispose();
 				callback.accept(Plugin.this);
 			}

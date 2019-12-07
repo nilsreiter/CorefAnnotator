@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.plugin.csv;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -15,6 +16,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -32,7 +34,9 @@ public class CSVWriter extends SingleFileWriter {
 	private static final String ENTITY_NUM = "entityNum";
 	private static final String SURFACE = "surface";
 	private static final String END = "end";
+	private static final String END_LINE = "end_line";
 	private static final String BEGIN = "begin";
+	private static final String BEGIN_LINE = "begin_line";
 	private static final String CONTEXT_LEFT = "leftContext";
 	private static final String CONTEXT_RIGHT = "rightContext";
 
@@ -51,6 +55,10 @@ public class CSVWriter extends SingleFileWriter {
 	public static final String PARAM_CONTEXT_UNIT = "PARAM_CONTEXT_UNIT";
 	@ConfigurationParameter(name = PARAM_CONTEXT_UNIT, defaultValue = "CHARACTER")
 	Plugin.ContextUnit optionContextUnit = ContextUnit.CHARACTER;
+
+	public static final String PARAM_INCLUDE_LINE_NUMBERS = "PARAM_INCLUDE_LINE_NUMBERS";
+	@ConfigurationParameter(name = PARAM_INCLUDE_LINE_NUMBERS, defaultValue = "false")
+	boolean includeLineNumbers = false;
 
 	Iterable<Entity> entities = null;
 	String replacementForNewlines = " ";
@@ -78,6 +86,12 @@ public class CSVWriter extends SingleFileWriter {
 		ImmutableList<Flag> entityFlags = allFlags
 				.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
+		RangedHashSetValuedHashMap<Line> lineIndex = new RangedHashSetValuedHashMap<Line>();
+		if (includeLineNumbers) {
+			for (Line line : JCasUtil.select(jcas, Line.class))
+				lineIndex.add(line);
+		}
+
 		if (entities == null)
 			entities = JCasUtil.select(jcas, Entity.class);
 
@@ -85,6 +99,10 @@ public class CSVWriter extends SingleFileWriter {
 			// this is the header row
 			p.print(BEGIN);
 			p.print(END);
+			if (includeLineNumbers) {
+				p.print(BEGIN_LINE);
+				p.print(END_LINE);
+			}
 			if (optionContextWidth > 0) {
 				p.print(CONTEXT_LEFT);
 			}
@@ -112,18 +130,41 @@ public class CSVWriter extends SingleFileWriter {
 						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 					p.print(mention.getBegin());
 					p.print(mention.getEnd());
+					if (includeLineNumbers) {
+						try {
+							p.print(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
+						} catch (Exception e) {
+							p.print(-1);
+						}
+						try {
+							p.print(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
+						} catch (IllegalStateException e) {
+							p.print(-1);
+						}
+					}
 					if (optionContextWidth > 0) {
-						String contextString = getContext(jcas, mention, true);
-						if (optionReplaceNewlines)
-							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-						p.print(contextString);
+						try {
+
+							String contextString = getContext(jcas, mention, true);
+							if (optionReplaceNewlines)
+								contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
+							p.print(contextString);
+						} catch (NoSuchElementException e) {
+							p.print("");
+
+						}
 					}
 					p.print((optionTrimWhitespace ? surface.trim() : surface));
 					if (optionContextWidth > 0) {
-						String contextString = getContext(jcas, mention, false);
-						if (optionReplaceNewlines)
-							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-						p.print(contextString);
+						try {
+							String contextString = getContext(jcas, mention, false);
+							if (optionReplaceNewlines)
+								contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
+							p.print(contextString);
+						} catch (NoSuchElementException e) {
+							p.print("");
+
+						}
 					}
 					p.print(entityNum);
 					p.print(entity.getLabel());
