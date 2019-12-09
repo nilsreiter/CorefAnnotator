@@ -48,8 +48,6 @@ public class FileCompareOpenAction extends IkonAction {
 
 						for (int i = 0; i < f.length; i++) {
 							final int j = i;
-							File profileFile = new File(f[i].getParentFile(), "profile.xml");
-							final Profile profile = new Parser().getProfileOrNull(profileFile);
 
 							new JCasLoader(f[i], jcas -> {
 								cmw.setJCas(jcas, files.collect(file -> file.getName()).get(j), j);
