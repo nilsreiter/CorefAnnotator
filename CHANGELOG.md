@@ -20,6 +20,11 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   available if both files are loaded with the same profile, which 
   also means they have to be in the same directory.
   #272 #267
+- Opening multiple files at once is now much faster by using
+  the default dialog for opening files #275
+- Opening or importing a new document should no longer auto-
+  create the coreference-related flags ambiguous, difficult and 
+  Nonnominal. #277
 
 ## 1.12.0
 
