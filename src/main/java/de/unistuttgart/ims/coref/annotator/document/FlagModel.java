@@ -65,8 +65,8 @@ public class FlagModel extends SubModel implements Model {
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
 
-		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS,
-				Defaults.CFG_CREATE_DEFAULT_FLAGS) && !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
+		if (preferences.getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS, Defaults.CFG_CREATE_DEFAULT_FLAGS)
+				&& !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
 			initialiseDefaultFlags();
 		}
 	}
