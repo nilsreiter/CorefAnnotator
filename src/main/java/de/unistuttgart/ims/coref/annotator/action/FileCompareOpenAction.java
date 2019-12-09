@@ -62,7 +62,6 @@ public class FileCompareOpenAction extends IkonAction {
 						}
 						cmw.setVisible(true);
 						cmw.pack();
-						SwingUtilities.getWindowAncestor((Component) e.getSource()).setVisible(false);
 					} catch (UIMAException e1) {
 						Annotator.logger.catching(e1);
 					}
