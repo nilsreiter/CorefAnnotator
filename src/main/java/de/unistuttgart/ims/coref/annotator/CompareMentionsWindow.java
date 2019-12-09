@@ -153,7 +153,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				intersectMentions = intersectMentions.select(m -> m.getBegin() <= offset && offset <= m.getEnd());
 
 				if (!intersectMentions.isEmpty()) {
-					pMenu.add("Intersection");
+					pMenu.add(Annotator.getString(Strings.COMPARE_CONTEXTMENU_INTERSECTION));
 					for (Mention m : intersectMentions) {
 						pMenu.add(new MentionPanel(m, null));
 					}
