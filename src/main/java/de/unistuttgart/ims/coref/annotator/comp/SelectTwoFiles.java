@@ -27,6 +27,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
 
+@Deprecated
 public class SelectTwoFiles extends JDialog {
 
 	private static final long serialVersionUID = 1L;

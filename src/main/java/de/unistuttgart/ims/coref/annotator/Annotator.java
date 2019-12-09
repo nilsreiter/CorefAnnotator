@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -278,6 +279,7 @@ public class Annotator {
 					v.initialise();
 
 				}
+
 			});
 		}
 		return null;
@@ -311,43 +313,58 @@ public class Annotator {
 		this.opening.setVisible(true);
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor) {
+	public void fileOpenDialog(Component parent, IOPlugin flavor, boolean multi, Consumer<File[]> okCallback,
+			Consumer<Object> cancelCallback, String title) {
 		if (Annotator.javafx()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
 					javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-					fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
+					fileChooser.setTitle(title);
 					fileChooser.setInitialDirectory(getCurrentDirectory());
 					// fileChooser.getExtensionFilters().clear();
 					fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
-					File file = fileChooser.showOpenDialog(null);
-					if (file != null)
-						open(file, flavor, Constants.X_UNSPECIFIED);
-					else
-						showOpening();
+					File[] result;
+					if (multi) {
+						result = fileChooser.showOpenMultipleDialog(null).toArray(new File[] {});
+						if (result != null) {
+							okCallback.accept(result);
+							return;
+						}
+					} else {
+						result = new File[1];
+						result[0] = fileChooser.showOpenDialog(null);
+						if (result[0] != null) {
+							okCallback.accept(result);
+							return;
+						}
+					}
+					cancelCallback.accept(null);
 				}
 			});
 		} else {
 			JFileChooser openDialog;
 			openDialog = new JFileChooser();
-			openDialog.setMultiSelectionEnabled(true);
+			openDialog.setMultiSelectionEnabled(multi);
 			openDialog.setFileFilter(FileFilters.xmi_gz);
-			openDialog.setDialogTitle("Open files using " + flavor.getName() + " scheme");
+			openDialog.setDialogTitle(title);
 			openDialog.setFileFilter(flavor.getFileFilter());
 			openDialog.setCurrentDirectory(getCurrentDirectory());
 			int r = openDialog.showOpenDialog(parent);
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
-				for (File f : openDialog.getSelectedFiles()) {
-					setCurrentDirectory(f.getParentFile());
-					open(f, flavor, Constants.X_UNSPECIFIED);
-				}
+				setCurrentDirectory(openDialog.getSelectedFiles()[0].getParentFile());
+				okCallback.accept(openDialog.getSelectedFiles());
 				break;
 			default:
-				showOpening();
+				cancelCallback.accept(null);
 			}
 		}
+	}
+
+	public void fileOpenDialog(Component parent, IOPlugin flavor) {
+		fileOpenDialog(parent, flavor, false, f -> open(f[0], flavor, Constants.X_UNSPECIFIED), o -> showOpening(),
+				"Open files using " + flavor.getName() + " scheme");
 	}
 
 	public static String getString(String key) {

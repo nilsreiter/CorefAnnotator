@@ -6,18 +6,17 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.apache.uima.UIMAException;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
-import de.unistuttgart.ims.coref.annotator.profile.Parser;
-import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class FileCompareOpenAction extends IkonAction {
@@ -31,11 +30,45 @@ public class FileCompareOpenAction extends IkonAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JDialog dialog = new SelectTwoFiles(new RunComparisonAction());
-		dialog.setVisible(true);
-		dialog.pack();
+		Annotator.app.fileOpenDialog(null, Annotator.app.getPluginManager().getDefaultIOPlugin(), true, f -> {
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					ImmutableList<File> files = Lists.immutable.of(f);
+
+					CompareMentionsWindow cmw;
+					try {
+						cmw = new CompareMentionsWindow(Annotator.app, f.length);
+						cmw.setIndeterminateProgress();
+						cmw.setVisible(true);
+						cmw.setFiles(files);
+
+						for (int i = 0; i < f.length; i++) {
+							final int j = i;
+
+							new JCasLoader(f[i], jcas -> {
+								cmw.setJCas(jcas, files.collect(file -> file.getName()).get(j), j);
+							}, ex -> {
+								cmw.setVisible(false);
+								cmw.dispose();
+								Annotator.app.warnDialog(ex.getLocalizedMessage(), "Loading Error");
+							}).execute();
+
+						}
+						cmw.setVisible(true);
+						cmw.pack();
+					} catch (UIMAException e1) {
+						Annotator.logger.catching(e1);
+					}
+				}
+
+			});
+		}, o -> {
+		}, "");
 	}
 
+	@Deprecated
 	class RunComparisonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -62,8 +95,6 @@ public class FileCompareOpenAction extends IkonAction {
 
 						for (int i = 0; i < stf.getFiles().size(); i++) {
 							final int j = i;
-							File profileFile = new File(stf.getFiles().get(i).getParentFile(), "profile.xml");
-							final Profile profile = new Parser().getProfileOrNull(profileFile);
 
 							new JCasLoader(stf.getFiles().get(i), jcas -> {
 								cmw.setJCas(jcas, stf.getNames().get(j), j);
