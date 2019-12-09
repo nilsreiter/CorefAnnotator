@@ -70,6 +70,7 @@ public class FileCompareOpenAction extends IkonAction {
 		}, "");
 	}
 
+	@Deprecated
 	class RunComparisonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
