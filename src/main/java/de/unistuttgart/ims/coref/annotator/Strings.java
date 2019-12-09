@@ -86,6 +86,8 @@ public class Strings {
 	public static final String ACTION_SORT_REVERT = "action.sort_revert";
 	public static final String ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME = "action.toggle.compare_by_entity_name";
 	public static final String ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME_TOOLTIP = "action.toggle.compare_by_entity_name.tooltip";
+	public static final String ACTION_TOGGLE_CREATE_DEFAULT_FLAGS = "action.toggle.create_default_flags";
+	public static final String ACTION_TOGGLE_CREATE_DEFAULT_FLAGS_TOOLTIP = "action.toggle.create_default_flags.tooltip";
 	public static final String ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE = "action.toggle.ask_before_file_overwrite";
 	public static final String ACTION_TOGGLE_DELETE_EMPTY_ENTITIES = "action.toggle.delete_empty_entities";
 	public static final String ACTION_TOGGLE_ENTITY_VISIBILITY = "action.toggle.entity_visibility";
