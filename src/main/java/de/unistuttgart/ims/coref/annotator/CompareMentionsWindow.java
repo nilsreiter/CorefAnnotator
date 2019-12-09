@@ -298,6 +298,14 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		this.mentionsInfoPane.add(getAgreementPanel(), -1);
 	}
 
+	protected void ensureSameTexts() throws NotComparableException {
+		MutableList<JCas> ll = jcas.select(j -> j != null);
+		for (int i = 1; i < ll.size(); i++) {
+			if (!ll.get(i).getDocumentText().equals(ll.get(i - 1).getDocumentText()))
+				throw new NotComparableException(Annotator.getString(Strings.COMPARE_NOT_COMPARABLE));
+		}
+	}
+
 	protected double getAgreementInSpan(Span s) {
 		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
 
@@ -569,12 +577,13 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		drawAllAnnotations();
 	}
 
-	public void setJCas(JCas jcas, String annotatorId, int index) {
+	public void setJCas(JCas jcas, String annotatorId, int index) throws NotComparableException {
 		setJCas(jcas, annotatorId, index, null);
 	}
 
-	public void setJCas(JCas jcas, String annotatorId, int index, Profile profile) {
+	public void setJCas(JCas jcas, String annotatorId, int index, Profile profile) throws NotComparableException {
 		this.jcas.set(index, jcas);
+		this.ensureSameTexts();
 		this.annotatorIds.set(index, annotatorId);
 		this.annotatorStats.set(index, new AnnotatorStatistics());
 		this.annotatorStats.get(index).analyze(jcas, m -> {
@@ -842,6 +851,16 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		public Span getOverlappingPart() {
 			return overlappingPart;
 		}
+
+	}
+
+	public static class NotComparableException extends Exception {
+
+		public NotComparableException(String string) {
+			super(string);
+		}
+
+		private static final long serialVersionUID = 1L;
 
 	}
 

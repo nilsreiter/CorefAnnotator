@@ -15,6 +15,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
+import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow.NotComparableException;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -48,7 +49,14 @@ public class FileCompareOpenAction extends IkonAction {
 							final int j = i;
 
 							new JCasLoader(f[i], jcas -> {
-								cmw.setJCas(jcas, files.collect(file -> file.getName()).get(j), j);
+								try {
+									cmw.setJCas(jcas, files.collect(file -> file.getName()).get(j), j);
+								} catch (NotComparableException e) {
+									Annotator.logger.catching(e);
+									cmw.setVisible(false);
+									cmw.dispose();
+									Annotator.app.warnDialog(e.getLocalizedMessage(), "Loading Error");
+								}
 							}, ex -> {
 								cmw.setVisible(false);
 								cmw.dispose();
@@ -97,7 +105,14 @@ public class FileCompareOpenAction extends IkonAction {
 							final int j = i;
 
 							new JCasLoader(stf.getFiles().get(i), jcas -> {
-								cmw.setJCas(jcas, stf.getNames().get(j), j);
+								try {
+									cmw.setJCas(jcas, stf.getNames().get(j), j);
+								} catch (NotComparableException e1) {
+									cmw.setVisible(false);
+									cmw.dispose();
+									Annotator.app.warnDialog(e1.getLocalizedMessage(), "Loading Error");
+									Annotator.logger.catching(e1);
+								}
 							}, ex -> {
 								cmw.setVisible(false);
 								cmw.dispose();
