@@ -2,12 +2,14 @@ package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -27,11 +29,25 @@ public class FileMergeOpenAction extends IkonAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JDialog dialog = new SelectTwoFiles(new RunMergeAction());
-		dialog.setVisible(true);
-		dialog.pack();
+		Annotator.app.fileOpenDialog(null, Annotator.app.getPluginManager().getDefaultIOPlugin(), true, files -> {
+			ImmutableList<File> fileList = Lists.immutable.of(files);
+			MergeFilesPlugin pl = new MergeFilesPlugin();
+			pl.setFiles(fileList);
+
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					DocumentWindow dw = Annotator.app.open(fileList.getFirst(), pl, "");
+					dw.setFile(null);
+				}
+
+			});
+		}, o -> {
+		}, "");
 	}
 
+	@Deprecated
 	class RunMergeAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
