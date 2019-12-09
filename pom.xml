@@ -101,6 +101,7 @@
 								<Build-Number>${project.version}</Build-Number>
 							</manifestEntries>
 						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
 					</transformers>
 					<finalName>${project.name}-${project.version}-full</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
