@@ -328,6 +328,7 @@ public class Annotator {
 					if (multi) {
 						result = fileChooser.showOpenMultipleDialog(null).toArray(new File[] {});
 						if (result != null) {
+							setCurrentDirectory(result[0].getParentFile());
 							okCallback.accept(result);
 							return;
 						}
@@ -335,6 +336,7 @@ public class Annotator {
 						result = new File[1];
 						result[0] = fileChooser.showOpenDialog(null);
 						if (result[0] != null) {
+							setCurrentDirectory(result[0].getParentFile());
 							okCallback.accept(result);
 							return;
 						}
