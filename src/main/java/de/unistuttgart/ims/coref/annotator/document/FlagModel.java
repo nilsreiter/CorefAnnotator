@@ -16,6 +16,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -64,7 +65,8 @@ public class FlagModel extends SubModel implements Model {
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
 
-		if (!JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
+		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS,
+				Defaults.CFG_CREATE_DEFAULT_FLAGS) && !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
 			initialiseDefaultFlags();
 		}
 	}
@@ -218,6 +220,7 @@ public class FlagModel extends SubModel implements Model {
 		return featureStructures.select(fs -> Util.isX(fs, flag.getKey()));
 	}
 
+	@Deprecated
 	protected void initialiseDefaultFlags() {
 		Flag flag;
 
