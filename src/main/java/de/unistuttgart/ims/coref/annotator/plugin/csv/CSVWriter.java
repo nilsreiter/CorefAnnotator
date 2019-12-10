@@ -58,7 +58,7 @@ public class CSVWriter extends SingleFileWriter {
 
 	public static final String PARAM_INCLUDE_LINE_NUMBERS = "PARAM_INCLUDE_LINE_NUMBERS";
 	@ConfigurationParameter(name = PARAM_INCLUDE_LINE_NUMBERS, defaultValue = "false")
-	boolean includeLineNumbers = false;
+	boolean optionIncludeLineNumbers = false;
 
 	Iterable<Entity> entities = null;
 	String replacementForNewlines = " ";
@@ -87,7 +87,7 @@ public class CSVWriter extends SingleFileWriter {
 				.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
 		RangedHashSetValuedHashMap<Line> lineIndex = new RangedHashSetValuedHashMap<Line>();
-		if (includeLineNumbers) {
+		if (optionIncludeLineNumbers) {
 			for (Line line : JCasUtil.select(jcas, Line.class))
 				lineIndex.add(line);
 		}
@@ -99,7 +99,7 @@ public class CSVWriter extends SingleFileWriter {
 			// this is the header row
 			p.print(BEGIN);
 			p.print(END);
-			if (includeLineNumbers) {
+			if (optionIncludeLineNumbers) {
 				p.print(BEGIN_LINE);
 				p.print(END_LINE);
 			}
@@ -130,7 +130,7 @@ public class CSVWriter extends SingleFileWriter {
 						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 					p.print(mention.getBegin());
 					p.print(mention.getEnd());
-					if (includeLineNumbers) {
+					if (optionIncludeLineNumbers) {
 						try {
 							p.print(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
 						} catch (Exception e) {
@@ -258,6 +258,14 @@ public class CSVWriter extends SingleFileWriter {
 
 	public void setOptionContextUnit(Plugin.ContextUnit optionContextUnit) {
 		this.optionContextUnit = optionContextUnit;
+	}
+
+	public boolean isOptionIncludeLineNumbers() {
+		return optionIncludeLineNumbers;
+	}
+
+	public void setOptionIncludeLineNumbers(boolean optionIncludeLineNumbers) {
+		this.optionIncludeLineNumbers = optionIncludeLineNumbers;
 	}
 
 }

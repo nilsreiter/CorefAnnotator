@@ -74,7 +74,8 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 							.getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
 					csvWriter.setOptionContextUnit(ContextUnit.valueOf(Annotator.app.getPreferences()
 							.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
-
+					csvWriter.setOptionIncludeLineNumbers(Annotator.app.getPreferences().getBoolean(
+							Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS));
 					csvWriter.configure();
 					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
 						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
