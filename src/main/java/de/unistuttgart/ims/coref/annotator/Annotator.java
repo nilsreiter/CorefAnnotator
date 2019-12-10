@@ -355,8 +355,15 @@ public class Annotator {
 			int r = openDialog.showOpenDialog(parent);
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
-				setCurrentDirectory(openDialog.getSelectedFiles()[0].getParentFile());
-				okCallback.accept(openDialog.getSelectedFiles());
+				File[] selectedFiles;
+				if (multi)
+					selectedFiles = openDialog.getSelectedFiles();
+				else {
+					selectedFiles = new File[1];
+					selectedFiles[0] = openDialog.getSelectedFile();
+				}
+				setCurrentDirectory(selectedFiles[0].getParentFile());
+				okCallback.accept(selectedFiles);
 				break;
 			default:
 				cancelCallback.accept(null);
