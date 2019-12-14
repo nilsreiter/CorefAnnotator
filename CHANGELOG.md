@@ -25,6 +25,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Opening or importing a new document should no longer auto-
   create the coreference-related flags ambiguous, difficult and 
   Nonnominal. #277
+- If line numbers are displayed in the tree, and a segmentation 
+  exist, the segments are also displayed in the tree. #279
 
 ## 1.12.2
 
