@@ -86,6 +86,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
@@ -183,6 +184,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Parser;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
@@ -1199,9 +1201,18 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			StringBuilder b = new StringBuilder();
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_LINE_NUMBER_IN_TREE,
 					Defaults.CFG_SHOW_LINE_NUMBER_IN_TREE)) {
-				Integer ln = getDocumentModel().getLineNumber(m.getBegin());
-				if (ln != null)
+				Segment segment = getDocumentModel().getSegmentModel().getSegmentAt(m.getBegin());
+				AnnotationTreeNode<Segment> tn = getDocumentModel().getSegmentModel().getAnnotationTreeNode(segment);
+				String sep = "/";
+				String ln = UimaUtil.toString(tn, sep, 20);
+				Integer lineNumber = getDocumentModel().getLineNumber(m.getBegin());
+				if (lineNumber != null)
+					ln = ln + sep + lineNumber.toString();
+				if (ln != null) {
+					if (ln.startsWith(sep))
+						ln = ln.substring(sep.length());
 					b.append('(').append(ln).append(')').append(' ');
+				}
 			}
 			b.append(m.getCoveredText());
 

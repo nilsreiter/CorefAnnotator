@@ -8,11 +8,15 @@ import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.uima.UIMAException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
+import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.xml.sax.SAXException;
+
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 
 public class UimaUtil {
 	public static JCas readJCas(String filename)
@@ -45,5 +49,21 @@ public class UimaUtil {
 				return i;
 		}
 		return -1;
+	}
+
+	public static String toString(AnnotationTreeNode<Segment> tn, String sep, int maxlength) {
+		if (tn == null)
+			return null;
+		StringBuilder b = new StringBuilder();
+		while (tn != null) {
+			String s = tn.get().getLabel();
+			s = StringUtils.abbreviate(s, maxlength);
+			if (s != null && !s.isBlank()) {
+				b.insert(0, s);
+				b.insert(0, sep);
+			}
+			tn = tn.getParent();
+		}
+		return b.toString();
 	}
 }
