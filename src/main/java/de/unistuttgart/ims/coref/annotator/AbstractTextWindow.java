@@ -78,6 +78,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 
 			if (src != AbstractTextWindow.this) {
 				TreePath tp = e.getNewLeadSelectionPath();
+				if (tp == null)
+					return;
 				@SuppressWarnings("unchecked")
 				AnnotationTreeNode<Segment> tn = (AnnotationTreeNode<Segment>) tp.getLastPathComponent();
 				try {
