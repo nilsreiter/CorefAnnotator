@@ -243,12 +243,12 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	protected void drawAllAnnotations() {
 		if (loadedJCas < size)
 			return;
-		MutableList<MutableSet<Span>> mapList = Lists.mutable.empty();
+		MutableList<MutableMap<Span, Mention>> mapList = Lists.mutable.empty();
 		MutableMap<Span, Mention> map = Maps.mutable.empty();
 		Span overlapping = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
 		int index = 0;
 		for (JCas jcas : jcas) {
-			MutableSet<Span> map1 = Sets.mutable.empty();
+			MutableMap<Span, Mention> map1 = Maps.mutable.empty();
 
 			Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
@@ -256,7 +256,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 						Defaults.CFG_IGNORE_SINGLETONS_WHEN_COMPARING)
 						&& entityMentionMaps.get(index).get(m.getEntity()).size() <= 1)
 					continue;
-				map1.add(new Span(m));
+				map1.put(new Span(m), m);
 				map.put(new Span(m), m);
 
 				if (m.getEnd() > annotatedRange.end)
@@ -272,9 +272,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			index++;
 		}
 
-		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst());
+		MutableSet<Span> intersection = Sets.mutable.withAll(mapList.getFirst().keySet());
 		for (int i = 1; i < mapList.size(); i++) {
-			intersection = intersection.intersect(mapList.get(i));
+			intersection = intersection.intersect(mapList.get(i).keysView().toSet());
 		}
 
 		for (Span s : intersection) {
@@ -284,10 +284,11 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		int total = agreed;
 		int totalInOverlappingPart = agreed;
 		for (int i = 0; i < mapList.size(); i++) {
-			Set<Span> spans = mapList.get(i);
+			MutableMap<Span, Mention> thisMap = mapList.get(i);
+			Set<Span> spans = mapList.get(i).keySet();
 			for (Span s : spans) {
 				if (!intersection.contains(s)) {
-					highlightManager.underline(map.get(s), colors[i]);
+					highlightManager.underline(thisMap.get(s), colors[i]);
 					total++;
 					if (overlapping.contains(s))
 						totalInOverlappingPart++;
