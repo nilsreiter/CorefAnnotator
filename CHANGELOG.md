@@ -26,6 +26,16 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   create the coreference-related flags ambiguous, difficult and 
   Nonnominal. #277
 
+## 1.12.2
+
+- Fixed the bug that the compare view hid some annotations if 
+  more than two annotators were compared, and more than two, but
+  not all of them had annotated something. #279
+
+## 1.12.1
+
+- Line numbers are now in sync with the lines they number #273
+
 ## 1.12.0
 
 - The app now includes a command line tool to convert multiple 
