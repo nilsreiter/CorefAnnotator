@@ -36,6 +36,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationTreeNode;
@@ -112,7 +113,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (value instanceof AnnotationTreeNode) {
 				@SuppressWarnings("unchecked")
 				AnnotationTreeNode<Segment> atn = (AnnotationTreeNode<Segment>) value;
-				setText(atn.get().getLabel());
+				setText(StringUtils.abbreviate(atn.get().getLabel(), 20));
 			}
 			if (leaf)
 				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS));
