@@ -185,6 +185,8 @@ public class SegmentModel extends SubModel implements ListModel<Segment>, TreeMo
 	}
 
 	protected Object[] getPathToRoot(AnnotationTreeNode<Segment> s) {
+		if (s == null)
+			return new Object[] { tree.getRoot() };
 		MutableList<Object> l = Lists.mutable.of(s);
 		AnnotationTreeNode<Segment> cur = s;
 		while (cur != tree.getRoot()) {
