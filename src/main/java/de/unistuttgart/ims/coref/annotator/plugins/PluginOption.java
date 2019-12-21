@@ -7,12 +7,34 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 
 public abstract class PluginOption {
+	public static class StringPluginOption extends PluginOption {
+		JTextField component;
+
+		public StringPluginOption(Preferences preferences, String preferencesKey, String defaultValue, String stringKey,
+				String tooltipKey) {
+			super(preferences, preferencesKey, defaultValue, stringKey, tooltipKey);
+			component = new JTextField();
+			component.setText(preferences.get(preferencesKey, defaultValue));
+		}
+
+		@Override
+		public Component getComponent() {
+			return component;
+		}
+
+		@Override
+		public void ok() {
+			preferences.put(preferencesKey, component.getText());
+		}
+	}
+
 	public static class IntegerPluginOption extends PluginOption {
 		JSpinner component;
 
@@ -55,6 +77,36 @@ public abstract class PluginOption {
 		@Override
 		public void ok() {
 			preferences.putBoolean(preferencesKey, checkBox.isSelected());
+		};
+
+	}
+
+	public static class StringArrayPluginOption extends PluginOption {
+
+		JComboBox<String> component;
+
+		public StringArrayPluginOption(Preferences preferences, String preferencesKey, String defaultValue,
+				String stringKey, String tooltipKey, String[] availableValues, ListCellRenderer<Object> cellRenderer) {
+			super(preferences, preferencesKey, defaultValue, stringKey, tooltipKey);
+			component = new JComboBox<String>(availableValues);
+			if (cellRenderer != null)
+				component.setRenderer(cellRenderer);
+
+			component.setSelectedItem(preferences.get(preferencesKey, defaultValue));
+		}
+
+		@Override
+		public void setValues(Object values) {
+		};
+
+		@Override
+		public Component getComponent() {
+			return component;
+		}
+
+		@Override
+		public void ok() {
+			preferences.put(preferencesKey, (String) component.getSelectedItem());
 		};
 
 	}
