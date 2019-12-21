@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 
@@ -15,7 +13,7 @@ public class FileImportAction extends IkonAction {
 	IOPlugin plugin;
 
 	public FileImportAction(Annotator mApplication, IOPlugin plugin) {
-		super(plugin.getName(), false, MaterialDesign.MDI_IMPORT);
+		super(plugin.getName(), false, plugin.getIkon());
 		putValue(Action.SHORT_DESCRIPTION, plugin.getDescription());
 		this.plugin = plugin;
 	}

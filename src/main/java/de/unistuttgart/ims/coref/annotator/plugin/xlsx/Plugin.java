@@ -1,10 +1,12 @@
-package de.unistuttgart.ims.coref.annotator.plugin.csv;
+package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -20,54 +22,49 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
+import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableExportPlugin {
+/**
+ * 
+ * @author reiterns
+ */
+public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin
+		implements IOPlugin, ConfigurableExportPlugin {
 
-	public static enum ContextUnit {
-		CHARACTER, TOKEN, LINE;
-
-		public boolean isPossible(JCas jcas) {
-			switch (this) {
-			case LINE:
-				return JCasUtil.exists(jcas, Line.class);
-			case TOKEN:
-				return JCasUtil.exists(jcas, Token.class);
-			default:
-				return true;
-			}
-		}
-	};
+	public static final String XLSX = "xlsx";
 
 	@Override
 	public String getDescription() {
-		return "Export mentions in a CSV table";
+		return "Export mentions in an Excel file";
 	}
 
 	@Override
 	public String getName() {
-		return "CSV";
+		return Annotator.getString(Strings.NAME_MS_EXCEL);
+	}
+
+	@Override
+	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
+		return null;
 	}
 
 	@Override
@@ -78,13 +75,26 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 	@Override
 	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
 		AggregateBuilder b = new AggregateBuilder();
-		b.add(AnalysisEngineFactory.createEngineDescription(CSVWriter.class, CSVWriter.PARAM_FILE, f.getAbsolutePath(),
-				CSVWriter.PARAM_CONTEXTWIDTH, getOptionContextWidth(), CSVWriter.PARAM_REPLACE_NEWLINES,
-				isOptionReplaceNewlines(), CSVWriter.PARAM_TRIM_WHITESPACE, isOptionTrimWhitespace(),
-				CSVWriter.PARAM_CONTEXT_UNIT, getOptionContextUnit(), CSVWriter.PARAM_INCLUDE_LINE_NUMBERS,
-				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS,
-						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS)));
+		b.add(AnalysisEngineFactory.createEngineDescription(XLSXWriter.class,
+				XLSXWriter.PARAM_SEPARATE_SHEETS_FOR_ENTITIES,
+				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_XLSX_SEPARATE_ENTITIES,
+						Defaults.CFG_OPTION_SEPARATE_ENTITIES),
+				XLSXWriter.PARAM_FILE, f.getAbsolutePath(), XLSXWriter.PARAM_CONTEXTWIDTH, getOptionContextWidth(),
+				XLSXWriter.PARAM_REPLACE_NEWLINES, isOptionReplaceNewlines(), XLSXWriter.PARAM_TRIM_WHITESPACE,
+				isOptionTrimWhitespace(), XLSXWriter.PARAM_CONTEXT_UNIT, getOptionContextUnit(),
+				XLSXWriter.PARAM_INCLUDE_LINE_NUMBERS, Annotator.app.getPreferences().getBoolean(
+						Constants.PLUGIN_XLSX_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS)));
 		return b.createAggregateDescription();
+	}
+
+	@Override
+	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
+		return null;
+	}
+
+	@Override
+	public Class<? extends StylePlugin> getStylePlugin() {
+		return null;
 	}
 
 	@Override
@@ -93,12 +103,12 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 
 			@Override
 			public boolean accept(File f) {
-				return f.getName().endsWith(".csv");
+				return f.getName().endsWith("." + XLSX);
 			}
 
 			@Override
 			public String getDescription() {
-				return "CSV";
+				return Annotator.getString(Strings.NAME_MS_EXCEL);
 			}
 
 		};
@@ -106,7 +116,7 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 
 	@Override
 	public String getSuffix() {
-		return ".csv";
+		return "." + XLSX;
 	}
 
 	@Override
@@ -116,7 +126,7 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.csv;
+		return new ExtensionFilter(Annotator.getString(Strings.NAME_MS_EXCEL), XLSX);
 	}
 
 	@Override
@@ -124,13 +134,14 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 			Consumer<ConfigurableExportPlugin> callback) {
 
 		ImmutableList<PluginOption> options = Lists.immutable.of(
-				new PluginOption.IntegerPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_CSV_CONTEXT_WIDTH,
-						Defaults.CFG_OPTION_CONTEXT_WIDTH, "dialog.export_options.context_width",
-						"dialog.export_options.context_width.tooltip", 0, 500, 25),
+				new PluginOption.IntegerPluginOption(Annotator.app.getPreferences(),
+						Constants.PLUGIN_XLSX_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH_TOOLTIP, 0, 500, 25),
 				(PluginOption) new PluginOption.EnumPluginOption<ContextUnit>(ContextUnit.class,
-						Annotator.app.getPreferences(), Constants.PLUGIN_CSV_CONTEXT_UNIT,
-						Defaults.CFG_OPTION_CONTEXT_UNIT, "dialog.export_options.context_unit",
-						"dialog.export_options.context_unit.tooltip", Lists.immutable.of(ContextUnit.values())
+						Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_CONTEXT_UNIT,
+						Defaults.CFG_OPTION_CONTEXT_UNIT, Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT_TOOLTIP, Lists.immutable.of(ContextUnit.values())
 								.select(cu -> cu.isPossible(documentModel.getJcas())).toArray(new ContextUnit[] {}),
 						new DefaultListCellRenderer() {
 							private static final long serialVersionUID = 1L;
@@ -143,17 +154,23 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 								return this;
 							}
 						}),
-				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_CSV_TRIM,
-						Defaults.CFG_OPTION_TRIM, "dialog.export_options.trim_whitespace",
-						"dialog.export_options.trim_whitespace.tooltip"),
-				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_CSV_REPLACE_NEWLINES,
-						Defaults.CFG_OPTION_REPLACE_NEWLINES, "dialog.export_options.replace_newline",
-						"dialog.export_options.replace_newline.tooltip"),
-				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS,
-						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS, "dialog.export_options.include_line_numbers",
-						"dialog.export_options.include_line_numbers.tooltip"));
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_TRIM,
+						Defaults.CFG_OPTION_TRIM, Strings.ACTION_TOGGLE_TRIM_WHITESPACE,
+						Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP),
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_REPLACE_NEWLINES,
+						Defaults.CFG_OPTION_REPLACE_NEWLINES, Strings.DIALOG_EXPORT_OPTIONS_REPLACE_NEWLINE,
+						Strings.DIALOG_EXPORT_OPTIONS_REPLACE_NEWLINE_TOOLTIP),
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_INCLUDE_LINE_NUMBERS,
+						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS, Strings.DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS,
+						Strings.DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS_TOOLTIP),
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_SEPARATE_ENTITIES,
+						Defaults.CFG_OPTION_SEPARATE_ENTITIES, Strings.DIALOG_EXPORT_OPTIONS_SEPARATE_ENTITIES,
+						Strings.DIALOG_EXPORT_OPTIONS_SEPARATE_ENTITIES_TOOLTIP),
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_AUTO_OPEN,
+						Defaults.CFG_OPTION_AUTO_OPEN, Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN,
+						Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN_TOOLTIP));
 
-		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
+		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_, getName()));
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
 
@@ -171,6 +188,7 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 			public void actionPerformed(ActionEvent e) {
 				for (PluginOption option : options)
 					option.ok();
+
 				dialog.dispose();
 				callback.accept(Plugin.this);
 			}
@@ -212,21 +230,43 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableEx
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
+	@Override
 	public int getOptionContextWidth() {
-		return Annotator.app.getPreferences().getInt((Constants.PLUGIN_CSV_CONTEXT_WIDTH), 30);
+		return Annotator.app.getPreferences().getInt((Constants.PLUGIN_XLSX_CONTEXT_WIDTH), 30);
 	}
 
+	@Override
 	public boolean isOptionTrimWhitespace() {
-		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_CSV_TRIM), true);
+		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_XLSX_TRIM), true);
 	}
 
+	@Override
 	public boolean isOptionReplaceNewlines() {
-		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_CSV_REPLACE_NEWLINES), true);
+		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_XLSX_REPLACE_NEWLINES), true);
 	}
 
+	@Override
 	public ContextUnit getOptionContextUnit() {
 		return ContextUnit.valueOf(
-				Annotator.app.getPreferences().get((Constants.PLUGIN_CSV_CONTEXT_UNIT), ContextUnit.CHARACTER.name()));
+				Annotator.app.getPreferences().get((Constants.PLUGIN_XLSX_CONTEXT_UNIT), ContextUnit.CHARACTER.name()));
+	}
+
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return f -> {
+			try {
+				if (Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_XLSX_AUTO_OPEN,
+						Defaults.CFG_OPTION_AUTO_OPEN))
+					Desktop.getDesktop().open(f);
+			} catch (IOException e) {
+				Annotator.logger.catching(e);
+			}
+		};
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return MaterialDesign.MDI_FILE_EXCEL;
 	}
 
 }

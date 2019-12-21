@@ -7,8 +7,6 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
-
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
@@ -26,7 +24,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 	IOPlugin plugin;
 
 	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, IOPlugin plugin) {
-		super(dw, MaterialDesign.MDI_EXPORT);
+		super(dw, plugin.getIkon());
 		putValue(Action.NAME, plugin.getName());
 		if (plugin.getDescription() != null)
 			putValue(Action.SHORT_DESCRIPTION, plugin.getDescription());

@@ -19,6 +19,8 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
@@ -98,6 +100,11 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFi
 	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return ExtensionFilters.xmi_gz;
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return MaterialDesign.MDI_FILE_EXPORT;
 	}
 
 }

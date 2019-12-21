@@ -746,8 +746,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			if (color != null)
 				l.setForeground(color);
 			if (isShowText())
-				l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
-			l.setToolTipText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+				l.setText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
+			l.setToolTipText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
 			panel.add(Box.createRigidArea(new Dimension(5, 5)));
 			panel.add(l);

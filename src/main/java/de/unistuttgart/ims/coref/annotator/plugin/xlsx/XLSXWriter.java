@@ -1,12 +1,19 @@
-package de.unistuttgart.ims.coref.annotator.plugin.csv;
+package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
@@ -24,10 +31,10 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
-import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
+import de.unistuttgart.ims.coref.annotator.plugins.SingleFileStream;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
-public class CSVWriter extends SingleFileWriter {
+public class XLSXWriter extends SingleFileStream {
 
 	private static final String ENTITY_GROUP = "entityGroup";
 	private static final String ENTITY_LABEL = "entityLabel";
@@ -60,6 +67,10 @@ public class CSVWriter extends SingleFileWriter {
 	@ConfigurationParameter(name = PARAM_INCLUDE_LINE_NUMBERS, defaultValue = "false")
 	boolean optionIncludeLineNumbers = false;
 
+	public static final String PARAM_SEPARATE_SHEETS_FOR_ENTITIES = "PARAM_SEPARATE_SHEETS_FOR_ENTITIES";
+	@ConfigurationParameter(name = PARAM_SEPARATE_SHEETS_FOR_ENTITIES, defaultValue = "false")
+	boolean optionSeparateSheetsForEntities = false;
+
 	Iterable<Entity> entities = null;
 	String replacementForNewlines = " ";
 
@@ -75,7 +86,7 @@ public class CSVWriter extends SingleFileWriter {
 	}
 
 	@Override
-	public void write(JCas jcas, Writer os) throws IOException {
+	public void write(JCas jcas, OutputStream os) throws IOException {
 
 		ImmutableList<Mention> allMentions = Lists.mutable.withAll(JCasUtil.select(jcas, Mention.class))
 				.sortThis(new AnnotationComparator()).toImmutable();
@@ -95,91 +106,141 @@ public class CSVWriter extends SingleFileWriter {
 		if (entities == null)
 			entities = JCasUtil.select(jcas, Entity.class);
 
-		try (CSVPrinter p = new CSVPrinter(os, CSVFormat.EXCEL)) {
-			// this is the header row
-			p.print(BEGIN);
-			p.print(END);
-			if (optionIncludeLineNumbers) {
-				p.print(BEGIN_LINE);
-				p.print(END_LINE);
-			}
-			if (optionContextWidth > 0) {
-				p.print(CONTEXT_LEFT);
-			}
-			p.print(SURFACE);
-			if (optionContextWidth > 0) {
-				p.print(CONTEXT_RIGHT);
-			}
-			p.print(ENTITY_NUM);
-			p.print(ENTITY_LABEL);
-			p.print(ENTITY_GROUP);
-			for (Flag flag : entityFlags) {
-				p.print(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
-			}
-			for (Flag flag : mentionFlags) {
-				p.print(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
-			}
-			p.println();
-			int entityNum = 0;
-			for (Entity entity : entities) {
-				for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
-					String surface = mention.getCoveredText();
-					if (mention.getDiscontinuous() != null)
-						surface += " " + mention.getDiscontinuous().getCoveredText();
-					if (optionReplaceNewlines)
-						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-					p.print(mention.getBegin());
-					p.print(mention.getEnd());
-					if (optionIncludeLineNumbers) {
-						try {
-							p.print(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
-						} catch (Exception e) {
-							p.print(-1);
-						}
-						try {
-							p.print(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
-						} catch (IllegalStateException e) {
-							p.print(-1);
-						}
-					}
-					if (optionContextWidth > 0) {
-						try {
+		@SuppressWarnings("resource")
+		Workbook wb = new XSSFWorkbook();
+		CellStyle cs = wb.createCellStyle();
+		cs.setWrapText(true);
 
-							String contextString = getContext(jcas, mention, true);
-							if (optionReplaceNewlines)
-								contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-							p.print(contextString);
-						} catch (NoSuchElementException e) {
-							p.print("");
+		Sheet sheet = null;
 
-						}
-					}
-					p.print((optionTrimWhitespace ? surface.trim() : surface));
-					if (optionContextWidth > 0) {
-						try {
-							String contextString = getContext(jcas, mention, false);
-							if (optionReplaceNewlines)
-								contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-							p.print(contextString);
-						} catch (NoSuchElementException e) {
-							p.print("");
-
-						}
-					}
-					p.print(entityNum);
-					p.print(entity.getLabel());
-					p.print((entity instanceof EntityGroup));
-					for (Flag flag : entityFlags) {
-						p.print(Util.isX(entity, flag.getKey()));
-					}
-					for (Flag flag : mentionFlags) {
-						p.print(Util.isX(mention, flag.getKey()));
-					}
-					p.println();
-				}
-				entityNum++;
-			}
+		int cellNum = 0;
+		if (!optionSeparateSheetsForEntities) {
+			sheet = wb.createSheet("Export");
+			printHeader(sheet, entityFlags, mentionFlags);
 		}
+
+		int rowNum = 1;
+		Cell cell;
+		Row row;
+		int entityNum = 0;
+		int surfaceColumn = Integer.MIN_VALUE;
+		for (Entity entity : entities) {
+			if (optionSeparateSheetsForEntities) {
+				sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(entity.getLabel()));
+				printHeader(sheet, entityFlags, mentionFlags);
+				rowNum = 1;
+			}
+			for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
+				row = sheet.createRow(rowNum++);
+				cellNum = 0;
+				String surface = mention.getCoveredText();
+				if (mention.getDiscontinuous() != null)
+					surface += " " + mention.getDiscontinuous().getCoveredText();
+				if (optionReplaceNewlines)
+					surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
+				row.createCell(cellNum++).setCellValue(mention.getBegin());
+				row.createCell(cellNum++).setCellValue(mention.getEnd());
+				if (optionIncludeLineNumbers) {
+					try {
+						row.createCell(cellNum++)
+								.setCellValue(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
+					} catch (Exception e) {
+						row.createCell(cellNum++).setCellValue(-1);
+					}
+					try {
+						row.createCell(cellNum++)
+								.setCellValue(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
+					} catch (IllegalStateException e) {
+						row.createCell(cellNum++).setCellValue(-1);
+					}
+				}
+				if (optionContextWidth > 0) {
+					try {
+
+						String contextString = getContext(jcas, mention, true);
+						if (optionReplaceNewlines)
+							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
+						cell = row.createCell(cellNum++);
+						cell.setCellValue(contextString);
+						cell.setCellStyle(cs);
+					} catch (NoSuchElementException e) {
+						row.createCell(cellNum++).setCellValue("");
+					}
+				}
+				surfaceColumn = cellNum;
+				row.createCell(cellNum++).setCellValue((optionTrimWhitespace ? surface.trim() : surface));
+				if (optionContextWidth > 0) {
+					try {
+						String contextString = getContext(jcas, mention, false);
+						if (optionReplaceNewlines)
+							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
+						cell = row.createCell(cellNum++);
+						cell.setCellValue(contextString);
+						cell.setCellStyle(cs);
+					} catch (NoSuchElementException e) {
+						row.createCell(cellNum++).setCellValue("");
+					}
+				}
+				row.createCell(cellNum++).setCellValue(entityNum);
+				row.createCell(cellNum++).setCellValue(entity.getLabel());
+				row.createCell(cellNum++).setCellValue((entity instanceof EntityGroup));
+				for (Flag flag : entityFlags) {
+					row.createCell(cellNum++).setCellValue(Util.isX(entity, flag.getKey()));
+				}
+				for (Flag flag : mentionFlags) {
+					row.createCell(cellNum++).setCellValue(Util.isX(mention, flag.getKey()));
+				}
+			}
+			entityNum++;
+			sheet.setColumnWidth(surfaceColumn - 1, 40 * 256);
+			sheet.setColumnWidth(surfaceColumn, 40 * 256);
+			sheet.setColumnWidth(surfaceColumn + 1, 40 * 256);
+			sheet.createFreezePane(0, 1, 0, 1);
+		}
+		wb.write(os);
+	}
+
+	protected void printHeader(Sheet sheet, Iterable<Flag> flags1, Iterable<Flag> flags2) {
+		Font ft = sheet.getWorkbook().createFont();
+		ft.setBold(true);
+		CellStyle cs = sheet.getWorkbook().createCellStyle();
+		cs.setFont(ft);
+
+		int cellNum = 0;
+		Row row = sheet.createRow(0);
+		Cell cell;
+
+		cell = row.createCell(cellNum++);
+		cell.setCellValue(BEGIN);
+
+		cell = row.createCell(cellNum++);
+		cell.setCellValue(END);
+
+		if (optionIncludeLineNumbers) {
+			row.createCell(cellNum++).setCellValue(BEGIN_LINE);
+			row.createCell(cellNum++).setCellValue(END_LINE);
+		}
+		if (optionContextWidth > 0) {
+			row.createCell(cellNum++).setCellValue(CONTEXT_LEFT);
+		}
+		row.createCell(cellNum++).setCellValue(SURFACE);
+		if (optionContextWidth > 0) {
+			row.createCell(cellNum++).setCellValue(CONTEXT_RIGHT);
+		}
+		row.createCell(cellNum++).setCellValue(ENTITY_NUM);
+		row.createCell(cellNum++).setCellValue(ENTITY_LABEL);
+		row.createCell(cellNum++).setCellValue(ENTITY_GROUP);
+
+		for (Flag flag : flags1) {
+			row.createCell(cellNum++).setCellValue(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
+		}
+		for (Flag flag : flags2) {
+			row.createCell(cellNum++).setCellValue(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
+		}
+
+		Iterator<Cell> ci = row.cellIterator();
+		while (ci.hasNext())
+			ci.next().setCellStyle(cs);
 	}
 
 	protected String getContext(JCas jcas, Mention mention, boolean backward) {
@@ -208,7 +269,6 @@ public class CSVWriter extends SingleFileWriter {
 			if (backward)
 				if (optionTrimWhitespace) {
 					return StringUtils.right(text.substring(0, mention.getBegin()).trim(), optionContextWidth);
-
 				} else {
 					return StringUtils.right(text, optionContextWidth);
 				}

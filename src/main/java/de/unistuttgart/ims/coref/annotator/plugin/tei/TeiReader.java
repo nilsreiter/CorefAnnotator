@@ -105,6 +105,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
+		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
+			jcas.setDocumentLanguage(getLanguage());
+
 		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 		// TODO: Remove <rs> elements
