@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -85,6 +86,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return ExtensionFilters.tei;
+	}
+
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return null;
 	}
 
 }

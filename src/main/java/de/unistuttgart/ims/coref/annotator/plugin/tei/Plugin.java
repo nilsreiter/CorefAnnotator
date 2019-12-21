@@ -203,4 +203,9 @@ public class Plugin implements ConfigurableImportPlugin, IOPlugin {
 		return lab;
 	}
 
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return null;
+	}
+
 }

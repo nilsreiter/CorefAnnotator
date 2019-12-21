@@ -281,4 +281,9 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				ContextUnit.CHARACTER.name()));
 	}
 
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return null;
+	}
+
 }

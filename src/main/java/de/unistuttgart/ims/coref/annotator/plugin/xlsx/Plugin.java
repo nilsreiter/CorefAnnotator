@@ -2,9 +2,11 @@ package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -273,6 +275,17 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 	public ContextUnit getOptionContextUnit() {
 		return ContextUnit.valueOf(
 				Annotator.app.getPreferences().get((Constants.PLUGIN_XLSX_CONTEXT_UNIT), ContextUnit.CHARACTER.name()));
+	}
+
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return f -> {
+			try {
+				Desktop.getDesktop().open(f);
+			} catch (IOException e) {
+				Annotator.logger.catching(e);
+			}
+		};
 	}
 
 }

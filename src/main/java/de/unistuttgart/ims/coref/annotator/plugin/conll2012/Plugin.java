@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugin.conll2012;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -107,6 +108,11 @@ public class Plugin implements IOPlugin {
 	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return new ExtensionFilter("CoNLL 2012", "*.conll");
+	}
+
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return null;
 	}
 
 }

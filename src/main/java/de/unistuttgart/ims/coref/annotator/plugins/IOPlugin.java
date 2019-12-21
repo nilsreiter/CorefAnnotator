@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -29,5 +30,7 @@ public interface IOPlugin extends Plugin {
 	String getSuffix();
 
 	String[] getSupportedLanguages();
+
+	Consumer<File> getPostExportAction();
 
 }
