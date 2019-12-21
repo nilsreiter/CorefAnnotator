@@ -14,14 +14,12 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -38,18 +36,14 @@ import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-/**
- * 
- * @author reiterns TODO: make configurable
- */
-public class Plugin implements IOPlugin, ConfigurableExportPlugin {
+public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableExportPlugin {
 
 	public static enum ContextUnit {
 		CHARACTER, TOKEN, LINE;
@@ -77,11 +71,6 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 	}
 
 	@Override
-	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
 	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
 		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
 	}
@@ -96,16 +85,6 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 				Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS,
 						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS)));
 		return b.createAggregateDescription();
-	}
-
-	@Override
-	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return null;
 	}
 
 	@Override
@@ -233,37 +212,21 @@ public class Plugin implements IOPlugin, ConfigurableExportPlugin {
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
-	protected JLabel getLabel(String text, String tooltip) {
-		JLabel lab = new JLabel(text);
-		lab.setToolTipText(tooltip);
-		return lab;
-	}
-
-	@Deprecated
-	private String getPrefKey(String key) {
-		return key;
-	}
-
 	public int getOptionContextWidth() {
-		return Annotator.app.getPreferences().getInt(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_WIDTH), 30);
+		return Annotator.app.getPreferences().getInt((Constants.PLUGIN_CSV_CONTEXT_WIDTH), 30);
 	}
 
 	public boolean isOptionTrimWhitespace() {
-		return Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_TRIM), true);
+		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_CSV_TRIM), true);
 	}
 
 	public boolean isOptionReplaceNewlines() {
-		return Annotator.app.getPreferences().getBoolean(getPrefKey(Constants.PLUGIN_CSV_REPLACE_NEWLINES), true);
+		return Annotator.app.getPreferences().getBoolean((Constants.PLUGIN_CSV_REPLACE_NEWLINES), true);
 	}
 
 	public ContextUnit getOptionContextUnit() {
-		return ContextUnit.valueOf(Annotator.app.getPreferences().get(getPrefKey(Constants.PLUGIN_CSV_CONTEXT_UNIT),
-				ContextUnit.CHARACTER.name()));
-	}
-
-	@Override
-	public Consumer<File> getPostExportAction() {
-		return null;
+		return ContextUnit.valueOf(
+				Annotator.app.getPreferences().get((Constants.PLUGIN_CSV_CONTEXT_UNIT), ContextUnit.CHARACTER.name()));
 	}
 
 }

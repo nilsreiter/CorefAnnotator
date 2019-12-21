@@ -29,6 +29,8 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
@@ -36,13 +38,14 @@ import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements ConfigurableImportPlugin, IOPlugin {
+public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin, IOPlugin {
 
 	String language = Constants.X_UNSPECIFIED;
 	String textRootSelector = null;
@@ -106,11 +109,6 @@ public class Plugin implements ConfigurableImportPlugin, IOPlugin {
 	@Override
 	public String getSuffix() {
 		return ".xml";
-	}
-
-	@Override
-	public String[] getSupportedLanguages() {
-		return null;
 	}
 
 	@Override
@@ -204,8 +202,8 @@ public class Plugin implements ConfigurableImportPlugin, IOPlugin {
 	}
 
 	@Override
-	public Consumer<File> getPostExportAction() {
-		return null;
+	public Ikon getIkon() {
+		return MaterialDesign.MDI_FILE_XML;
 	}
 
 }

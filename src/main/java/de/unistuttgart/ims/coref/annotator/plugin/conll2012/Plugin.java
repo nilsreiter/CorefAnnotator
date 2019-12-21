@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.conll2012;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -16,14 +15,14 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
@@ -74,11 +73,6 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return null;
-	}
-
-	@Override
 	public FileFilter getFileFilter() {
 		return new FileFilter() {
 
@@ -101,18 +95,8 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public String[] getSupportedLanguages() {
-		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
-	}
-
-	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return new ExtensionFilter("CoNLL 2012", "*.conll");
-	}
-
-	@Override
-	public Consumer<File> getPostExportAction() {
-		return null;
 	}
 
 }

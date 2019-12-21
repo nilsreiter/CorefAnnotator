@@ -1,7 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.plaintext;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -14,12 +13,12 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements IOPlugin {
 
 	@Override
 	public String getDescription() {
@@ -37,19 +36,9 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TextReader.class, TextReader.PARAM_SOURCE_LOCATION,
 				f.getAbsolutePath(), TextReader.ENCODING_AUTO, true);
-	}
-
-	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return null;
 	}
 
 	@Override
@@ -63,22 +52,8 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
 	public String getSuffix() {
 		return ".txt";
 	}
 
-	@Override
-	public String[] getSupportedLanguages() {
-		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
-	}
-
-	@Override
-	public Consumer<File> getPostExportAction() {
-		return null;
-	}
 }

@@ -16,7 +16,6 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -30,6 +29,8 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
@@ -44,7 +45,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * 
- * @author reiterns TODO: make configurable
+ * @author reiterns
  */
 public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin
 		implements IOPlugin, ConfigurableExportPlugin {
@@ -230,13 +231,6 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 	}
 
 	@Override
-	protected JLabel getLabel(String text, String tooltip) {
-		JLabel lab = new JLabel(text);
-		lab.setToolTipText(tooltip);
-		return lab;
-	}
-
-	@Override
 	public int getOptionContextWidth() {
 		return Annotator.app.getPreferences().getInt((Constants.PLUGIN_XLSX_CONTEXT_WIDTH), 30);
 	}
@@ -268,6 +262,11 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 				Annotator.logger.catching(e);
 			}
 		};
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return MaterialDesign.MDI_FILE_EXCEL;
 	}
 
 }
