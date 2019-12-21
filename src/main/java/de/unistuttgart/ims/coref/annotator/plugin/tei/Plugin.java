@@ -62,7 +62,8 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 	ResourceBundle resourceBundle;
 
 	public Plugin() {
-		resourceBundle = ResourceBundle.getBundle("plugins.tei.strings", Locale.getDefault());
+		// resourceBundle = ResourceBundle.getBundle("plugins.tei.strings",
+		// Locale.getDefault());
 	}
 
 	@Override
@@ -156,18 +157,15 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 							}
 						}));
 
-		JDialog dialog = new JDialog(parent,
-				resourceBundle.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_TITLE));
+		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.IMPORT_DIALOG_TITLE));
 
-		Action okAction = new AbstractAction(
-				resourceBundle.getString(de.unistuttgart.ims.coref.annotator.plugin.tei.Strings.IMPORT_DIALOG_OK)) {
+		Action okAction = new AbstractAction(Annotator.getString(Strings.IMPORT_DIALOG_OK)) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				for (PluginOption po : options) {
+				for (PluginOption po : options)
 					po.ok();
-				}
 
 				dialog.dispose();
 				callback.accept(Plugin.this);

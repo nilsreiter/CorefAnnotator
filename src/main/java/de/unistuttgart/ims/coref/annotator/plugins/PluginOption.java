@@ -106,7 +106,9 @@ public abstract class PluginOption {
 
 		@Override
 		public void ok() {
-			preferences.put(preferencesKey, (String) component.getSelectedItem());
+			Object o = component.getSelectedItem();
+			System.err.println(o);
+			preferences.put(preferencesKey, (String) o);
 		};
 
 	}
