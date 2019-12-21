@@ -41,6 +41,8 @@ public class ExportWorker extends SwingWorker<Object, Object> {
 	@Override
 	protected void done() {
 		consumer.accept(file, jcas);
+		if (plugin.getPostExportAction() != null)
+			plugin.getPostExportAction().accept(file);
 	}
 
 }

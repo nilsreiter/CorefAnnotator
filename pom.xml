@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.12.2</version>
+	<version>1.13.0</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
@@ -12,9 +12,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>1.9.0</version.dkpro>
 		<version.ikonli>2.1.1</version.ikonli>
+		<version.eclipse>9.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13</version.javafx>
+		<version.javafx>13.0.1</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -73,7 +74,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.2</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -100,6 +101,8 @@
 								<Build-Number>${project.version}</Build-Number>
 							</manifestEntries>
 						</transformer>
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 					</transformers>
 					<finalName>${project.name}-${project.version}-full</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
@@ -506,6 +509,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-fontawesome-pack</artifactId>
+			<version>${version.ikonli}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-swing</artifactId>
 			<version>${version.ikonli}</version>
 		</dependency>
@@ -544,12 +552,12 @@
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections-api</artifactId>
-			<version>9.2.0</version>
+			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections</artifactId>
-			<version>9.2.0</version>
+			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
@@ -586,23 +594,33 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.0.0</version>
+			<version>3.1.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-controls</artifactId>
-      		<version>${version.javafx}</version>
-    	</dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
 		<dependency>
-      		<groupId>org.openjfx</groupId>
-      		<artifactId>javafx-swing</artifactId>
-      		<version>${version.javafx}</version>
-    	</dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
 			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.1</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

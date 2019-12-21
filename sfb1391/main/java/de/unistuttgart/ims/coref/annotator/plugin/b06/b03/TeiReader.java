@@ -41,6 +41,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 	String documentId = null;
 
 	private static final String CHAPTER = "chapter";
+	private static final String STANZA = "stanza";
 	private static final String TYPE = "type";
 	private static final String N = "n";
 	private static final String RS = "rs";
@@ -147,6 +148,21 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			}
 		}
 
+		// create segment annotations for stanzas
+		for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+			if (ms.getMilestoneType() == null || !ms.getMilestoneType().equalsIgnoreCase(STANZA))
+				continue;
+			Milestone nextMS = getNextMilestone(ms, STANZA);
+			if (nextMS != null) {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMS.getBegin(), Segment.class);
+				seg.setLabel(ms.getN());
+			} else {
+				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), jcas.getDocumentText().length(),
+						Segment.class);
+				seg.setLabel(ms.getN());
+			}
+		}
+
 		// We skip this for now
 		// TODO: need a new way to display many small segments
 		if (false)
@@ -166,7 +182,6 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			if (ms != current && ms.getMilestoneType() != null && ms.getMilestoneType().equalsIgnoreCase(type))
 				return ms;
 		}
-
 		return null;
 
 	}

@@ -18,7 +18,7 @@ import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public abstract class AbstractXmiPlugin implements IOPlugin {
+public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements IOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
@@ -56,4 +56,5 @@ public abstract class AbstractXmiPlugin implements IOPlugin {
 	public String[] getSupportedLanguages() {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
+
 }

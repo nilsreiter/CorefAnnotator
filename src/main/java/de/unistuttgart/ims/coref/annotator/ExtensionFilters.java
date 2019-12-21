@@ -9,5 +9,6 @@ public class ExtensionFilters {
 	static public ExtensionFilter txt = new ExtensionFilter("Plain text", "*.txt");
 	static public ExtensionFilter tei = new ExtensionFilter("TEI", "*.xml", "*.tei");
 	static public ExtensionFilter json = new ExtensionFilter("JSON", "*.json");
+	static public ExtensionFilter csv = new ExtensionFilter("CSV", "*.csv");
 
 }

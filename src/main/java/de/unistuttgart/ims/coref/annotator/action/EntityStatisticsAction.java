@@ -1,55 +1,27 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CSVWriter;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Constants;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Defaults;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
-
-	private static final String ENTITY_GROUP = "entityGroup";
-	private static final String ENTITY_LABEL = "entityLabel";
-	private static final String ENTITY_NUM = "entityNum";
-	private static final String SURFACE = "surface";
-	private static final String END = "end";
-	private static final String BEGIN = "begin";
-	private static final String CONTEXT_LEFT = "leftContext";
-	private static final String CONTEXT_RIGHT = "rightContext";
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,75 +36,12 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 	protected void optionDialog(Consumer<EntityStatisticsAction> callback) {
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(optionContextWidth, 0, 500, 25));
-		JCheckBox trimWhitespace = new JCheckBox();
-		JCheckBox replaceNewlineCharacters = new JCheckBox();
-		trimWhitespace.setSelected(optionTrimWhitespace);
+		Plugin csvPlugin = Annotator.app.getPluginManager().getPlugin(Plugin.class);
 
-		JDialog dialog = new JDialog(getTarget(), Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
+		csvPlugin.showExportConfigurationDialog(getTarget(), getTarget().getDocumentModel(), p -> {
+			callback.accept(EntityStatisticsAction.this);
+		});
 
-		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
-		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.context_width"),
-				Annotator.getString("dialog.export_options.context_width.tooltip")));
-		optionPanel.add(spinner);
-
-		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.trim_whitespace"),
-				Annotator.getString("dialog.export_options.trim_whitespace.tooltip")));
-		optionPanel.add(trimWhitespace);
-
-		optionPanel.add(getLabel(Annotator.getString("dialog.export_options.replace_newline"),
-				Annotator.getString("dialog.export_options.replace_newline.tooltip")));
-		optionPanel.add(replaceNewlineCharacters);
-
-		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-		Action okAction = new AbstractAction(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_OK)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				optionContextWidth = ((SpinnerNumberModel) spinner.getModel()).getNumber().intValue();
-				optionTrimWhitespace = trimWhitespace.isSelected();
-				optionReplaceNewlines = replaceNewlineCharacters.isSelected();
-				dialog.dispose();
-				callback.accept(EntityStatisticsAction.this);
-			}
-		};
-
-		Action cancelAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.DIALOG_CANCEL)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.dispose();
-			}
-		};
-
-		Action helpAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.MENU_HELP)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				HelpWindow.show("Input/Output");
-			}
-		};
-
-		JButton okButton = new JButton(okAction);
-
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(okButton);
-		buttonPanel.add(new JButton(cancelAction));
-		buttonPanel.add(new JButton(helpAction));
-
-		dialog.getContentPane().add(optionPanel, BorderLayout.CENTER);
-		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-		dialog.pack();
-		dialog.setLocationRelativeTo(getTarget());
-		dialog.setVisible(true);
-		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
 	protected void saveDialog() {
@@ -151,90 +60,27 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 				@Override
 				protected Object doInBackground() throws Exception {
+
 					getDocumentWindow().setMessage(Annotator.getString(Strings.ENTITY_STATISTICS_STATUS));
 					getDocumentWindow().setIndeterminateProgress();
-					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
-					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
-					ImmutableList<Flag> entityFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
-					String text = getDocumentWindow().getDocumentModel().getJcas().getDocumentText();
-
-					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
-						// this is the header row
-						p.print(BEGIN);
-						p.print(END);
-						if (optionContextWidth > 0) {
-							p.print(CONTEXT_LEFT);
-						}
-						p.print(SURFACE);
-						if (optionContextWidth > 0) {
-							p.print(CONTEXT_RIGHT);
-						}
-						p.print(ENTITY_NUM);
-						p.print(ENTITY_LABEL);
-						p.print(ENTITY_GROUP);
-						for (Flag flag : entityFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						for (Flag flag : mentionFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						p.println();
-						int entityNum = 0;
-						for (Entity entity : getDocumentWindow().getSelectedEntities()) {
-							for (Mention mention : getDocumentWindow().getDocumentModel().getCoreferenceModel()
-									.get(entity)) {
-								String surface = mention.getCoveredText();
-								if (mention.getDiscontinuous() != null)
-									surface += " " + mention.getDiscontinuous().getCoveredText();
-								if (optionReplaceNewlines)
-									surface = surface.replaceAll("[\n\r\f]", "");
-								p.print(mention.getBegin());
-								p.print(mention.getEnd());
-								if (optionContextWidth > 0) {
-									String contextString;
-									if (optionTrimWhitespace) {
-										contextString = StringUtils.right(text.substring(0, mention.getBegin()).trim(),
-												optionContextWidth);
-
-									} else {
-										contextString = StringUtils.right(text, optionContextWidth);
-									}
-									if (optionReplaceNewlines)
-										contextString = contextString.replaceAll("[\n\r\f]", " ");
-									p.print(contextString);
-								}
-								p.print((optionTrimWhitespace ? surface.trim() : surface));
-								if (optionContextWidth > 0) {
-									String contextString;
-									if (optionTrimWhitespace) {
-										contextString = StringUtils.left(text.substring(mention.getEnd()).trim(),
-												optionContextWidth);
-									} else {
-										contextString = StringUtils.left(text, optionContextWidth);
-									}
-									if (optionReplaceNewlines)
-										contextString = contextString.replaceAll("[\n\r\f]", " ");
-									p.print(contextString);
-								}
-								p.print(entityNum);
-								p.print(entity.getLabel());
-								p.print((entity instanceof EntityGroup));
-								for (Flag flag : entityFlags) {
-									p.print(Util.isX(entity, flag.getKey()));
-								}
-								for (Flag flag : mentionFlags) {
-									p.print(Util.isX(mention, flag.getKey()));
-								}
-								p.println();
-							}
-							entityNum++;
-						}
-					} catch (IOException e1) {
-						Annotator.logger.catching(e1);
+					CSVWriter csvWriter = new CSVWriter();
+					csvWriter.setEntities(getDocumentWindow().getSelectedEntities());
+					csvWriter.setOptionContextWidth(Annotator.app.getPreferences()
+							.getInt(Constants.PLUGIN_CSV_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH));
+					csvWriter.setOptionReplaceNewlines(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES, Defaults.CFG_OPTION_REPLACE_NEWLINES));
+					csvWriter.setOptionTrimWhitespace(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
+					csvWriter.setOptionContextUnit(ContextUnit.valueOf(Annotator.app.getPreferences()
+							.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
+					csvWriter.setOptionIncludeLineNumbers(Annotator.app.getPreferences().getBoolean(
+							Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS));
+					csvWriter.configure();
+					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
+						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
 					}
+
 					return null;
 				}
 

@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.BorderFactory;
@@ -26,11 +27,11 @@ import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
-public abstract class AbstractWindow extends JFrame {
+public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	JPanel statusBar = new JPanel();
-	JProgressBar progressBar = new JProgressBar();
+	protected JProgressBar progressBar = new JProgressBar();
 	JLabel messageLabel = new JLabel();
 	JLabel miscLabel = new JLabel();
 	JLabel miscLabel2 = new JLabel();
@@ -39,6 +40,10 @@ public abstract class AbstractWindow extends JFrame {
 	JMenuBar menuBar = new JMenuBar();
 
 	JMenu menu_settings = null;
+
+	public AbstractWindow() {
+		Annotator.app.getPreferences().addPreferenceChangeListener(this);
+	}
 
 	protected void initializeWindow() {
 		SpringLayout springs = new SpringLayout();
@@ -178,6 +183,8 @@ public abstract class AbstractWindow extends JFrame {
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TEXT_LABELS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_LINE_NUMBER_IN_TREE)));
 		menu_settings.add(
 				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
 		menu_settings.add(new JCheckBoxMenuItem(
@@ -193,7 +200,19 @@ public abstract class AbstractWindow extends JFrame {
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_UNDERLINE_SINGLETONS_IN_GRAY)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TOC)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_CREATE_DEFAULT_FLAGS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_COMPARE_BY_ENTITY_NAME)));
+
 		return menu_settings;
 
 	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+	};
+
 }

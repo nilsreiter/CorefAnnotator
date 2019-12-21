@@ -3,6 +3,33 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.13.0
+
+- CSV export has been improved in multiple ways
+  - Can now be done for the entire file
+  - It's possible so specify lines as context #261
+  - Line numbers can be included in the export #268
+- Line numbers in which mentions appear can now be shown 
+  in the tree #266
+- Segment annotations (e.g., stanzas or chapters) can now be 
+  displayed as a table of contents on the left of the text. 
+  The TOC is fully interactive and can be used to navigate in 
+  long texts i#263
+- Compare view now supports comparing the actual entity assignment.
+  This behavior can be enabled via the settings menu is only 
+  available if both files are loaded with the same profile, which 
+  also means they have to be in the same directory.
+  #272 #267
+- Opening multiple files at once is now much faster by using
+  the default dialog for opening files #275
+- Opening or importing a new document should no longer auto-
+  create the coreference-related flags ambiguous, difficult and 
+  Nonnominal. #277
+- If line numbers are displayed in the tree, and a segmentation 
+  exist, the segments are also displayed in the tree. #279
+- Added a new exporter that directly exports into MS Excel and 
+  is more configurable. #285
+
 ## 1.12.2
 
 - Fixed the bug that the compare view hid some annotations if 

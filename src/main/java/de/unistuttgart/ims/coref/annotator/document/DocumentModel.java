@@ -9,6 +9,7 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -173,6 +174,10 @@ public class DocumentModel implements Model {
 
 	public Integer getLineNumber(Span range) {
 		return lineNumberModel.getLineNumber(range);
+	}
+
+	public Integer getLineNumber(int position) {
+		return lineNumberModel.getLineNumber(position);
 	}
 
 	public Preferences getPreferences() {
@@ -378,6 +383,16 @@ public class DocumentModel implements Model {
 
 		public Integer getLineNumber(Span range) {
 			List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
+			if (lineList.size() != 1)
+				return null;
+			Line line = lineList.get(0);
+			if (line.getNumber() < 0)
+				return null;
+			return line.getNumber();
+		}
+
+		public Integer getLineNumber(int position) {
+			List<Line> lineList = JCasUtil.selectPreceding(Line.class, new Annotation(jcas, position, position), 1);
 			if (lineList.size() != 1)
 				return null;
 			Line line = lineList.get(0);
