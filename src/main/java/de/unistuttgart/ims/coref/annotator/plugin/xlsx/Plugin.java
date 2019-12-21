@@ -160,7 +160,10 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 						"dialog.export_options.include_line_numbers.tooltip"),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_SEPARATE_ENTITIES,
 						Defaults.CFG_OPTION_SEPARATE_ENTITIES, "dialog.export_options.separate_entities",
-						"dialog.export_options.separate_entities.tooltip"));
+						"dialog.export_options.separate_entities.tooltip"),
+				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_AUTO_OPEN,
+						Defaults.CFG_OPTION_AUTO_OPEN, "dialog.export_options.auto_open",
+						"dialog.export_options.auto_open.tooltip"));
 
 		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
 
@@ -254,7 +257,9 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 	public Consumer<File> getPostExportAction() {
 		return f -> {
 			try {
-				Desktop.getDesktop().open(f);
+				if (Annotator.app.getPreferences().getBoolean(Constants.PLUGIN_XLSX_AUTO_OPEN,
+						Defaults.CFG_OPTION_AUTO_OPEN))
+					Desktop.getDesktop().open(f);
 			} catch (IOException e) {
 				Annotator.logger.catching(e);
 			}
