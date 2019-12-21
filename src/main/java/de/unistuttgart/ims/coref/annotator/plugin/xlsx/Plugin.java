@@ -31,6 +31,8 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import com.ibm.icu.text.MessageFormat;
+
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
@@ -49,6 +51,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin
 		implements IOPlugin, ConfigurableExportPlugin {
 
+	public static final String XLSX = "xlsx";
+
 	@Override
 	public String getDescription() {
 		return "Export mentions in an Excel file";
@@ -56,7 +60,7 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 
 	@Override
 	public String getName() {
-		return "Microsoft Excel";
+		return Annotator.getString(Strings.NAME_MS_EXCEL);
 	}
 
 	@Override
@@ -100,12 +104,12 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 
 			@Override
 			public boolean accept(File f) {
-				return f.getName().endsWith(".xlsx");
+				return f.getName().endsWith("." + XLSX);
 			}
 
 			@Override
 			public String getDescription() {
-				return "Microsoft Excel";
+				return Annotator.getString(Strings.NAME_MS_EXCEL);
 			}
 
 		};
@@ -113,7 +117,7 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 
 	@Override
 	public String getSuffix() {
-		return ".xlsx";
+		return "." + XLSX;
 	}
 
 	@Override
@@ -123,20 +127,22 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return new ExtensionFilter("Microsoft Excel", "xlsx");
+		return new ExtensionFilter(Annotator.getString(Strings.NAME_MS_EXCEL), XLSX);
 	}
 
 	@Override
 	public void showExportConfigurationDialog(JFrame parent, DocumentModel documentModel,
 			Consumer<ConfigurableExportPlugin> callback) {
 
-		ImmutableList<PluginOption> options = Lists.immutable.of(new PluginOption.IntegerPluginOption(
-				Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH,
-				"dialog.export_options.context_width", "dialog.export_options.context_width.tooltip", 0, 500, 25),
+		ImmutableList<PluginOption> options = Lists.immutable.of(
+				new PluginOption.IntegerPluginOption(Annotator.app.getPreferences(),
+						Constants.PLUGIN_XLSX_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH_TOOLTIP, 0, 500, 25),
 				(PluginOption) new PluginOption.EnumPluginOption<ContextUnit>(ContextUnit.class,
 						Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_CONTEXT_UNIT,
-						Defaults.CFG_OPTION_CONTEXT_UNIT, "dialog.export_options.context_unit",
-						"dialog.export_options.context_unit.tooltip", Lists.immutable.of(ContextUnit.values())
+						Defaults.CFG_OPTION_CONTEXT_UNIT, Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT,
+						Strings.DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT_TOOLTIP, Lists.immutable.of(ContextUnit.values())
 								.select(cu -> cu.isPossible(documentModel.getJcas())).toArray(new ContextUnit[] {}),
 						new DefaultListCellRenderer() {
 							private static final long serialVersionUID = 1L;
@@ -150,22 +156,23 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 							}
 						}),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_TRIM,
-						Defaults.CFG_OPTION_TRIM, "dialog.export_options.trim_whitespace",
-						"dialog.export_options.trim_whitespace.tooltip"),
+						Defaults.CFG_OPTION_TRIM, Strings.ACTION_TOGGLE_TRIM_WHITESPACE,
+						Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_REPLACE_NEWLINES,
-						Defaults.CFG_OPTION_REPLACE_NEWLINES, "dialog.export_options.replace_newline",
-						"dialog.export_options.replace_newline.tooltip"),
+						Defaults.CFG_OPTION_REPLACE_NEWLINES, Strings.DIALOG_EXPORT_OPTIONS_REPLACE_NEWLINE,
+						Strings.DIALOG_EXPORT_OPTIONS_REPLACE_NEWLINE_TOOLTIP),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_INCLUDE_LINE_NUMBERS,
-						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS, "dialog.export_options.include_line_numbers",
-						"dialog.export_options.include_line_numbers.tooltip"),
+						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS, Strings.DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS,
+						Strings.DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS_TOOLTIP),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_SEPARATE_ENTITIES,
-						Defaults.CFG_OPTION_SEPARATE_ENTITIES, "dialog.export_options.separate_entities",
-						"dialog.export_options.separate_entities.tooltip"),
+						Defaults.CFG_OPTION_SEPARATE_ENTITIES, Strings.DIALOG_EXPORT_OPTIONS_SEPARATE_ENTITIES,
+						Strings.DIALOG_EXPORT_OPTIONS_SEPARATE_ENTITIES_TOOLTIP),
 				new BooleanPluginOption(Annotator.app.getPreferences(), Constants.PLUGIN_XLSX_AUTO_OPEN,
-						Defaults.CFG_OPTION_AUTO_OPEN, "dialog.export_options.auto_open",
-						"dialog.export_options.auto_open.tooltip"));
+						Defaults.CFG_OPTION_AUTO_OPEN, Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN,
+						Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN_TOOLTIP));
 
-		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
+		JDialog dialog = new JDialog(parent,
+				MessageFormat.format(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_), getName()));
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
 
