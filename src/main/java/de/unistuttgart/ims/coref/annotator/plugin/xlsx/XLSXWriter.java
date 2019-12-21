@@ -2,11 +2,13 @@ package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -199,10 +201,21 @@ public class XLSXWriter extends SingleFileStream {
 	}
 
 	protected void printHeader(Sheet sheet, Iterable<Flag> flags1, Iterable<Flag> flags2) {
+		Font ft = sheet.getWorkbook().createFont();
+		ft.setBold(true);
+		CellStyle cs = sheet.getWorkbook().createCellStyle();
+		cs.setFont(ft);
+
 		int cellNum = 0;
 		Row row = sheet.createRow(0);
-		row.createCell(cellNum++).setCellValue(BEGIN);
-		row.createCell(cellNum++).setCellValue(END);
+		Cell cell;
+
+		cell = row.createCell(cellNum++);
+		cell.setCellValue(BEGIN);
+
+		cell = row.createCell(cellNum++);
+		cell.setCellValue(END);
+
 		if (optionIncludeLineNumbers) {
 			row.createCell(cellNum++).setCellValue(BEGIN_LINE);
 			row.createCell(cellNum++).setCellValue(END_LINE);
@@ -224,6 +237,10 @@ public class XLSXWriter extends SingleFileStream {
 		for (Flag flag : flags2) {
 			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
 		}
+
+		Iterator<Cell> ci = row.cellIterator();
+		while (ci.hasNext())
+			ci.next().setCellStyle(cs);
 	}
 
 	protected String getContext(JCas jcas, Mention mention, boolean backward) {
