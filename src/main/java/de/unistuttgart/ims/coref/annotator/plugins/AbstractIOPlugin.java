@@ -5,30 +5,15 @@ import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.Annotator;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public abstract class AbstractIOPlugin implements IOPlugin {
-	private static final String DESCRIPTION = "/description.txt";
-	private static final String UTF8 = "UTF-8";
-
-	@Override
-	public String getDescription() {
-		try {
-			return IOUtils.toString(getClass().getResourceAsStream(DESCRIPTION), UTF8);
-		} catch (Exception e) {
-			Annotator.logger.catching(e);
-		}
-		return StringUtils.EMPTY;
-	}
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {

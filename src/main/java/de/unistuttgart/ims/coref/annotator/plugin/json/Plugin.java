@@ -9,8 +9,6 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
@@ -77,11 +75,6 @@ public class Plugin extends AbstractIOPlugin implements IOPlugin {
 	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return ExtensionFilters.json;
-	}
-
-	@Override
-	public Ikon getIkon() {
-		return MaterialDesign.MDI_JSON;
 	}
 
 }
