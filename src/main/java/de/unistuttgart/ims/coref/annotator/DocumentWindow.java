@@ -1144,7 +1144,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			if (color != null)
 				l.setForeground(color);
 			if (showText)
-				l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+				l.setText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
 			panel.add(Box.createRigidArea(new Dimension(5, 5)));
 			panel.add(l);

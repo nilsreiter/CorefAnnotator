@@ -232,10 +232,10 @@ public class XLSXWriter extends SingleFileStream {
 		row.createCell(cellNum++).setCellValue(ENTITY_GROUP);
 
 		for (Flag flag : flags1) {
-			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			row.createCell(cellNum++).setCellValue(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 		}
 		for (Flag flag : flags2) {
-			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			row.createCell(cellNum++).setCellValue(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 		}
 
 		Iterator<Cell> ci = row.cellIterator();

@@ -43,6 +43,8 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import com.ibm.icu.text.MessageFormat;
+
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
@@ -376,9 +378,9 @@ public class Annotator {
 				"Open files using " + flavor.getName() + " scheme");
 	}
 
-	public static String getString(String key) {
+	public static String getString(String key, Object... parameters) {
 		try {
-			return getString(key, Locale.getDefault());
+			return getString(key, Locale.getDefault(), parameters);
 		} catch (java.util.MissingResourceException e) {
 			logger.catching(e);
 			return key;
@@ -391,7 +393,17 @@ public class Annotator {
 		return rbundle.getString(key);
 	}
 
-	public static String getString(String key, String defaultValue) {
+	public static String getString(String key, Locale locale, Object... parameters) {
+		if (rbundle == null)
+			rbundle = ResourceBundle.getBundle("locales/strings", locale);
+		if (parameters.length > 0) {
+			String s = rbundle.getString(key);
+			return MessageFormat.format(s, parameters);
+		}
+		return rbundle.getString(key);
+	}
+
+	public static String getStringWithDefault(String key, String defaultValue) {
 		try {
 			return getString(key, Locale.getDefault());
 		} catch (java.util.MissingResourceException e) {

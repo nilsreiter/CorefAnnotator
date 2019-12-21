@@ -66,7 +66,7 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener, Cor
 		if (color != null)
 			l.setForeground(color);
 		if (isShowText())
-			l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			l.setText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 		l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
 		panel.add(Box.createRigidArea(new Dimension(5, 5)));
 		panel.add(l);

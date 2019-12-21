@@ -31,8 +31,6 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import com.ibm.icu.text.MessageFormat;
-
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
@@ -171,8 +169,7 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 						Defaults.CFG_OPTION_AUTO_OPEN, Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN,
 						Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN_TOOLTIP));
 
-		JDialog dialog = new JDialog(parent,
-				MessageFormat.format(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_), getName()));
+		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_, getName()));
 
 		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
 

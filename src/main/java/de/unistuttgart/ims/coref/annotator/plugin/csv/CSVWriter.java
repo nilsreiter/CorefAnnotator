@@ -114,10 +114,10 @@ public class CSVWriter extends SingleFileWriter {
 			p.print(ENTITY_LABEL);
 			p.print(ENTITY_GROUP);
 			for (Flag flag : entityFlags) {
-				p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
+				p.print(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 			}
 			for (Flag flag : mentionFlags) {
-				p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
+				p.print(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 			}
 			p.println();
 			int entityNum = 0;
