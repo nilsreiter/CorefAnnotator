@@ -58,6 +58,7 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 	@Deprecated
 	String textRootSelector = null;
 
+	@Deprecated
 	ResourceBundle resourceBundle;
 
 	public Plugin() {
