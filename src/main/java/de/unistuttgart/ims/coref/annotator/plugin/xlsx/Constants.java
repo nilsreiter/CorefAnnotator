@@ -6,6 +6,7 @@ public class Constants {
 	public static final String PLUGIN_XLSX_TRIM = "PLUGIN_XLSX_TRIM";
 	public static final String PLUGIN_XLSX_REPLACE_NEWLINES = "PLUGIN_XLSX_REPLACE_NEWLINES";
 	public static final String PLUGIN_XLSX_INCLUDE_LINE_NUMBERS = "PLUGIN_XLSX_INCLUDE_LINE_NUMBERS";
+	public static final String PLUGIN_XLSX_SEPARATE_ENTITIES = "PLUGIN_XLSX_SEPARATE_ENTITIES";
 
 	@Deprecated
 	public static String full(String s) {

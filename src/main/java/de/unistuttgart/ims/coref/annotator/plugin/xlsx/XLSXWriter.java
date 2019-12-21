@@ -5,9 +5,12 @@ import java.io.OutputStream;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
@@ -25,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.plugin.xlsx.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileStream;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
@@ -61,6 +64,10 @@ public class XLSXWriter extends SingleFileStream {
 	public static final String PARAM_INCLUDE_LINE_NUMBERS = "PARAM_INCLUDE_LINE_NUMBERS";
 	@ConfigurationParameter(name = PARAM_INCLUDE_LINE_NUMBERS, defaultValue = "false")
 	boolean optionIncludeLineNumbers = false;
+
+	public static final String PARAM_SEPARATE_SHEETS_FOR_ENTITIES = "PARAM_SEPARATE_SHEETS_FOR_ENTITIES";
+	@ConfigurationParameter(name = PARAM_SEPARATE_SHEETS_FOR_ENTITIES, defaultValue = "false")
+	boolean optionSeparateSheetsForEntities = false;
 
 	Iterable<Entity> entities = null;
 	String replacementForNewlines = " ";
@@ -99,43 +106,31 @@ public class XLSXWriter extends SingleFileStream {
 
 		@SuppressWarnings("resource")
 		Workbook wb = new XSSFWorkbook();
-		Sheet sheet = wb.createSheet("Export");
+		CellStyle cs = wb.createCellStyle();
+		cs.setWrapText(true);
 
-		int rowNum = 0;
-		Row row = sheet.createRow(rowNum++);
+		Sheet sheet = null;
 
-		int cellNum = 1;
-		row.createCell(cellNum++).setCellValue(BEGIN);
-		row.createCell(cellNum++).setCellValue(END);
-
-		// this is the header row
-		if (optionIncludeLineNumbers) {
-			row.createCell(cellNum++).setCellValue(BEGIN_LINE);
-			row.createCell(cellNum++).setCellValue(END_LINE);
-		}
-		if (optionContextWidth > 0) {
-			row.createCell(cellNum++).setCellValue(CONTEXT_LEFT);
-		}
-		row.createCell(cellNum++).setCellValue(SURFACE);
-		if (optionContextWidth > 0) {
-			row.createCell(cellNum++).setCellValue(CONTEXT_RIGHT);
-		}
-		row.createCell(cellNum++).setCellValue(ENTITY_NUM);
-		row.createCell(cellNum++).setCellValue(ENTITY_LABEL);
-		row.createCell(cellNum++).setCellValue(ENTITY_GROUP);
-
-		for (Flag flag : entityFlags) {
-			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
-		}
-		for (Flag flag : mentionFlags) {
-			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
+		int cellNum = 0;
+		if (!optionSeparateSheetsForEntities) {
+			sheet = wb.createSheet("Export");
+			printHeader(sheet, entityFlags, mentionFlags);
 		}
 
+		int rowNum = 1;
+		Cell cell;
+		Row row;
 		int entityNum = 0;
+		int surfaceColumn = Integer.MIN_VALUE;
 		for (Entity entity : entities) {
+			if (optionSeparateSheetsForEntities) {
+				sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(entity.getLabel()));
+				printHeader(sheet, entityFlags, mentionFlags);
+				rowNum = 1;
+			}
 			for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
 				row = sheet.createRow(rowNum++);
-				cellNum = 1;
+				cellNum = 0;
 				String surface = mention.getCoveredText();
 				if (mention.getDiscontinuous() != null)
 					surface += " " + mention.getDiscontinuous().getCoveredText();
@@ -163,18 +158,23 @@ public class XLSXWriter extends SingleFileStream {
 						String contextString = getContext(jcas, mention, true);
 						if (optionReplaceNewlines)
 							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-						row.createCell(cellNum++).setCellValue(contextString);
+						cell = row.createCell(cellNum++);
+						cell.setCellValue(contextString);
+						cell.setCellStyle(cs);
 					} catch (NoSuchElementException e) {
 						row.createCell(cellNum++).setCellValue("");
 					}
 				}
+				surfaceColumn = cellNum;
 				row.createCell(cellNum++).setCellValue((optionTrimWhitespace ? surface.trim() : surface));
 				if (optionContextWidth > 0) {
 					try {
 						String contextString = getContext(jcas, mention, false);
 						if (optionReplaceNewlines)
 							contextString = contextString.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-						row.createCell(cellNum++).setCellValue(contextString);
+						cell = row.createCell(cellNum++);
+						cell.setCellValue(contextString);
+						cell.setCellStyle(cs);
 					} catch (NoSuchElementException e) {
 						row.createCell(cellNum++).setCellValue("");
 					}
@@ -190,8 +190,40 @@ public class XLSXWriter extends SingleFileStream {
 				}
 			}
 			entityNum++;
+			sheet.setColumnWidth(surfaceColumn - 1, 40 * 256);
+			sheet.setColumnWidth(surfaceColumn, 40 * 256);
+			sheet.setColumnWidth(surfaceColumn + 1, 40 * 256);
+			sheet.createFreezePane(0, 1, 0, 1);
 		}
 		wb.write(os);
+	}
+
+	protected void printHeader(Sheet sheet, Iterable<Flag> flags1, Iterable<Flag> flags2) {
+		int cellNum = 0;
+		Row row = sheet.createRow(0);
+		row.createCell(cellNum++).setCellValue(BEGIN);
+		row.createCell(cellNum++).setCellValue(END);
+		if (optionIncludeLineNumbers) {
+			row.createCell(cellNum++).setCellValue(BEGIN_LINE);
+			row.createCell(cellNum++).setCellValue(END_LINE);
+		}
+		if (optionContextWidth > 0) {
+			row.createCell(cellNum++).setCellValue(CONTEXT_LEFT);
+		}
+		row.createCell(cellNum++).setCellValue(SURFACE);
+		if (optionContextWidth > 0) {
+			row.createCell(cellNum++).setCellValue(CONTEXT_RIGHT);
+		}
+		row.createCell(cellNum++).setCellValue(ENTITY_NUM);
+		row.createCell(cellNum++).setCellValue(ENTITY_LABEL);
+		row.createCell(cellNum++).setCellValue(ENTITY_GROUP);
+
+		for (Flag flag : flags1) {
+			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
+		}
+		for (Flag flag : flags2) {
+			row.createCell(cellNum++).setCellValue(Annotator.getString(flag.getLabel(), flag.getLabel()));
+		}
 	}
 
 	protected String getContext(JCas jcas, Mention mention, boolean backward) {

@@ -8,5 +8,6 @@ public class Defaults {
 	public static final boolean CFG_OPTION_TRIM = true;
 	public static final boolean CFG_OPTION_REPLACE_NEWLINES = false;
 	public static final boolean CFG_OPTION_INCLUDE_LINE_NUMBERS = false;
+	public static final boolean CFG_OPTION_SEPARATE_ENTITIES = true;
 
 }
