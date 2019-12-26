@@ -128,6 +128,7 @@ import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowDocumentStatistics;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
@@ -532,6 +533,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		toolsMenu.add(new RenameAllEntitiesAction(this));
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.add(new ShowFlagEditor(this));
+		toolsMenu.add(new ShowDocumentStatistics(this));
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(Annotator.app));

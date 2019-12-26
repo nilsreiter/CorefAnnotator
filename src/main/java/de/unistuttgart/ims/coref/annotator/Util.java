@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.Locale;
 
 import javax.swing.tree.TreeModel;
@@ -290,6 +291,14 @@ public class Util {
 	public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
 		int x = Constants.RANDOM.nextInt(clazz.getEnumConstants().length);
 		return clazz.getEnumConstants()[x];
+	}
+
+	public static String format(String formatString, Object... objects) {
+		StringBuilder b = new StringBuilder();
+		try (Formatter formatter = new Formatter(b)) {
+			formatter.format(Locale.getDefault(), formatString, objects);
+			return b.toString();
+		}
 	}
 
 }
