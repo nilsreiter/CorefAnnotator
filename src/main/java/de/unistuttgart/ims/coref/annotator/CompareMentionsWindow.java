@@ -75,7 +75,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
@@ -620,9 +620,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		JMenu fileImportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_IMPORT_FROM));
 
 		PluginManager pm = mainApplication.getPluginManager();
-		for (Class<? extends IOPlugin> pluginClass : pm.getIOPlugins()) {
+		for (Class<? extends UimaIOPlugin> pluginClass : pm.getIOPlugins()) {
 			try {
-				IOPlugin plugin = pm.getIOPlugin(pluginClass);
+				UimaIOPlugin plugin = pm.getIOPlugin(pluginClass);
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
 			} catch (ResourceInitializationException e) {

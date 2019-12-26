@@ -16,13 +16,13 @@ import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.CoNLL2012Reader;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
 
 	@Override
 	public String getDescription() {

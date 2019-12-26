@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.coref.annotator.uima.Fix131;
 import de.unistuttgart.ims.uimautil.SetJCasLanguage;
@@ -34,13 +34,13 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
-	IOPlugin flavor;
+	UimaIOPlugin flavor;
 	File file = null;
 	String language = null;
 	Consumer<JCas> success = null;
 	Consumer<Exception> failConsumer = null;
 
-	public JCasLoader(File file, IOPlugin flavor, String language, Consumer<JCas> consumer,
+	public JCasLoader(File file, UimaIOPlugin flavor, String language, Consumer<JCas> consumer,
 			Consumer<Exception> failConsumer) {
 		this.success = consumer;
 		this.failConsumer = failConsumer;

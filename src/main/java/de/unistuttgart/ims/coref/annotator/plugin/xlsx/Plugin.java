@@ -37,7 +37,7 @@ import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
@@ -48,7 +48,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
  * @author reiterns
  */
 public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin
-		implements IOPlugin, ConfigurableExportPlugin {
+		implements UimaIOPlugin, ConfigurableExportPlugin {
 
 	public static final String XLSX = "xlsx";
 

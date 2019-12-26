@@ -18,7 +18,7 @@ import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements IOPlugin {
+public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements UimaIOPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {

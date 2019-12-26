@@ -180,7 +180,7 @@ import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Parser;
@@ -545,9 +545,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		JMenu fileExportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_EXPORT_AS));
 
 		PluginManager pm = Annotator.app.getPluginManager();
-		for (Class<? extends IOPlugin> pluginClass : pm.getIOPlugins()) {
+		for (Class<? extends UimaIOPlugin> pluginClass : pm.getIOPlugins()) {
 			try {
-				IOPlugin plugin = pm.getIOPlugin(pluginClass);
+				UimaIOPlugin plugin = pm.getIOPlugin(pluginClass);
 				if (plugin.getImporter() != null)
 					fileImportMenu.add(new FileImportAction(Annotator.app, plugin));
 				if (plugin.getExporter() != null)
@@ -648,7 +648,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.app.close(this);
 	}
 
-	public void loadFile(File file, IOPlugin flavor, String language) {
+	public void loadFile(File file, UimaIOPlugin flavor, String language) {
 		if (flavor instanceof DefaultIOPlugin)
 			this.file = file;
 

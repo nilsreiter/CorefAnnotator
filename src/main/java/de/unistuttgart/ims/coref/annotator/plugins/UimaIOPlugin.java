@@ -12,7 +12,7 @@ import org.kordamp.ikonli.Ikon;
 
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public interface IOPlugin extends Plugin {
+public interface UimaIOPlugin extends Plugin {
 
 	AnalysisEngineDescription getImporter() throws ResourceInitializationException;
 

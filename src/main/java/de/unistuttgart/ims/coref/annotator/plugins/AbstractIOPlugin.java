@@ -13,7 +13,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public abstract class AbstractIOPlugin implements IOPlugin {
+public abstract class AbstractIOPlugin implements UimaIOPlugin {
 
 	@Override
 	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {

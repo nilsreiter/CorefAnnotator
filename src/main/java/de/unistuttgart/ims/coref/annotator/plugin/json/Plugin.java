@@ -13,10 +13,10 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
 
 	@Override
 	public String getDescription() {

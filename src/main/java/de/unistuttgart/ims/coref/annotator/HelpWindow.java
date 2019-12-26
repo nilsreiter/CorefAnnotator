@@ -25,7 +25,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.io.IOUtils;
 
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 
 public class HelpWindow extends JFrame {
 
@@ -127,8 +127,8 @@ public class HelpWindow extends JFrame {
 			b.append("<body style=\"font-family:sans-serif;font-size:12pt;\"><h1>Input/Output</h1>");
 		}
 
-		for (Class<? extends IOPlugin> pluginClass : Annotator.app.getPluginManager().getIOPlugins()) {
-			IOPlugin instance = Annotator.app.getPluginManager().getIOPlugin(pluginClass);
+		for (Class<? extends UimaIOPlugin> pluginClass : Annotator.app.getPluginManager().getIOPlugins()) {
+			UimaIOPlugin instance = Annotator.app.getPluginManager().getIOPlugin(pluginClass);
 
 			b.append("<h2>").append(instance.getName()).append("</h2>");
 			b.append("<p>Class name: <code>").append(pluginClass.getName()).append("</code></p>");

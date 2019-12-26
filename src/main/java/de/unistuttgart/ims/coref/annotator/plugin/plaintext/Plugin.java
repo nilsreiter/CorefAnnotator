@@ -14,11 +14,11 @@ import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
 
 	@Override
 	public String getDescription() {

@@ -42,7 +42,7 @@ import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.StringArrayPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.StringPluginOption;
@@ -50,7 +50,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin, IOPlugin {
+public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin, UimaIOPlugin {
 
 	@Deprecated
 	String language = Constants.X_UNSPECIFIED;

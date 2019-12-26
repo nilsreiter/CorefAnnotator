@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
 import javafx.application.Platform;
 
@@ -21,9 +21,9 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
-	IOPlugin plugin;
+	UimaIOPlugin plugin;
 
-	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, IOPlugin plugin) {
+	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, UimaIOPlugin plugin) {
 		super(dw, plugin.getIkon());
 		putValue(Action.NAME, plugin.getName());
 		if (plugin.getDescription() != null)

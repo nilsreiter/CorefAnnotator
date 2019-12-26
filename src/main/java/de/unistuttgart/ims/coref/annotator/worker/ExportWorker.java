@@ -11,16 +11,16 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.CasCopier;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 
 public class ExportWorker extends SwingWorker<Object, Object> {
 
 	File file;
 	JCas jcas;
 	BiConsumer<File, JCas> consumer;
-	IOPlugin plugin;
+	UimaIOPlugin plugin;
 
-	public ExportWorker(File file, JCas jcas, IOPlugin plugin, BiConsumer<File, JCas> consumer) {
+	public ExportWorker(File file, JCas jcas, UimaIOPlugin plugin, BiConsumer<File, JCas> consumer) {
 		this.file = file;
 		this.jcas = jcas;
 		this.plugin = plugin;

@@ -17,11 +17,11 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin {
+public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
 
 	private static final String NAME = "B06: TEI for B03";
 	private static final String DE = "de";

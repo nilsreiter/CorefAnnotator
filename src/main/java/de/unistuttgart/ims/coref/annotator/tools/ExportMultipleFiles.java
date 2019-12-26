@@ -17,7 +17,7 @@ import com.lexicalscope.jewel.cli.Option;
 
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.PluginManager;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
@@ -34,7 +34,7 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 public class ExportMultipleFiles {
 	static Options options;
 
-	static IOPlugin outputPlugin;
+	static UimaIOPlugin outputPlugin;
 
 	static Pattern filenamePattern = Pattern.compile("^(.*)\\.xmi(\\.gz)?");
 
@@ -56,7 +56,7 @@ public class ExportMultipleFiles {
 
 		// set some static properties
 		pluginManager = new PluginManager();
-		outputPlugin = pluginManager.getIOPlugin((Class<? extends IOPlugin>) Class
+		outputPlugin = pluginManager.getIOPlugin((Class<? extends UimaIOPlugin>) Class
 				.forName("de.unistuttgart.ims.coref.annotator.plugin." + options.getOutputFormat().name() + ".Plugin"));
 
 		// iterate over the input files or directories

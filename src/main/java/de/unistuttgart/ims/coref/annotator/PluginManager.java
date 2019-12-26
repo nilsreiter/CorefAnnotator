@@ -15,13 +15,13 @@ import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class PluginManager {
-	ImmutableSet<Class<? extends IOPlugin>> ioPlugins;
+	ImmutableSet<Class<? extends UimaIOPlugin>> ioPlugins;
 	ImmutableSet<Class<? extends StylePlugin>> stylePlugins;
 	ImmutableSet<Class<? extends EntityRankingPlugin>> rankingPlugins;
 	ImmutableSet<Class<? extends ProcessingPlugin>> processingPlugins;
@@ -30,8 +30,8 @@ public class PluginManager {
 	public void init() {
 		Annotator.logger.trace("Initialising plugin manager");
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
-		MutableSet<Class<? extends IOPlugin>> ioPlugins = Sets.mutable
-				.withAll(reflections.getSubTypesOf(IOPlugin.class));
+		MutableSet<Class<? extends UimaIOPlugin>> ioPlugins = Sets.mutable
+				.withAll(reflections.getSubTypesOf(UimaIOPlugin.class));
 		// it's unclear why this is found in the first place
 		ioPlugins.remove(DefaultIOPlugin.class);
 		ioPlugins.remove(AbstractXmiPlugin.class);
@@ -53,7 +53,7 @@ public class PluginManager {
 		instances.put(DefaultStylePlugin.class, new DefaultStylePlugin());
 	}
 
-	public ImmutableSet<Class<? extends IOPlugin>> getIOPlugins() {
+	public ImmutableSet<Class<? extends UimaIOPlugin>> getIOPlugins() {
 		return ioPlugins;
 	}
 
@@ -61,7 +61,7 @@ public class PluginManager {
 		return stylePlugins;
 	}
 
-	public IOPlugin getDefaultIOPlugin() {
+	public UimaIOPlugin getDefaultIOPlugin() {
 		return getIOPlugin(DefaultIOPlugin.class);
 	}
 
@@ -89,7 +89,7 @@ public class PluginManager {
 		return getPlugin(clazz);
 	}
 
-	public IOPlugin getIOPlugin(Class<? extends IOPlugin> cl) {
+	public UimaIOPlugin getIOPlugin(Class<? extends UimaIOPlugin> cl) {
 		return getPlugin(cl);
 	}
 

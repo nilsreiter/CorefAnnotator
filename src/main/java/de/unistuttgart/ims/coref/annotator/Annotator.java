@@ -56,7 +56,7 @@ import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
@@ -191,7 +191,7 @@ public class Annotator {
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
 		panel.setPreferredSize(new Dimension(width, 200));
 		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
-			IOPlugin p = getPluginManager().getIOPlugin(plugin);
+			UimaIOPlugin p = getPluginManager().getIOPlugin(plugin);
 			try {
 				if (p.getImporter() != null) {
 					AbstractAction importAction = new FileImportAction(this, p);
@@ -248,7 +248,7 @@ public class Annotator {
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
+	public synchronized DocumentWindow open(final File file, UimaIOPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow();
 
@@ -315,7 +315,7 @@ public class Annotator {
 		this.opening.setVisible(true);
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor, boolean multi, Consumer<File[]> okCallback,
+	public void fileOpenDialog(Component parent, UimaIOPlugin flavor, boolean multi, Consumer<File[]> okCallback,
 			Consumer<Object> cancelCallback, String title) {
 		if (Annotator.javafx()) {
 			Platform.runLater(new Runnable() {
@@ -373,7 +373,7 @@ public class Annotator {
 		}
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor) {
+	public void fileOpenDialog(Component parent, UimaIOPlugin flavor) {
 		fileOpenDialog(parent, flavor, false, f -> open(f[0], flavor, Constants.X_UNSPECIFIED), o -> showOpening(),
 				"Open files using " + flavor.getName() + " scheme");
 	}

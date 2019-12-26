@@ -38,12 +38,12 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements IOPlugin, ConfigurableExportPlugin {
+public class Plugin extends AbstractIOPlugin implements UimaIOPlugin, ConfigurableExportPlugin {
 
 	public static enum ContextUnit {
 		CHARACTER, TOKEN, LINE;

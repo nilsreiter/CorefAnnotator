@@ -11,11 +11,11 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class MergeFilesPlugin extends AbstractXmiPlugin implements IOPlugin {
+public class MergeFilesPlugin extends AbstractXmiPlugin implements UimaIOPlugin {
 
 	ImmutableList<File> files;
 
