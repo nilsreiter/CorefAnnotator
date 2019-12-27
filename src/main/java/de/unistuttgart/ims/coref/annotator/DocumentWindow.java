@@ -331,6 +331,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		controls.add(actions.formGroupAction);
 		controls.add(actions.mergeSelectedEntitiesAction);
 		controls.add(actions.showSearchPanelAction);
+		controls.add(actions.showDocumentStatistics);
+
 		getContentPane().add(controls, BorderLayout.NORTH);
 
 		for (Component comp : controls.getComponents())
@@ -534,7 +536,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		toolsMenu.add(new RenameAllEntitiesAction(this));
 		toolsMenu.add(new RemoveForeignAnnotationsAction(this));
 		toolsMenu.add(new ShowFlagEditor(this));
-		toolsMenu.add(new ShowDocumentStatistics(this));
+		toolsMenu.add(actions.showDocumentStatistics);
 		toolsMenu.addSeparator();
 		// toolsMenu.add(new ShowHistoryAction(this));
 		toolsMenu.add(new ShowLogWindowAction(Annotator.app));
@@ -1800,6 +1802,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		UndoAction undoAction;
 		AbstractAction setDocumentLanguageAction = new SetLanguageAction(DocumentWindow.this);
 		AbstractAction showSearchPanelAction;
+		AbstractAction showDocumentStatistics = new ShowDocumentStatistics(DocumentWindow.this);
 		SortTree sortByAlpha;
 		SortTree sortByMentions;
 		ToggleEntitySortOrder sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
