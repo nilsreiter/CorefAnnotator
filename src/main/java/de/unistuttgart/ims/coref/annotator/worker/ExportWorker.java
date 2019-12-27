@@ -11,16 +11,18 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.CasCopier;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DocumentModelExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 
 public class ExportWorker extends SwingWorker<Object, Object> {
 
 	File file;
 	JCas jcas;
 	BiConsumer<File, JCas> consumer;
-	UimaIOPlugin plugin;
+	ExportPlugin plugin;
 
-	public ExportWorker(File file, JCas jcas, UimaIOPlugin plugin, BiConsumer<File, JCas> consumer) {
+	public ExportWorker(File file, JCas jcas, ExportPlugin plugin, BiConsumer<File, JCas> consumer) {
 		this.file = file;
 		this.jcas = jcas;
 		this.plugin = plugin;
@@ -34,7 +36,12 @@ public class ExportWorker extends SwingWorker<Object, Object> {
 		JCas newJCas = JCasFactory.createJCas();
 
 		CasCopier.copyCas(jcas.getCas(), newJCas.getCas(), true, false);
-		SimplePipeline.runPipeline(newJCas, plugin.getExporter(), plugin.getWriter(file));
+		if (plugin instanceof UimaExportPlugin)
+			SimplePipeline.runPipeline(newJCas, ((UimaExportPlugin) plugin).getExporter(),
+					((UimaExportPlugin) plugin).getWriter(file));
+		else if (plugin instanceof DocumentModelExportPlugin) {
+			// TODO: implement
+		}
 		return null;
 	}
 

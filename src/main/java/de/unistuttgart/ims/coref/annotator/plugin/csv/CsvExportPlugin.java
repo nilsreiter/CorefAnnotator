@@ -36,14 +36,14 @@ import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
-import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements UimaIOPlugin, ConfigurableExportPlugin {
+public class CsvExportPlugin extends AbstractExportPlugin implements UimaExportPlugin, ConfigurableExportPlugin {
 
 	public static enum ContextUnit {
 		CHARACTER, TOKEN, LINE;
@@ -110,11 +110,6 @@ public class Plugin extends AbstractIOPlugin implements UimaIOPlugin, Configurab
 	}
 
 	@Override
-	public String[] getSupportedLanguages() {
-		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
-	}
-
-	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return ExtensionFilters.csv;
 	}
@@ -172,7 +167,7 @@ public class Plugin extends AbstractIOPlugin implements UimaIOPlugin, Configurab
 				for (PluginOption option : options)
 					option.ok();
 				dialog.dispose();
-				callback.accept(Plugin.this);
+				callback.accept(CsvExportPlugin.this);
 			}
 		};
 

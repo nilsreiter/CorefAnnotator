@@ -23,7 +23,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 
@@ -54,7 +54,7 @@ public class CSVWriter extends SingleFileWriter {
 
 	public static final String PARAM_CONTEXT_UNIT = "PARAM_CONTEXT_UNIT";
 	@ConfigurationParameter(name = PARAM_CONTEXT_UNIT, defaultValue = "CHARACTER")
-	Plugin.ContextUnit optionContextUnit = ContextUnit.CHARACTER;
+	CsvExportPlugin.ContextUnit optionContextUnit = ContextUnit.CHARACTER;
 
 	public static final String PARAM_INCLUDE_LINE_NUMBERS = "PARAM_INCLUDE_LINE_NUMBERS";
 	@ConfigurationParameter(name = PARAM_INCLUDE_LINE_NUMBERS, defaultValue = "false")
@@ -252,11 +252,11 @@ public class CSVWriter extends SingleFileWriter {
 		this.optionReplaceNewlines = optionReplaceNewlines;
 	}
 
-	public Plugin.ContextUnit getOptionContextUnit() {
+	public CsvExportPlugin.ContextUnit getOptionContextUnit() {
 		return optionContextUnit;
 	}
 
-	public void setOptionContextUnit(Plugin.ContextUnit optionContextUnit) {
+	public void setOptionContextUnit(CsvExportPlugin.ContextUnit optionContextUnit) {
 		this.optionContextUnit = optionContextUnit;
 	}
 

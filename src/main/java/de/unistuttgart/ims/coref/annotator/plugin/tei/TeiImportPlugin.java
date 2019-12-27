@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -36,35 +35,20 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.HelpWindow;
-import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.StringArrayPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.StringPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin, UimaIOPlugin {
-
-	@Deprecated
-	String language = Constants.X_UNSPECIFIED;
-
-	@Deprecated
-	String textRootSelector = null;
-
-	@Deprecated
-	ResourceBundle resourceBundle;
-
-	public Plugin() {
-		// resourceBundle = ResourceBundle.getBundle("plugins.tei.strings",
-		// Locale.getDefault());
-	}
+public class TeiImportPlugin extends AbstractImportPlugin implements ConfigurableImportPlugin, UimaImportPlugin {
 
 	@Override
 	public String getDescription() {
@@ -78,7 +62,7 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 
 	@Override
 	public String getName() {
-		return "TEI/XML";
+		return Constants.NAME;
 	}
 
 	@Override
@@ -86,11 +70,6 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 		AggregateBuilder b = new AggregateBuilder();
 		b.add(AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
 		return b.createAggregateDescription();
-	}
-
-	@Override
-	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(MapCorefToXmlElements.class);
 	}
 
 	@Override
@@ -105,12 +84,6 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 						de.unistuttgart.ims.coref.annotator.plugin.tei.Constants.PLUGIN_TEI_LANGUAGE,
 						de.unistuttgart.ims.coref.annotator.plugin.tei.Defaults.TEXT_LANGUAGE),
 				TeiReader.PARAM_DOCUMENT_ID, f.getName());
-	}
-
-	@Override
-	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(TeiWriter.class, TeiWriter.PARAM_OUTPUT_FILE,
-				f.getAbsolutePath());
 	}
 
 	@Override
@@ -144,7 +117,8 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 				new StringArrayPluginOption(Annotator.app.getPreferences(),
 						de.unistuttgart.ims.coref.annotator.plugin.tei.Constants.PLUGIN_TEI_LANGUAGE, "German",
 						de.unistuttgart.ims.coref.annotator.Strings.LANGUAGE, Strings.IMPORT_DIALOG_LANGUAGE_TOOLTIP,
-						Constants.SUPPORTED_LANGUAGES, new DefaultListCellRenderer() {
+						de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES,
+						new DefaultListCellRenderer() {
 
 							private static final long serialVersionUID = 1L;
 
@@ -168,7 +142,7 @@ public class Plugin extends AbstractIOPlugin implements ConfigurableImportPlugin
 					po.ok();
 
 				dialog.dispose();
-				callback.accept(Plugin.this);
+				callback.accept(TeiImportPlugin.this);
 			}
 		};
 

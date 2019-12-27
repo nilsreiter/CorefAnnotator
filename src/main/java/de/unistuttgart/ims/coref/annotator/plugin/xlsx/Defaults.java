@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 
 public class Defaults {
 	public static final boolean CFG_OPTION_AUTO_OPEN = true;

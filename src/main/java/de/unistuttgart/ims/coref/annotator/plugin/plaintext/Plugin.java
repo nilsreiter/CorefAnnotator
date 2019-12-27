@@ -13,12 +13,12 @@ import org.apache.uima.resource.ResourceInitializationException;
 import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
+public class Plugin extends AbstractImportPlugin implements UimaImportPlugin {
 
 	@Override
 	public String getDescription() {

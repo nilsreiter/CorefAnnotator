@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -18,7 +19,8 @@ import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements UimaIOPlugin {
+@Deprecated
+public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements UimaImportPlugin, UimaExportPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
@@ -55,6 +57,11 @@ public abstract class AbstractXmiPlugin extends AbstractIOPlugin implements Uima
 	@Override
 	public String[] getSupportedLanguages() {
 		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
+	}
+
+	@Override
+	public Consumer<File> getPostExportAction() {
+		return null;
 	}
 
 }

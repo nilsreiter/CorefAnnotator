@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -37,18 +36,17 @@ import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * 
  * @author reiterns
  */
-public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin
-		implements UimaIOPlugin, ConfigurableExportPlugin {
+public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin
+		implements UimaExportPlugin, ConfigurableExportPlugin {
 
 	public static final String XLSX = "xlsx";
 
@@ -60,11 +58,6 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 	@Override
 	public String getName() {
 		return Annotator.getString(Strings.NAME_MS_EXCEL);
-	}
-
-	@Override
-	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return null;
 	}
 
 	@Override
@@ -85,16 +78,6 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.Plugi
 				XLSXWriter.PARAM_INCLUDE_LINE_NUMBERS, Annotator.app.getPreferences().getBoolean(
 						Constants.PLUGIN_XLSX_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS)));
 		return b.createAggregateDescription();
-	}
-
-	@Override
-	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return null;
 	}
 
 	@Override

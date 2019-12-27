@@ -41,7 +41,6 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -75,7 +74,7 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
@@ -620,14 +619,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		JMenu fileImportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_IMPORT_FROM));
 
 		PluginManager pm = mainApplication.getPluginManager();
-		for (Class<? extends UimaIOPlugin> pluginClass : pm.getIOPlugins()) {
-			try {
-				UimaIOPlugin plugin = pm.getIOPlugin(pluginClass);
-				if (plugin.getImporter() != null)
-					fileImportMenu.add(new FileImportAction(mainApplication, plugin));
-			} catch (ResourceInitializationException e) {
-				Annotator.logger.catching(e);
-			}
+		for (ImportPlugin plugin : pm.getIOPluginObjects().selectInstancesOf(ImportPlugin.class)) {
+			fileImportMenu.add(new FileImportAction(mainApplication, plugin));
 
 		}
 

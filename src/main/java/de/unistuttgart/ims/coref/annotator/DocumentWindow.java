@@ -91,7 +91,6 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -178,11 +177,13 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.MatchingRanker;
 import de.unistuttgart.ims.coref.annotator.plugin.rankings.PreceedingRanker;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Parser;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
@@ -545,16 +546,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		JMenu fileExportMenu = new JMenu(Annotator.getString(Strings.MENU_FILE_EXPORT_AS));
 
 		PluginManager pm = Annotator.app.getPluginManager();
-		for (Class<? extends UimaIOPlugin> pluginClass : pm.getIOPlugins()) {
-			try {
-				UimaIOPlugin plugin = pm.getIOPlugin(pluginClass);
-				if (plugin.getImporter() != null)
-					fileImportMenu.add(new FileImportAction(Annotator.app, plugin));
-				if (plugin.getExporter() != null)
-					fileExportMenu.add(new FileExportAction(this, this, plugin));
-			} catch (ResourceInitializationException e) {
-				Annotator.logger.catching(e);
-			}
+
+		for (ImportPlugin iplugin : pm.getIOPluginObjects().selectInstancesOf(ImportPlugin.class)) {
+			fileImportMenu.add(new FileImportAction(Annotator.app, iplugin));
+		}
+
+		for (ExportPlugin plugin : pm.getIOPluginObjects().selectInstancesOf(ExportPlugin.class)) {
+			fileExportMenu.add(new FileExportAction(this, this, plugin));
 
 		}
 
@@ -648,8 +646,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.app.close(this);
 	}
 
-	public void loadFile(File file, UimaIOPlugin flavor, String language) {
-		if (flavor instanceof DefaultIOPlugin)
+	public void loadFile(File file, ImportPlugin flavor, String language) {
+		if (flavor instanceof DefaultImportPlugin)
 			this.file = file;
 
 		JCasLoader lai;
@@ -657,28 +655,30 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		setIndeterminateProgress();
 		File profileFile = new File(file.getParentFile(), "profile.xml");
 		final Profile profile = new Parser().getProfileOrNull(profileFile);
-		lai = new JCasLoader(file, flavor, language, jcas -> {
-			this.setJCas(jcas, profile);
-		}, ex -> {
-			String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
-					Annotator.getString("message.wrong_file_version.help") };
-			ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
-					ex.getCause().getLocalizedMessage(), options, new BooleanSupplier[] { () -> {
-						return true;
-					}, () -> {
-						try {
-							Desktop.getDesktop().browse(
-									new URI("https://github.com/nilsreiter/CorefAnnotator/wiki/File-format-versions"));
-						} catch (IOException | URISyntaxException e) {
-							Annotator.logger.catching(e);
-						}
-						return true;
-					} });
-			setVisible(false);
-			dispose();
+		if (flavor instanceof UimaImportPlugin) {
+			lai = new JCasLoader(file, (UimaImportPlugin) flavor, language, jcas -> {
+				this.setJCas(jcas, profile);
+			}, ex -> {
+				String[] options = new String[] { Annotator.getString("message.wrong_file_version.ok"),
+						Annotator.getString("message.wrong_file_version.help") };
+				ImprovedMessageDialog.showMessageDialog(this, Annotator.getString("message.wrong_file_version.title"),
+						ex.getCause().getLocalizedMessage(), options, new BooleanSupplier[] { () -> {
+							return true;
+						}, () -> {
+							try {
+								Desktop.getDesktop().browse(new URI(
+										"https://github.com/nilsreiter/CorefAnnotator/wiki/File-format-versions"));
+							} catch (IOException | URISyntaxException e) {
+								Annotator.logger.catching(e);
+							}
+							return true;
+						} });
+				setVisible(false);
+				dispose();
 
-		});
-		lai.execute();
+			});
+			lai.execute();
+		}
 
 	}
 

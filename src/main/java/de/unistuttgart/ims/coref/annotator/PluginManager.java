@@ -10,18 +10,20 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.reflections.Reflections;
 
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractXmiPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.Plugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class PluginManager {
-	ImmutableSet<Class<? extends UimaIOPlugin>> ioPlugins;
+	ImmutableSet<Class<? extends IOPlugin>> ioPlugins;
 	ImmutableSet<Class<? extends StylePlugin>> stylePlugins;
 	ImmutableSet<Class<? extends EntityRankingPlugin>> rankingPlugins;
 	ImmutableSet<Class<? extends ProcessingPlugin>> processingPlugins;
@@ -30,12 +32,15 @@ public class PluginManager {
 	public void init() {
 		Annotator.logger.trace("Initialising plugin manager");
 		Reflections reflections = new Reflections("de.unistuttgart.ims.coref.annotator.plugin.");
-		MutableSet<Class<? extends UimaIOPlugin>> ioPlugins = Sets.mutable
-				.withAll(reflections.getSubTypesOf(UimaIOPlugin.class));
+		MutableSet<Class<? extends IOPlugin>> ioPlugins = Sets.mutable
+				.withAll(reflections.getSubTypesOf(IOPlugin.class)).select(c -> !c.isInterface());
+
 		// it's unclear why this is found in the first place
-		ioPlugins.remove(DefaultIOPlugin.class);
+		ioPlugins.remove(DefaultImportPlugin.class);
 		ioPlugins.remove(AbstractXmiPlugin.class);
 		ioPlugins.remove(AbstractIOPlugin.class);
+		ioPlugins.remove(AbstractImportPlugin.class);
+		ioPlugins.remove(AbstractExportPlugin.class);
 		this.ioPlugins = ioPlugins.toImmutable();
 
 		rankingPlugins = Sets.immutable.withAll(reflections.getSubTypesOf(EntityRankingPlugin.class));
@@ -49,20 +54,24 @@ public class PluginManager {
 		Annotator.logger.info("Found ProcessingPlugins: {}",
 				StringUtils.join(processingPlugins.castToCollection(), ','));
 
-		instances.put(DefaultIOPlugin.class, new DefaultIOPlugin());
+		instances.put(DefaultImportPlugin.class, new DefaultImportPlugin());
 		instances.put(DefaultStylePlugin.class, new DefaultStylePlugin());
 	}
 
-	public ImmutableSet<Class<? extends UimaIOPlugin>> getIOPlugins() {
+	public ImmutableSet<Class<? extends IOPlugin>> getIOPlugins() {
 		return ioPlugins;
+	}
+
+	public ImmutableSet<? extends IOPlugin> getIOPluginObjects() {
+		return ioPlugins.collect(i -> getPlugin(i));
 	}
 
 	public ImmutableSet<Class<? extends StylePlugin>> getStylePlugins() {
 		return stylePlugins;
 	}
 
-	public UimaIOPlugin getDefaultIOPlugin() {
-		return getIOPlugin(DefaultIOPlugin.class);
+	public DefaultImportPlugin getDefaultIOPlugin() {
+		return getIOPlugin(DefaultImportPlugin.class);
 	}
 
 	public StylePlugin getDefaultStylePlugin() {
@@ -89,7 +98,7 @@ public class PluginManager {
 		return getPlugin(clazz);
 	}
 
-	public UimaIOPlugin getIOPlugin(Class<? extends UimaIOPlugin> cl) {
+	public <T extends IOPlugin> T getIOPlugin(Class<T> cl) {
 		return getPlugin(cl);
 	}
 

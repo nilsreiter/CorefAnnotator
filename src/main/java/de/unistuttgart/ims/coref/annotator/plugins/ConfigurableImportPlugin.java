@@ -4,6 +4,6 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
-public interface ConfigurableImportPlugin {
+public interface ConfigurableImportPlugin extends ImportPlugin {
 	void showImportConfigurationDialog(JFrame parent, Consumer<ConfigurableImportPlugin> callback);
 }

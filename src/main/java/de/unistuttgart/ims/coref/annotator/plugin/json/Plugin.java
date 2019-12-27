@@ -12,11 +12,11 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.AbstractIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
+public class Plugin extends AbstractExportPlugin implements UimaExportPlugin {
 
 	@Override
 	public String getDescription() {
@@ -65,11 +65,6 @@ public class Plugin extends AbstractIOPlugin implements UimaIOPlugin {
 	@Override
 	public String getSuffix() {
 		return ".json";
-	}
-
-	@Override
-	public String[] getSupportedLanguages() {
-		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
 
 	@Override
