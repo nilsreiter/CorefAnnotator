@@ -1,7 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.stats;
 
-import java.util.Map;
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
