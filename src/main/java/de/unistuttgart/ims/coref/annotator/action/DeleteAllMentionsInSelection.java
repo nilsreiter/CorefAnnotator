@@ -33,7 +33,7 @@ public class DeleteAllMentionsInSelection extends TargetedIkonAction<DocumentWin
 		if (low == high)
 			return;
 		MutableSet<? extends Annotation> annotations = Sets.mutable
-				.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low, high));
+				.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentionsBetween(low, high));
 		@SuppressWarnings("unchecked")
 		MutableSet<Mention> mentions = (MutableSet<Mention>) annotations.select(a -> a instanceof Mention);
 

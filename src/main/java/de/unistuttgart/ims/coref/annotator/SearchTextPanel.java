@@ -100,7 +100,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)) {
 				return new AnnotationTransfer(Lists.immutable.ofAll(list.getSelectedValuesList())
 						.collect(sr -> sr.getSpan()).flatCollect(span -> searchContainer.getDocumentWindow()
-								.getDocumentModel().getCoreferenceModel().getMentions(span.begin, span.end)));
+								.getDocumentModel().getCoreferenceModel().getMentionsBetween(span.begin, span.end)));
 
 			} else
 				return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),

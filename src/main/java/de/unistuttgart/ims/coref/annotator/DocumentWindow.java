@@ -1485,7 +1485,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 				// something is selected
 				if (dot != mark) {
-					ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentions(low, high)
+					ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentionsBetween(low, high)
 							.selectInstancesOf(Mention.class);
 					mentions.addAllIterable(ms);
 				}
