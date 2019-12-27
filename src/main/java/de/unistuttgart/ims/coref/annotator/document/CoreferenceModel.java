@@ -8,6 +8,7 @@ import java.util.prefs.Preferences;
 
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -48,6 +49,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
+import de.unistuttgart.ims.coref.annotator.document.op.DuplicateMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
@@ -66,6 +68,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
@@ -408,9 +411,33 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			edit((ToggleGenericFlag) operation);
 		} else if (operation instanceof RenameAllEntities) {
 			edit((RenameAllEntities) operation);
+		} else if (operation instanceof DuplicateMentions) {
+			edit((DuplicateMentions) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
+	}
+
+	protected void edit(DuplicateMentions op) {
+		op.setNewMentions(op.getSourceMentions().collect(oldMention -> {
+			Mention newMention = addTo(oldMention.getEntity(), new Span(oldMention));
+			try {
+				if (oldMention.getFlags() != null)
+					newMention.setFlags(UimaUtil.clone(oldMention.getFlags()));
+			} catch (CASException e) {
+				Annotator.logger.catching(e);
+			}
+			if (oldMention.getDiscontinuous() != null) {
+				DetachedMentionPart dmp = AnnotationFactory.createAnnotation(getJCas(),
+						oldMention.getDiscontinuous().getBegin(), oldMention.getDiscontinuous().getEnd(),
+						DetachedMentionPart.class);
+				dmp.setMention(newMention);
+				newMention.setDiscontinuous(dmp);
+			}
+			return newMention;
+		}));
+		op.getNewMentions().forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m)));
+		registerEdit(op);
 	}
 
 	protected void edit(RemoveDuplicateMentionsInEntities op) {
@@ -961,7 +988,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			undo((RenameAllEntities) operation);
 		} else if (operation instanceof MergeMentions) {
 			undo((MergeMentions) operation);
+		} else if (operation instanceof DuplicateMentions) {
+			undo((DuplicateMentions) operation);
 		}
+	}
+
+	private void undo(DuplicateMentions op) {
+
 	}
 
 	private void undo(RemoveMention op) {

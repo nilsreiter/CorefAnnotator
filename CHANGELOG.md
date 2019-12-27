@@ -3,6 +3,16 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.0
+
+- Added a new preference called `sticky markers`. If enabled, 
+  changing the markers of any mention *also* changes the markers
+  of *all* mentions that cover the (exact) same span. Thus, the 
+  markers are "sticky" to their position. New mentions in other 
+  entities do *not* automatically get all the flags, but it's now 
+  possible to duplicate mentions and then move them to a new entity.
+  #271
+
 ## 1.13.0
 
 - CSV export has been improved in multiple ways

@@ -31,6 +31,7 @@ public class Strings {
 	public static final String ACTION_DELETE_FLAG = "action.delete_flag";
 	public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 	public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+	public static final String ACTION_DUPLICATE_MENTIONS = "action.duplicate_mentions";
 	public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 	public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 	public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";

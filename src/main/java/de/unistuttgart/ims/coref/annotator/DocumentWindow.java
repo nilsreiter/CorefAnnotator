@@ -107,6 +107,7 @@ import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteAllMentionsInSelection;
+import de.unistuttgart.ims.coref.annotator.action.DuplicateMentions;
 import de.unistuttgart.ims.coref.annotator.action.EntityStatisticsAction;
 import de.unistuttgart.ims.coref.annotator.action.ExampleExport;
 import de.unistuttgart.ims.coref.annotator.action.FileExportAction;
@@ -262,6 +263,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_MENTIONS));
 		treePopupMenu.add(mentionFlagsInTreePopup);
 		treePopupMenu.add(this.actions.mergeMentions);
+		treePopupMenu.add(this.actions.duplicateMentionsAction);
 		treePopupMenu.addSeparator();
 		treePopupMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		treePopupMenu.add(this.actions.newEntityAction);
@@ -1806,6 +1808,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		NewEntityAction newEntityAction;
 		RenameEntityAction renameAction;
 		RemoveDuplicatesAction removeDuplicatesAction;
+		DuplicateMentions duplicateMentionsAction = new DuplicateMentions(DocumentWindow.this);
 		EntityStatisticsAction entityStatisticsAction;
 		ViewSetLineNumberStyle lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this,
 				LineNumberStyle.NONE);
