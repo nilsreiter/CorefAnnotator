@@ -92,6 +92,7 @@ public class Constants {
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
 	public static final String CFG_SHOW_TOC = "CFG_SHOW_TOC";
 	public static final String CFG_SHOW_LINE_NUMBER_IN_TREE = "CFG_SHOW_LINE_NUMBER_IN_TREE";
+	public static final String CFG_STICKY_FLAGS = "CFG_STICKY_FLAGS";
 
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
 	public static final String CFG_ENTITY_SORT_ORDER = "CFG_ENTITY_SORT_ORDER";
@@ -173,6 +174,10 @@ public class Constants {
 
 	public static final Setting<Boolean> SETTING_SHOW_TOC = new Setting<Boolean>(CFG_SHOW_TOC,
 			Strings.ACTION_TOGGLE_SHOW_TOC, Strings.ACTION_TOGGLE_SHOW_TOC_TOOLTIP, Defaults.CFG_SHOW_TOC,
+			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
+
+	public static final Setting<Boolean> SETTING_STICKY_FLAGS = new Setting<Boolean>(CFG_STICKY_FLAGS,
+			Strings.ACTION_TOGGLE_STICKY_FLAGS, Strings.ACTION_TOGGLE_STICKY_FLAGS_TOOLTIP, Defaults.CFG_STICKY_FLAGS,
 			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",

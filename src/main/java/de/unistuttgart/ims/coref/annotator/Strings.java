@@ -105,6 +105,8 @@ public class Strings {
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 	public static final String ACTION_TOGGLE_SHOW_TOC = "action.toggle.show_toc";
 	public static final String ACTION_TOGGLE_SHOW_TOC_TOOLTIP = "action.toggle.show_toc.tooltip";
+	public static final String ACTION_TOGGLE_STICKY_FLAGS = "action.toggle.sticky_flags";
+	public static final String ACTION_TOGGLE_STICKY_FLAGS_TOOLTIP = "action.toggle.sticky_flags.tooltip";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY = "action.toggle.underline_singletons_in_gray";

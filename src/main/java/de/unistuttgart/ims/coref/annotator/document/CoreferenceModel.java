@@ -633,12 +633,19 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
-	public ImmutableSet<Annotation> getMentions(int start, int end) {
+	public ImmutableSet<Annotation> getMentionsBetween(int start, int end) {
 		MutableSet<Annotation> mentions = Sets.mutable.empty();
 		for (int i = start; i <= end; i++) {
 			mentions.addAll(characterPosition2AnnotationMap.get(i).select(a -> a instanceof Mention));
 		}
 		return mentions.toImmutable();
+	}
+
+	public ImmutableSet<Mention> getMatchingMentions(int start, int end) {
+		MutableSet<Annotation> mentions = Sets.mutable.empty();
+		mentions.addAll(
+				characterPosition2AnnotationMap.get(start).select(m -> m.getEnd() == end && m.getBegin() == start));
+		return mentions.selectInstancesOf(Mention.class).toImmutable();
 	}
 
 	public Preferences getPreferences() {
