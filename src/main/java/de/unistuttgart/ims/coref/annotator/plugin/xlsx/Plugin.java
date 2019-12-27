@@ -1,24 +1,14 @@
 package de.unistuttgart.ims.coref.annotator.plugin.xlsx;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -32,10 +22,10 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.HelpWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.PluginConfigurationDialog;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
@@ -153,64 +143,8 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.CsvEx
 						Defaults.CFG_OPTION_AUTO_OPEN, Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN,
 						Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN_TOOLTIP));
 
-		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_, getName()));
+		new PluginConfigurationDialog(parent, this, callback, options).setVisible(true);
 
-		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
-
-		for (PluginOption option : options) {
-			optionPanel.add(option.getLabel());
-			optionPanel.add(option.getComponent());
-		}
-
-		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-		Action okAction = new AbstractAction(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_OK)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				for (PluginOption option : options)
-					option.ok();
-
-				dialog.dispose();
-				callback.accept(Plugin.this);
-			}
-		};
-
-		Action cancelAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.DIALOG_CANCEL)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.dispose();
-			}
-		};
-
-		Action helpAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.MENU_HELP)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				HelpWindow.show("Input/Output");
-			}
-		};
-
-		JButton okButton = new JButton(okAction);
-
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(okButton);
-		buttonPanel.add(new JButton(cancelAction));
-		buttonPanel.add(new JButton(helpAction));
-
-		dialog.getContentPane().add(optionPanel, BorderLayout.CENTER);
-		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-		dialog.pack();
-		dialog.setLocationRelativeTo(parent);
-		dialog.setVisible(true);
-		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
 	@Override

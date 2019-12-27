@@ -1,22 +1,12 @@
 package de.unistuttgart.ims.coref.annotator.plugin.csv;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -32,12 +22,11 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
-import de.unistuttgart.ims.coref.annotator.HelpWindow;
-import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.PluginConfigurationDialog;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.PluginOption.BooleanPluginOption;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
@@ -148,63 +137,7 @@ public class CsvExportPlugin extends AbstractExportPlugin implements UimaExportP
 						Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS, "dialog.export_options.include_line_numbers",
 						"dialog.export_options.include_line_numbers.tooltip"));
 
-		JDialog dialog = new JDialog(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE));
-
-		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
-
-		for (PluginOption option : options) {
-			optionPanel.add(option.getLabel());
-			optionPanel.add(option.getComponent());
-		}
-
-		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-		Action okAction = new AbstractAction(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_OK)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				for (PluginOption option : options)
-					option.ok();
-				dialog.dispose();
-				callback.accept(CsvExportPlugin.this);
-			}
-		};
-
-		Action cancelAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.DIALOG_CANCEL)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.dispose();
-			}
-		};
-
-		Action helpAction = new AbstractAction(
-				Annotator.getString(de.unistuttgart.ims.coref.annotator.Strings.MENU_HELP)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				HelpWindow.show("Input/Output");
-			}
-		};
-
-		JButton okButton = new JButton(okAction);
-
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(okButton);
-		buttonPanel.add(new JButton(cancelAction));
-		buttonPanel.add(new JButton(helpAction));
-
-		dialog.getContentPane().add(optionPanel, BorderLayout.CENTER);
-		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-		dialog.pack();
-		dialog.setLocationRelativeTo(parent);
-		dialog.setVisible(true);
-		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		new PluginConfigurationDialog(parent, this, callback, options).setVisible(true);
 	}
 
 	public int getOptionContextWidth() {
