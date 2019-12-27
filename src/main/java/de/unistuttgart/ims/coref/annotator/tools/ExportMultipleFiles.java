@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,8 +17,11 @@ import com.lexicalscope.jewel.cli.CommandLineInterface;
 import com.lexicalscope.jewel.cli.Option;
 
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.PluginManager;
-import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.plugins.ExportPlugin;
+import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
@@ -34,13 +38,12 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 public class ExportMultipleFiles {
 	static Options options;
 
-	static UimaExportPlugin outputPlugin;
+	static ExportPlugin outputPlugin;
 
 	static Pattern filenamePattern = Pattern.compile("^(.*)\\.xmi(\\.gz)?");
 
 	static PluginManager pluginManager;
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 			throws ResourceInitializationException, ClassNotFoundException, InterruptedException, ExecutionException {
 		// no GUI here
@@ -56,8 +59,7 @@ public class ExportMultipleFiles {
 
 		// set some static properties
 		pluginManager = new PluginManager();
-		outputPlugin = pluginManager.getIOPlugin((Class<? extends UimaExportPlugin>) Class
-				.forName("de.unistuttgart.ims.coref.annotator.plugin." + options.getOutputFormat().name() + ".Plugin"));
+		outputPlugin = pluginManager.getIOPlugin(options.getOutputFormat().getPluginClass());
 
 		// iterate over the input files or directories
 		for (File file : options.getInput()) {
@@ -101,13 +103,18 @@ public class ExportMultipleFiles {
 		loader.execute();
 		JCas jcas = loader.get();
 
+		DocumentModelLoader dml = new DocumentModelLoader(null, jcas);
+		dml.setPreferences(Preferences.userNodeForPackage(Annotator.class));
+		dml.execute();
+		DocumentModel dm = dml.get();
+
 		// generate output file
 		File targetFile = new File(options.getOutputDirectory(),
 				(namePart == null ? DocumentMetaData.get(jcas).getDocumentTitle() : namePart)
 						+ outputPlugin.getSuffix());
 
 		// write jcas to output file
-		ExportWorker w = new ExportWorker(targetFile, jcas, outputPlugin, (f, j) -> {
+		ExportWorker w = new ExportWorker(targetFile, dm, outputPlugin, (f, j) -> {
 			System.out.println(f.getAbsolutePath() + ": done.");
 		});
 		w.execute();
@@ -115,7 +122,25 @@ public class ExportMultipleFiles {
 	}
 
 	public enum OutputFormat {
-		tei, conll2012, json
+		tei, conll2012, json, qdtei, stats;
+
+		Class<? extends ExportPlugin> getPluginClass() {
+			switch (this) {
+			case stats:
+				return de.unistuttgart.ims.coref.annotator.plugin.statistics.Plugin.class;
+			case conll2012:
+				return de.unistuttgart.ims.coref.annotator.plugin.conll2012.ConllExportPlugin.class;
+			case json:
+				return de.unistuttgart.ims.coref.annotator.plugin.json.Plugin.class;
+			case tei:
+				return de.unistuttgart.ims.coref.annotator.plugin.tei.TeiExportPlugin.class;
+			case qdtei:
+				return de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei.QuadramaTeiExportPlugin.class;
+			default:
+				return null;
+			}
+		}
+
 	}
 
 	public enum OutputFilename {

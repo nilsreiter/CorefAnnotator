@@ -33,10 +33,6 @@ public class DocumentStatistics implements CoreferenceModelListener {
 	int numberOfTokens = -1;
 	int numberOfCharacters = -1;
 
-	public Map<String, Double> getAllStatistics() {
-		return null;
-	}
-
 	public double getMeanOfMentionsPerEntity() {
 		return getSummaryStatistics().getMean();
 	}

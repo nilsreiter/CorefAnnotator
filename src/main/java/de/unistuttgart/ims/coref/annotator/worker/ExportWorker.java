@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.function.BiConsumer;
 
 import javax.swing.SwingWorker;
@@ -11,6 +12,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.CasCopier;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.DocumentModelExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
@@ -21,10 +23,12 @@ public class ExportWorker extends SwingWorker<Object, Object> {
 	JCas jcas;
 	BiConsumer<File, JCas> consumer;
 	ExportPlugin plugin;
+	DocumentModel documentModel;
 
-	public ExportWorker(File file, JCas jcas, ExportPlugin plugin, BiConsumer<File, JCas> consumer) {
+	public ExportWorker(File file, DocumentModel documentModel, ExportPlugin plugin, BiConsumer<File, JCas> consumer) {
 		this.file = file;
-		this.jcas = jcas;
+		this.documentModel = documentModel;
+		this.jcas = documentModel.getJcas();
 		this.plugin = plugin;
 		this.consumer = consumer;
 	}
@@ -40,7 +44,9 @@ public class ExportWorker extends SwingWorker<Object, Object> {
 			SimplePipeline.runPipeline(newJCas, ((UimaExportPlugin) plugin).getExporter(),
 					((UimaExportPlugin) plugin).getWriter(file));
 		else if (plugin instanceof DocumentModelExportPlugin) {
-			// TODO: implement
+			try (FileWriter fw = new FileWriter(file)) {
+				((DocumentModelExportPlugin) plugin).write(documentModel, fw);
+			}
 		}
 		return null;
 	}
