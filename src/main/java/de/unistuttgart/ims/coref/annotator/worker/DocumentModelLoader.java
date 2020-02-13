@@ -17,6 +17,7 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 	Consumer<DocumentModel> consumer = null;
 	JCas jcas;
 	Profile profile;
+	Preferences preferences;
 
 	public DocumentModelLoader(Consumer<DocumentModel> consumer, JCas jcas) {
 		this.consumer = consumer;
@@ -34,14 +35,15 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	@Override
 	protected DocumentModel doInBackground() throws Exception {
-		DocumentModel documentModel = load(Annotator.app.getPreferences());
+		DocumentModel documentModel = load(preferences == null ? Annotator.app.getPreferences() : preferences);
 		return documentModel;
 	}
 
 	@Override
 	protected void done() {
 		try {
-			consumer.accept(get());
+			if (consumer != null)
+				consumer.accept(get());
 		} catch (InterruptedException | ExecutionException e) {
 			Annotator.logger.catching(e);
 		}
@@ -53,6 +55,14 @@ public class DocumentModelLoader extends SwingWorker<DocumentModel, Integer> {
 
 	public void setProfile(Profile profile) {
 		this.profile = profile;
+	}
+
+	public Preferences getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(Preferences preferences) {
+		this.preferences = preferences;
 	}
 
 }

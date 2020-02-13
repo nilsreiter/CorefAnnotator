@@ -55,8 +55,8 @@ import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
@@ -190,16 +190,9 @@ public class Annotator {
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
 		panel.setPreferredSize(new Dimension(width, 200));
-		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
-			IOPlugin p = getPluginManager().getIOPlugin(plugin);
-			try {
-				if (p.getImporter() != null) {
-					AbstractAction importAction = new FileImportAction(this, p);
-					pan.add(new JButton(importAction));
-				}
-			} catch (ResourceInitializationException e1) {
-				logger.catching(e1);
-			}
+		pluginManager.getIOPluginObjects().selectInstancesOf(ImportPlugin.class).forEachWith((p, pan) -> {
+			AbstractAction importAction = new FileImportAction(this, p);
+			pan.add(new JButton(importAction));
 		}, panel);
 
 		mainPanel.add(panel);
@@ -248,7 +241,7 @@ public class Annotator {
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
+	public synchronized DocumentWindow open(final File file, ImportPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow();
 
@@ -261,7 +254,7 @@ public class Annotator {
 					@Override
 					public void run() {
 						openFiles.add(v);
-						if (flavor instanceof DefaultIOPlugin)
+						if (flavor instanceof DefaultImportPlugin)
 							recentFiles.add(0, file);
 						v.initialise();
 
@@ -276,7 +269,7 @@ public class Annotator {
 				@Override
 				public void run() {
 					openFiles.add(v);
-					if (flavor instanceof DefaultIOPlugin)
+					if (flavor instanceof DefaultImportPlugin)
 						recentFiles.add(0, file);
 					v.initialise();
 
@@ -315,7 +308,7 @@ public class Annotator {
 		this.opening.setVisible(true);
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor, boolean multi, Consumer<File[]> okCallback,
+	public void fileOpenDialog(Component parent, ImportPlugin flavor, boolean multi, Consumer<File[]> okCallback,
 			Consumer<Object> cancelCallback, String title) {
 		if (Annotator.javafx()) {
 			Platform.runLater(new Runnable() {
@@ -373,7 +366,7 @@ public class Annotator {
 		}
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor) {
+	public void fileOpenDialog(Component parent, ImportPlugin flavor) {
 		fileOpenDialog(parent, flavor, false, f -> open(f[0], flavor, Constants.X_UNSPECIFIED), o -> showOpening(),
 				"Open files using " + flavor.getName() + " scheme");
 	}

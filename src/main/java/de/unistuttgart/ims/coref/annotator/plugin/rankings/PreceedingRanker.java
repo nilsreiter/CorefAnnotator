@@ -7,6 +7,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.Sets;
+import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -36,6 +37,11 @@ public class PreceedingRanker implements EntityRankingPlugin {
 						return cModel.getLabel(o1).compareTo(cModel.getLabel(o2));
 					}
 				});
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return null;
 	}
 
 }

@@ -9,6 +9,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
+import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.Util;
@@ -78,5 +79,10 @@ public class MatchingRanker implements EntityRankingPlugin {
 		}
 		return false;
 
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return null;
 	}
 }

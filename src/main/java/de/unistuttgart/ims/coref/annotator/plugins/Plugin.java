@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
+import org.kordamp.ikonli.Ikon;
+
 /**
  * All plugins should implement this interface to provide some meta data for the
  * UI.
@@ -23,5 +25,7 @@ public interface Plugin {
 	 * @return
 	 */
 	String getName();
+
+	Ikon getIkon();
 
 }

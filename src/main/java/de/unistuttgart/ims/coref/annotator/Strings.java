@@ -134,6 +134,8 @@ public class Strings {
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT_TOOLTIP = "dialog.export_options.context_unit.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH = "dialog.export_options.context_width";
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH_TOOLTIP = "dialog.export_options.context_width.tooltip";
+	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_HEADER = "dialog.export_options.include_header";
+	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_HEADER_TOOLTIP = "dialog.export_options.include_header.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS = "dialog.export_options.include_line_numbers";
 	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS_TOOLTIP = "dialog.export_options.include_line_numbers.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_OK = "dialog.export_options.ok";
