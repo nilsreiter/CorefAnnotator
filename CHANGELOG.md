@@ -12,6 +12,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   entities do *not* automatically get all the flags, but it's now 
   possible to duplicate mentions and then move them to a new entity.
   #271
+- Added a new view to show simple summary statistics, and an 
+  exporter that exports the same info as CSV file. #286
 
 ## 1.13.0
 
