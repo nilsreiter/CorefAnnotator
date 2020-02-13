@@ -14,6 +14,7 @@ public class DocumentStatisticsWindow extends JDialog implements WindowListener 
 
 	public DocumentStatisticsWindow(AbstractTextWindow dw) {
 		super(dw);
+		this.setResizable(false);
 		this.setModalityType(ModalityType.MODELESS);
 		DocumentStatistics ds = new DocumentStatistics();
 		ds.setDocumentModel(dw.getDocumentModel());
