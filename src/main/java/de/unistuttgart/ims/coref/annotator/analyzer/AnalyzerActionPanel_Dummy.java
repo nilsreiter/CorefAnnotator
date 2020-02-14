@@ -13,7 +13,7 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 
 	@Override
 	public ACTION getType() {
-		return null;
+		return ACTION.DUMMY;
 	}
 
 	@Override

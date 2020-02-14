@@ -12,14 +12,14 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 public abstract class AnalyzerActionPanel extends JPanel {
 
 	static enum ACTION {
-		MENTION;
+		MENTION, DUMMY;
 
 		AnalyzerActionPanel getObject(DocumentModel documentModel, Iterable<Entity> entity) {
 			switch (this) {
 			case MENTION:
 				return new AnalyzerActionPanel_Mention(documentModel, entity);
 			default:
-				return null;
+				return new AnalyzerActionPanel_Dummy(documentModel, entity);
 			}
 		}
 	};
