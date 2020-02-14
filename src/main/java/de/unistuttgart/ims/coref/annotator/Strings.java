@@ -117,6 +117,10 @@ public class Strings {
 	public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
 	public static final String ANALZYER_ACTIONS = "analyzer.actions";
 	public static final String ANALZYER_ACTIONS_ = "analyzer.actions.";
+	public static final String ANALYZER_DATATABLE_MENTIONS = "analyzer.datatable.mentions";
+	public static final String ANALYZER_DATATABLE_COUNT = "analyzer.datatable.count";
+	public static final String ANALYZER_PLOT_REST_CATEGORY = "analyzer.plot.rest_category";
+	public static final String ANALYZER_PLOT_REST_LIMIT = "analyzer.plot.rest_limit";
 	public static final String ANALZYER_ENTITIES = "analyzer.entities";
 	public static final String COMPARE_CONTEXTMENU_INTERSECTION = "compare.contextmenu.intersection";
 	public static final String COMPARE_NOT_COMPARABLE = "compare.not_comparable";

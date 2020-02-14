@@ -3,7 +3,6 @@ package de.unistuttgart.ims.coref.annotator.analyzer;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
@@ -16,6 +15,8 @@ import org.knowm.xchart.PieChartBuilder;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.Styler.LegendPosition;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
@@ -27,8 +28,26 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	double limit = 0.04;
 
+	XChartPanel<PieChart> chartPanel;
+	JTable jtable;
+	MyTableModel tableModel;
+	JScrollPane tableScroller;
+
 	public AnalyzerActionPanel_ChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
+
+		tableModel = new MyTableModel();
+		jtable = new JTable();
+		jtable.setAutoCreateRowSorter(true);
+		jtable.setModel(tableModel);
+		jtable.setShowGrid(true);
+		tableScroller = new JScrollPane(jtable);
+		add(tableScroller);
+
+		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
+		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
+
 	}
 
 	void setFullData(MutableMapIterable<String, Integer> counts) {
@@ -43,8 +62,11 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 	}
 
 	public void refresh() {
-		removeAll();
-
+		if (chartPanel != null) {
+			remove(chartPanel);
+			chartPanel = null;
+		}
+		revalidate();
 		// CHART
 		PieChart chart = new PieChartBuilder().width(400).height(400).title(getClass().getSimpleName()).build();
 
@@ -61,50 +83,27 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 				.select((s, i) -> (double) i / (double) getTotalNumber() < limit);
 
 		MutableMapIterable<String, Integer> cts2 = cts.select((s, i) -> !smallest.containsKey(s));
-		cts2.put("Rest", (int) smallest.valuesView().sumOfInt(i -> i));
+		cts2.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
+				(int) smallest.valuesView().sumOfInt(i -> i));
 
 		cts2.forEach((s, i) -> {
 			chart.addSeries(s, i);
 		});
 
-		XChartPanel<PieChart> chartPanel = new XChartPanel<PieChart>(chart);
+		chartPanel = new XChartPanel<PieChart>(chart);
 		chartPanel.setPreferredSize(new Dimension(400, 400));
 		add(chartPanel);
 		chartConstraints(chartPanel);
-
-		// OPTIONS
-		JPanel optionPanel = getOptionPanel();
-		add(optionPanel);
-
-		layout.putConstraint(SpringLayout.NORTH, optionPanel, gap, SpringLayout.SOUTH, chartPanel);
-		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, optionPanel);
-		layout.putConstraint(SpringLayout.WEST, optionPanel, gap, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanel);
 
 		// TABLE
-		JTable jtable = new JTable();
-		MyTableModel tm = new MyTableModel();
 		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { s, i }, null)).keysView()
 				.toArray(new Object[cts.size()][]);
-		tm.setDataVector(dv, new String[] { "Mention", "Number" });
-		// TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tm);
-
-		jtable.setAutoCreateRowSorter(true);
-		jtable.setModel(tm);
-		jtable.setShowGrid(true);
-		// jtable.setRowSorter(sorter);
-
-		JScrollPane tableScroller = new JScrollPane(jtable);
-		add(tableScroller);
-
-		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, optionPanel);
-		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
-		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
+		tableModel.setDataVector(dv, new String[] { Annotator.getString(Strings.ANALYZER_DATATABLE_MENTIONS),
+				Annotator.getString(Strings.ANALYZER_DATATABLE_COUNT) });
 
 		revalidate();
 	}
-
-	abstract JPanel getOptionPanel();
 
 	public class MyTableModel extends DefaultTableModel {
 

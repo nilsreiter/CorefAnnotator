@@ -12,6 +12,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
@@ -49,7 +51,7 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_ChartTable 
 		JPanel pan = new JPanel();
 		pan.setLayout(new SpringLayout());
 
-		JLabel lab = new JLabel("Group below");
+		JLabel lab = new JLabel(Annotator.getString(Strings.ANALYZER_PLOT_REST_LIMIT));
 		pan.add(lab);
 
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
