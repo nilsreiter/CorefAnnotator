@@ -55,17 +55,13 @@ public class AnalyzerWindow extends AbstractWindow {
 
 		@Override
 		public AnalyzerActionPanel.ACTION getElementAt(int index) {
-			switch (index) {
-			case 0:
-				return AnalyzerActionPanel.ACTION.MENTION;
-			default:
-				return AnalyzerActionPanel.ACTION.DUMMY;
-			}
+			return AnalyzerActionPanel.ACTION.values()[index];
+
 		}
 
 		@Override
 		public int getSize() {
-			return 1;
+			return AnalyzerActionPanel.ACTION.values().length;
 		}
 
 	}
