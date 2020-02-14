@@ -1,5 +1,18 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -8,6 +21,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public abstract class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTable {
@@ -57,6 +71,46 @@ public abstract class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_
 
 		setFullData(cts);
 
+	}
+
+	@Override
+	JPanel getOptionPanel() {
+		JPanel pan = new JPanel();
+		pan.setLayout(new SpringLayout());
+
+		JLabel lab = new JLabel("Group below");
+		pan.add(lab);
+
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
+		spinner.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				limit = (double) spinner.getValue();
+				refresh();
+			}
+
+		});
+		pan.add(spinner);
+
+		pan.add(new JLabel("Direction"));
+		JComboBox<DIRECTION> directionBox = new JComboBox<DIRECTION>();
+		directionBox.setModel(new DefaultComboBoxModel<DIRECTION>());
+		directionBox.addItem(DIRECTION.LEFT);
+		directionBox.addItem(DIRECTION.RIGHT);
+		directionBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				direction = (DIRECTION) directionBox.getSelectedItem();
+				refresh();
+			}
+		});
+		pan.add(directionBox);
+
+		SpringUtilities.makeGrid(pan, 2, 2, // rows, cols
+				0, 0, // initialX, initialY
+				5, 5);// xPad, yPad
+		return pan;
 	}
 
 }

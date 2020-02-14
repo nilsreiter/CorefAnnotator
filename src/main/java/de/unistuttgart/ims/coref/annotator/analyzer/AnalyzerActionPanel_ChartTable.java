@@ -3,15 +3,10 @@ package de.unistuttgart.ims.coref.annotator.analyzer;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.Spring;
 import javax.swing.SpringLayout;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.eclipse.collections.api.map.MutableMapIterable;
@@ -78,25 +73,12 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		chartConstraints(chartPanel);
 
 		// OPTIONS
-		JLabel lab = new JLabel("Group below");
-		add(lab);
-		layout.putConstraint(SpringLayout.NORTH, lab, gap, SpringLayout.SOUTH, chartPanel);
-		layout.putConstraint(SpringLayout.WEST, lab, gap, SpringLayout.WEST, this);
+		JPanel optionPanel = getOptionPanel();
+		add(optionPanel);
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
-		spinner.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				limit = (double) spinner.getValue();
-				refresh();
-			}
-
-		});
-		add(spinner);
-		layout.putConstraint(SpringLayout.NORTH, spinner, gap, SpringLayout.SOUTH, chartPanel);
-		layout.putConstraint(SpringLayout.EAST, spinner, -gap, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, spinner, Spring.constant(5, 20, 300), SpringLayout.EAST, lab);
+		layout.putConstraint(SpringLayout.NORTH, optionPanel, gap, SpringLayout.SOUTH, chartPanel);
+		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, optionPanel);
+		layout.putConstraint(SpringLayout.WEST, optionPanel, gap, SpringLayout.WEST, this);
 
 		// TABLE
 		JTable jtable = new JTable();
@@ -114,13 +96,15 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		JScrollPane tableScroller = new JScrollPane(jtable);
 		add(tableScroller);
 
-		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, spinner);
+		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, optionPanel);
 		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
 		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
 
 		revalidate();
 	}
+
+	abstract JPanel getOptionPanel();
 
 	public class MyTableModel extends DefaultTableModel {
 
