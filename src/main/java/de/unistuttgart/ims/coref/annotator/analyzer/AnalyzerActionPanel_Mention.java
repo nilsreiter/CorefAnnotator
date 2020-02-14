@@ -4,16 +4,20 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.knowm.xchart.PieChart;
 import org.knowm.xchart.PieChartBuilder;
 import org.knowm.xchart.XChartPanel;
@@ -33,8 +37,6 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel {
 
 	public AnalyzerActionPanel_Mention(DocumentModel documentModel, Iterable<Entity> entities) {
 		super(documentModel, entities);
-
-		setPreferredSize(new Dimension(400, 400));
 
 		setEntities(entities);
 	}
@@ -97,8 +99,30 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel {
 		});
 		add(spinner);
 		layout.putConstraint(SpringLayout.NORTH, spinner, gap, SpringLayout.SOUTH, chartPanel);
-		layout.putConstraint(SpringLayout.EAST, spinner, -gap, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, spinner, gap, SpringLayout.EAST, this);
 		layout.putConstraint(SpringLayout.WEST, spinner, Spring.constant(5, 20, 300), SpringLayout.EAST, lab);
+
+		// TABLE
+		JTable jtable = new JTable();
+		MyTableModel tm = new MyTableModel();
+		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { s, i }, null)).keysView()
+				.toArray(new Object[cts.size()][]);
+		tm.setDataVector(dv, new String[] { "Mention", "Number" });
+		// TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tm);
+
+		jtable.setAutoCreateRowSorter(true);
+		jtable.setModel(tm);
+		jtable.setShowGrid(true);
+		// jtable.setRowSorter(sorter);
+
+		JScrollPane tableScroller = new JScrollPane(jtable);
+		add(tableScroller);
+
+		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, spinner);
+		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
+		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
+
 		revalidate();
 	}
 
@@ -106,6 +130,19 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel {
 	public void setEntities(Iterable<Entity> entities) {
 		this.entities = entities;
 		refresh();
+	}
+
+	public class MyTableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Class<?> getColumnClass(int c) {
+			if (c == 0)
+				return String.class;
+			else
+				return Integer.class;
+		}
 	}
 
 }

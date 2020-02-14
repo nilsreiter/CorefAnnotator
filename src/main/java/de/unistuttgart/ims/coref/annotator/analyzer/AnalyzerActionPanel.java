@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -31,6 +32,9 @@ public abstract class AnalyzerActionPanel extends JPanel {
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
+
+		setPreferredSize(new Dimension(400, 800));
+
 		layout = new SpringLayout();
 		setLayout(layout);
 	}

@@ -1,7 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
-import java.awt.Dimension;
-
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
@@ -11,7 +9,6 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 
 	public AnalyzerActionPanel_Dummy(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
-		setPreferredSize(new Dimension(400, 800));
 	}
 
 	@Override
