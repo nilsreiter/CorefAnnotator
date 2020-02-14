@@ -23,15 +23,15 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-public class MentionAnalyzerActionPanel extends AnalyzerActionPanel {
+public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	Iterable<Entity> entities = null;
 
-	double limit = 0.05;
+	double limit = 0.04;
 
-	public MentionAnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entities) {
+	public AnalyzerActionPanel_Mention(DocumentModel documentModel, Iterable<Entity> entities) {
 		super(documentModel, entities);
 
 		setPreferredSize(new Dimension(400, 400));
@@ -85,7 +85,7 @@ public class MentionAnalyzerActionPanel extends AnalyzerActionPanel {
 		layout.putConstraint(SpringLayout.NORTH, lab, gap, SpringLayout.SOUTH, chartPanel);
 		layout.putConstraint(SpringLayout.WEST, lab, gap, SpringLayout.WEST, this);
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.05));
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
 		spinner.addChangeListener(new ChangeListener() {
 
 			@Override

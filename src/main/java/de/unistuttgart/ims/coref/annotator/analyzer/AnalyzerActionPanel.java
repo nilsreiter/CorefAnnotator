@@ -16,7 +16,7 @@ public abstract class AnalyzerActionPanel extends JPanel {
 		AnalyzerActionPanel getObject(DocumentModel documentModel, Iterable<Entity> entity) {
 			switch (this) {
 			case MENTION:
-				return new MentionAnalyzerActionPanel(documentModel, entity);
+				return new AnalyzerActionPanel_Mention(documentModel, entity);
 			default:
 				return null;
 			}

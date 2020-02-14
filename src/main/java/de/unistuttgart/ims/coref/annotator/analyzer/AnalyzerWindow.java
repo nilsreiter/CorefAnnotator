@@ -106,6 +106,7 @@ public class AnalyzerWindow extends AbstractWindow {
 			}
 		}
 	}
+
 	class MyTreeCellRenderer extends DefaultListCellRenderer implements PreferenceChangeListener {
 
 		private static final long serialVersionUID = 1L;
@@ -184,6 +185,7 @@ public class AnalyzerWindow extends AbstractWindow {
 		}
 
 	}
+
 	private static final long serialVersionUID = 1L;
 
 	JList<AnalyzerActionPanel.ACTION> actionList;
@@ -209,16 +211,17 @@ public class AnalyzerWindow extends AbstractWindow {
 		entityList.setCellRenderer(new MyTreeCellRenderer());
 		entityList.addListSelectionListener(new EntityListSelectionListener());
 		entityList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		entityList.setPreferredSize(new Dimension(200, 600));
 
 		actionList = new JList<AnalyzerActionPanel.ACTION>();
 		actionList.setModel(new ActionListModel());
 		actionList.addListSelectionListener(new ActionListSelectionListener());
 		actionList.setCellRenderer(new ActionListCellRenderer());
+		actionList.setPreferredSize(new Dimension(200, 600));
 
-		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionList, new JLabel("placeholder"));
-		add(innerSplitPane, BorderLayout.CENTER);
+		actionPanel = new AnalyzerActionPanel_Dummy(documentModel, null);
 
-		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionList, new JLabel("bla"));
+		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionList, actionPanel);
 		outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entityList, innerSplitPane);
 
 		add(outerSplitPane, BorderLayout.CENTER);
