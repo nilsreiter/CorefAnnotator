@@ -1,8 +1,10 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
@@ -28,13 +30,18 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	double limit = 0.04;
 
-	XChartPanel<PieChart> chartPanel;
 	JTable jtable;
 	MyTableModel tableModel;
 	JScrollPane tableScroller;
+	JPanel chartPanelContainer;
 
 	public AnalyzerActionPanel_ChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
+
+		chartPanelContainer = new JPanel();
+		chartPanelContainer.setLayout(new BorderLayout());
+		add(chartPanelContainer);
+		chartConstraints(chartPanelContainer);
 
 		tableModel = new MyTableModel();
 		jtable = new JTable();
@@ -47,6 +54,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
 		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
+		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanelContainer);
 
 	}
 
@@ -62,11 +70,8 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 	}
 
 	public void refresh() {
-		if (chartPanel != null) {
-			remove(chartPanel);
-			chartPanel = null;
-		}
-		revalidate();
+		chartPanelContainer.removeAll();
+
 		// CHART
 		PieChart chart = new PieChartBuilder().width(400).height(400).title(getClass().getSimpleName()).build();
 
@@ -90,11 +95,10 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			chart.addSeries(s, i);
 		});
 
+		XChartPanel<PieChart> chartPanel;
 		chartPanel = new XChartPanel<PieChart>(chart);
 		chartPanel.setPreferredSize(new Dimension(400, 400));
-		add(chartPanel);
-		chartConstraints(chartPanel);
-		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanel);
+		chartPanelContainer.add(chartPanel, BorderLayout.CENTER);
 
 		// TABLE
 		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { s, i }, null)).keysView()
