@@ -3,7 +3,6 @@ package de.unistuttgart.ims.coref.annotator.analyzer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -83,28 +82,28 @@ public abstract class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_
 
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
 		spinner.addChangeListener(new ChangeListener() {
-
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				limit = (double) spinner.getValue();
 				refresh();
 			}
-
 		});
 		pan.add(spinner);
 
 		pan.add(new JLabel("Direction"));
-		JComboBox<DIRECTION> directionBox = new JComboBox<DIRECTION>();
-		directionBox.setModel(new DefaultComboBoxModel<DIRECTION>());
-		directionBox.addItem(DIRECTION.LEFT);
-		directionBox.addItem(DIRECTION.RIGHT);
+		JComboBox<DIRECTION> directionBox = new JComboBox<DIRECTION>(DIRECTION.values());
+		directionBox.setEditable(false);
+		directionBox.setSelectedItem(direction);
 		directionBox.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				direction = (DIRECTION) directionBox.getSelectedItem();
 				refresh();
 			}
+
 		});
+
 		pan.add(directionBox);
 
 		SpringUtilities.makeGrid(pan, 2, 2, // rows, cols
