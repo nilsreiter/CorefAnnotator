@@ -27,8 +27,8 @@ public abstract class AnalyzerActionPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	DocumentModel documentModel;
-	int gap = 5;
-	SpringLayout layout;
+	protected int gap = 5;
+	protected SpringLayout layout;
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
