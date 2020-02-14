@@ -50,6 +50,7 @@ import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileMergeOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectAnalyzeAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
@@ -177,6 +178,7 @@ public class Annotator {
 		panel.add(new JButton(new ShowLogWindowAction(this)));
 		panel.add(new JButton(openCompareAction));
 		panel.add(new JButton(new FileMergeOpenAction()));
+		panel.add(new JButton(new FileSelectAnalyzeAction()));
 		mainPanel.add(panel);
 
 		mainPanel.add(Box.createVerticalStrut(10));
