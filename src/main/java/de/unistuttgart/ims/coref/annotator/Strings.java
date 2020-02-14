@@ -115,6 +115,9 @@ public class Strings {
 	public static final String ACTION_UNDO = "action.undo";
 	public static final String ACTION_VIEW_DECREASE_FONT_SIZE = "action.view.decrease_font_size";
 	public static final String ACTION_VIEW_INCREASE_FONT_SIZE = "action.view.increase_font_size";
+	public static final String ANALZYER_ACTIONS = "analyzer.actions";
+	public static final String ANALZYER_ACTIONS_ = "analyzer.actions.";
+	public static final String ANALZYER_ENTITIES = "analyzer.entities";
 	public static final String COMPARE_CONTEXTMENU_INTERSECTION = "compare.contextmenu.intersection";
 	public static final String COMPARE_NOT_COMPARABLE = "compare.not_comparable";
 	public static final String DIALOG_ANNOTATOR_LABEL = "dialog.annotator_label";

@@ -8,6 +8,7 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -15,19 +16,20 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.commons.lang3.StringUtils;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.AbstractWindow;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
@@ -44,7 +46,8 @@ public class AnalyzerWindow extends AbstractWindow {
 		@Override
 		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
-			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			super.getListCellRendererComponent(list, Annotator.getString(Strings.ANALZYER_ACTIONS_ + value.toString()),
+					index, isSelected, cellHasFocus);
 			return this;
 		}
 	}
@@ -61,7 +64,7 @@ public class AnalyzerWindow extends AbstractWindow {
 
 		@Override
 		public int getSize() {
-			return AnalyzerActionPanel.ACTION.values().length;
+			return AnalyzerActionPanel.ACTION.values().length - 1;
 		}
 
 	}
@@ -159,11 +162,6 @@ public class AnalyzerWindow extends AbstractWindow {
 				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
 			}
 
-			String visLabel = StringUtils.abbreviate(entity.getLabel(), "…", Constants.UI_MAX_STRING_WIDTH_IN_TREE);
-
-			if (entity.getKey() != null) {
-				lab1.setText(visLabel + " [" + entity.getKey() + "]");
-			}
 			if (entity instanceof EntityGroup) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
@@ -218,9 +216,21 @@ public class AnalyzerWindow extends AbstractWindow {
 
 		actionPanel = new AnalyzerActionPanel_Dummy(documentModel, null);
 
-		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionList, actionPanel);
-		outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entityList, innerSplitPane);
+		JPanel entityListPanel = new JPanel();
+		entityListPanel.setLayout(new BorderLayout(5, 5));
+		entityListPanel.add(new JScrollPane(entityList), BorderLayout.CENTER);
+		entityListPanel.add(new JLabel(Annotator.getString(Strings.ANALZYER_ENTITIES)), BorderLayout.NORTH);
+		entityListPanel.setPreferredSize(new Dimension(200, 600));
 
+		JPanel actionListPanel = new JPanel();
+		actionListPanel.setLayout(new BorderLayout(5, 5));
+		actionListPanel.add(new JScrollPane(actionList), BorderLayout.CENTER);
+		actionListPanel.add(new JLabel(Annotator.getString(Strings.ANALZYER_ACTIONS)), BorderLayout.NORTH);
+		actionListPanel.setPreferredSize(new Dimension(200, 600));
+
+		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionListPanel, actionPanel);
+		outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entityListPanel, innerSplitPane);
+		innerSplitPane.setBorder(BorderFactory.createEmptyBorder());
 		add(outerSplitPane, BorderLayout.CENTER);
 		pack();
 
