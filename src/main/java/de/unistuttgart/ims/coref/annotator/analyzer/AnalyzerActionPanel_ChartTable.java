@@ -25,8 +25,11 @@ import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.CategorySeries;
+import org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle;
 import org.knowm.xchart.PieChart;
 import org.knowm.xchart.PieChartBuilder;
+import org.knowm.xchart.PieSeries;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.Styler.LegendPosition;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
@@ -107,12 +110,15 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			categoryChart.getStyler().setLegendPosition(LegendPosition.OutsideE);
 			categoryChart.getStyler().setChartBackgroundColor(getBackground());
 			categoryChart.getStyler().setChartTitleVisible(false);
+			categoryChart.getStyler().setDefaultSeriesRenderStyle(CategorySeriesRenderStyle.Bar);
 
 			// Series
-
 			int snum = 0;
-			for (String c : cts.keySet()) {
-				categoryChart.addSeries(c, new int[] { snum++ }, new int[] { cts.get(c) });
+			for (String c : cts2.keySet()) {
+				CategorySeries series = categoryChart.addSeries(c, new int[] { snum++ }, new int[] { cts2.get(c) });
+				if (c.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
+					series.setFillColor(Color.lightGray);
+				}
 			}
 			XChartPanel<CategoryChart> categoryChartPanel;
 			categoryChartPanel = new XChartPanel<CategoryChart>(categoryChart);
@@ -136,7 +142,10 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			// Series
 
 			cts2.forEach((s, i) -> {
-				pieChart.addSeries(s, i);
+				PieSeries series = pieChart.addSeries(s, i);
+				if (s.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
+					series.setFillColor(Color.lightGray);
+				}
 			});
 
 			XChartPanel<PieChart> chartPanel;
