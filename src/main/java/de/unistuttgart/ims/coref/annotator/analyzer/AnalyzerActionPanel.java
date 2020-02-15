@@ -37,11 +37,13 @@ public abstract class AnalyzerActionPanel extends JPanel {
 	int gap = 5;
 	SpringLayout layout;
 	JPanel optionPanel;
+	int chartWidth = 700;
+	int chartHeight = 500;
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
 
-		setPreferredSize(new Dimension(400, 800));
+		setPreferredSize(new Dimension(700, 800));
 
 		layout = new SpringLayout();
 		setLayout(layout);

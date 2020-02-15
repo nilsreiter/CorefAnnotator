@@ -37,7 +37,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 
 		this.entities = entities;
 
-		XYChart chart = new XYChartBuilder().width(800).height(600).build();
+		XYChart chart = new XYChartBuilder().width(chartWidth).height(chartHeight).build();
 
 		// Customize Chart
 		chart.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
