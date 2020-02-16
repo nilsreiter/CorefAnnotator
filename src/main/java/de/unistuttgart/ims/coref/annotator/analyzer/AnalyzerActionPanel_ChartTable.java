@@ -132,9 +132,6 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 					.title(getClass().getSimpleName()).build();
 
 			// Customize Chart
-			Color[] sliceColors = new Color[] { new Color(224, 68, 14), new Color(230, 105, 62),
-					new Color(236, 143, 110), new Color(243, 180, 159), new Color(246, 199, 182) };
-			pieChart.getStyler().setSeriesColors(sliceColors);
 			pieChart.getStyler().setLegendPosition(LegendPosition.OutsideE);
 			pieChart.getStyler().setChartBackgroundColor(getBackground());
 			pieChart.getStyler().setChartTitleVisible(false);
