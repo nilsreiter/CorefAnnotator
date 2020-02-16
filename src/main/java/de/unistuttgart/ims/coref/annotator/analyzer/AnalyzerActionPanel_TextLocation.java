@@ -23,6 +23,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
+		init();
 		setEntities(entity);
 	}
 

@@ -15,14 +15,14 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 public abstract class AnalyzerActionPanel extends JPanel {
 
 	static enum ACTION {
-		MENTION, NEIGHBOUR_RIGHT, TEXTLOCATION, DUMMY;
+		MENTION, NEIGHBOUR, TEXTLOCATION, DUMMY;
 
 		AnalyzerActionPanel getObject(DocumentModel documentModel, Iterable<Entity> entity) {
 			switch (this) {
 			case TEXTLOCATION:
 				return new AnalyzerActionPanel_TextLocation(documentModel, entity);
-			case NEIGHBOUR_RIGHT:
-				return new AnalyzerActionPanel_NeighbourRight(documentModel, entity);
+			case NEIGHBOUR:
+				return new AnalyzerActionPanel_Neighbour(documentModel, entity);
 			case MENTION:
 				return new AnalyzerActionPanel_Mention(documentModel, entity);
 			default:

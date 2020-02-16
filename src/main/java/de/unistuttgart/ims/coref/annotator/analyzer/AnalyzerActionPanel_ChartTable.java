@@ -51,7 +51,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	MutableMapIterable<String, Integer> cts;
 
-	double limit = 0.04;
+	double limit = 0.01;
 
 	JTable jtable = new JTable();
 	MyTableModel tableModel = new MyTableModel();
@@ -197,7 +197,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		pan.add(new JLabel(Annotator.getString(Strings.ANALYZER_PLOT_PLOT_TYPE)));
 
 		JComboBox<ChartType> plotTypeBox = new JComboBox<ChartType>(ChartType.values());
-		plotTypeBox.setSelectedItem(ChartType.BAR);
+		plotTypeBox.setSelectedItem(chartType);
 		plotTypeBox.setRenderer(new DefaultListCellRenderer() {
 
 			private static final long serialVersionUID = 1L;
