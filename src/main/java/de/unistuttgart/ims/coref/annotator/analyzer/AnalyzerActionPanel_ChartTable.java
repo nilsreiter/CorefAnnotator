@@ -61,7 +61,6 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	public AnalyzerActionPanel_ChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
-
 	}
 
 	abstract void calculateCounts();
@@ -183,7 +182,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		JLabel lab = new JLabel(Annotator.getString(Strings.ANALYZER_PLOT_REST_LIMIT));
 		pan.add(lab);
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.02));
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(limit, 0, 1, 0.01));
 		spinner.addChangeListener(new ChangeListener() {
 
 			@Override

@@ -20,12 +20,11 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 
 	@Override
 	public void setEntities(Iterable<Entity> entities) {
-
+		this.entities = entities;
 	}
 
 	@Override
 	void refresh() {
-
 	}
 
 }

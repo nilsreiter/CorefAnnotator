@@ -85,6 +85,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 		unitBox.setSelectedItem(neighbourType);
 		unitBox.addActionListener(new ActionListener() {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				neighbourType = (Class<? extends Annotation>) unitBox.getSelectedItem();
@@ -93,6 +94,9 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 
 		});
 		unitBox.setRenderer(new TranslatedListCellRenderer(Strings.ANALYZER_NEIGHBOUR_UNIT_) {
+
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index,
 					boolean isSelected, boolean cellHasFocus) {

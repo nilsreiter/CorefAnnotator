@@ -2,7 +2,9 @@ package de.unistuttgart.ims.coref.annotator.analyzer;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -40,6 +42,7 @@ public abstract class AnalyzerActionPanel extends JPanel {
 	int chartWidth = 700;
 	int chartHeight = 500;
 	Iterable<Entity> entities = null;
+	Font headerFont = this.getFont().deriveFont(this.getFont().getSize() * 1.5f).deriveFont(Font.BOLD);
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
@@ -58,6 +61,8 @@ public abstract class AnalyzerActionPanel extends JPanel {
 		layout = new SpringLayout();
 		setLayout(layout);
 		JLabel headerLabel = new JLabel(Annotator.getString(Strings.ANALZYER_ACTIONS_ + getType().toString()));
+		headerLabel.setFont(headerFont);
+		headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
 		add(headerLabel);
 		layout.putConstraint(SpringLayout.NORTH, headerLabel, gap, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, headerLabel, gap, SpringLayout.WEST, this);

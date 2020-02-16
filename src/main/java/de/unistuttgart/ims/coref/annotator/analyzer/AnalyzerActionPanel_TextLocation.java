@@ -34,8 +34,6 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 	void refresh() {
 		removeAll();
 
-		this.entities = entities;
-
 		XYChart chart = new XYChartBuilder().width(chartWidth).height(chartHeight).build();
 
 		// Customize Chart
