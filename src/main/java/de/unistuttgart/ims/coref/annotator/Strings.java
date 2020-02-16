@@ -119,6 +119,8 @@ public class Strings {
 	public static final String ANALZYER_ACTIONS_ = "analyzer.actions.";
 	public static final String ANALYZER_DATATABLE_MENTIONS = "analyzer.datatable.mentions";
 	public static final String ANALYZER_DATATABLE_COUNT = "analyzer.datatable.count";
+	public static final String ANALYZER_NEIGHBOUR_DIRECTION = "analyzer.neighbour.direction";
+	public static final String ANALYZER_NEIGHBOUR_DIRECTION_ = "analyzer.neighbour.direction.";
 	public static final String ANALYZER_PLOT_PLOT_TYPE = "analyzer.plot.plot_type";
 	public static final String ANALYZER_PLOT_PLOT_TYPE_BAR = "analyzer.plot.plot_type.bar";
 	public static final String ANALYZER_PLOT_PLOT_TYPE_PIE = "analyzer.plot.plot_type.pie";
