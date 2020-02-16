@@ -17,6 +17,8 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_ChartTable 
 	public AnalyzerActionPanel_Mention(DocumentModel documentModel, Iterable<Entity> entities) {
 		super(documentModel, entities);
 
+		init();
+
 		setEntities(entities);
 	}
 

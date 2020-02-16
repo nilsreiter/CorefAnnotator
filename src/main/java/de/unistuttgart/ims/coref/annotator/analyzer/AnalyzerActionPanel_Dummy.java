@@ -9,6 +9,8 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 
 	public AnalyzerActionPanel_Dummy(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
+
+		init();
 	}
 
 	@Override

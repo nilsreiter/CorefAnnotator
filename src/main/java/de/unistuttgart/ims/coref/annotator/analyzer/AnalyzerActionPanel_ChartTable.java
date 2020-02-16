@@ -53,33 +53,34 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	double limit = 0.04;
 
-	JTable jtable;
-	MyTableModel tableModel;
-	JScrollPane tableScroller;
-	JPanel chartPanelContainer;
+	JTable jtable = new JTable();
+	MyTableModel tableModel = new MyTableModel();
+	JScrollPane tableScroller = new JScrollPane(jtable);
+	JPanel chartPanelContainer = new JPanel();
 	ChartType chartType = ChartType.BAR;
 
 	public AnalyzerActionPanel_ChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
 
-		chartPanelContainer = new JPanel();
+	}
+
+	@Override
+	void init() {
+		super.init();
+
 		chartPanelContainer.setLayout(new BorderLayout());
 		add(chartPanelContainer);
 		chartConstraints(chartPanelContainer);
 
-		tableModel = new MyTableModel();
-		jtable = new JTable();
 		jtable.setAutoCreateRowSorter(true);
 		jtable.setModel(tableModel);
 		jtable.setShowGrid(true);
-		tableScroller = new JScrollPane(jtable);
 		add(tableScroller);
 
 		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
 		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
 		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanelContainer);
-
 	}
 
 	void setFullData(MutableMapIterable<String, Integer> counts) {

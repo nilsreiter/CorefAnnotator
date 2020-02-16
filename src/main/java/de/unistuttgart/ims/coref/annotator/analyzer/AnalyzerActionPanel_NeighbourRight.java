@@ -10,6 +10,8 @@ public class AnalyzerActionPanel_NeighbourRight extends AnalyzerActionPanel_Neig
 	public AnalyzerActionPanel_NeighbourRight(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
 		direction = DIRECTION.RIGHT;
+
+		init();
 		setEntities(entity);
 	}
 

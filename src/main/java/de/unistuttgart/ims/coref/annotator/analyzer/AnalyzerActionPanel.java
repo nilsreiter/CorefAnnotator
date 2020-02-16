@@ -42,7 +42,15 @@ public abstract class AnalyzerActionPanel extends JPanel {
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
+	}
 
+	void chartConstraints(Component c) {
+		layout.putConstraint(SpringLayout.WEST, c, gap, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, c, gap, SpringLayout.SOUTH, optionPanel);
+		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, c);
+	}
+
+	void init() {
 		setPreferredSize(new Dimension(700, 800));
 
 		layout = new SpringLayout();
@@ -58,13 +66,6 @@ public abstract class AnalyzerActionPanel extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, optionPanel, gap, SpringLayout.SOUTH, headerLabel);
 		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, optionPanel);
 		layout.putConstraint(SpringLayout.WEST, optionPanel, gap, SpringLayout.WEST, this);
-
-	}
-
-	void chartConstraints(Component c) {
-		layout.putConstraint(SpringLayout.WEST, c, gap, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, c, gap, SpringLayout.SOUTH, optionPanel);
-		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, c);
 	}
 
 	public abstract ACTION getType();
