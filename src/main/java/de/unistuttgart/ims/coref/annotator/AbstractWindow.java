@@ -27,7 +27,7 @@ import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
-public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener {
+public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener, HasDocumentModel {
 
 	private static final long serialVersionUID = 1L;
 	JPanel statusBar = new JPanel();

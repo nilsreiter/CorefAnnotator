@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
@@ -48,35 +47,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 
 		init();
 
-		setEntities(entity);
-	}
-
-	@Override
-	public void setEntities(Iterable<Entity> entities) {
-		ImmutableList<Mention> mentions = Lists.immutable.withAll(entities)
-				.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
-		ImmutableList<? extends Annotation> followers;
-		if (direction == DIRECTION.RIGHT) {
-			followers = mentions.flatCollect(m -> JCasUtil.selectFollowing(neighbourType, m, n));
-		} else {
-			followers = mentions.flatCollect(m -> JCasUtil.selectPreceding(neighbourType, m, n));
-
-		}
-		MutableMapIterable<String, Integer> cts;
-
-		switch (toText) {
-		case ENTITY:
-			cts = followers.selectInstancesOf(Mention.class).countBy(m -> m.getEntity().getLabel())
-					.toMapOfItemToCount();
-			break;
-		case COVEREDTEXT:
-		default:
-			cts = followers.countBy(m -> m.getCoveredText()).toMapOfItemToCount();
-
-		}
-
-		setFullData(cts);
-
+		refresh();
 	}
 
 	@Override
@@ -141,6 +112,33 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 	@Override
 	public ACTION getType() {
 		return ACTION.NEIGHBOUR;
+	}
+
+	@Override
+	void calculateCounts() {
+		ImmutableList<Mention> mentions = Lists.immutable.withAll(entities)
+				.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
+		ImmutableList<? extends Annotation> followers;
+		if (direction == DIRECTION.RIGHT) {
+			followers = mentions.flatCollect(m -> JCasUtil.selectFollowing(neighbourType, m, n));
+		} else {
+			followers = mentions.flatCollect(m -> JCasUtil.selectPreceding(neighbourType, m, n));
+
+		}
+
+		if (neighbourType != Mention.class)
+			toText = TOTEXT.COVEREDTEXT;
+		switch (toText) {
+		case ENTITY:
+			cts = followers.selectInstancesOf(Mention.class).countBy(m -> m.getEntity().getLabel())
+					.toMapOfItemToCount();
+			break;
+		case COVEREDTEXT:
+		default:
+			cts = followers.countBy(m -> m.getCoveredText()).toMapOfItemToCount();
+
+		}
+
 	}
 
 }

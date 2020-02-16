@@ -31,18 +31,23 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.AbstractWindow;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.HasDocumentModel;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectAnalyzeAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 
-public class AnalyzerWindow extends AbstractWindow {
+public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 
 	public class ActionListCellRenderer extends DefaultListCellRenderer {
 
@@ -79,6 +84,9 @@ public class AnalyzerWindow extends AbstractWindow {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()) {
+				actionPanel = actionList.getSelectedValue().getObject(documentModel,
+						entityList.getSelectedValuesList());
+				innerSplitPane.add(actionPanel, JSplitPane.RIGHT);
 				updateActionPanel();
 			}
 		}
@@ -107,6 +115,7 @@ public class AnalyzerWindow extends AbstractWindow {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()) {
+				actionPanel.setEntities(entityList.getSelectedValuesList());
 				updateActionPanel();
 			}
 		}
@@ -204,11 +213,15 @@ public class AnalyzerWindow extends AbstractWindow {
 		init();
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		return documentModel;
 	}
 
 	protected void init() {
+
+		initializeWindow();
+
 		entityList = new JList<Entity>();
 		entityList.setCellRenderer(new MyTreeCellRenderer());
 		entityList.addListSelectionListener(new EntityListSelectionListener());
@@ -239,7 +252,6 @@ public class AnalyzerWindow extends AbstractWindow {
 		outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entityListPanel, innerSplitPane);
 		innerSplitPane.setBorder(BorderFactory.createEmptyBorder());
 		add(outerSplitPane, BorderLayout.CENTER);
-		pack();
 
 		// Menus
 		JMenu menu = new JMenu(Annotator.getString(Strings.MENU_FILE));
@@ -249,6 +261,19 @@ public class AnalyzerWindow extends AbstractWindow {
 		menu.add(new de.unistuttgart.ims.coref.annotator.action.CloseAction());
 		menuBar.add(menu);
 
+		JMenu procMenu = new JMenu(Annotator.getString(Strings.MENU_TOOLS_PROC));
+		for (Class<? extends ProcessingPlugin> pp : Annotator.app.getPluginManager().getProcessingPlugins()) {
+			ProcessAction pa = new ProcessAction(this, Annotator.app.getPluginManager().getPlugin(pp));
+			procMenu.add(pa);
+		}
+
+		menu = new JMenu(Annotator.getString(Strings.MENU_TOOLS));
+		menu.add(procMenu);
+		menu.add(new SetLanguageAction(this));
+		menu.addSeparator();
+		menu.add(new ShowLogWindowAction(Annotator.app));
+
+		menuBar.add(menu);
 		menuBar.add(initialiseMenuSettings());
 
 		setJMenuBar(menuBar);
@@ -260,12 +285,18 @@ public class AnalyzerWindow extends AbstractWindow {
 		controls.add(openAnnotatorAction);
 		add(controls, BorderLayout.NORTH);
 
+		add(getStatusBar(), BorderLayout.SOUTH);
+
+		pack();
+
 	}
 
 	protected void initContent() {
 		entityList.setModel(new EntityListModel());
 
 		openAnnotatorAction.setFile(documentModel.getFile());
+
+		stopIndeterminateProgress();
 	}
 
 	public void setDocumentModel(DocumentModel documentModel) {
@@ -278,13 +309,6 @@ public class AnalyzerWindow extends AbstractWindow {
 	}
 
 	protected void updateActionPanel() {
-		if (!entityList.isSelectionEmpty() && !actionList.isSelectionEmpty())
-			if (actionPanel == null || actionPanel.getType() != actionList.getSelectedValue()) {
-				actionPanel = actionList.getSelectedValue().getObject(documentModel,
-						entityList.getSelectedValuesList());
-				innerSplitPane.add(actionPanel, JSplitPane.RIGHT);
-			} else {
-				actionPanel.setEntities(entityList.getSelectedValuesList());
-			}
+		actionPanel.refresh();
 	}
 }

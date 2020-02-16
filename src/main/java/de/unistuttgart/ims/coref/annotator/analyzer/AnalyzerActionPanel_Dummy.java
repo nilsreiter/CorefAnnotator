@@ -23,4 +23,9 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 
 	}
 
+	@Override
+	void refresh() {
+
+	}
+
 }

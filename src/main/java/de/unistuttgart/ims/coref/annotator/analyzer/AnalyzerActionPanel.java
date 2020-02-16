@@ -39,9 +39,11 @@ public abstract class AnalyzerActionPanel extends JPanel {
 	JPanel optionPanel;
 	int chartWidth = 700;
 	int chartHeight = 500;
+	Iterable<Entity> entities = null;
 
 	public AnalyzerActionPanel(DocumentModel documentModel, Iterable<Entity> entity) {
 		this.documentModel = documentModel;
+		this.entities = entity;
 	}
 
 	void chartConstraints(Component c) {
@@ -70,7 +72,12 @@ public abstract class AnalyzerActionPanel extends JPanel {
 
 	public abstract ACTION getType();
 
-	public abstract void setEntities(Iterable<Entity> entities);
+	public void setEntities(Iterable<Entity> entities) {
+		this.entities = entities;
+		this.refresh();
+	};
+
+	abstract void refresh();
 
 	JPanel getOptionPanel() {
 		return new JPanel();

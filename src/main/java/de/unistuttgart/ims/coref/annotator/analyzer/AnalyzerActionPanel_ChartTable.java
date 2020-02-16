@@ -64,6 +64,8 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	}
 
+	abstract void calculateCounts();
+
 	@Override
 	void init() {
 		super.init();
@@ -83,19 +85,18 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanelContainer);
 	}
 
-	void setFullData(MutableMapIterable<String, Integer> counts) {
-		this.cts = counts;
-		refresh();
-	}
-
 	int getTotalNumber() {
 		if (this.cts == null)
 			return 0;
 		return (int) cts.valuesView().sumOfInt(i -> i);
 	}
 
+	@Override
 	public void refresh() {
 		chartPanelContainer.removeAll();
+
+		calculateCounts();
+
 		MutableMapIterable<String, Integer> smallest = cts
 				.select((s, i) -> (double) i / (double) getTotalNumber() < limit);
 

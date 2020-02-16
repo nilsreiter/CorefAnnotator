@@ -19,12 +19,10 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 
 	private static final long serialVersionUID = 1L;
-	Iterable<Entity> entities;
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
 		init();
-		setEntities(entity);
 	}
 
 	@Override
@@ -33,7 +31,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 	}
 
 	@Override
-	public void setEntities(Iterable<Entity> entities) {
+	void refresh() {
 		removeAll();
 
 		this.entities = entities;
