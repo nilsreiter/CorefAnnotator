@@ -15,9 +15,11 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -31,6 +33,9 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectAnalyzeAction;
+import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
@@ -189,9 +194,11 @@ public class AnalyzerWindow extends AbstractWindow {
 
 	JList<Entity> entityList;
 
-	JSplitPane innerSplitPane;;
+	JSplitPane innerSplitPane;
 
-	JSplitPane outerSplitPane;;
+	JSplitPane outerSplitPane;
+
+	SelectedFileOpenAction openAnnotatorAction = new SelectedFileOpenAction(Annotator.app, null);
 
 	public AnalyzerWindow() {
 		init();
@@ -234,10 +241,31 @@ public class AnalyzerWindow extends AbstractWindow {
 		add(outerSplitPane, BorderLayout.CENTER);
 		pack();
 
+		// Menus
+		JMenu menu = new JMenu(Annotator.getString(Strings.MENU_FILE));
+		menu.add(new FileSelectAnalyzeAction());
+		menu.add(new FileSelectOpenAction(Annotator.app));
+		menu.add(openAnnotatorAction);
+		menu.add(new de.unistuttgart.ims.coref.annotator.action.CloseAction());
+		menuBar.add(menu);
+
+		menuBar.add(initialiseMenuSettings());
+
+		setJMenuBar(menuBar);
+
+		// toolbar
+		JToolBar controls = new JToolBar();
+		controls.setFocusable(false);
+		controls.setRollover(true);
+		controls.add(openAnnotatorAction);
+		add(controls, BorderLayout.NORTH);
+
 	}
 
 	protected void initContent() {
 		entityList.setModel(new EntityListModel());
+
+		openAnnotatorAction.setFile(documentModel.getFile());
 	}
 
 	public void setDocumentModel(DocumentModel documentModel) {

@@ -31,6 +31,7 @@ public class FileSelectAnalyzeAction extends IkonAction {
 		Annotator.app.fileOpenDialog(null, Annotator.app.getPluginManager().getDefaultIOPlugin(), false, file -> {
 			JCasLoader loader = new JCasLoader(file[0], jcas -> {
 				DocumentModelLoader dml = new DocumentModelLoader(dm -> {
+					dm.setFile(file[0]);
 					aw.setDocumentModel(dm);
 				}, jcas);
 				dml.execute();

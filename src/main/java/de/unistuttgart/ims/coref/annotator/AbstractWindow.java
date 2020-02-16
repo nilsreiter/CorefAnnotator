@@ -37,7 +37,7 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	JLabel miscLabel2 = new JLabel();
 	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
-	JMenuBar menuBar = new JMenuBar();
+	protected JMenuBar menuBar = new JMenuBar();
 
 	JMenu menu_settings = null;
 

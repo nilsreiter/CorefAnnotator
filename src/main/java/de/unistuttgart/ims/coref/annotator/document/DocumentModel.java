@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.io.File;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,6 +72,8 @@ public class DocumentModel implements Model {
 	Preferences preferences;
 
 	Profile profile;
+
+	File file = null;
 
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
@@ -433,5 +436,13 @@ public class DocumentModel implements Model {
 
 	public void setProfile(Profile profile) {
 		this.profile = profile;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }
