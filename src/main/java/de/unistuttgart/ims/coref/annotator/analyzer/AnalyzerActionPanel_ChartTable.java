@@ -100,8 +100,10 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 				.select((s, i) -> (double) i / (double) getTotalNumber() < limit);
 
 		MutableMapIterable<String, Integer> cts2 = cts.select((s, i) -> !smallest.containsKey(s));
-		cts2.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
-				(int) smallest.valuesView().sumOfInt(i -> i));
+
+		if ((int) smallest.valuesView().sumOfInt(i -> i) > 0)
+			cts2.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
+					(int) smallest.valuesView().sumOfInt(i -> i));
 
 		switch (chartType) {
 		case BAR:
