@@ -14,8 +14,8 @@ public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
 	}
 
 	@Override
-	public ACTION getType() {
-		return ACTION.DUMMY;
+	public AnalysisAction getType() {
+		return AnalysisAction.DUMMY;
 	}
 
 	@Override

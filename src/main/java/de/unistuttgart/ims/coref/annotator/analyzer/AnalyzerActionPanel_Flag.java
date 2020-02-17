@@ -85,8 +85,8 @@ public class AnalyzerActionPanel_Flag extends AnalyzerActionPanel_ChartTable {
 	}
 
 	@Override
-	public ACTION getType() {
-		return ACTION.Flag;
+	public AnalysisAction getType() {
+		return AnalysisAction.Flag;
 	}
 
 	@Override

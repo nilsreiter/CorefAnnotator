@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator.analyzer;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-enum ACTION {
+enum AnalysisAction {
 	MENTION, NEIGHBOUR, TEXTLOCATION, Flag, DUMMY;
 
 	AnalyzerActionPanel getObject(DocumentModel documentModel, Iterable<Entity> entity) {

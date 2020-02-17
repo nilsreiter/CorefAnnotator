@@ -26,8 +26,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 	}
 
 	@Override
-	public ACTION getType() {
-		return ACTION.TEXTLOCATION;
+	public AnalysisAction getType() {
+		return AnalysisAction.TEXTLOCATION;
 	}
 
 	@Override

@@ -33,8 +33,8 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_ChartTable 
 	}
 
 	@Override
-	public ACTION getType() {
-		return ACTION.MENTION;
+	public AnalysisAction getType() {
+		return AnalysisAction.MENTION;
 	}
 
 	@Override

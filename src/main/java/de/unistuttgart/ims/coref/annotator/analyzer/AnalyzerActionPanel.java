@@ -58,7 +58,7 @@ public abstract class AnalyzerActionPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, optionPanel, gap, SpringLayout.WEST, this);
 	}
 
-	public abstract ACTION getType();
+	public abstract AnalysisAction getType();
 
 	public void setEntities(Iterable<Entity> entities) {
 		this.entities = entities;

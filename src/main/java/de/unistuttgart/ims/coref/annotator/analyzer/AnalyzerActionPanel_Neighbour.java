@@ -110,8 +110,8 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 	}
 
 	@Override
-	public ACTION getType() {
-		return ACTION.NEIGHBOUR;
+	public AnalysisAction getType() {
+		return AnalysisAction.NEIGHBOUR;
 	}
 
 	@Override
