@@ -68,7 +68,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 		pan.add(directionBox);
 
 		// unit
-		pan.add(new JLabel(Annotator.getString(Strings.ANALYZER_NEIGHBOUR_UNIT)));
+		pan.add(new JLabel(Annotator.getString(Strings.ANALYZER_UNIT)));
 
 		DefaultComboBoxModel<Class<?>> unitBoxModel = new DefaultComboBoxModel<Class<?>>();
 		unitBoxModel.addElement(Mention.class);
@@ -89,7 +89,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 			}
 
 		});
-		unitBox.setRenderer(new TranslatedListCellRenderer(Strings.ANALYZER_NEIGHBOUR_UNIT_) {
+		unitBox.setRenderer(new TranslatedListCellRenderer(Strings.ANALYZER_UNIT_) {
 
 			private static final long serialVersionUID = 1L;
 
