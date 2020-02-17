@@ -38,10 +38,6 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 		LEFT, RIGHT
 	};
 
-	enum TOTEXT {
-		COVEREDTEXT, ENTITY
-	}
-
 	public AnalyzerActionPanel_Neighbour(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
 
