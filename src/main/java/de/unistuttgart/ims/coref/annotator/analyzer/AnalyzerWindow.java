@@ -62,19 +62,19 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		}
 	}
 
-	public class ActionListModel extends AbstractListModel<AnalyzerActionPanel.ACTION> {
+	public class ActionListModel extends AbstractListModel<ACTION> {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public AnalyzerActionPanel.ACTION getElementAt(int index) {
-			return AnalyzerActionPanel.ACTION.values()[index];
+		public ACTION getElementAt(int index) {
+			return ACTION.values()[index];
 
 		}
 
 		@Override
 		public int getSize() {
-			return AnalyzerActionPanel.ACTION.values().length - 1;
+			return ACTION.values().length - 1;
 		}
 
 	}
@@ -197,7 +197,7 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 
 	private static final long serialVersionUID = 1L;
 
-	JList<AnalyzerActionPanel.ACTION> actionList;
+	JList<ACTION> actionList;
 	AnalyzerActionPanel actionPanel;
 	DocumentModel documentModel;
 
@@ -228,7 +228,7 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		entityList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		entityList.setPreferredSize(new Dimension(200, 600));
 
-		actionList = new JList<AnalyzerActionPanel.ACTION>();
+		actionList = new JList<ACTION>();
 		actionList.setModel(new ActionListModel());
 		actionList.addListSelectionListener(new ActionListSelectionListener());
 		actionList.setCellRenderer(new ActionListCellRenderer());
