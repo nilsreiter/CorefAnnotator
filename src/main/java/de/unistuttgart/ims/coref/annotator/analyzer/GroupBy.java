@@ -1,5 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
-enum TOTEXT {
+enum GroupBy {
 	COVEREDTEXT, ENTITY
 }

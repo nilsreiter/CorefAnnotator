@@ -32,7 +32,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 	int n = 1;
 	Class<? extends Annotation> neighbourType = Mention.class;
 	DIRECTION direction = DIRECTION.RIGHT;
-	TOTEXT toText = TOTEXT.ENTITY;
+	GroupBy toText = GroupBy.ENTITY;
 
 	enum DIRECTION {
 		LEFT, RIGHT
@@ -127,7 +127,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 		}
 
 		if (neighbourType != Mention.class)
-			toText = TOTEXT.COVEREDTEXT;
+			toText = GroupBy.COVEREDTEXT;
 		switch (toText) {
 		case ENTITY:
 			cts = followers.selectInstancesOf(Mention.class).countBy(m -> m.getEntity().getLabel())
