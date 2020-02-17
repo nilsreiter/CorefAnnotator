@@ -68,9 +68,7 @@ public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_ChartTable 
 		unitBox.setRenderer(new TranslatedListCellRenderer(Strings.ANALYZER_GROUPBY_));
 		pan.add(unitBox);
 
-		SpringUtilities.makeGrid(pan, pan.getComponents().length / 2, 2, // rows, cols
-				0, 0, // initialX, initialY
-				5, 5);// xPad, yPad
+		SpringUtilities.makeGrid(pan, pan.getComponents().length / 2, 2, 0, 0, 5, 5);
 
 		return pan;
 	}
