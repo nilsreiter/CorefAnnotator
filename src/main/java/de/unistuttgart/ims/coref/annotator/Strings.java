@@ -119,6 +119,8 @@ public class Strings {
 	public static final String ANALZYER_ACTIONS_ = "analyzer.actions.";
 	public static final String ANALYZER_DATATABLE_MENTIONS = "analyzer.datatable.mentions";
 	public static final String ANALYZER_DATATABLE_COUNT = "analyzer.datatable.count";
+	public static final String ANALYZER_GROUPBY = "analyzer.groupby";
+	public static final String ANALYZER_GROUPBY_ = "analyzer.groupby.";
 	public static final String ANALYZER_NEIGHBOUR_DIRECTION = "analyzer.neighbour.direction";
 	public static final String ANALYZER_NEIGHBOUR_DIRECTION_ = "analyzer.neighbour.direction.";
 	public static final String ANALYZER_NEIGHBOUR_UNIT = "analyzer.neighbour.unit";
