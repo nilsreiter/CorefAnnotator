@@ -32,32 +32,41 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		save(0);
+	}
+
+	void save(long when) {
+		Annotator.logger.trace("saving in {} ms.", when);
 		if (timer != null) {
 			timer.cancel();
 			timer.purge();
 		}
 		timer = new Timer();
-		TimerTask tt = new TimerTask() {
-
-			@Override
-			public void run() {
-				target.setIndeterminateProgress();
-
-				SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
-						(file, jcas) -> {
-							target.getDocumentModel().getHistory().clear();
-							target.setWindowTitle();
-							target.stopIndeterminateProgress();
-						});
-				worker.execute();
-			}
-		};
-		timer.schedule(tt, 0, 10000);
+		TimerTask tt = new SaveTimerTask();
+		timer.schedule(tt, when, 10000);
 	}
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
 		setEnabled(state.isSavable() && target.getFile() != null);
+		save(10000);
+	}
+
+	class SaveTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			target.setIndeterminateProgress();
+
+			SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
+					(file, jcas) -> {
+						target.getDocumentModel().getHistory().clear();
+						target.setWindowTitle();
+						target.stopIndeterminateProgress();
+					});
+			worker.execute();
+		}
+
 	}
 
 }
