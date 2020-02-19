@@ -106,40 +106,9 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
-	/**
-	 * The document
-	 */
-	@Deprecated
-	JCas jcas;
-
 	public CoreferenceModel(DocumentModel documentModel) {
 		super(documentModel);
-		this.jcas = documentModel.getJcas();
 		documentModel.getPreferences().addPreferenceChangeListener(this);
-	}
-
-	/**
-	 * Create a new entity e and a new mention m, and add m to e. Does not fire any
-	 * events.
-	 * 
-	 * @param begin Begin of mention
-	 * @param end   End of mention
-	 * @return The new mention
-	 */
-	private Mention add(int begin, int end) {
-		Annotator.logger.traceEntry();
-		// document model
-		Mention m = createMention(begin, end);
-		Entity e = createEntity(m.getCoveredText());
-		m.setEntity(e);
-		entityMentionMap.put(e, m);
-
-		return m;
-	}
-
-	@Deprecated
-	private Mention add(Span selection) {
-		return add(selection.begin, selection.end);
 	}
 
 	public boolean addCoreferenceModelListener(CoreferenceModelListener e) {
@@ -196,7 +165,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
-		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(jcas, b, e, DetachedMentionPart.class);
+		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(documentModel.getJcas(), b, e,
+				DetachedMentionPart.class);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
 			dmp = AnnotationUtil.trim(dmp);
 		registerAnnotation(dmp);
@@ -204,21 +174,21 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	protected Entity createEntity(String l) {
-		Entity e = new Entity(jcas);
+		Entity e = new Entity(documentModel.getJcas());
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
-		e.setFlags(new StringArray(jcas, 0));
+		e.setFlags(new StringArray(documentModel.getJcas(), 0));
 		e.addToIndexes();
 		return e;
 	}
 
 	protected EntityGroup createEntityGroup(String l, int initialSize) {
-		EntityGroup e = new EntityGroup(jcas);
+		EntityGroup e = new EntityGroup(documentModel.getJcas());
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
-		e.setFlags(new StringArray(jcas, 0));
+		e.setFlags(new StringArray(documentModel.getJcas(), 0));
 		e.addToIndexes();
-		e.setMembers(new FSArray(jcas, initialSize));
+		e.setMembers(new FSArray(documentModel.getJcas(), initialSize));
 		return e;
 	}
 
@@ -240,7 +210,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
-		Mention m = AnnotationFactory.createAnnotation(jcas, b, e, Mention.class);
+		Mention m = AnnotationFactory.createAnnotation(documentModel.getJcas(), b, e, Mention.class);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			m = AnnotationUtil.trim(m);
 		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
@@ -316,7 +286,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 			op.setEntities(newMembers.toImmutable());
 
-			FSArray arr = new FSArray(jcas, op.getEntityGroup().getMembers().size() + newMembers.size());
+			FSArray arr = new FSArray(documentModel.getJcas(),
+					op.getEntityGroup().getMembers().size() + newMembers.size());
 			int i = 0;
 			for (; i < op.getEntityGroup().getMembers().size(); i++) {
 				arr.set(i, op.getEntityGroup().getMembers(i));
@@ -500,7 +471,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	protected void edit(RemoveSingletons operation) {
 		MutableSet<Entity> entities = Sets.mutable.empty();
 		MutableSet<Mention> mentions = Sets.mutable.empty();
-		for (Entity entity : Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class))) {
+		for (Entity entity : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class))) {
 			ImmutableSet<Mention> ms = getMentions(entity);
 			switch (ms.size()) {
 			case 0:
@@ -557,11 +528,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			featureStructures.add(fs);
 
 			if (Util.isX(fs, operation.getFlag())) {
-				fs.setFeatureValue(feature,
-						Util.removeFrom(jcas, (StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+				fs.setFeatureValue(feature, Util.removeFrom(documentModel.getJcas(),
+						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
 			} else {
-				fs.setFeatureValue(feature,
-						Util.addTo(jcas, (StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+				fs.setFeatureValue(feature, Util.addTo(documentModel.getJcas(),
+						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
@@ -585,13 +556,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	public ImmutableList<Entity> getSingletons() {
-		return Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class)).select(e -> getMentions(e).size() == 1)
-				.toList().toImmutable();
+		return Sets.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class))
+				.select(e -> getMentions(e).size() == 1).toList().toImmutable();
 	}
 
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
 
-		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(jcas, Entity.class));
+		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
 		return eset.toSortedList(new Comparator<Entity>() {
 
 			@Override
@@ -720,12 +691,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	public void initialPainting() {
 		if (initialized)
 			return;
-		for (Entity entity : JCasUtil.select(jcas, Entity.class)) {
+		for (Entity entity : JCasUtil.select(documentModel.getJcas(), Entity.class)) {
 			fireEvent(Event.get(this, Event.Type.Add, null, entity));
 			if (entity.getKey() != null)
 				keyMap.put(new Character(entity.getKey().charAt(0)), entity);
 		}
-		for (Mention mention : JCasUtil.select(jcas, Mention.class)) {
+		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
@@ -810,7 +781,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			// TODO: remove parts
 		}
 		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
-			group.setMembers(Util.removeFrom(jcas, group.getMembers(), entity));
+			group.setMembers(Util.removeFrom(documentModel.getJcas(), group.getMembers(), entity));
 			updateEntityGroupLabel(group);
 			fireEvent(Event.get(this, Event.Type.Remove, group, entity));
 		}
@@ -847,7 +818,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 */
 	private void removeFrom(EntityGroup eg, Entity entity) {
 		FSArray oldArray = eg.getMembers();
-		FSArray arr = new FSArray(jcas, oldArray.size() - 1);
+		FSArray arr = new FSArray(documentModel.getJcas(), oldArray.size() - 1);
 
 		for (int i = 0, j = 0; i < oldArray.size() - 1 && j < arr.size() - 1; i++, j++) {
 
@@ -942,7 +913,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				e.addToIndexes();
 				if (op.entityEntityGroupMap.containsKey(e)) {
 					for (EntityGroup group : op.entityEntityGroupMap.get(e)) {
-						group.setMembers(Util.addTo(jcas, group.getMembers(), e));
+						group.setMembers(Util.addTo(documentModel.getJcas(), group.getMembers(), e));
 						entityEntityGroupMap.put(e, group);
 						updateEntityGroupLabel(group);
 					}
@@ -952,7 +923,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
 			FSArray oldArr = op.getEntityGroup().getMembers();
-			FSArray newArr = new FSArray(jcas, oldArr.size() + op.getEntities().size());
+			FSArray newArr = new FSArray(documentModel.getJcas(), oldArr.size() + op.getEntities().size());
 			int i = 0;
 			for (; i < oldArr.size(); i++) {
 				newArr.set(i, oldArr.get(i));
