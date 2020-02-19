@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator;
 
 public class Defaults {
 	public static final String CFG_ANNOTATOR_ID = "Unknown annotator";
+	public static final int CFG_AUTOSAVE_TIMER = 300000;
 	public static final boolean CFG_COMPARE_BY_ENTITY_NAME = true;
 	public static final boolean CFG_CREATE_DEFAULT_FLAGS = false;
 	public static final boolean CFG_DELETE_EMPTY_ENTITIES = false;

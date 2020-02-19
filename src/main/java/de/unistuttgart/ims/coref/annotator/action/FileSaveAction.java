@@ -12,6 +12,8 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
@@ -22,6 +24,8 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 	private static final long serialVersionUID = 1L;
 
 	Timer timer = null;
+
+	int period = Annotator.app.getPreferences().getInt(Constants.CFG_AUTOSAVE_TIMER, Defaults.CFG_AUTOSAVE_TIMER);
 
 	public FileSaveAction(DocumentWindow dw) {
 		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
@@ -43,13 +47,13 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		}
 		timer = new Timer();
 		TimerTask tt = new SaveTimerTask();
-		timer.schedule(tt, when, 10000);
+		timer.schedule(tt, when, period);
 	}
 
 	@Override
 	public void documentStateEvent(DocumentState state) {
 		setEnabled(state.isSavable() && target.getFile() != null);
-		save(10000);
+		save(period);
 	}
 
 	class SaveTimerTask extends TimerTask {
