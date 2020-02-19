@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator.action;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
@@ -19,6 +21,8 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	private static final long serialVersionUID = 1L;
 
+	Timer timer = null;
+
 	public FileSaveAction(DocumentWindow dw) {
 		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
 		putValue(Action.NAME, Annotator.getString("action.save"));
@@ -28,14 +32,27 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		target.setIndeterminateProgress();
-		SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
-				(file, jcas) -> {
-					target.getDocumentModel().getHistory().clear();
-					target.setWindowTitle();
-					target.stopIndeterminateProgress();
-				});
-		worker.execute();
+		if (timer != null) {
+			timer.cancel();
+			timer.purge();
+		}
+		timer = new Timer();
+		TimerTask tt = new TimerTask() {
+
+			@Override
+			public void run() {
+				target.setIndeterminateProgress();
+
+				SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
+						(file, jcas) -> {
+							target.getDocumentModel().getHistory().clear();
+							target.setWindowTitle();
+							target.stopIndeterminateProgress();
+						});
+				worker.execute();
+			}
+		};
+		timer.schedule(tt, 0, 10000);
 	}
 
 	@Override
