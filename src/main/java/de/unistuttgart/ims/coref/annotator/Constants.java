@@ -77,6 +77,7 @@ public class Constants {
 
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
 	public static final String CFG_ASK_BEFORE_FILE_OVERWRITE = "CFG_ASK_FILE_OVERWRITE";
+	public static final String CFG_AUTOSAVE_TIMER = "CFG_AUTOSAVE_TIMER";
 
 	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
 	public static final String CFG_COMPARE_BY_ENTITY_NAME = "CFG_COMPARE_BY_ENTITY_NAME";
@@ -129,6 +130,9 @@ public class Constants {
 			CFG_ASK_BEFORE_FILE_OVERWRITE, Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE,
 			Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE, Defaults.CFG_ASK_BEFORE_FILE_OVERWRITE,
 			MaterialDesign.MDI_SETTINGS);
+
+	public static final Setting<Integer> SETTING_AUTOSAVE_TIMER = new Setting<Integer>(Constants.CFG_AUTOSAVE_TIMER,
+			null, 1, MaterialDesign.MDI_TIMER);
 
 	public static final Setting<Boolean> SETTING_CREATE_DEFAULT_FLAGS = new Setting<Boolean>(CFG_CREATE_DEFAULT_FLAGS,
 			Strings.ACTION_TOGGLE_CREATE_DEFAULT_FLAGS, Strings.ACTION_TOGGLE_CREATE_DEFAULT_FLAGS_TOOLTIP, false,
