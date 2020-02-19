@@ -14,6 +14,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   #271
 - Added a new view to show simple summary statistics, and an 
   exporter that exports the same info as CSV file. #286
+- Automatic saving every 5 minutes
 
 ## 1.13.0
 
