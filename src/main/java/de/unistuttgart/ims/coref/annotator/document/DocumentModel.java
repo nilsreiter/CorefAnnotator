@@ -72,6 +72,8 @@ public class DocumentModel implements Model {
 
 	Profile profile;
 
+	transient int savedHistoryHash = history.hashCode();
+
 	public DocumentModel(JCas jcas, Preferences preferences) {
 		this.jcas = jcas;
 		this.preferences = preferences;
@@ -197,6 +199,7 @@ public class DocumentModel implements Model {
 		return treeModel;
 	}
 
+	@Deprecated
 	public boolean hasUnsavedChanges() {
 		return unsavedChanges;
 	}
@@ -216,7 +219,8 @@ public class DocumentModel implements Model {
 	}
 
 	public boolean isSavable() {
-		return hasUnsavedChanges() || getHistory().size() > 0;
+		return savedHistoryHash != history.hashCode();
+		// return hasUnsavedChanges();// || getHistory().size() > 0;
 	}
 
 	public void loadProfile(Profile profile) {
@@ -284,6 +288,11 @@ public class DocumentModel implements Model {
 		fireDocumentChangedEvent();
 	}
 
+	public void saved() {
+		unsavedChanges = false;
+		savedHistoryHash = history.hashCode();
+	}
+
 	public void setCoreferenceModel(CoreferenceModel coreferenceModel) {
 		this.coreferenceModel = coreferenceModel;
 	}
@@ -329,6 +338,7 @@ public class DocumentModel implements Model {
 	public void undo() {
 		if (!history.isEmpty()) {
 			undo(history.pop());
+			unsavedChanges = true;
 			fireDocumentChangedEvent();
 		}
 	}
