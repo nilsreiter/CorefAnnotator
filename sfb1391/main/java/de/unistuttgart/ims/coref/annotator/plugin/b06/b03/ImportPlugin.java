@@ -1,11 +1,11 @@
-package de.unistuttgart.ims.coref.annotator.plugin.tei;
+package de.unistuttgart.ims.coref.annotator.plugin.b06.b03;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
@@ -13,28 +13,29 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements IOPlugin {
+public class ImportPlugin extends AbstractImportPlugin implements UimaImportPlugin {
 
 	@Override
 	public String getDescription() {
 		try {
-			return IOUtils.toString(getClass().getResourceAsStream("/plugin.tei/description.txt"), "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
+			return IOUtils.toString(getClass().getResourceAsStream(Constants.DESCRIPTION), Constants.UTF8);
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
 		}
-		return "";
+		return StringUtils.EMPTY;
 	}
 
 	@Override
 	public String getName() {
-		return "TEI/XML";
+		return Constants.NAME;
 	}
 
 	@Override
@@ -45,25 +46,9 @@ public class Plugin implements IOPlugin {
 	}
 
 	@Override
-	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(MapCorefToXmlElements.class);
-	}
-
-	@Override
 	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
 		return CollectionReaderFactory.createReaderDescription(TeiReader.class, TeiReader.PARAM_SOURCE_LOCATION,
-				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, "de", TeiReader.PARAM_DOCUMENT_ID, f.getName());
-	}
-
-	@Override
-	public AnalysisEngineDescription getWriter(File f) throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(TeiWriter.class, TeiWriter.PARAM_OUTPUT_FILE,
-				f.getAbsolutePath());
-	}
-
-	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return TeiStylePlugin.class;
+				f.getAbsoluteFile(), TeiReader.PARAM_LANGUAGE, Constants.DE, TeiReader.PARAM_DOCUMENT_ID, f.getName());
 	}
 
 	@Override
@@ -73,12 +58,7 @@ public class Plugin implements IOPlugin {
 
 	@Override
 	public String getSuffix() {
-		return ".xml";
-	}
-
-	@Override
-	public String[] getSupportedLanguages() {
-		return null;
+		return Constants.XML;
 	}
 
 	@Override

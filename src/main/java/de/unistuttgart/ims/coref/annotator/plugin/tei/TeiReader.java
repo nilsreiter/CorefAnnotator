@@ -17,6 +17,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
@@ -32,9 +33,13 @@ import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 public class TeiReader extends ResourceCollectionReaderBase {
 
 	public static final String PARAM_DOCUMENT_ID = "Document Id";
+	public static final String PARAM_TEXT_ROOT_SELECTOR = "Root Selector";
 
 	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
 	String documentId = null;
+
+	@ConfigurationParameter(name = PARAM_TEXT_ROOT_SELECTOR, mandatory = false, defaultValue = "")
+	String rootSelector = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -51,13 +56,14 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
-		gxr.setTextRootSelector(null);
+		gxr.setTextRootSelector(rootSelector.isEmpty() ? null : rootSelector);
 		gxr.setPreserveWhitespace(true);
 
 		// set the document title
 		gxr.addGlobalRule("titleStmt > title", (d, e) -> d.setDocumentTitle(e.text()));
 
-		gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
+		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
+			gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
 
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
@@ -98,6 +104,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			DocumentMetaData.get(jcas).setDocumentId(documentId);
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
+
+		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
+			jcas.setDocumentLanguage(getLanguage());
 
 		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());

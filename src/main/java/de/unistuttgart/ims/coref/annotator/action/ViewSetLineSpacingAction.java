@@ -9,15 +9,15 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
 
-public class ViewSetLineSpacingAction extends DocumentWindowAction implements PropertyChangeListener {
+public class ViewSetLineSpacingAction extends TargetedIkonAction<AbstractTextWindow> implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
 	float spacing;
 
-	public ViewSetLineSpacingAction(DocumentWindow documentWindow, float spacing) {
+	public ViewSetLineSpacingAction(AbstractTextWindow documentWindow, float spacing) {
 		super(documentWindow, String.valueOf(spacing), false, MaterialDesign.MDI_FORMAT_LINE_SPACING);
 
 		this.spacing = spacing;

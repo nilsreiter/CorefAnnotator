@@ -5,7 +5,6 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
@@ -13,11 +12,11 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Plugin implements IOPlugin {
+public class Plugin extends AbstractExportPlugin implements UimaExportPlugin {
 
 	@Override
 	public String getDescription() {
@@ -27,11 +26,6 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getName() {
 		return "rCat/JSON";
-	}
-
-	@Override
-	public AnalysisEngineDescription getImporter() throws ResourceInitializationException {
-		return null;
 	}
 
 	@Override
@@ -49,16 +43,6 @@ public class Plugin implements IOPlugin {
 		b.add(AnalysisEngineFactory.createEngineDescription(JSONWriter.class, JSONWriter.PARAM_FILE,
 				f.getAbsolutePath()));
 		return b.createAggregateDescription();
-	}
-
-	@Override
-	public CollectionReaderDescription getReader(File f) throws ResourceInitializationException {
-		return null;
-	}
-
-	@Override
-	public Class<? extends StylePlugin> getStylePlugin() {
-		return null;
 	}
 
 	@Override
@@ -81,11 +65,6 @@ public class Plugin implements IOPlugin {
 	@Override
 	public String getSuffix() {
 		return ".json";
-	}
-
-	@Override
-	public String[] getSupportedLanguages() {
-		return de.unistuttgart.ims.coref.annotator.Constants.SUPPORTED_LANGUAGES;
 	}
 
 	@Override

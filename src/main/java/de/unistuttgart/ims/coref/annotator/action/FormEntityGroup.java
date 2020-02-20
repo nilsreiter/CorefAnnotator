@@ -17,15 +17,15 @@ import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 
-public class FormEntityGroup extends DocumentWindowAction implements TreeSelectionListener {
+public class FormEntityGroup extends TargetedOperationIkonAction<DocumentWindow> implements TreeSelectionListener {
 	private static final long serialVersionUID = 1L;
 
 	public FormEntityGroup(DocumentWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_GROUP, MaterialDesign.MDI_ACCOUNT_MULTIPLE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_GROUP_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
+				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		operationClass = GroupEntities.class;
 	}
 
 	@Override

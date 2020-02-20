@@ -12,13 +12,14 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.collection.CollectionReaderDescription;
-import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
@@ -26,7 +27,7 @@ import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFileIOPlugin {
+public final class DefaultImportPlugin extends AbstractImportPlugin implements DirectFileIOPlugin, UimaImportPlugin {
 
 	File lastFile;
 
@@ -52,11 +53,6 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFi
 		AggregateBuilder b1 = new AggregateBuilder();
 		b1.add(AnalysisEngineFactory.createEngineDescription(CheckLoadability.class));
 		return b1.createAggregateDescription();
-	}
-
-	@Override
-	public AnalysisEngineDescription getExporter() throws ResourceInitializationException {
-		return AnalysisEngineFactory.createEngineDescription(NoOpAnnotator.class);
 	}
 
 	@Override
@@ -98,6 +94,16 @@ public final class DefaultIOPlugin extends AbstractXmiPlugin implements DirectFi
 	@Override
 	public ExtensionFilter getExtensionFilter() {
 		return ExtensionFilters.xmi_gz;
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return MaterialDesign.MDI_FILE_EXPORT;
+	}
+
+	@Override
+	public String getSuffix() {
+		return ".xmi";
 	}
 
 }

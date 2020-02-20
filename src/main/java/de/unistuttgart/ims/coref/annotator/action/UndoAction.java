@@ -21,7 +21,7 @@ public class UndoAction extends DocumentWindowAction implements DocumentStateLis
 	public UndoAction(DocumentWindow dw) {
 		super(dw, Strings.ACTION_UNDO, MaterialDesign.MDI_UNDO);
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
 	}
 

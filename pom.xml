@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.10.0-SNAPSHOT</version>
+	<version>1.14.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
@@ -12,8 +12,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>1.9.0</version.dkpro>
 		<version.ikonli>2.1.1</version.ikonli>
+		<version.eclipse>9.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<version.javafx>13.0.1</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -72,7 +74,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.2</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -99,6 +101,8 @@
 								<Build-Number>${project.version}</Build-Number>
 							</manifestEntries>
 						</transformer>
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 					</transformers>
 					<finalName>${project.name}-${project.version}-full</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
@@ -123,6 +127,11 @@
 							</excludes>
 						</filter>
 					</filters>
+					<artifactSet>
+						<excludes>
+							<exclude>org.openjfx:*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
@@ -139,6 +148,23 @@
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
+				<configuration>
+					<schemaDirectory>src/main/xsd</schemaDirectory>
+					<generatePackage>de.unistuttgart.ims.coref.annotator.profile</generatePackage>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<resources>
@@ -201,6 +227,18 @@
 								</goals>
 							</execution>
 						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.codehaus.plexus</groupId>
+								<artifactId>plexus-archiver</artifactId>
+								<version>4.1.0</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.velocity</groupId>
+								<artifactId>velocity-tools</artifactId>
+								<version>2.0</version>
+							</dependency>
+						</dependencies>
 					</plugin>
 				</plugins>
 			</build>
@@ -317,6 +355,90 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>sfb1391</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>sfb1391-add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>sfb1391/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sfb1391-add-test-source</id>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>add-test-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>sfb1391/test/java</source>
+									</sources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sfb1391-add-resource</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>add-resource</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>sfb1391/main/resources</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.uima</groupId>
+						<artifactId>jcasgen-maven-plugin</artifactId>
+						<version>2.8.1</version>  <!-- change this to the latest version -->
+						<executions>
+							<execution>
+								<id>3</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>  <!-- this is the only goal -->
+								<!-- runs in phase process-resources by default -->
+								<configuration>
+									<!-- REQUIRED -->
+									<typeSystemIncludes>
+										<!-- one or more ant-like file patterns identifying top level descriptors -->
+										<typeSystemInclude>sfb1391/main/resources/sfb1391-types.xml</typeSystemInclude>
+									</typeSystemIncludes>
+									<!-- true or false, default = false -->
+									<!-- if true, then although the complete merged type system will 
+										be created internally, only those types whose definition is contained within 
+										this maven project will be generated. The others will be presumed to be available 
+										via other projects. -->
+									<!-- OPTIONAL -->
+									<limitToProject>true</limitToProject>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -366,23 +488,28 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.12.0</version>
+			<version>2.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.12.0</version>
+			<version>2.12.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>28.0-jre</version>
+			<version>28.1-jre</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-materialdesign-pack</artifactId>
+			<version>${version.ikonli}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-fontawesome-pack</artifactId>
 			<version>${version.ikonli}</version>
 		</dependency>
 		<dependency>
@@ -425,12 +552,12 @@
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections-api</artifactId>
-			<version>9.2.0</version>
+			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
 			<artifactId>eclipse-collections</artifactId>
-			<version>9.2.0</version>
+			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
@@ -467,8 +594,33 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.27.0</version>
+			<version>3.1.0</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${version.javafx}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.1</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -490,13 +642,6 @@
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>javafx</artifactId>
-				<version>2.2</version>
-				<systemPath>${java.home}/lib/ext/jfxrt.jar</systemPath>
-				<scope>system</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -3,12 +3,100 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.0
+
+- Added a new preference called `sticky markers`. If enabled, 
+  changing the markers of any mention *also* changes the markers
+  of *all* mentions that cover the (exact) same span. Thus, the 
+  markers are "sticky" to their position. New mentions in other 
+  entities do *not* automatically get all the flags, but it's now 
+  possible to duplicate mentions and then move them to a new entity.
+  #271
+- Added a new view to show simple summary statistics, and an 
+  exporter that exports the same info as CSV file. #286
+
+## 1.13.0
+
+- CSV export has been improved in multiple ways
+  - Can now be done for the entire file
+  - It's possible so specify lines as context #261
+  - Line numbers can be included in the export #268
+- Line numbers in which mentions appear can now be shown 
+  in the tree #266
+- Segment annotations (e.g., stanzas or chapters) can now be 
+  displayed as a table of contents on the left of the text. 
+  The TOC is fully interactive and can be used to navigate in 
+  long texts i#263
+- Compare view now supports comparing the actual entity assignment.
+  This behavior can be enabled via the settings menu is only 
+  available if both files are loaded with the same profile, which 
+  also means they have to be in the same directory.
+  #272 #267
+- Opening multiple files at once is now much faster by using
+  the default dialog for opening files #275
+- Opening or importing a new document should no longer auto-
+  create the coreference-related flags ambiguous, difficult and 
+  Nonnominal. #277
+- If line numbers are displayed in the tree, and a segmentation 
+  exist, the segments are also displayed in the tree. #279
+
+## 1.12.2
+
+- Fixed the bug that the compare view hid some annotations if 
+  more than two annotators were compared, and more than two, but
+  not all of them had annotated something. #279
+
+## 1.12.1
+
+- Line numbers are now in sync with the lines they number #273
+
+## 1.12.0
+
+- The app now includes a command line tool to convert multiple 
+  files at once. #242
+- Added a SFB1391 specific importer than interprets `<lb>` tags 
+  properly #255
+- Export mention statistics now has some configuration options. 
+  Import and export plugins can have that as well now. #76
+- Sorting of entities in the tree is now case insensitive #257
+- Shortcut keys are now displayed in brackets #256
+- We can now specify a profile when loading the application #249. 
+  The profile is stored in an XML file called `profile.xml` in the same
+  directory as the XMI file to be loaded. The profile can
+  - pre-define flags and entities
+  - disallow operations
+  - set configuration options
+- Singletons can now be displayed in light gray #177
+  
+
+## 1.11.2
+
+- Using the QuaDramA/TEI importer no longer generates files in the
+  old format #246
+- Flags can now be deleted properly #247
+
+## 1.11.1
+
+- Entities in tree are now sortable again #241
+
+## 1.11.0
+
+- JavaFX is now optional. If JavaFX classes can't be loaded, the application
+  uses file open/save windows from classic swing. #220
+- The app now compiles with OpenJDK properly. 
+  Tested using OpenJDK 12 #237
+- Updated guava from 28.0-jre to 28.1-jre #236
+- Updated log4j-core from 2.12.0 to 2.12.1 #234
+- Updated log4j-api from 2.12.0 to 2.12.1 #233
+- Updated mockito-core from 2.27.0 to 3.0.0 #229
+
 ## 1.10.0
 
 - With a new toggle setting, assigning a mention over an already 
   existing mention replaces the annotation #149
 - The status bar at the bottom now shows the entity name if the cursor
-  is within a mention of an entity #189
+  is within a mention of an entity. Thanks @andreasvc for the initial 
+  code contribution! #189
 - Line spacing can now be set explicitly in the View menu #226
 - Adjacent mentions that belong to the same entity can now be merged
   with a single action. Two mentions are considered adjacent, if there is

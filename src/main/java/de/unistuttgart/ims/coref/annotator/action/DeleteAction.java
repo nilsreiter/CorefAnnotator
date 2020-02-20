@@ -43,6 +43,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	FeatureStructure featureStructure = null;
 	boolean enabledByText;
 	boolean enabledByTree;
+	boolean disabledByModel;
 
 	public DeleteAction(DocumentWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
@@ -54,7 +55,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		this.featureStructure = featureStructure;
 	}
 
@@ -112,6 +113,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		enabledByText = e.getDot() != e.getMark();
+		disabledByModel = false;
 		setStatus();
 	}
 
@@ -121,12 +123,24 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 		tsu.collectData(e);
 		enabledByTree = tsu.isDetachedMentionPart() || tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf())
 				|| (tsu.isEntity() && tsu.isLeaf());
+		disabledByModel = tsu.getFeatureStructures().collect(fs -> getOperation(fs))
+				.collect(op -> getTarget().getDocumentModel().isBlocked(op)).contains(true);
 		setStatus();
 
 	}
 
 	protected void setStatus() {
-		setEnabled(enabledByText || enabledByTree);
+		setEnabled(!disabledByModel && (enabledByText || enabledByTree));
+	}
+
+	protected Class<? extends Operation> getOperation(FeatureStructure fs) {
+		if (fs instanceof Mention)
+			return RemoveMention.class;
+		else if (fs instanceof Entity)
+			return RemoveEntities.class;
+		else if (fs instanceof DetachedMentionPart)
+			return RemovePart.class;
+		return null;
 	}
 
 }

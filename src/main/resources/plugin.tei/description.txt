@@ -1,6 +1,0 @@
-This plugin imports from arbitrary XML/TEI files. The entire textual 
-content including the header is treated as the document text, i.e., 
-everything not in tags will be in the document. All 
-elements with the attribute 'ref' are treated as a mention. Exporting 
-into TEI/XML only works when the document has been imported from 
-TEI/XML before.

@@ -16,6 +16,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
@@ -64,7 +65,8 @@ public class FlagModel extends SubModel implements Model {
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
 
-		if (!JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
+		if (preferences.getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS, Defaults.CFG_CREATE_DEFAULT_FLAGS)
+				&& !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
 			initialiseDefaultFlags();
 		}
 	}
@@ -136,13 +138,12 @@ public class FlagModel extends SubModel implements Model {
 		keys.add(key);
 
 		operation.setAddedFlag(f);
-		fireFlagEvent(Event.get(this, Type.Add, f));
 		documentModel.fireDocumentChangedEvent();
+		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
 	protected void edit(DeleteFlag operation) {
 		Flag flag = operation.getFlag();
-		fireFlagEvent(Event.get(this, Type.Remove, flag));
 
 		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
 				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
@@ -161,6 +162,8 @@ public class FlagModel extends SubModel implements Model {
 		});
 
 		flag.removeFromIndexes();
+		fireFlagEvent(Event.get(this, Type.Remove, flag));
+
 	}
 
 	protected void edit(UpdateFlag op) {
@@ -187,7 +190,7 @@ public class FlagModel extends SubModel implements Model {
 			flag.setKey((String) op.getNewValue());
 			break;
 		}
-		Annotator.logger.entry(op);
+		Annotator.logger.traceEntry();
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 	}
 
@@ -217,6 +220,7 @@ public class FlagModel extends SubModel implements Model {
 		return featureStructures.select(fs -> Util.isX(fs, flag.getKey()));
 	}
 
+	@Deprecated
 	protected void initialiseDefaultFlags() {
 		Flag flag;
 
@@ -341,7 +345,7 @@ public class FlagModel extends SubModel implements Model {
 	}
 
 	public void updateFlag(Flag flag) {
-		Annotator.logger.entry(flag);
+		Annotator.logger.traceEntry();
 		fireFlagEvent(Event.get(this, Event.Type.Update, flag));
 		documentModel.getCoreferenceModel()
 				.fireEvent(Event.get(this, Event.Type.Update, getFlaggedFeatureStructures(flag)));

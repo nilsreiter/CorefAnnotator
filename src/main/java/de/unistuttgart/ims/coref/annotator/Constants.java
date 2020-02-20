@@ -77,7 +77,10 @@ public class Constants {
 
 	public static final String CFG_ANNOTATOR_ID = "CFG_ANNOTATOR_ID";
 	public static final String CFG_ASK_BEFORE_FILE_OVERWRITE = "CFG_ASK_FILE_OVERWRITE";
+
 	public static final String CFG_CURRENT_DIRECTORY = "CFG_CURRENT_DIRECTORY";
+	public static final String CFG_COMPARE_BY_ENTITY_NAME = "CFG_COMPARE_BY_ENTITY_NAME";
+	public static final String CFG_CREATE_DEFAULT_FLAGS = "CFG_CREATE_DEFAULT_FLAGS";
 
 	public static final String CFG_DELETE_EMPTY_ENTITIES = "CFG_DELETE_EMPTY_ENTITIES";
 
@@ -87,10 +90,19 @@ public class Constants {
 	public static final String CFG_REPLACE_MENTION = "CFG_REPLACE_MENTION";
 	public static final String CFG_SEARCH_RESULTS_CONTEXT = "CFG_SEARCH_RESULTS_CONTEXT";
 	public static final String CFG_SHOW_TEXT_LABELS = "Show text labels";
+	public static final String CFG_SHOW_TOC = "CFG_SHOW_TOC";
+	public static final String CFG_SHOW_LINE_NUMBER_IN_TREE = "CFG_SHOW_LINE_NUMBER_IN_TREE";
+	public static final String CFG_STICKY_FLAGS = "CFG_STICKY_FLAGS";
+
 	public static final String CFG_TRIM_WHITESPACE = "Trim Whitespace";
+	public static final String CFG_ENTITY_SORT_ORDER = "CFG_ENTITY_SORT_ORDER";
+	public static final String CFG_ENTITY_SORT_DESCENDING = "CFG_ENTITY_SORT_DESCENDING";
+	public static final String CFG_UNDERLINE_SINGLETONS_IN_GRAY = "CFG_UNDERLINE_SINGLETONS_IN_GRAY";
 
 	public static final String ENTITY_FLAG_GENERIC = "Generic";
 	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
+
+	public static final int MAX_SEGMENTS_IN_SCROLLBAR = 15;
 
 	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
 			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
@@ -118,6 +130,10 @@ public class Constants {
 			Strings.ACTION_TOGGLE_ASK_BEFORE_FILE_OVERWRITE, Defaults.CFG_ASK_BEFORE_FILE_OVERWRITE,
 			MaterialDesign.MDI_SETTINGS);
 
+	public static final Setting<Boolean> SETTING_CREATE_DEFAULT_FLAGS = new Setting<Boolean>(CFG_CREATE_DEFAULT_FLAGS,
+			Strings.ACTION_TOGGLE_CREATE_DEFAULT_FLAGS, Strings.ACTION_TOGGLE_CREATE_DEFAULT_FLAGS_TOOLTIP, false,
+			MaterialDesign.MDI_FLAG_OUTLINE);
+
 	public static final Setting<Boolean> SETTING_DELETE_EMPTY_ENTITIES = new Setting<Boolean>(CFG_DELETE_EMPTY_ENTITIES,
 			Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, Strings.ACTION_TOGGLE_DELETE_EMPTY_ENTITIES, true,
 			MaterialDesign.MDI_GHOST);
@@ -137,6 +153,9 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
 			Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP, false,
 			MaterialDesign.MDI_FORMAT_TEXT);
+	public static final Setting<Boolean> SETTING_SHOW_LINE_NUMBER_IN_TREE = new Setting<Boolean>(
+			CFG_SHOW_LINE_NUMBER_IN_TREE, Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE,
+			Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE_TOOLTIP, false, MaterialDesign.MDI_FORMAT_TEXT);
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);
@@ -144,6 +163,22 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_REPLACE_MENTION = new Setting<Boolean>(CFG_REPLACE_MENTION,
 			Strings.ACTION_TOGGLE_REPLACE_MENTION, Strings.ACTION_TOGGLE_REPLACE_MENTION_TOOLTIP, false,
 			MaterialDesign.MDI_DIRECTIONS_FORK);
+
+	public static final Setting<Boolean> SETTING_UNDERLINE_SINGLETONS_IN_GRAY = new Setting<Boolean>(
+			CFG_UNDERLINE_SINGLETONS_IN_GRAY, Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY,
+			Strings.ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
+
+	public static final Setting<Boolean> SETTING_COMPARE_BY_ENTITY_NAME = new Setting<Boolean>(
+			CFG_COMPARE_BY_ENTITY_NAME, Strings.ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME,
+			Strings.ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME_TOOLTIP, false, MaterialDesign.MDI_FORMAT_UNDERLINE);
+
+	public static final Setting<Boolean> SETTING_SHOW_TOC = new Setting<Boolean>(CFG_SHOW_TOC,
+			Strings.ACTION_TOGGLE_SHOW_TOC, Strings.ACTION_TOGGLE_SHOW_TOC_TOOLTIP, Defaults.CFG_SHOW_TOC,
+			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
+
+	public static final Setting<Boolean> SETTING_STICKY_FLAGS = new Setting<Boolean>(CFG_STICKY_FLAGS,
+			Strings.ACTION_TOGGLE_STICKY_FLAGS, Strings.ACTION_TOGGLE_STICKY_FLAGS_TOOLTIP, Defaults.CFG_STICKY_FLAGS,
+			MaterialDesign.MDI_FORMAT_LIST_BULLETED_TYPE);
 
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };

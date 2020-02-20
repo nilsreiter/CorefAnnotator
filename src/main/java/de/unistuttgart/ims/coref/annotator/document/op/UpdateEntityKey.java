@@ -7,11 +7,11 @@ public class UpdateEntityKey extends UpdateOperation<Entity> implements Corefere
 	Character newKey;
 	Entity previousOwner;
 
-	public UpdateEntityKey(char newKey, Entity entity) {
+	public UpdateEntityKey(Entity entity, Character string) {
 		super(entity);
 		if (entity.getKey() != null)
 			oldKey = entity.getKey().charAt(0);
-		this.newKey = newKey;
+		this.newKey = string;
 	}
 
 	public UpdateEntityKey(Entity entity) {

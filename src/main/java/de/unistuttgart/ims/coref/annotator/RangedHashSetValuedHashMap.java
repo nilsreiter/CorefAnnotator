@@ -152,7 +152,7 @@ public class RangedHashSetValuedHashMap<V extends Annotation> implements Mutable
 	}
 
 	@Override
-	public boolean putAllPairs(Pair<Integer, V>... pairs) {
+	public boolean putAllPairs(@SuppressWarnings("unchecked") Pair<Integer, V>... pairs) {
 		return map.putAllPairs(pairs);
 	}
 

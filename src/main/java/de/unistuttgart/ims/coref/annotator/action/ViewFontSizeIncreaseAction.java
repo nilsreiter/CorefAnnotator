@@ -10,16 +10,16 @@ import javax.swing.text.StyleConstants;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 
-public class ViewFontSizeIncreaseAction extends DocumentWindowAction {
+public class ViewFontSizeIncreaseAction extends TargetedIkonAction<AbstractTextWindow> {
 	private static final long serialVersionUID = 1L;
 
-	public ViewFontSizeIncreaseAction(DocumentWindow dw) {
+	public ViewFontSizeIncreaseAction(AbstractTextWindow dw) {
 		super(dw, Strings.ACTION_VIEW_INCREASE_FONT_SIZE, MaterialDesign.MDI_FORMAT_SIZE);
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

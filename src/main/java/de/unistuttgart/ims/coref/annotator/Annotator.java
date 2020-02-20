@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -42,6 +43,8 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import com.ibm.icu.text.MessageFormat;
+
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
 import de.unistuttgart.ims.coref.annotator.action.ExitAction;
 import de.unistuttgart.ims.coref.annotator.action.FileCompareOpenAction;
@@ -51,8 +54,9 @@ import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultImportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
@@ -70,9 +74,6 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
-	@Deprecated
-	JFileChooser openDialog;
-
 	protected JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
@@ -86,6 +87,8 @@ public class Annotator {
 	Preferences preferences = Preferences.userNodeForPackage(Annotator.class);
 
 	public static Annotator app;
+
+	static Boolean javafx = null;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -112,7 +115,8 @@ public class Annotator {
 	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
 		logger.trace("Application startup. Version " + Version.get().toString());
-		new JFXPanel();
+		if (Annotator.javafx())
+			new JFXPanel();
 		this.pluginManager.init();
 		this.recentFiles = loadRecentFiles();
 
@@ -134,9 +138,6 @@ public class Annotator {
 	}
 
 	protected void initialiseDialogs() {
-		openDialog = new JFileChooser();
-		openDialog.setMultiSelectionEnabled(true);
-		openDialog.setFileFilter(FileFilters.xmi_gz);
 
 		opening = getOpeningDialog();
 	}
@@ -189,16 +190,9 @@ public class Annotator {
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
 		panel.setPreferredSize(new Dimension(width, 200));
-		pluginManager.getIOPlugins().forEachWith((plugin, pan) -> {
-			IOPlugin p = getPluginManager().getIOPlugin(plugin);
-			try {
-				if (p.getImporter() != null) {
-					AbstractAction importAction = new FileImportAction(this, p);
-					pan.add(new JButton(importAction));
-				}
-			} catch (ResourceInitializationException e1) {
-				logger.catching(e1);
-			}
+		pluginManager.getIOPluginObjects().selectInstancesOf(ImportPlugin.class).forEachWith((p, pan) -> {
+			AbstractAction importAction = new FileImportAction(this, p);
+			pan.add(new JButton(importAction));
 		}, panel);
 
 		mainPanel.add(panel);
@@ -247,23 +241,42 @@ public class Annotator {
 		typeSystemDescription = TypeSystemDescriptionFactory.createTypeSystemDescription();
 	}
 
-	public synchronized DocumentWindow open(final File file, IOPlugin flavor, String language) {
+	public synchronized DocumentWindow open(final File file, ImportPlugin flavor, String language) {
 		logger.trace("Creating new DocumentWindow");
 		DocumentWindow v = new DocumentWindow();
-		v.loadFile(file, flavor, language);
 
-		SwingUtilities.invokeLater(new Runnable() {
+		if (flavor instanceof ConfigurableImportPlugin)
+			((ConfigurableImportPlugin) flavor).showImportConfigurationDialog(v, fl -> {
+				v.loadFile(file, flavor, language);
 
-			@Override
-			public void run() {
-				openFiles.add(v);
-				if (flavor instanceof DefaultIOPlugin)
-					recentFiles.add(0, file);
-				v.initialise();
+				SwingUtilities.invokeLater(new Runnable() {
 
-			}
-		});
+					@Override
+					public void run() {
+						openFiles.add(v);
+						if (flavor instanceof DefaultImportPlugin)
+							recentFiles.add(0, file);
+						v.initialise();
 
+					}
+				});
+			});
+		else {
+			v.loadFile(file, flavor, language);
+
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					openFiles.add(v);
+					if (flavor instanceof DefaultImportPlugin)
+						recentFiles.add(0, file);
+					v.initialise();
+
+				}
+
+			});
+		}
 		return null;
 
 	}
@@ -295,30 +308,72 @@ public class Annotator {
 		this.opening.setVisible(true);
 	}
 
-	public void fileOpenDialog(Component parent, IOPlugin flavor) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-				fileChooser.setTitle("Open files using " + flavor.getName() + " scheme");
-				fileChooser.setInitialDirectory(getCurrentDirectory());
-				// fileChooser.getExtensionFilters().clear();
-				fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
-				File file = fileChooser.showOpenDialog(null);
-				if (file != null)
-					open(file, flavor, Constants.X_UNSPECIFIED);
-				else
-					showOpening();
-
+	public void fileOpenDialog(Component parent, ImportPlugin flavor, boolean multi, Consumer<File[]> okCallback,
+			Consumer<Object> cancelCallback, String title) {
+		if (Annotator.javafx()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+					fileChooser.setTitle(title);
+					fileChooser.setInitialDirectory(getCurrentDirectory());
+					// fileChooser.getExtensionFilters().clear();
+					fileChooser.getExtensionFilters().add(flavor.getExtensionFilter());
+					File[] result;
+					if (multi) {
+						result = fileChooser.showOpenMultipleDialog(null).toArray(new File[] {});
+						if (result != null) {
+							setCurrentDirectory(result[0].getParentFile());
+							okCallback.accept(result);
+							return;
+						}
+					} else {
+						result = new File[1];
+						result[0] = fileChooser.showOpenDialog(null);
+						if (result[0] != null) {
+							setCurrentDirectory(result[0].getParentFile());
+							okCallback.accept(result);
+							return;
+						}
+					}
+					cancelCallback.accept(null);
+				}
+			});
+		} else {
+			JFileChooser openDialog;
+			openDialog = new JFileChooser();
+			openDialog.setMultiSelectionEnabled(multi);
+			openDialog.setFileFilter(FileFilters.xmi_gz);
+			openDialog.setDialogTitle(title);
+			openDialog.setFileFilter(flavor.getFileFilter());
+			openDialog.setCurrentDirectory(getCurrentDirectory());
+			int r = openDialog.showOpenDialog(parent);
+			switch (r) {
+			case JFileChooser.APPROVE_OPTION:
+				File[] selectedFiles;
+				if (multi)
+					selectedFiles = openDialog.getSelectedFiles();
+				else {
+					selectedFiles = new File[1];
+					selectedFiles[0] = openDialog.getSelectedFile();
+				}
+				setCurrentDirectory(selectedFiles[0].getParentFile());
+				okCallback.accept(selectedFiles);
+				break;
+			default:
+				cancelCallback.accept(null);
 			}
-
-		});
-
+		}
 	}
 
-	public static String getString(String key) {
+	public void fileOpenDialog(Component parent, ImportPlugin flavor) {
+		fileOpenDialog(parent, flavor, false, f -> open(f[0], flavor, Constants.X_UNSPECIFIED), o -> showOpening(),
+				"Open files using " + flavor.getName() + " scheme");
+	}
+
+	public static String getString(String key, Object... parameters) {
 		try {
-			return getString(key, Locale.getDefault());
+			return getString(key, Locale.getDefault(), parameters);
 		} catch (java.util.MissingResourceException e) {
 			logger.catching(e);
 			return key;
@@ -331,7 +386,17 @@ public class Annotator {
 		return rbundle.getString(key);
 	}
 
-	public static String getString(String key, String defaultValue) {
+	public static String getString(String key, Locale locale, Object... parameters) {
+		if (rbundle == null)
+			rbundle = ResourceBundle.getBundle("locales/strings", locale);
+		if (parameters.length > 0) {
+			String s = rbundle.getString(key);
+			return MessageFormat.format(s, parameters);
+		}
+		return rbundle.getString(key);
+	}
+
+	public static String getStringWithDefault(String key, String defaultValue) {
 		try {
 			return getString(key, Locale.getDefault());
 		} catch (java.util.MissingResourceException e) {
@@ -417,4 +482,16 @@ public class Annotator {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	public static boolean javafx() {
+		if (javafx == null)
+			try {
+				Class.forName("javafx.embed.swing.JFXPanel");
+				new JFXPanel();
+				javafx = true;
+			} catch (Exception e) {
+				javafx = false;
+			}
+		return javafx;
+	}
 }

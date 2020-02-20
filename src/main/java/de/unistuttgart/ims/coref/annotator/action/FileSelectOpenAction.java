@@ -21,7 +21,7 @@ public class FileSelectOpenAction extends IkonAction {
 		super(MaterialDesign.MDI_OPEN_IN_APP);
 		putValue(Action.NAME, Annotator.getString("action.open"));
 		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		mainApplication = mApplication;
 	}
 
