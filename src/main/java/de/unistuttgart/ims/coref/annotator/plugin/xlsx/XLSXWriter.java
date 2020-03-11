@@ -30,7 +30,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileStream;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 

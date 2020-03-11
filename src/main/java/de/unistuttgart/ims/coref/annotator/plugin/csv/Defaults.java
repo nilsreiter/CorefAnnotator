@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.csv;
 
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 
 public class Defaults {
 	public static final int CFG_OPTION_CONTEXT_WIDTH = 30;

@@ -31,6 +31,7 @@ public class Strings {
 	public static final String ACTION_DELETE_FLAG = "action.delete_flag";
 	public static final String ACTION_DELETE_FLAG_TOOLTIP = "action.delete_flag.tooltip";
 	public static final String ACTION_DELETE_TOOLTIP = "action.delete.tooltip";
+	public static final String ACTION_DUPLICATE_MENTIONS = "action.duplicate_mentions";
 	public static final String ACTION_EDIT_COMMENT = "action.edit.comment";
 	public static final String ACTION_EDIT_COMMENT_TOOLTIP = "action.edit.comment.tooltip";
 	public static final String ACTION_ENTITY_STATISTICS = "action.entity_statistics";
@@ -105,6 +106,8 @@ public class Strings {
 	public static final String ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP = "action.toggle.show_text_labels.tooltip";
 	public static final String ACTION_TOGGLE_SHOW_TOC = "action.toggle.show_toc";
 	public static final String ACTION_TOGGLE_SHOW_TOC_TOOLTIP = "action.toggle.show_toc.tooltip";
+	public static final String ACTION_TOGGLE_STICKY_FLAGS = "action.toggle.sticky_flags";
+	public static final String ACTION_TOGGLE_STICKY_FLAGS_TOOLTIP = "action.toggle.sticky_flags.tooltip";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE = "action.toggle.trim_whitespace";
 	public static final String ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP = "action.toggle.trim_whitespace.tooltip";
 	public static final String ACTION_TOGGLE_UNDERLINE_SINGLETONS_IN_GRAY = "action.toggle.underline_singletons_in_gray";
@@ -131,6 +134,8 @@ public class Strings {
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_UNIT_TOOLTIP = "dialog.export_options.context_unit.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH = "dialog.export_options.context_width";
 	public static final String DIALOG_EXPORT_OPTIONS_CONTEXT_WIDTH_TOOLTIP = "dialog.export_options.context_width.tooltip";
+	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_HEADER = "dialog.export_options.include_header";
+	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_HEADER_TOOLTIP = "dialog.export_options.include_header.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS = "dialog.export_options.include_line_numbers";
 	public static final String DIALOG_EXPORT_OPTIONS_INCLUDE_LINE_NUMBERS_TOOLTIP = "dialog.export_options.include_line_numbers.tooltip";
 	public static final String DIALOG_EXPORT_OPTIONS_OK = "dialog.export_options.ok";

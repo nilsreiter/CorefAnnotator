@@ -28,7 +28,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 
 	@Override
 	protected Object doInBackground() throws Exception {
-
+		Annotator.logger.info("Saving ... ");
 		OutputStream os = null;
 		try {
 			if (file.getName().endsWith(".xmi")) {
@@ -48,6 +48,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 
 	@Override
 	protected void done() {
+		Annotator.logger.info("Saved.");
 		consumer.accept(file, jcas);
 	}
 

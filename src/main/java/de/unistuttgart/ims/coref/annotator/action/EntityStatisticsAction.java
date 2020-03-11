@@ -18,8 +18,8 @@ import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CSVWriter;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.Constants;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.Defaults;
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin;
-import de.unistuttgart.ims.coref.annotator.plugin.csv.Plugin.ContextUnit;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
@@ -36,7 +36,7 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 	protected void optionDialog(Consumer<EntityStatisticsAction> callback) {
 
-		Plugin csvPlugin = Annotator.app.getPluginManager().getPlugin(Plugin.class);
+		CsvExportPlugin csvPlugin = Annotator.app.getPluginManager().getPlugin(CsvExportPlugin.class);
 
 		csvPlugin.showExportConfigurationDialog(getTarget(), getTarget().getDocumentModel(), p -> {
 			callback.accept(EntityStatisticsAction.this);

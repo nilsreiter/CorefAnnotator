@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.ExportPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.ExportWorker;
 import javafx.application.Platform;
 
@@ -21,9 +21,9 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
-	IOPlugin plugin;
+	ExportPlugin plugin;
 
-	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, IOPlugin plugin) {
+	public FileExportAction(DocumentWindow documentWindow, DocumentWindow dw, ExportPlugin plugin) {
 		super(dw, plugin.getIkon());
 		putValue(Action.NAME, plugin.getName());
 		if (plugin.getDescription() != null)
@@ -53,11 +53,10 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 						target.setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 
 						Annotator.app.setCurrentDirectory(f.getParentFile());
-						ExportWorker worker = new ExportWorker(f, target.getDocumentModel().getJcas(), plugin,
-								(file, jcas) -> {
-									target.stopIndeterminateProgress();
-									target.setMessage("");
-								});
+						ExportWorker worker = new ExportWorker(f, target.getDocumentModel(), plugin, (file, jcas) -> {
+							target.stopIndeterminateProgress();
+							target.setMessage("");
+						});
 						worker.execute();
 					}
 
@@ -91,7 +90,7 @@ public class FileExportAction extends TargetedIkonAction<DocumentWindow> {
 				target.setMessage(Annotator.getString(Strings.MESSAGE_SAVING));
 
 				Annotator.app.setCurrentDirectory(f.getParentFile());
-				ExportWorker worker = new ExportWorker(f, target.getDocumentModel().getJcas(), plugin, (file, jcas) -> {
+				ExportWorker worker = new ExportWorker(f, target.getDocumentModel(), plugin, (file, jcas) -> {
 					target.stopIndeterminateProgress();
 					target.setMessage("");
 				});

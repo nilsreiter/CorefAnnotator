@@ -10,10 +10,12 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.uima.UIMAException;
+import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.StringArray;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
@@ -65,5 +67,12 @@ public class UimaUtil {
 			tn = tn.getParent();
 		}
 		return b.toString();
+	}
+
+	public static StringArray clone(StringArray arr) throws CASException {
+		StringArray newArray = new StringArray(arr.getCAS().getJCas(), arr.size());
+		for (int i = 0; i < newArray.size(); i++)
+			newArray.set(i, arr.get(i));
+		return newArray;
 	}
 }

@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-public interface ConfigurableExportPlugin {
+public interface ConfigurableExportPlugin extends ExportPlugin {
 	void showExportConfigurationDialog(JFrame parent, DocumentModel documentModel,
 			Consumer<ConfigurableExportPlugin> callback);
 
