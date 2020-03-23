@@ -9,9 +9,9 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.dkpro.core.io.conll.Conll2012Writer;
+import org.dkpro.core.tokit.BreakIteratorSegmenter;
 
-import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2012Writer;
-import de.tudarmstadt.ukp.dkpro.core.tokit.BreakIteratorSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
 import de.unistuttgart.ims.uimautil.SetDocumentId;
