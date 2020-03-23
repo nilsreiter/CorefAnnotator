@@ -15,7 +15,7 @@ import org.dkpro.core.stanfordnlp.StanfordPosTagger;
 import org.dkpro.core.stanfordnlp.StanfordSegmenter;
 
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
-import de.unistuttgart.ims.uimautil.SetJCasLanguage;
+import de.unistuttgart.ims.coref.annotator.uima.SetJCasLanguage;
 
 public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.plaintext.Plugin {
 

@@ -9,6 +9,7 @@ import java.util.prefs.Preferences;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.CASRuntimeException;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -68,8 +69,8 @@ import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationUtil;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
-import de.unistuttgart.ims.uimautil.AnnotationUtil;
 
 /**
  * Class represents the document and the tree view on the document. All
@@ -679,7 +680,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		}
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
-			mention.getEntity().addToIndexes();
+			try {
+				mention.getEntity().addToIndexes();
+			} catch (CASRuntimeException e) {
+				Annotator.logger.catching(e);
+			}
 			registerAnnotation(mention);
 			if (mention.getDiscontinuous() != null) {
 				registerAnnotation(mention.getDiscontinuous());

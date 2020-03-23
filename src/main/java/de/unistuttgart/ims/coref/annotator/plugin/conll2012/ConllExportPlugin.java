@@ -14,7 +14,7 @@ import org.dkpro.core.tokit.BreakIteratorSegmenter;
 
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaExportPlugin;
-import de.unistuttgart.ims.uimautil.SetDocumentId;
+import de.unistuttgart.ims.coref.annotator.uima.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class ConllExportPlugin extends AbstractExportPlugin implements UimaExportPlugin {

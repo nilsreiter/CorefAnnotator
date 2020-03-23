@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
-import de.unistuttgart.ims.uimautil.SetDocumentId;
+import de.unistuttgart.ims.coref.annotator.uima.SetDocumentId;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public final class DefaultExportPlugin extends AbstractExportPlugin implements DirectFileIOPlugin, UimaExportPlugin {
