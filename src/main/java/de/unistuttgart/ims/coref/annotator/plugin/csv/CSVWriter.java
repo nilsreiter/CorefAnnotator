@@ -11,6 +11,7 @@ import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -137,7 +138,14 @@ public class CSVWriter extends SingleFileWriter {
 							p.print(-1);
 						}
 						try {
-							p.print(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
+							Annotation a = new Annotation(jcas);
+							a.setBegin(mention.getEnd());
+							a.setEnd(mention.getEnd());
+							p.print(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
+						} catch (IndexOutOfBoundsException e) {
+							JCasUtil.selectPreceding(Line.class, new Annotation(jcas), 1);
+							p.print(JCasUtil.selectCovering(jcas, Line.class, mention.getEnd(), mention.getEnd()).get(0)
+									.getNumber() - 1);
 						} catch (IllegalStateException e) {
 							p.print(-1);
 						}

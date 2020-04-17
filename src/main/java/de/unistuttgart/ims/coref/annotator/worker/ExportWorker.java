@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.worker;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.function.BiConsumer;
 
 import javax.swing.SwingWorker;
@@ -46,6 +47,8 @@ public class ExportWorker extends SwingWorker<Object, Object> {
 		else if (plugin instanceof DocumentModelExportPlugin) {
 			try (FileWriter fw = new FileWriter(file)) {
 				((DocumentModelExportPlugin) plugin).write(documentModel, fw);
+			} catch (IOException e) {
+				Annotator.logger.catching(e);
 			}
 		}
 		return null;
