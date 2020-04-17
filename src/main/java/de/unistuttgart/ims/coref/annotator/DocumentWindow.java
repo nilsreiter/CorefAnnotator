@@ -783,6 +783,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		if (model.hasLineNumbers()) {
 			actions.lineNumberStyleFixed.setEnabled(true);
 			this.setLineNumberStyle(actions.lineNumberStyleFixed.getStyle());
+		} else {
+			actions.lineNumberStyleDynamic.setEnabled(true);
+			this.setLineNumberStyle(actions.lineNumberStyleDynamic.getStyle());
 		}
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
