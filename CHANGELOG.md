@@ -40,6 +40,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   Nonnominal. #277
 - If line numbers are displayed in the tree, and a segmentation 
   exist, the segments are also displayed in the tree. #279
+- Added a new exporter that directly exports into MS Excel and 
+  is more configurable. #285
 
 ## 1.12.2
 
