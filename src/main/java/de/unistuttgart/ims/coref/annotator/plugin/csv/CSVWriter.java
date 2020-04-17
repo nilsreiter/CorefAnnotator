@@ -24,9 +24,11 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
 
 public class CSVWriter extends SingleFileWriter {
 
@@ -36,8 +38,10 @@ public class CSVWriter extends SingleFileWriter {
 	private static final String SURFACE = "surface";
 	private static final String END = "end";
 	private static final String END_LINE = "end_line";
+	private static final String END_SEGMENT = "end_segment";
 	private static final String BEGIN = "begin";
 	private static final String BEGIN_LINE = "begin_line";
+	private static final String BEGIN_SEGMENT = "begin_segment";
 	private static final String CONTEXT_LEFT = "leftContext";
 	private static final String CONTEXT_RIGHT = "rightContext";
 
@@ -87,10 +91,13 @@ public class CSVWriter extends SingleFileWriter {
 		ImmutableList<Flag> entityFlags = allFlags
 				.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
+		RangedHashSetValuedHashMap<Segment> segmentIndex = new RangedHashSetValuedHashMap<Segment>();
 		RangedHashSetValuedHashMap<Line> lineIndex = new RangedHashSetValuedHashMap<Line>();
 		if (optionIncludeLineNumbers) {
 			for (Line line : JCasUtil.select(jcas, Line.class))
 				lineIndex.add(line);
+			for (Segment segment : JCasUtil.select(jcas, Segment.class))
+				segmentIndex.add(segment);
 		}
 
 		if (entities == null)
@@ -101,6 +108,10 @@ public class CSVWriter extends SingleFileWriter {
 			p.print(BEGIN);
 			p.print(END);
 			if (optionIncludeLineNumbers) {
+				if (segmentIndex.notEmpty()) {
+					p.print(BEGIN_SEGMENT);
+					p.print(END_SEGMENT);
+				}
 				p.print(BEGIN_LINE);
 				p.print(END_LINE);
 			}
@@ -131,7 +142,18 @@ public class CSVWriter extends SingleFileWriter {
 						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 					p.print(mention.getBegin());
 					p.print(mention.getEnd());
+
 					if (optionIncludeLineNumbers) {
+						if (segmentIndex.notEmpty()) {
+							Segment segment = Lists.mutable.ofAll(segmentIndex.get(mention.getBegin()))
+									.min(new AnnotationLengthComparator<Segment>());
+							p.print(segment.getLabel());
+
+							segment = Lists.mutable.ofAll(segmentIndex.get(mention.getEnd()))
+									.min(new AnnotationLengthComparator<Segment>());
+							p.print(segment.getLabel());
+						}
+
 						try {
 							p.print(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
 						} catch (Exception e) {
@@ -142,11 +164,7 @@ public class CSVWriter extends SingleFileWriter {
 							a.setBegin(mention.getEnd());
 							a.setEnd(mention.getEnd());
 							p.print(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
-						} catch (IndexOutOfBoundsException e) {
-							JCasUtil.selectPreceding(Line.class, new Annotation(jcas), 1);
-							p.print(JCasUtil.selectCovering(jcas, Line.class, mention.getEnd(), mention.getEnd()).get(0)
-									.getNumber() - 1);
-						} catch (IllegalStateException e) {
+						} catch (Exception e) {
 							p.print(-1);
 						}
 					}
