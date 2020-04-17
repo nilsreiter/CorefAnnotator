@@ -18,6 +18,7 @@ import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -148,8 +149,12 @@ public class XLSXWriter extends SingleFileStream {
 						row.createCell(cellNum++).setCellValue(-1);
 					}
 					try {
+						Annotation a = new Annotation(jcas);
+						a.setBegin(mention.getEnd());
+						a.setEnd(mention.getEnd());
+
 						row.createCell(cellNum++)
-								.setCellValue(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
+								.setCellValue(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
 					} catch (IllegalStateException e) {
 						row.createCell(cellNum++).setCellValue(-1);
 					}
