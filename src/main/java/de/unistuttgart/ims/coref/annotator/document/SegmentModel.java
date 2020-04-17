@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
-import java.util.Comparator;
 import java.util.NoSuchElementException;
 
 import javax.swing.ListModel;
@@ -22,6 +21,7 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
 
 public class SegmentModel extends SubModel implements ListModel<Segment>, TreeModel {
 	DocumentModel documentModel;
@@ -162,14 +162,7 @@ public class SegmentModel extends SubModel implements ListModel<Segment>, TreeMo
 		MutableSet<Segment> segments = position2Segment.get(textPosition);
 		if (segments.isEmpty())
 			return null;
-		return Lists.mutable.ofAll(segments).min(new Comparator<Segment>() {
-
-			@Override
-			public int compare(Segment o1, Segment o2) {
-				return Integer.compare(o1.getEnd() - o1.getBegin(), o2.getEnd() - o2.getBegin());
-			}
-
-		});
+		return Lists.mutable.ofAll(segments).min(new AnnotationLengthComparator<Segment>());
 	}
 
 	public Segment getRootSegment() {
