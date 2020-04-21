@@ -29,18 +29,15 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 	@Override
 	protected Object doInBackground() throws Exception {
 		Annotator.logger.info("Saving ... ");
-		OutputStream os = null;
-		try {
-			if (file.getName().endsWith(".xmi")) {
-				os = new FileOutputStream(file);
-			} else if (file.getName().endsWith(".gz")) {
-				os = new GZIPOutputStream(new FileOutputStream(file));
-			}
-			if (os != null)
+
+		if (file.getName().endsWith(".xmi")) {
+			try (OutputStream os = new FileOutputStream(file)) {
 				XmiCasSerializer.serialize(jcas.getCas(), os);
-		} finally {
-			if (os != null)
-				os.close();
+			}
+		} else if (file.getName().endsWith(".gz")) {
+			try (OutputStream os = new GZIPOutputStream(new FileOutputStream(file))) {
+				XmiCasSerializer.serialize(jcas.getCas(), os);
+			}
 		}
 
 		return null;
