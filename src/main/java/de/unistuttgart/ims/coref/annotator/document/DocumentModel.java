@@ -174,6 +174,10 @@ public class DocumentModel implements Model {
 		return lineNumberModel.getMaximum();
 	}
 
+	public String getLineLabel(Span range) {
+		return lineNumberModel.getLineLabel(range);
+	}
+
 	public Integer getLineNumber(Span range) {
 		return lineNumberModel.getLineNumber(range);
 	}
@@ -399,6 +403,14 @@ public class DocumentModel implements Model {
 			if (line.getNumber() < 0)
 				return null;
 			return line.getNumber();
+		}
+
+		public String getLineLabel(Span range) {
+			List<Line> lineList = JCasUtil.selectCovered(getJcas(), Line.class, range.begin, range.end);
+			if (lineList.size() != 1)
+				return null;
+			Line line = lineList.get(0);
+			return line.getLabel();
 		}
 
 		public Integer getLineNumber(int position) {

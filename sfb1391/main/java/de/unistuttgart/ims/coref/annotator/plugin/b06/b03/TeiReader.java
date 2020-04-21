@@ -127,8 +127,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				try {
 					line.setNumber(Integer.valueOf(lb.getN()));
 				} catch (NumberFormatException e) {
-					line.setNumber(Integer.MIN_VALUE);
-					// catch silently
+					line.setLabel(lb.getN());
 				}
 			}
 		}
