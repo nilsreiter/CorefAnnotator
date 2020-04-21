@@ -152,18 +152,22 @@ public class Util {
 		return Util.contains((StringArray) fs.getFeatureValue(feature), flag);
 	}
 
+	@Deprecated
 	public static boolean isGeneric(Entity e) {
 		return Util.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC);
 	}
 
+	@Deprecated
 	public static boolean isDifficult(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
 	}
 
+	@Deprecated
 	public static boolean isNonNominal(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_NON_NOMINAL);
 	}
 
+	@Deprecated
 	public static boolean isAmbiguous(Mention m) {
 		return Util.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
 	}

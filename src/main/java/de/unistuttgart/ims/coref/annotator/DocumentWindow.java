@@ -1303,6 +1303,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	class TextViewKeyListener implements KeyListener {
+		@SuppressWarnings("deprecation")
 		@Override
 		public void keyTyped(KeyEvent e) {
 			CoreferenceModel cModel = getDocumentModel().getCoreferenceModel();
@@ -1511,6 +1512,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	class TextMouseListener implements MouseListener, MouseMotionListener {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {

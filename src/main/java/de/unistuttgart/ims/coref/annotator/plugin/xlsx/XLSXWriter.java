@@ -18,6 +18,7 @@ import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -30,9 +31,11 @@ import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileStream;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
 
 public class XLSXWriter extends SingleFileStream {
 
@@ -42,8 +45,10 @@ public class XLSXWriter extends SingleFileStream {
 	private static final String SURFACE = "surface";
 	private static final String END = "end";
 	private static final String END_LINE = "end_line";
+	private static final String END_SEGMENT = "end_segment";
 	private static final String BEGIN = "begin";
 	private static final String BEGIN_LINE = "begin_line";
+	private static final String BEGIN_SEGMENT = "begin_segment";
 	private static final String CONTEXT_LEFT = "leftContext";
 	private static final String CONTEXT_RIGHT = "rightContext";
 
@@ -97,10 +102,13 @@ public class XLSXWriter extends SingleFileStream {
 		ImmutableList<Flag> entityFlags = allFlags
 				.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
+		RangedHashSetValuedHashMap<Segment> segmentIndex = new RangedHashSetValuedHashMap<Segment>();
 		RangedHashSetValuedHashMap<Line> lineIndex = new RangedHashSetValuedHashMap<Line>();
 		if (optionIncludeLineNumbers) {
 			for (Line line : JCasUtil.select(jcas, Line.class))
 				lineIndex.add(line);
+			for (Segment segment : JCasUtil.select(jcas, Segment.class))
+				segmentIndex.add(segment);
 		}
 
 		if (entities == null)
@@ -116,7 +124,7 @@ public class XLSXWriter extends SingleFileStream {
 		int cellNum = 0;
 		if (!optionSeparateSheetsForEntities) {
 			sheet = wb.createSheet("Export");
-			printHeader(sheet, entityFlags, mentionFlags);
+			printHeader(sheet, entityFlags, mentionFlags, segmentIndex.notEmpty());
 		}
 
 		int rowNum = 1;
@@ -127,7 +135,7 @@ public class XLSXWriter extends SingleFileStream {
 		for (Entity entity : entities) {
 			if (optionSeparateSheetsForEntities) {
 				sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(entity.getLabel()));
-				printHeader(sheet, entityFlags, mentionFlags);
+				printHeader(sheet, entityFlags, mentionFlags, segmentIndex.notEmpty());
 				rowNum = 1;
 			}
 			for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
@@ -141,6 +149,14 @@ public class XLSXWriter extends SingleFileStream {
 				row.createCell(cellNum++).setCellValue(mention.getBegin());
 				row.createCell(cellNum++).setCellValue(mention.getEnd());
 				if (optionIncludeLineNumbers) {
+					if (segmentIndex.notEmpty()) {
+						Segment segment = Lists.mutable.ofAll(segmentIndex.get(mention.getBegin()))
+								.min(new AnnotationLengthComparator<Segment>());
+						row.createCell(cellNum++).setCellValue(segment.getLabel());
+						segment = Lists.mutable.ofAll(segmentIndex.get(mention.getEnd()))
+								.min(new AnnotationLengthComparator<Segment>());
+						row.createCell(cellNum++).setCellValue(segment.getLabel());
+					}
 					try {
 						row.createCell(cellNum++)
 								.setCellValue(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
@@ -148,9 +164,13 @@ public class XLSXWriter extends SingleFileStream {
 						row.createCell(cellNum++).setCellValue(-1);
 					}
 					try {
+						Annotation a = new Annotation(jcas);
+						a.setBegin(mention.getEnd());
+						a.setEnd(mention.getEnd());
+
 						row.createCell(cellNum++)
-								.setCellValue(JCasUtil.selectFollowing(Line.class, mention, 1).get(0).getNumber() - 1);
-					} catch (IllegalStateException e) {
+								.setCellValue(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
+					} catch (Exception e) {
 						row.createCell(cellNum++).setCellValue(-1);
 					}
 				}
@@ -200,7 +220,7 @@ public class XLSXWriter extends SingleFileStream {
 		wb.write(os);
 	}
 
-	protected void printHeader(Sheet sheet, Iterable<Flag> flags1, Iterable<Flag> flags2) {
+	protected void printHeader(Sheet sheet, Iterable<Flag> flags1, Iterable<Flag> flags2, boolean includeSegments) {
 		Font ft = sheet.getWorkbook().createFont();
 		ft.setBold(true);
 		CellStyle cs = sheet.getWorkbook().createCellStyle();
@@ -217,6 +237,11 @@ public class XLSXWriter extends SingleFileStream {
 		cell.setCellValue(END);
 
 		if (optionIncludeLineNumbers) {
+			if (includeSegments) {
+				row.createCell(cellNum++).setCellValue(BEGIN_SEGMENT);
+				row.createCell(cellNum++).setCellValue(END_SEGMENT);
+			}
+
 			row.createCell(cellNum++).setCellValue(BEGIN_LINE);
 			row.createCell(cellNum++).setCellValue(END_LINE);
 		}

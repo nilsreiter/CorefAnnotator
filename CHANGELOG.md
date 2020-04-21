@@ -14,6 +14,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   #271
 - Added a new view to show simple summary statistics, and an 
   exporter that exports the same info as CSV file. #286
+- Automatic saving every 5 minutes #294
 
 ## 1.13.0
 
@@ -39,6 +40,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   Nonnominal. #277
 - If line numbers are displayed in the tree, and a segmentation 
   exist, the segments are also displayed in the tree. #279
+- Added a new exporter that directly exports into MS Excel and 
+  is more configurable. #285
 
 ## 1.12.2
 

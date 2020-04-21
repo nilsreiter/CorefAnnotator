@@ -12,7 +12,7 @@ public class ShowDocumentStatistics extends TargetedIkonAction<DocumentWindow> {
 	private static final long serialVersionUID = 1L;
 
 	public ShowDocumentStatistics(DocumentWindow dw) {
-		super(dw, "action.show_statistics", MaterialDesign.MDI_CHART_BAR);
+		super(dw, "action.show_statistics", MaterialDesign.MDI_TABLE);
 	}
 
 	@SuppressWarnings("unused")
