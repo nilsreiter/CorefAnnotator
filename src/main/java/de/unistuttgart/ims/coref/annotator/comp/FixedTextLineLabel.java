@@ -13,10 +13,7 @@ public class FixedTextLineLabel extends TextLineNumber {
 
 	@Override
 	protected String getTextLineNumber(int rowStartOffset, int rowEndOffset) {
-
-		String l = textWindow.getDocumentModel().getLineLabel(new Span(rowStartOffset, rowEndOffset));
-		return l;
-
+		return textWindow.getDocumentModel().getLineLabel(new Span(rowStartOffset, rowEndOffset));
 	}
 
 }
