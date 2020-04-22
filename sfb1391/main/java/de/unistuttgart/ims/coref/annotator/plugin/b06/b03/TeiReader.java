@@ -58,6 +58,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			return;
 		}
 
+		boolean lineNumbersAreNumbers = true;
+
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
@@ -118,15 +120,24 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				element.removeFromIndexes();
 		}
 
+		// check if all line numbers are numbers
+		for (LineBreak lb : JCasUtil.select(jcas, LineBreak.class)) {
+			lineNumbersAreNumbers = lineNumbersAreNumbers && lb.getN().matches("^\\d+$");
+		}
+
 		// fix lines
 		for (LineBreak lb : JCasUtil.select(jcas, LineBreak.class)) {
 			Milestone nextMilestone = null;
 			nextMilestone = JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
 			if (nextMilestone != null) {
 				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
-				try {
-					line.setNumber(Integer.valueOf(lb.getN()));
-				} catch (NumberFormatException e) {
+				if (lineNumbersAreNumbers)
+					try {
+						line.setNumber(Integer.valueOf(lb.getN()));
+					} catch (NumberFormatException e) {
+						line.setLabel(lb.getN());
+					}
+				else {
 					line.setLabel(lb.getN());
 				}
 			}
