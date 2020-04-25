@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.2
+
+- Fixed a bug what caused the auto-save to continue saving a file
+  even after the document had been closed #309
+
 ## 1.14.1
 
 - Fixes a bug that prevented the export of full mention
