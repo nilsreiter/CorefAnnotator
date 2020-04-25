@@ -2,6 +2,7 @@ package de.unistuttgart.ims.coref.annotator.plugin.b06.b03;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -157,8 +158,15 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), nextMS.getBegin(), Segment.class);
 				seg.setLabel(ms.getN());
 			} else {
-				Segment seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), jcas.getDocumentText().length(),
-						Segment.class);
+				List<Segment> coveringSegments = JCasUtil.selectCovering(Segment.class, ms);
+				Segment seg;
+				if (!coveringSegments.isEmpty()) {
+					seg = coveringSegments.get(coveringSegments.size() - 1);
+					seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), seg.getEnd(), Segment.class);
+				} else {
+					seg = AnnotationFactory.createAnnotation(jcas, ms.getEnd(), jcas.getDocumentText().length(),
+							Segment.class);
+				}
 				seg.setLabel(ms.getN());
 			}
 		}
@@ -166,7 +174,9 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		// We skip this for now
 		// TODO: need a new way to display many small segments
 		if (false)
-			for (Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
+			for (
+
+			Milestone ms : JCasUtil.select(jcas, Milestone.class)) {
 				Milestone nextMilestone = null;
 				nextMilestone = JCasUtil.selectFollowing(Milestone.class, ms, 1).get(0);
 				if (nextMilestone != null) {
@@ -179,8 +189,13 @@ public class TeiReader extends ResourceCollectionReaderBase {
 
 	Milestone getNextMilestone(Milestone current, String type) {
 		for (Milestone ms : JCasUtil.selectFollowing(Milestone.class, current, Integer.MAX_VALUE)) {
-			if (ms != current && ms.getMilestoneType() != null && ms.getMilestoneType().equalsIgnoreCase(type))
+			if (ms == current)
+				continue;
+			if (ms.getMilestoneType() == null)
+				continue;
+			if (ms.getMilestoneType().equalsIgnoreCase(type))
 				return ms;
+
 		}
 		return null;
 
