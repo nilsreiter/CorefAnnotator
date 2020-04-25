@@ -122,7 +122,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		// fix lines
 		for (LineBreak lb : JCasUtil.select(jcas, LineBreak.class)) {
 			Milestone nextMilestone = null;
-			nextMilestone = JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
+			nextMilestone = getNextMilestone(lb, null);// JCasUtil.selectFollowing(Milestone.class, lb, 1).get(0);
 			if (nextMilestone != null) {
 				Line line = AnnotationFactory.createAnnotation(jcas, lb.getEnd(), nextMilestone.getBegin(), Line.class);
 				try {
@@ -191,6 +191,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		for (Milestone ms : JCasUtil.selectFollowing(Milestone.class, current, Integer.MAX_VALUE)) {
 			if (ms == current)
 				continue;
+			if (type == null)
+				return ms;
 			if (ms.getMilestoneType() == null)
 				continue;
 			if (ms.getMilestoneType().equalsIgnoreCase(type))
