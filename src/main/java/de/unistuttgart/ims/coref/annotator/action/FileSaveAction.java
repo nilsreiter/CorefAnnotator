@@ -3,6 +3,8 @@ package de.unistuttgart.ims.coref.annotator.action;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,7 +48,8 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 			timer.purge();
 		}
 		timer = new Timer();
-		TimerTask tt = new SaveTimerTask();
+		SaveTimerTask tt = new SaveTimerTask();
+		getTarget().addWindowListener(tt);
 		timer.schedule(tt, when, period);
 	}
 
@@ -56,7 +59,7 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		save(period);
 	}
 
-	class SaveTimerTask extends TimerTask {
+	class SaveTimerTask extends TimerTask implements WindowListener {
 
 		@Override
 		public void run() {
@@ -69,6 +72,36 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 						target.stopIndeterminateProgress();
 					});
 			worker.execute();
+		}
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			Annotator.logger.debug("Cancelling auto-save timer.");
+			this.cancel();
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
 		}
 
 	}
