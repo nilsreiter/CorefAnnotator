@@ -1,0 +1,1954 @@
+<xml version="1.0" encoding="UTF-8"/>
+<teiCorpus version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader type="corpus">
+    <fileDesc>
+      <author>Rumelant von Sachsen</author>
+      <title>Sangspruchdichtungen nach der Jenaer Liederhandschrift (Jena, UB, Ms. El. F. 101)</title>
+    </fileDesc>
+    <profileDesc>
+      <langUsage ident="mhd" usage="100"/>
+    </profileDesc>
+    <docEdition>Runow, Holger: Rumlant von Sachsen. Edition – Übersetzung – Kommentar.</docEdition>
+  </teiHeader>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title> Ton I</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n=" Ton I"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Got in vier elementen 
+<lb/>sich erscheinet. 
+<lb/>ob wir den nicht recht erkenten, 
+<lb/>der uns hât gereinet? 
+<lb/>aller sünden smitten 
+<lb/>wuosch uns abe sîn bluot. 
+<lb/>sîn vleisch wart durchstochen 
+<lb/>sam diu erde, 
+<lb/>die mit phlüegen wirt zebrochen. 
+<lb/>dar nâch der vil werde 
+<lb/>an dem krûtze mitten 
+<lb/>hienc; sin vrucht ist guot. 
+<lb/>der uns sîn vleischlich erde in acker brâchte, 
+<lb/>ze sâte er wart gephlüeget in der marter. 
+<lb/>dô er menschlîche brôdicheit bedâchte, 
+<lb/>dô wart menscheit im trûter unde zarter. 
+<lb/>nû kumpt sîn erbarmen 
+<lb/>uns ze trôste, 
+<lb/>sît daz er die vreuden armen 
+<lb/>gnædichlîche erlôste 
+<lb/>von des tiuvels †kyten† 
+<lb/>ûz der helle gluot. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Wer kan daz begrîfen 
+<lb/>al mit sinne, 
+<lb/>wie man twinget in den phîfen 
+<lb/>luft, daz sie gewinne 
+<lb/>süezer dœne schelle, 
+<lb/>kreftich unde lût? 
+<lb/>von sich selben kunde 
+<lb/>luft nicht bringen 
+<lb/>alsô guoter dœne vunde, 
+<lb/>des muoz man sie twingen. 
+<lb/>steige [ ] unde velle, 
+<lb/>dâ von wirt sie trût. 
+<lb/>sam | ist uns Got nû herzelîchen trûter, 
+<lb/>sît daz die luft in sînes herzen grunde 
+<lb/>betwungen wart, sô reine, süeze, lûter, 
+<lb/>der lufte galm erschein im ûz dem munde. 
+<lb/>dô des krûtzes vürste 
+<lb/>sprach die mære 
+<lb/>iamerlîche, daz in dürste 
+<lb/>und ez volkomen wære, 
+<lb/>her brâchte ûz der helle 
+<lb/>maniger sêle brût. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Viur ist nicht sô kreftich 
+<lb/>heiz al eine, 
+<lb/>ê sîn marter im ze scheftich 
+<lb/>wirt. wie man daz meine, 
+<lb/>des ist ungelêret 
+<lb/>maniger hande man: 
+<lb/>mit den blâsebalgen 
+<lb/>wirt gepînet 
+<lb/>viur, daz ez muoz vor winde walgen, 
+<lb/>daz sîn gluote erschînet. 
+<lb/>kreftelîchen mêret 
+<lb/>wirt sîn hitze dan. 
+<lb/>alsô wart Gotes barmicheit geblâsen: 
+<lb/>vil maniges iudenbalges âdem anspîte 
+<lb/>sînen lîb, dô er entfienc vil marter mâsen, 
+<lb/>dâ von sîn lob erklinget alsô wîte. 
+<lb/>nû sîn gnâden güete 
+<lb/>heizer brinnet, 
+<lb/>in der wâren minne glüete 
+<lb/>her diu menscheit minnet. 
+<lb/>des sî Got geêret, 
+<lb/>der daz allez kan. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Wazzer hât natiure 
+<lb/>kalt gestellet. 
+<lb/>man betwinget ez mit viure, 
+<lb/>daz sîn walm erwellet, 
+<lb/>daz ein rôe spîse 
+<lb/>wirt gemachet gar. 
+<lb/>sunder twingen siudet 
+<lb/>wazzer selten. 
+<lb/>swer mich des mit kunst vergiudet, 
+<lb/>des muoz ich entgelte. 
+<lb/>ob ich daz bewîse, 
+<lb/>des wirt man gewar: 
+<lb/>Got ist gelîch dem wazzer in disen sachen, 
+<lb/>ie wesender Got, starc, ê her mensche würde; 
+<lb/>ist wazzer starch, daz mac man starcher machen 
+<lb/>sam tete sich Got mit sîner menschen bürde. 
+<lb/>Kristes ougen wazzer 
+<lb/>sôt in walme. 
+<lb/>wart sîn menscheit vreuden lazzer 
+<lb/>in des tôdes qualme, 
+<lb/>des stêt her ze prîse 
+<lb/>missewende bar. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Der den zirkel tichte 
+<lb/>senewel umme 
+<lb/>und die linien durch die richte 
+<lb/>sunder alle krumme 
+<lb/>nâch der winkel mâze 
+<lb/>zwîer wende schaft, 
+<lb/>wol sîn zirkel elle 
+<lb/>dinc begrîfet, 
+<lb/>beide himel und die helle, 
+<lb/>daz im nicht entslîfet. 
+<lb/>ganz in rechter sâze 
+<lb/>vollichlîch sîn kraft 
+<lb/>gezirkelt hât sich selbe um alle kêre, 
+<lb/>daz nicht ist ûzen im, des man gedenket. 
+<lb/>dîn linie durch den zirkel recht uns lêre 
+<lb/>der wîse geist, den uns der vater schenket 
+<lb/>unde den sun gewaltich 
+<lb/>kunde senden 
+<lb/>uns ein Got, des name drîvaltich 
+<lb/>ist, der in zwên wenden 
+<lb/>zwîer ê gelâze 
+<lb/>selbe ist winkelhaft. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/>Loter ritter bœse, 
+<lb/>phlichtgeselle, 
+<lb/>daz dîn wîb Got von dir lœse, 
+<lb/>du laz unde du snelle: 
+<lb/>snel in houbetschanden, 
+<lb/>aller tugende laz! 
+<lb/>vische, vog‹e›le, würme, 
+<lb/>tier mit liuten 
+<lb/>dîner vreuden burch erstürme, 
+<lb/>waz ich kan gediuten, 
+<lb/>gnâde in allen landen 
+<lb/>sol dir sîn gehaz. 
+<lb/>dich mîde gruoz von allen guoten vrouwen. 
+<lb/>dîn sâme unde ouch dîn sât verdorre unsüeze 
+<lb/>sô Gelboe der berc von allen touwen 
+<lb/>verteilet ist, der vluoch dir haften müeze. 
+<lb/>unheil dir beiegene, 
+<lb/>swâ du kêres, 
+<lb/>swebel, bech, viur ûf dich regene, 
+<lb/>wen du schande mêres. 
+<lb/>Got der sol mîn anden 
+<lb/>an dir rechen baz. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Prüebet, herren, prüebet, 
+<lb/>wer vertirbet. 
+<lb/>nâch dem lützel ougen trüebet, 
+<lb/>der in kerge stirbet; 
+<lb/>sîn lob mit im sîget, 
+<lb/>sô daz recht gebôt. 
+<lb/>swâ ein milter herre 
+<lb/>lîbes wantelt, 
+<lb/>klagendez lob vür helle werre 
+<lb/>wirt umme in gemantelt, 
+<lb/>daz er schône ûf stîget, 
+<lb/>ûz von aller nôt. 
+<lb/>wer helfet dem, des name hie wirt vergezzen? 
+<lb/>des man nâch tôde selten wol gedenket, 
+<lb/>sie ne ruochen, die sîn erbe haben besezzen, 
+<lb/>ob er wirt in der helle grunt gesenket. 
+<lb/>swer nû lob versûmet 
+<lb/>rîche lebende, 
+<lb/>swenne her ez hie mit schanden rûmet, 
+<lb/>klage im nâch ze gebende 
+<lb/>wirt vil gar geswîget: 
+<lb/>sô ist her vollen tôt. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>Messinc unde kopfer, 
+<lb/>der daz werket, 
+<lb/>der ist ouch ein hamerklopfer, 
+<lb/>doch sô wirt gemerket 
+<lb/>messinc bî dem golde, 
+<lb/>swer daz prüeben kan. 
+<lb/>lûter guldîn smîde 
+<lb/>vürsten zieret. 
+<lb/>herren bruste nicht erlîde 
+<lb/>kopfer; wirt gewieret, 
+<lb/>messincmeister solde 
+<lb/>wîchen baz hin dan. 
+<lb/>die vürsten sint des kopfers worden inne, 
+<lb/>wie daz gemischet ist mit kalemîne. 
+<lb/>die trüegen ez noch vür guot in irme sinne, 
+<lb/>gemischet valsch bî goldes liechtem schîne. 
+<lb/>kunterfeiter, bringe 
+<lb/>dîn zimierde, 
+<lb/>messinc unde kopfer dringe 
+<lb/>her mit valscher wirde. 
+<lb/>daz dîn herze wolde, 
+<lb/>dar hâstû nicht an. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  9"/> 9
+<lb/>Ihesus Krist, der kristen 
+<lb/>ê wart gichtich, 
+<lb/>der mac uns vil wol gevristen, 
+<lb/>daz ist ougen sichtich. 
+<lb/>tôdes kunft uns allen 
+<lb/>willich ist bereit. 
+<lb/>Got hette einen Marner 
+<lb/>lange vristet, 
+<lb/>der was maniges warner. 
+<lb/>nû hât in verlistet 
+<lb/>mortliche tôdes vallen. 
+<lb/>Got, daz ist mir leit! 
+<lb/>schentlîcher mort der wart noch nie begangen 
+<lb/>an eime kranken, blinden alten manne, 
+<lb/>deme selber nâch dem tôde möchte erlangen. 
+<lb/>die morder sîn die stên ze Gotes banne. 
+<lb/>Kristes muoter, süeze 
+<lb/>maget, gedenke, 
+<lb/>was her dînes lobes grüeze 
+<lb/>schône mit gelenke 
+<lb/>manigem kunde schallen 
+<lb/>dîner werdicheit. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  10"/> 10
+<lb/>Swer kan beide, brechen 
+<lb/>unde büezen, 
+<lb/>der mac wol ze dingen sprechen 
+<lb/>sûren unde ze süezen. 
+<lb/>sol ein wîs man kunnen 
+<lb/>schanden sich bewarn, 
+<lb/>sô wirt her genæme 
+<lb/>ze allen stunden; 
+<lb/>swaz er tuot, daz ist gezæme 
+<lb/>gesten unde den kunden. 
+<lb/>Got wil êre gunnen 
+<lb/>den, die rechte varn. 
+<lb/>die Kristes in ze lœser nicht verlougen 
+<lb/>und im des iên, daz in ein maget gebære, 
+<lb/>die sêt her an mit liebes vaters ougen. 
+<lb/>ir rechten kristen, vreuwet iuch der mære. 
+<lb/>iuden, ketzer, heiden, 
+<lb/>bœse kristen, 
+<lb/>wer sol iuch rechtes bescheiden? 
+<lb/>Satanâs mit listen 
+<lb/>stricket iuch sô tougen, 
+<lb/>daz ir êren barn. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  11"/> 11
+<lb/>Got, der aller wunder 
+<lb/>wunder wundert, 
+<lb/>der hât sunderlîch besunder 
+<lb/>wunder ûz gesundert, 
+<lb/>daz vür alle wunder 
+<lb/>michel wunder ist. 
+<lb/>sunder sünden schimel 
+<lb/>wunderære, 
+<lb/>Got ob allen himelen himel, 
+<lb/>dû bist wunderbære 
+<lb/>mitten, oben und under, 
+<lb/>umme durch dîn list. 
+<lb/>mit listen her aller liste list verliste, 
+<lb/>dô sich Got reine in menschen vleisch gevleischte, 
+<lb/>dâ er mit list sich vierzich wochen vriste. 
+<lb/>sô grôzer wunder list ich nie gevreischte, 
+<lb/>daz ein maget gebære 
+<lb/>sünden vrîe 
+<lb/>ein kint, daz ir vater wære. 
+<lb/>süeze maget Marîe, 
+<lb/>Gotes flammen zunder 
+<lb/>dû mit wundere bist. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton II</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton II"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Der wîse heiden Cato, der nie touf gewan, 
+<lb/>der sprichet die wort, daz ein islich kristenman 
+<lb/>bedenken mac, wie daz ein heiden vünde; 
+<lb/>her sprach: »ich bin den sünden alsô gar gehaz, 
+<lb/>ob nicht die gote sünde r‹æ›chen, wist ich daz, 
+<lb/>ob nimmer mensche wiste | mîne sünde, 
+<lb/>dennoch welt ich die sünde lân, 
+<lb/>sie ist ungesunt, von reinicheit gescheiden. 
+<lb/>daz mîner sünde würde nimmer nicht geseit, 
+<lb/>doch liez ich sünde durch der sünden unreinicheit.« 
+<lb/>nu prüebe, kristenvolc: diz sprach ein heiden! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Ihesus der sprach ze sînen iungeren: »swâ ir sît, 
+<lb/>in einer wirtschaft oder ze einer hôgezît, 
+<lb/>ir sulet iuch selber nicht ze hôe setzen. 
+<lb/>der wirt in grôzen êren vil die baz erkant, 
+<lb/>swenne er kumet, unde grîfet in bî der hant 
+<lb/>der wîse wirt, der kan im daz ergetzen: 
+<lb/>den biderben nideren setzet her hô, 
+<lb/>der hôe saz, dem ist daz michel schande; 
+<lb/>ze dem her sprichet ›stêt ûf unde rûmet deme die stat!‹, 
+<lb/>der hôe sitzet: ob der baz erworben hât, 
+<lb/>so wirt bekant, der sich nicht selber kande.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Der kuninc Salomôn gewaltich unde rîch, 
+<lb/>der wîse man, her sprach: »es ist unlobelîch, 
+<lb/>daz sich ein alter man ze tôren machet; 
+<lb/>daz ouch des rîchen mannes wort ist vil gelogen 
+<lb/>(der habe undanc); arman hôchvartich unde betrogen, 
+<lb/>der drîer hande liute sælde swachet. 
+<lb/>Got ist in sunderlîchen gram, 
+<lb/>den alten tôren, rîchen lügenæren, 
+<lb/>des armen menschen hôchvart. der es nicht wol vermac, 
+<lb/>der lîdet in der werlde manigen swæren tac. 
+<lb/>nâch irme tôde lît ir sêle in swæren.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Nu muoz ich dicke liegen durch des lîbes nôt, 
+<lb/>sît daz unrechticheit der rechticheit gebôt, 
+<lb/>daz sie nicht alle recht mit rechte ensprichet. 
+<lb/>unrechticheit gewaltes hât sô manige wal, 
+<lb/>daz rechticheit nicht kan ir rechten widerzal 
+<lb/>gebrûchen, dâ von rechtes vil zebrichet. 
+<lb/>daz prüebich an den rîchen wol, 
+<lb/>daz ir gewalt ir unrecht recht kan heizen. 
+<lb/>man mac ein dinc wol heizen, swie man ez heizen wil, 
+<lb/>daz urteil Gotes ist daz rechte hôheste zil, 
+<lb/>vor deme sol unrecht sich noch selben reizen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Nu daz ist von der armen sünder schulden komen, 
+<lb/>daz Gotes sun diu menscheit hât an sich genomen, 
+<lb/>dar zuo brâcht in die barmunge und die minne. 
+<lb/>wir ne wæren anders alle nimmer worden lôs, 
+<lb/>Marîa maget, wenne daz dich Got ze muoter kôs, 
+<lb/>nu bistu aller tiuvele twingerinne 
+<lb/>unde vrouwe ob aller engele schar. 
+<lb/>du Gotes bist in Gotes walt gewaltich, 
+<lb/>daz hâstu von der kranken sündere missetât. 
+<lb/>nu helfe der armen schare, die dir geholfen hât 
+<lb/>des, daz dîn êre ist alsô manichvaltich. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/>Daz alle sünder wisten Gotes muoter kraft, 
+<lb/>so ne würde nimmer kristenmensche zwîvelhaft. 
+<lb/>ir güete, ir minne Gotes zorn verwindet. 
+<lb/>Marîa kan, sie muoz, sie mac, sie sol, sie wil 
+<lb/>dem sündere helfen, sie hât aller gnâden vil. 
+<lb/>den sie mit liebe in irme dienste vindet, 
+<lb/>deme helfet Gotes barmicheit, 
+<lb/>die grœzer ist wen aller menschen sünde. 
+<lb/>iâ quæmen aller tiuvel schare ûf in ze klage 
+<lb/>ê dem gerechten richte zuo deme lesten tage, 
+<lb/>der sünder obe dem recht nû gnâde vünde. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Sô grôze liebe dâ zesamen wirt getragen, 
+<lb/>daz enkunde nimmer menschen zunge vollen sagen. 
+<lb/>vür swelichen sündere Marîâ wil dingen, 
+<lb/>sie sprichet: »kint, daz sint die brüste, die du süges, 
+<lb/>gedenke, lieber sune, gewere mich, ob du müges, 
+<lb/>lâ mich den sündere dir ze hulden bringen. 
+<lb/>sich, herzen trût, diz ist der schôz, 
+<lb/>dar ich dich ûffe want mit kranken tuochen. 
+<lb/>gedenke dîner scharfen marter, wie der tôt 
+<lb/>dîn menschenherze brach vür aller sünder nôt. 
+<lb/>sie müezen sünden, dar nâch gnâde suochen.« 
+<lb/> 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>Sô nimpt der sun sîne edelen muoter bî der hant 
+<lb/>unde sprichet: »vater mîn, ez ist alsô gewant, 
+<lb/>mîn muoter und ich suochen dîn erbarmen. 
+<lb/>gedenke, vater, dô ich von dem himele quam, 
+<lb/>daz ich von mîner muoter menscheit an mich nam. 
+<lb/>du sæges mich gekrûtzet mit den armen. 
+<lb/>den tôt ich vür die sünder leit, 
+<lb/>nu schouwe, herre vater, mîne wunden: 
+<lb/>ouch leit ich an handen unde an vüezen ungemach 
+<lb/>unde in der sîten, dâ mich tôt ein blinde erstach; 
+<lb/>dar umme hât manich sünder gnâde vunden.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  9"/> 9
+<lb/>Krist, durch den vrîtac, den du vrî uns hâs gegeben, 
+<lb/>do dîn lîb ‹uns› koufte vrî, dîn tôt gab uns dem leben, 
+<lb/>von tôde‹s› eigenschaft | wir sint gevrîet. 
+<lb/>sîn ôstermorgen sigehaften strît geschuof 
+<lb/>uns, vriderîche sælde dâ von sich erhuof, 
+<lb/>vil vreuden, die ze sælden uns gedîet. 
+<lb/>gib nû durch al dîn arebeit, 
+<lb/>vil süezer Got, die dû noch ie getæte, 
+<lb/>den kuningen unde den vürsten herren sulechen muot, 
+<lb/>daz in der kristenheit der ‹vride› werde guot: 
+<lb/>vride und vreude ist leider gar unstæte. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  10"/> 10
+<lb/>Sît man daz bœse bî de‹m› guoten merken sol, 
+<lb/>sô merket man daz guote bî de‹m› bœsen wol; 
+<lb/>und ne wære nicht bœser dinc, sô ne wære nicht guoter. 
+<lb/>hette Eva unde Adam nicht gebrochen Gotes gebot 
+<lb/>unde hette diu menscheit nie gesündet wider Got, 
+<lb/>sô ne wære Marîa nicht Gotes muoter; 
+<lb/>unde hette Got der menscheit nicht, 
+<lb/>was lobes hette her dan von menschen zungen? 
+<lb/>wir sulen im danken sîner edeln milticheit 
+<lb/>unde sîner marter, die er durch uns sünder leit, 
+<lb/>des ist unde wirt ime lob âne zal gesungen. 
+<lb/> 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  11"/> 11
+<lb/>Dô Ihesus, Gotes sun, mensche an dem krûtze erstarb, 
+<lb/>sîn gotheit vuor ze himele, dâ sie helfe erwarb. 
+<lb/>der vater unde der sun mit Gotes geiste 
+<lb/>quam in dem dritten morgen zuo der erden nider, 
+<lb/>dô wart Ihesus, der tôte mensche, lebendich wider, 
+<lb/>der sun dem vater sîn geheiz erleiste. 
+<lb/>dô er war Got unde mensche ûf stuont, 
+<lb/>die helle zebrach den vriunden sîn zu troste. 
+<lb/>sam lâze her mich hiute in sînem vride ûf stân, 
+<lb/>alsô her vride vacht, des ich gelouben hân, 
+<lb/>dô her Adam und al die sînen erlôste. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  12"/> 12
+<lb/>Wer ich in künsten wîs alsô Plato was, 
+<lb/>ein Aristotiles unde ein meister Ipocras, 
+<lb/>Galienus unde ein Socrates, die wîsen; 
+<lb/>Virgilius kunst, Boecius, Cato, Seneca mite, 
+<lb/>Donatus, Beda: het ich al ir künste site, 
+<lb/>dennoch sô ne kundich nimmer vollen prîsen 
+<lb/>des hôch gelobeten vürsten lob 
+<lb/>volbrecht ich nicht, sîn ist mê und ie mêre. 
+<lb/>ich hân von B r û n e s munde und ouch von manigem man 
+<lb/>gehôrt, daz sîn lob nieman gar volachten kan. 
+<lb/>wîch von im, Schande, swâ her hinnen kêre. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  13"/> 13
+<lb/>Durch swarze nacht ûf dringet liecht der morgen grâ, 
+<lb/>der klâren wolkenlôsen luft ir himel blâ 
+<lb/>gezieret ist mit liechter sunnen glaste. 
+<lb/>sam ist geschônet unde gezieret Beigerlant 
+<lb/>mit einem vürsten, der dâ lœset unser phant 
+<lb/>den gerenden unde manigerhande | gaste. 
+<lb/>her ist vor allem valsche klâr 
+<lb/>alsam die luft ân alle trüebe erkennet: 
+<lb/>des rœmeschen rîches erste kieser an dem kür, 
+<lb/>an leien vürsten hât er slüzzel unde tür, 
+<lb/>Lodewich, herzoge unde pfallenzgrâve genennet. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  14"/> 14
+<lb/>Ir edelen herren ritter unde gerende diet 
+<lb/>unde alle geistlich orden, die sîn hant beriet, 
+<lb/>nu sît gemant, daz ir sîn nicht vergezzen, 
+<lb/>des edelen vürsten, der sô grozer tugende phlac, 
+<lb/>daz êre in sîme herzen an sîn ende lac, 
+<lb/>went an den tôt sô hât her lob besezzen. 
+<lb/>dem an sîn alter grîse hâr 
+<lb/>mit êren wuoxsen sunder kerge nâhen, 
+<lb/>daz was der milte vürste Barnam von Stetîn. 
+<lb/>ich ziuge an al die gerenden, die nû lebendich sîn, 
+<lb/>daz sie nie milter süezen vürsten sâhen. 
+<lb/>
+<milestone type="stanza" n="Strophe  15"/> 15
+<lb/>Her ist nû hin, sîn vleisch ist tôt unde ist begraben, 
+<lb/>des hant die armen sorgen siechen kunde laben, 
+<lb/>daz er sie wol von armuot siuche erlôste. 
+<lb/>sît her sô manigen hie von nôt geholfen hât, 
+<lb/>nû helf im, Gotes muoter, der barmunge rât 
+<lb/>mit dîner helfe kum im dort zuo trôste. 
+<lb/>der herren unde der ritter munt, 
+<lb/>der vrouwen, geistlich orden, gernde‹n› zungen, 
+<lb/>die sulen dich, süeze muoter, bitten unde manen, 
+<lb/>daz dû im wollest dîner êren strâze banen, 
+<lb/>wenne Barnam nie von êren wart gedrungen. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton III</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton III"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Daz Gedeones wollen vlius in touwe 
+<lb/>quam, himelvrucht, daz ist die brût 
+<lb/>der wâren Gotes minne. 
+<lb/>her Moises der sach ze wunderschouwe 
+<lb/>den grüenen busch, de‹r› Gotes trût, 
+<lb/>dâ Got was selben inne. 
+<lb/>der himele viur dar inne enbran, 
+<lb/>sîn ‹est› und ouch sîn loub nie wart versenget. 
+<lb/>nû wis | gegrüezet, aller himele vrouwe. 
+<lb/>Aaron, dîn gerte vruchten kan, 
+<lb/>des sich al vrucht entfenget. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Daz vlius in himeltouwe lac begozzen, 
+<lb/>ein busch enbran, ein trocken gart 
+<lb/>truoch bluomen unde mandel: 
+<lb/>der himele geist quam in ir lîb gevlozzen 
+<lb/>der süezen maget, die muoter wart 
+<lb/>des kindes âne wandel. 
+<lb/>sie grüener busch in viure klâr, 
+<lb/>sie blüender gart, sie muoter maget âne ende: 
+<lb/>ir vlius daz truoch den himeltou beslozzen. 
+<lb/>Marîa maget ein kint gebar: 
+<lb/>Got gab sich an ir hende. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Die gar gelêrten leiebæren pfaffen 
+<lb/>die singent (des mich wunder hât, 
+<lb/>ob sie daz wollen gründen), 
+<lb/>wie al der helle winke‹l› sint geschaffen, 
+<lb/>unde wie daz himelrîch al stât. 
+<lb/>ich wæne, sie es nie durchvünden, 
+<lb/>wie sî gestalt der himele kreiz, 
+<lb/>daz edele firmament mit den planêten. 
+<lb/>sie wollen wizzen (die sich selber affen), 
+<lb/>daz âne Got kein mensche weiz: 
+<lb/>des sint sie wânprophêten. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Ez sprach ein iunger kuninc, der was ein heiden: 
+<lb/>»wie sol ich tuon, wie sol ich leben, 
+<lb/>daz man mich vürchte sêre? 
+<lb/>zuchtmeister mîn, daz soltu mich bescheiden. 
+<lb/>kanstû mir dâ zuo lêre geben, 
+<lb/>daz ist ein guote lêre.« 
+<lb/>sîn meister sprach: »daz kan ich wol: 
+<lb/>wiltû, daz man dich vürchte, swâ du kêres, 
+<lb/>so vürchte Got, lâ dir unvuoge leiden; 
+<lb/>ze rechte man dich vürchten sol: 
+<lb/>des dû Got vürchten lêres.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Sich dunket maniger edele unde hêre, 
+<lb/>wert unde rîch unde wol geborn, 
+<lb/>wîs unde gar genæme. 
+<lb/>der sumelîcher triuget sich vil sêre; 
+<lb/>der sich sô gæbe hât erkorn, 
+<lb/>nicht wol dem lüge anzæme. 
+<lb/>swem dunke, daz er edele sî, 
+<lb/>den bitte ich, daz er prüebe an lügenære: 
+<lb/>sêt her, mit lüge erwerben lob und êre, 
+<lb/>da muoz ie valscheit wesen bî. 
+<lb/>daz lob ist mir unmære. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton IV</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton IV"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Der kuninc Nabugodonosor gesach in sime troume 
+<lb/>ein bilde von der erden an den himel reichen, 
+<lb/>dem was daz houbet guldîn wunderlîch (des nam her goume), 
+<lb/>die brust und arme silberîn dem selben zeichen; 
+<lb/>sîn bûch êrîn geschaffen was, diu die von hertem stâle, 
+<lb/>îsîn die bein, 
+<lb/>die vüeze erdîn und îsenîn, daz bilde brach ze mâle 
+<lb/>ein grôzer stein, 
+<lb/>der quam ûz einem berge ân alle werc al eine. 
+<lb/>der stein zereib daz bilde und al zebrach ez kleine. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Daz houbet guldîn ist diu kristenheit unde alle kristen: 
+<lb/>swan sô der mensche in sîner toufe wirt gereinet, 
+<lb/>sô ist her lûter alsô ein golt. wil Got sîn leben vristen, 
+<lb/>sô nidert in die sünde; alsam daz silber meinet. 
+<lb/>unde ist er danne sünden vol in sînen mittel iâren 
+<lb/>(êrîner var: 
+<lb/>dô er sich selber lûtert nicht, her wil verharten zwâren 
+<lb/>in sünden gar), 
+<lb/>sô kumt sîn alter ûf die bein: mür bruchîsen. 
+<lb/>zebrechent im die vüeze erdîn, sô muoz her rîsen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Sô zürnet sich der stein, der ûz dem berge quam geloufen, 
+<lb/>der loufet ûf den sünder, daz er al zebrichet. 
+<lb/>welich ist der stein? - daz ist der Got, der sich liez Ihesus toufen. 
+<lb/>der berch ist Marîâ, die maget, der man wol sprichet. 
+<lb/>Got was âne aller sünden meil in ir, von ir ze kinde 
+<lb/>wart her geborn. 
+<lb/>her ist der stein, sie ist der berch; sîn loufen wirt vil swinde. 
+<lb/>der ist verlorn 
+<lb/>gar êwichlîche, swer sô lange in sünden blîbet, 
+<lb/>daz in der stein alsam daz bilde gar zerîbet. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Des wazzers möchte lîchte, daz ein rat wol bræchte | kerren. 
+<lb/>daz vant ein alter mülnære uns in hône wîse. 
+<lb/>hât her vil starker vluot gewalt, waz mac uns daz gewerren? 
+<lb/>sîn breiter wâch der stêt ouch nicht in ganzem prîse: 
+<lb/>sîn übervlüete ist alsô grôz, daz sie den tîch gebrichet 
+<lb/>mit ungevuoch. 
+<lb/>swer daz mit vuoge erwerbet, daz man im daz b‹e›ste sprichet, 
+<lb/>des ist genuoch. 
+<lb/>sprich, mülnære, nû dîn wâch drî starche rat wol trîbet, 
+<lb/>wes schult ist, daz dîn müle sô dicke lære blîbet? 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Wellich ist dîn wâch? – daz ist der sin, der dir ûz herzen vliuzet. 
+<lb/>drî rat her umme trîbet: weistus nicht, sô vrâges. 
+<lb/>daz eine rat melet dir latîn, des vil dîn kunst geniuzet, 
+<lb/>dar umme endanke ich dir nicht sêre grôzes wâges. 
+<lb/>daz ander rat dir swæbesch melet: dîn diutsch ist uns ze dræte. 
+<lb/>daz dritte rat 
+<lb/>daz ist dîn alter, nû ist dîn kunst verkunstet. ob ich hæte 
+<lb/>den selben phat 
+<lb/>gegen ze latîn unde ze diutischen alsô lange 
+<lb/>sô dû, mîn wazzer wære ouch starcher mit gesange. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/>Vil lieber Marner, vriunt, bistû der beste diutische singer, 
+<lb/>den man nû lebendich weiz, des hât dîn name grôze êre. 
+<lb/>dû hâs die mûseken an der hant, die sillaben an dem vinger 
+<lb/>gemezzen, des versmâ die leien nicht ze sêre. 
+<lb/>dû weist nicht al, daz Got vermac, wie er al sîne gâbe 
+<lb/>geteilet hât. 
+<lb/>iâ gît her eime Saxsen alsô vil alsô eime Swâbe 
+<lb/>helfe unde rât. 
+<lb/>daz Sunte Pawel in der pisteln hât gesprochen: 
+<lb/>›Got gît nâch sînem willen‹, lâ daz ungerochen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Ren, ram, rint - rechte râten ruoch nâch meisterlîcher orden: 
+<lb/>wie mac daz wunderlîche wunder sîn genennet? 
+<lb/>ez was ein kint unde wart ein man und ist ein kint geworden. 
+<lb/>daz wunder ist vür wunder wunderlîche erkennet. 
+<lb/>ez ist ein ren der wildicheit, ein ram der unbehende, 
+<lb/>der zucht ein rint; 
+<lb/>von alter gêt ez hinder sich, sîn lob hât widerwende. 
+<lb/>daz wunderkint 
+<lb/>treit grâer varwen stopfel hâr ûf kindes kinne. 
+<lb/>ez ist genant – nû rât, bistû des namen inne! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>Ir knechte sêt iuch alle vür, des sult ir mir gelouben: 
+<lb/>der vürsten und der herren vride ist ûz gegangen. 
+<lb/>swer nû kan tac unde nacht hûs unde strâzen rouben, 
+<lb/>der wirt in der herberge wol entfangen. 
+<lb/>swenne her maniger hande ware in sîme sacke bringet, 
+<lb/>sô wirt im gelt, 
+<lb/>dâ von im sîn gêre und ouch sîn biutel dicke erklinget. 
+<lb/>her kluocher helt, 
+<lb/>ist her dan ein küener rouber grimmes muotes, 
+<lb/>im gebrichet ê des lîbes dan des guotes. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  9"/> 9
+<lb/>Got, der nie sünden werc begienc, der machez im ze sûre, 
+<lb/>des schult ez sî, daz man urlouge nicht ensüenet. 
+<lb/>sie hetten leides alze vil, die armen lantgebûre. 
+<lb/>nû sê ich, daz bî irme guote maniger küenet. 
+<lb/>die kranke diet von swacher art die kristenheit nû neise‹n›, 
+<lb/>gebûres kint, 
+<lb/>die ne lâzen nichtes nicht den armen witewen unde weisen. 
+<lb/>die rouber sint, 
+<lb/>sie loufen sumelîche von ir meister phluoge, 
+<lb/>den armen liuten nieman tuot sô grôze unvuoge. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  10"/> 10
+<lb/>Ich wolte, daz die hôen vürsten unde die herren alle 
+<lb/>gedæchten an die nôt der Gotes kristenheite, 
+<lb/>daz man sie vünde in miltem muote, in rîcher vreuden schalle, 
+<lb/>daz in iren landen wære vride, guot geleite: 
+<lb/>sô möchten sie mit rechticheit vor Gotes angesichte 
+<lb/>ze rechte stân. 
+<lb/>mit kurzen worten sprichet Got; sîn grûwelich gerichte 
+<lb/>sol vollen gân 
+<lb/>ûf den, der unrecht, urlouge unde unvride minnet, 
+<lb/>daz er in helleglüeten sunder vride brinnet. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  11"/> 11
+<lb/>Ein âbentiur hie vor geschach, nû merket, waz ez diute: 
+<lb/>ein blinder man gienc eines nachtes ûf der strâze, 
+<lb/>dem brande ein blas in sîner hant; dô quâmen sênde liute, 
+<lb/>die giengen i‹n› ze muoze. wunder âne mâze 
+<lb/>sô nam sie des, waz dirre blinde mit dem blase wolte, 
+<lb/>der nicht ensach. 
+<lb/>der eine vragete in, waz im daz blas getragen solte. 
+<lb/>der blinde iach: 
+<lb/>»daz ich gesênden liuten lûchte,« – prüebet alle! 
+<lb/>»die wîsen mich ze wege von der graben valle.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  12"/> 12
+<lb/>Die iuden, ketzer unde heiden in daz swarze abgründe 
+<lb/>Got Ihesus Krist gevluochet hât, daz ist ir erbe. 
+<lb/>getoufter wuocherære, du schalc begêst vil grôze sünde, 
+<lb/>Got wil, daz al dîn werdicheit mit dir verterbe. 
+<lb/>ein volc ist in der kristenheit, dem Got noch swinder vluochet: 
+<lb/>ipocritê, 
+<lb/>der büezen – schœne pharisêi! – nimmer Got geruochet. 
+<lb/>sô wê in, wê, 
+<lb/>sie tragen alle in irme herzen bitter gallen 
+<lb/>und in ir munde honichseim. ôwê den allen! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  13"/> 13
+<lb/>Mir zagelweifet sumelich hunt vriuntlîchen âne mâze, 
+<lb/>der mich doch unverschuldes wîlen gerne bizze. 
+<lb/>den muoz ich streichen, daz er sîner bosheit mich erlâze. 
+<lb/>her wænet, daz ich sîner schalcheit nicht enwizze. 
+<lb/>iâ, bœser wicht, welt ich ez tuon, ich bræchte | iuch dicke gelsen, 
+<lb/>ir valscher hunt, 
+<lb/>wan daz ir mich in Iudas triuwen beten iuwer helsen, 
+<lb/>daz ist mir kunt. 
+<lb/>ich weiz wol, daz ir iuch ze mîme schaden vreuwen, 
+<lb/>doch wil ich iuwer valschen list mit vuoge steuwen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  14"/> 14
+<lb/>Mich wundert, wie den tummen kargen herren sî ze muote, 
+<lb/>daz sie nicht wellen herren sîn wîs unde milte. 
+<lb/>die wîsen milten herren mit der kargen herren guote 
+<lb/>bekosten manigen stolzen vechter under schilte. 
+<lb/>daz ich wære edele unde rîch (sô manige herren heizen, 
+<lb/>der muot ist kranc), 
+<lb/>mir dûchte, ê ich mîn guot mir lieze abrouben unde -reizen 
+<lb/>âne mînen danc, 
+<lb/>zwâre, ich vergæbe ez selben, ê manz mir benæme. 
+<lb/>sô vünde ich manigen man, der mir ze helfe quæme. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  15"/> 15
+<lb/>Wir lîden in der sumerzît vil heizer sunnen blicke. 
+<lb/>daz prüeb ich, daz ein kalder winter dar nâch dîhet. 
+<lb/>swan sô der snê gevallen ist, sô hœr ich, daz vil dicke 
+<lb/>man sprichet »gib den winden brôt, ez hât gesnîhet.« 
+<lb/>swer sîne guoten winde lât in hungernôt verterben 
+<lb/>den sumer lanc, 
+<lb/>der mac des winters in dem snê vil lützel mite erwerben, 
+<lb/>ir macht ist kranc. 
+<lb/>al mînen vriunden wil ich disen sanc bediuten: 
+<lb/>kranc ist der herren macht mit ungereiten liuten. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  16"/> 16
+<lb/>Der lieben süezen milten herren angesicht mich vreuwet, 
+<lb/>daz ich von herzelîcher liebe muoz erschricken. 
+<lb/>mîn herze hupfet manigen sprunc, mir ist vil ungedreuwet, 
+<lb/>swen ich gesê getriuwer herren ougen blicken, 
+<lb/>sô dunket mich, daz firmament, planêten unde sterne 
+<lb/>mir nâhen sîn. 
+<lb/>daz ich getriuwer herren milten ougen sê sô gerne, 
+<lb/>der sunnen schîn 
+<lb/>mich vreuwet nicht sô wol in sumelîcher stunde 
+<lb/>alsam ein gruoz von eines süezen herren munde. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  17"/> 17
+<lb/>Den gar verschamten kargen herren kan ich nicht gesingen, 
+<lb/>daz in ze danke sî, des muoz mich ir verdriezen; 
+<lb/>die wil ich um ir gâbe nimmer alze vil gedringen. 
+<lb/>sô trûwe ich milter herren michel baz geniezen. 
+<lb/>die bitter, vûlen, sûren, bœsen, kargen, êren blozen 
+<lb/>herren namen, 
+<lb/>die wænent sich den süezen milten herren lîch genôzen, 
+<lb/>dar umme ich schamen 
+<lb/>lîden, sam ich an in prüebe nagels kunne. 
+<lb/>Got gunne mir baz heiles, dan ich in wol gunne. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  18"/> 18
+<lb/>Die swalewe vêt die mücken, vor den valken des sie bâ|get. 
+<lb/>den ertvluc unde den swippersweif kan sie baz üeben. 
+<lb/>ir arme quitel, zwitter, schorfen, snarz ouch sange lâget, 
+<lb/>sie wil mit listen aller vogele dœne prüeben. 
+<lb/>die lerche und ouch die nachtegal die müezen von der swalewen 
+<lb/>verdulden spot, 
+<lb/>daz ist mir leit, ich klagez mê dan ob die louber valewen. 
+<lb/>ach herre Got, 
+<lb/>wie sol ein tôre werden wîs, der sich vergizzet, 
+<lb/>der zirket vremede kunst ê danne her sîne mizzet? 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  19"/> 19
+<lb/>Dô Got menschlîch ûf erden gienc mit sînen knechten allen, 
+<lb/>dô quam her ze einem mâle ûf eine hôe brücken, 
+<lb/>darunder vlôz ein tiefer bach, dô was dar în gevallen 
+<lb/>ein man, dem Sunte Peter quam dar zuo gelücken. 
+<lb/>dô her den helfelosen man gesach ze grunde sinken 
+<lb/>(tief was der bach), 
+<lb/>dô rief her: »helf im, herre Got, lâ nicht den man vertrinken!« 
+<lb/>Got wider sprach: 
+<lb/>»swer sich helfen wil, dem wil ich helfe senden; 
+<lb/>der rüere sich mit vüezen unde mit den henden.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  20"/> 20
+<lb/>Vervluochet sî der vürgedanc ûz valsches herzen grunde! 
+<lb/>vervluochet sî, der valschen rât aller erst bedenket! 
+<lb/>vervluochet sî die valsche zunge in valsches mannes munde, 
+<lb/>dâ her den valschen rât mit worten ûz gelenket. 
+<lb/>sô wê den tummen herren, wê! der ôren sîn verwâzen! 
+<lb/>ir heil zegât, 
+<lb/>die valsches râtes volgen unde hœren unde lâzen 
+<lb/>ir rechten rât. 
+<lb/>her tummer gouch, swie rîch her sî, der nicht enprüebet, 
+<lb/>daz eines valschen mannes rât ein lant betrüebet. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  21"/> 21
+<lb/>Iô sol man Gotes arebeit gedenken ze allen zîten, 
+<lb/>waz her vil swære hete von des menschen bruche. 
+<lb/>her leit vil schemelichen tôt, man stach in durch die sîten, 
+<lb/>dar zuo sô muoser lîden manigen smâhen spruche. 
+<lb/>des singet noch ein creatiur (der marterunge urkünde), 
+<lb/>daz ist der han, 
+<lb/>wie Ihesus an dem krûtze hienc vür aller menschen sünde 
+<lb/>(gedenket dar an); 
+<lb/>her slêt sich selben unde ruofet »crucifixus«. 
+<lb/>daz Ihesus an der hafte hienc des tôdes ‹ric sus›! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  22"/> 22
+<lb/>Man möchte ein bilde mâlen an die want mit eime nacke, 
+<lb/>daz sunder antlitz wære, wolte manz verkêren. 
+<lb/>âschaffen bilde mâler, unbederve snatersnacke, 
+<lb/>nû mâle selbe ein bilde. wer sol dich daz lêren, 
+<lb/>daz dû im kêres zuo der want die nase, munt und ougen, 
+<lb/>stirne und kin, 
+<lb/>daz man antlitz und ôren sê? der | kunst wil ich dich lougen, 
+<lb/>ich weiz den sin: 
+<lb/>gesniten antlitz mac man zuo der wende schicken, 
+<lb/>gemâlte bilde müezen gegen ir meister blicken. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  23"/> 23
+<lb/>Kundich der herren muoze wol gerâmen ze allen stunden, 
+<lb/>daz ich sie bæte, swen sie geben wol geluste, 
+<lb/>sô würdich dicke guotes rîch in maniger stat gevunden, 
+<lb/>daz gæben mir die herren. kundich durch ir bruste 
+<lb/>gesên ir herze und ouch ir sin, ob dâ icht milte wære, 
+<lb/>mit lobes lust 
+<lb/>sô liede ich selten aremuot. nû lîdich manige sware. 
+<lb/>der herren brust 
+<lb/>vindich bede‹ck›et mit sô maniger hande dache, 
+<lb/>ich enkan des nicht gerâmen, wen ir milte wache. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  24"/> 24
+<lb/>Ich wil den herren singen unde sagen unde lachen, 
+<lb/>daz sie gedenken mîner kunst, ich denke ir milde. 
+<lb/>ich kan sie machen vrô, sie vreuwen mich in manigen sachen. 
+<lb/>solt ich erweinen guot, daz wære ein grôz unbilde. 
+<lb/>daz ist ein arme kunst, dâ man der herren guot erweinet, 
+<lb/>die vreude ist kranc. 
+<lb/>die herren, die sich mit den weiner‹n› hânt alsô vereinet, 
+<lb/>dâ vlie mîn sanc. 
+<lb/>io erken ich manigen herren; lîchte vundich einen, 
+<lb/>der mir durch singen lieber gæbe wen durch weinen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  25"/> 25
+<lb/>Iô sol ich Gote klagen unde weinen mîne sünde: 
+<lb/>ich weiz wol, daz er mîn weinen gerne hœret. 
+<lb/>mit reinem bete ich Got sô drâte wol gebitten künde; 
+<lb/>swer alsô weinen kan, der blîbet ungetœret. 
+<lb/>die Gotes ougen sên des menschen ougen weinen gerne 
+<lb/>vür missetât. 
+<lb/>der sich von Gotes hulden mit den sünden dicke verne 
+<lb/>geworfen hât, 
+<lb/>der sol mit weinen Gotes barmicheit betwingen, 
+<lb/>daz er im genâdich sî. – der werlde sol man singen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  26"/> 26
+<lb/>Heralt ein singer was genant, des muot was sô verkêret, 
+<lb/>der sanc den bœsen herren lob unde schalt die guoten. 
+<lb/>dô man des wart gewar, dô sprach man: »swer nû ist geunêret, 
+<lb/>der mac sich lobes in Haraldes dôn vermuoten.« 
+<lb/>der trûwe und êre in herzen truoc mit allen guoten dingen, 
+<lb/>den man her schalt; 
+<lb/>dem al die menie laster sprach, des lob begunder singen: 
+<lb/>des phlac Heralt. 
+<lb/>noch weiz ich den, her enslîchet nimmer alsô lîse, 
+<lb/>her enbezzer sich, sîn lob kumt in Haraldes wîse. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  27"/> 27
+<lb/>Mir wære leit, daz ich den liuten allen wol behagete. 
+<lb/>solt ich ir aller hulde hân, wie | tætich danne? 
+<lb/>swen ich verræter, diebe, rouber, morder lob beiagete, 
+<lb/>der ketzer unde der heiden, sô wære ich ze banne. 
+<lb/>kan ich der bœsen liute haz mit rechticheit verschulden, 
+<lb/>sô tuon ich recht. 
+<lb/>mit bœsen werken wirbet man nâch bœser liute hulden. 
+<lb/>der bœsen knecht 
+<lb/>ne wil ich nimmer sîn gelîch alsô der guoten, 
+<lb/>der êrelôsen hulde ne wil ich nimmer muoten. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  28"/> 28
+<lb/>Der tôren sin unde affen rât, die wegen wol gelîche, 
+<lb/>swâ man sie vor den wîsen zuo der wâge bringet. 
+<lb/>die tôren unde die affen dunken sich gar sinnen rîche; 
+<lb/>swer affen râtes volget, vil im misselinget. 
+<lb/>des tôren sin ist wankelsam und ist gar wandelbære, 
+<lb/>daz ist mir kunt. 
+<lb/>swer den tôren volget vil, der merke mîne lêre 
+<lb/>ze diser stunt: 
+<lb/>ich lêre in, daz er tôren unde affen mîde 
+<lb/>und alle wîse‹n› liute bî im gerne lîde. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  29"/> 29
+<lb/>Swer den tôren vreuwen wil, der sol im schône entheizen, 
+<lb/>sô wirt her vrô in herzen unde guotes muotes. 
+<lb/>swen er die gâbe haben wil, wil in der gebende reizen, 
+<lb/>sô zie her vür und spreche: »mir enbrichet guotes. 
+<lb/>swen ich des guotes rîcher bin, sô wil ich mîne gâbe 
+<lb/>dir leisten vol. 
+<lb/>ich gæbe dir gerne; nû ze stunt mir brichet an der habe. 
+<lb/>nu habe dich wol!« 
+<lb/>man sol den tôren loben golt unde leisten steine, 
+<lb/>wen swer den tôren guote‹s› tuot, sîn danc ist kleine. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton V</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton V"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Ob aller minne minnen kraft, 
+<lb/>d‹er› hôch gelobeten werden minne meisterschaft, 
+<lb/>der minnichlîchen, vreude gebende‹n› minne, 
+<lb/>der süezen minnen berende‹n› vrucht, 
+<lb/>die den hêren geist mit sîner Gotes zucht 
+<lb/>al ummeslôz: der minne meisterinne, 
+<lb/>der wil ich singen mînen sanc, 
+<lb/>daz erste lob in diser nûwen wîse, 
+<lb/>sît Gotes zorn ir minne twanc: 
+<lb/>maget Marîa (du minne in hôem prîse!) 
+<lb/>den starken Got des überwant, 
+<lb/>daz er durch menschen minne mensche wart erkant. 
+<lb/>heil von Iesse dem vreude berenden rîse! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Ein tier hât grûwelichen zorn, 
+<lb/>des alle iegere grûwet, daz ist der einhorn. 
+<lb/>man iaget in lange, in kunde nieman vâhen, 
+<lb/>doch vienc in, sô mir ist gesaget, 
+<lb/>ein edele, reine, lûter, unbewollen maget: 
+<lb/>dô begunde ez sîner müede vaste nâhen. 
+<lb/>her leite sich in der megede schôz 
+<lb/>unde gab sich âne wunden ir gevangen, 
+<lb/>gewaltich starch und alsô grôz; 
+<lb/>in ne kunden alle iegere nicht erlangen, 
+<lb/>wen dô er sich gevangen bôt. 
+<lb/>sîn vleisch wart mür geslagen, in stach ein ieger tôt; 
+<lb/>dâ wart ein tiure wiltbræte ûf gehangen. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Uns seit die glôsa daz vür wâr, 
+<lb/>Got was vil irres muotes wol viunf tûsent iâr 
+<lb/>und dannoch mê, des wart vil manich tôte 
+<lb/>behalten in der helle habe. 
+<lb/>einborner Gotes sune, dô iagete dich her abe 
+<lb/>dîn vater, wen her dich verlôs vil nôte. 
+<lb/>her iagete dich unz in den lîb 
+<lb/>der süezen maget, sô man daz einhorn iagete. 
+<lb/>des alle megede unde alle wîb 
+<lb/>getiuret sîn, daz sie dir wol behagete, 
+<lb/>die muoter, die dich maget gebar. 
+<lb/>man iagete dich dar nâch wol drî und drîzich iâr 
+<lb/>unde dennoch mê, alsô dîn vater sagete. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Ein man, dem êre ist angeborn 
+<lb/>und êre hât, der lâz im daz nicht wesen zorn, 
+<lb/>ob man sîne êre singet unde sprichet. 
+<lb/>Got selben wil | gelobet wesen, 
+<lb/>dar umme schuof her alle dinc, daz hœre ich lesen. 
+<lb/>swer Got nicht lobet, in Gotes gebot her brichet. 
+<lb/>dô Got die engele nider stiez, 
+<lb/>daz quam dâ von, daz sie Got nicht enlobeten, 
+<lb/>daz er sie tiuvele werden liez: 
+<lb/>in zwivelem muote sie vil gar vertobeten. 
+<lb/>ein zwîvelære nicht êren hât; 
+<lb/>der sich unschuldich weiz in aller edelen tât, 
+<lb/>der zürnet sich, lobet man den ungehobeten. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Der durch uns starb unde ouch genas, 
+<lb/>der keiser unde herzoge unde ein bischof was, 
+<lb/>ûf einen tac her daz alles vollenbrâchte: 
+<lb/>her was ein keiser, dô er truoc 
+<lb/>die marterkrône, dô man in mit dornen sluoc. 
+<lb/>her was ouch herzoge in der selben achte, 
+<lb/>dô her dem her gezogete vür 
+<lb/>unz an die zît, daz her entfienc ein sterben 
+<lb/>vür unser nôt, daz was sîn kür; 
+<lb/>hie mite gedâchte her uns wider werben. 
+<lb/>her was ouch bischof zuo der stunt, 
+<lb/>her opferte aller kristenheit sîn lîb gewunt. 
+<lb/>drîvaltic vürste, lâ uns nicht verterben! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/> [ ]Ob aller tugenden anevanc, 
+<lb/>du muoter aller güete, sünden abeganc, 
+<lb/>du anbegin der himele, hôe erstîgen, 
+<lb/>daz bistu, reine, süeze tugent, 
+<lb/>daz man erbarmich sî in alter unde an iugent: 
+<lb/>Erbarmen, dir müezen alle tugende nîgen. 
+<lb/>du bis daz houbet, daz da treit 
+<lb/>die krône aller tugende, küniginne, 
+<lb/>wol dir der vollenkomenheit. 
+<lb/>Erbarmen, du bist Gotes hôeste minne, 
+<lb/>die her mit gotheit ie getruoch. 
+<lb/>durch barmicheit her mensche wart, des was genuoch, 
+<lb/>her starb durch barmicheit uns zuo gewinne. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Nu sêt, daz wunder Got vermac: 
+<lb/>sper unde krône ûf Drivels was vil manigen tac 
+<lb/>behalten, ê sich ieman sîn vermæze. 
+<lb/>nâch keiser Vriderîches zît 
+<lb/>wâren kuninge viunve, der nie keiner sît 
+<lb/>ze Âke, wæn ich, kuninges stuol besæze. 
+<lb/>swie vil sie truogen arebeit 
+<lb/>mit kost, mit koufe unde ouch mit gâbe, 
+<lb/>daz rîche was in unbereit. 
+<lb/>nu hab ez im von Havekesburch der grâbe, 
+<lb/>der milte Ruodolf unverzaget. 
+<lb/>in alsô grôzen êren wart nie kuninc betaget. 
+<lb/>kum heil dem Gotes ûz erwelten Swâbe! 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>Got in vil hôhen vreuden saz, 
+<lb/>dô her sô lanc, sô grôz, sô breit, sô rîche maz 
+<lb/>daz lob, daz an | dem edelen kuninge erschînet, 
+<lb/>daz im in sîner kindes iugent 
+<lb/>gebrichet nicht ein hâr an voller mannes tugent. 
+<lb/>nu schouwent, wie her sich nâch êren pînet. 
+<lb/>ia, her mac Erîch heizen wol: 
+<lb/>sin lîb, sîn muot, sîn herze ist êren rîche. 
+<lb/>nie vuor mit êren vart sô vol 
+<lb/>bî maniger zît, daz sprech ich sicherlîche, 
+<lb/>sô der von Tenemarken lant, 
+<lb/>der iunge kuninc, der nâch dem alten ist genant: 
+<lb/>ein Êrîch nâch dem anderen kuning Êrîche. 
+<lb/> 
+<lb/> 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton VI</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton VI"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Aller güete     voller vlüete     vlôz in gnâden strâmen 
+<lb/>kumpt gevlozzen her ûz Gotes herzen griez ursprunge, 
+<lb/>dâ von trinkent al, die sîner helfe durstic sîn. 
+<lb/>sîn geist vliuzet,     des geniuzet     swer des kan gerâmen, 
+<lb/>daz er sünden rûwich sî; der schrîe an Gotes barmunge, 
+<lb/>sô mac ers gelâzen nicht, her ne tuo im helfe schîn. 
+<lb/>her stêt ze vange mit den armen, 
+<lb/>im zur axlen ist sîn houbet geneiget, 
+<lb/>als her sich wil über uns erbarmen: 
+<lb/>umbevanc und kus her uns erzeiget. 
+<lb/>sünder, wiltu | gnâde suochen, du bist ungeveiget. 
+<lb/>dînes herzen ougenvluot mit rûwe trôst ûf reiget, 
+<lb/>dâ mit wirt gesweiget     al die lange sorge dîn. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Der vil reine     Got al eine,     klâre, wandels vrîe, 
+<lb/>dem nie ienz noch diz noch daz ûf wandel wart gevunden, 
+<lb/>niemant mê wen her ganz vollez lob al eine hât. 
+<lb/>her gît lêre,     salde und êre     sîner massenîe. 
+<lb/>alle menschen und die hôen engele nie vol kunden 
+<lb/>halbes lob gesingen sîner tugent, die her begât. 
+<lb/>die alle wîsheit in ir muote 
+<lb/>truoc, dô sie Got hette in ir bevangen, 
+<lb/>Marîa maget, die edele guote, 
+<lb/>Kristes lob nie vollen kunde erlangen. 
+<lb/>mensche, halt den namen Kristes in dîner sinne zangen, 
+<lb/>merke an sîner güete, waz er gnâden hât begangen: 
+<lb/>iô wart her gehangen     vür der sünder missetât. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Swen ich tummer     mînen kummer     bœsen liuten künden, 
+<lb/>daz ich an ir gnâdelôsen herzen gnâde sinne, 
+<lb/>trœsten sie mich trûwelîchen wol mit helfe? – nein! 
+<lb/>ob ich vlüzze,     des verdrüzze     mînen valschen vriunden, 
+<lb/>wente sie hoffen, daz ich sinken zuo der grunt beginne. 
+<lb/>mîn heil schif gestôzen hât ûf ir grunt nîdic stein, 
+<lb/>ne wærez nicht in sælden banden 
+<lb/>mit gelückes râte vast gebunden, 
+<lb/>die valsche diet in manigen landen 
+<lb/>wollen mich verleiten ze allen stunden. 
+<lb/>nu hân ich an trûwen liuten gnâden trôst ervunden, 
+<lb/>die mir helfen baz denne mir die ungetrûwen gunden, 
+<lb/>die von laster wunden     stinken alsô ein âs unrein. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Zwêne trût gesellen giengen spâte in eime walde. 
+<lb/>lustelîch geblüemet einen grüenen phat sie vunden, 
+<lb/>der gienc von der rechten strâze in wilder busche dorn. 
+<lb/>dô der wîse wolte den wec ze guoter nacht behalde, 
+<lb/>an den stîc der tumme gienc, des kriegen sie begunden. 
+<lb/>mit im gienc der wîse, dâ sie beide ir lîb verlorn. 
+<lb/>dô sie die morder dâ vernâmen, 
+<lb/>lûte schrei der wîse: »owê, geselle, 
+<lb/>daz wir von rechtem wege ie quâmen, 
+<lb/>daz ist dîn schult, diz swærlich ungevelle!« 
+<lb/>der tumme sprach: »die schult was dîn, daz merke, swer da welle: 
+<lb/>dû wære ê wîser vil den ich, du volgetes mir ze snelle; 
+<lb/>des wir tôdes quelle     müezen lîden unde zorn.« 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Klâr, gelûtert, liecht in schîne glanz ein lieblich sterne 
+<lb/>liez mich sînen werden glast bî sunnen schîne anblicken. 
+<lb/>dô dâchte ich: »ist diz Merkurius, ich sol werden rîch.« 
+<lb/>dô quam trüebe ein wolken swarz, ich sach ez vil ungerne, 
+<lb/>daz begunde sîne dinster vor den sterne schicken, 
+<lb/>alsô wart sîn blic entwendet mir verlustelîch. 
+<lb/>sô kreftich starch, alsô ich in prüebe, 
+<lb/>sô trûwe ich, daz er daz wolken breche, 
+<lb/>her schînet wol durch sîne trüebe. 
+<lb/>swen er wil, daz er sich selben reche, 
+<lb/>ûf daz man im wol ze sîner liechten glenze spreche, 
+<lb/>sô rât ich, daz er vertelge valsche wolken vreche. 
+<lb/>ich an mîner zeche     sach den stern ze Brûneswîch. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/>Alle kunst ist guot, dâ man ir güete zuo bedirbet. 
+<lb/>swâ man übele tuot mit kunst, des ist die kunst unschuldich. 
+<lb/>kunst ist guot in sich, ze guote hât sie Got gedâcht. 
+<lb/>swer nicht guoter kunst ne kan, der lâze sie unvertirbet. 
+<lb/>kunstere, wis bî grôzer kunst diemüetich unde geduldich, 
+<lb/>sô wirt Gotes wille an dir mit künsten vollenbrâcht. 
+<lb/>den Got mit künsten hât gerîchet, 
+<lb/>tuot her wol mit kunst, der edele rîche, 
+<lb/>sô hât ‹er› ez alsô gelîchet, 
+<lb/>daz er sich eime edelen manne gelîche. 
+<lb/>kunster, hüete, daz bî kunst dîn laster nicht enblîche, 
+<lb/>so hüete ein edel man, daz in die schande nicht beslîche. 
+<lb/>nicht ûz adele wîche,     der in adele ist wol geslacht. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Swen mîn herze Gotes trôst und wîsen muot gewinnet, 
+<lb/>sô vürcht ich den tiuvel nicht noch al sîn ingesinde, 
+<lb/>daz im zuo gehœret, dâ von bin ich unverzaget. 
+<lb/>swer sich wol bescheidelîch ûf rechticheit versinnet, 
+<lb/>der sol merken, wie der mensche rechte wîsheit vinde: 
+<lb/>an des menschen sêle wirt sîn wîsheit im gesaget. 
+<lb/>der menschen zucht êrlîchen heldet, 
+<lb/>der hât Got gewunnen ze eime vriunde, 
+<lb/>an sîner sêle Got geweldet 
+<lb/>aller wîsheit meisterschaft urkün‹de› 
+<lb/>‹...› 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>‹... 
+<lb/>... 
+<lb/>... 
+<lb/>...› 
+<lb/>vil schœne, liechter den ein blas, drî strange nicht ze kleine, 
+<lb/>gewunden rîch von waxse, lûchte nacht und ouch den tac. 
+<lb/>dô wart ein scheideltranc gebrûwen 
+<lb/>zwischen in, †gemelzet in dem merzen†, 
+<lb/>in driu geteilet †ûf ein rûwen† 
+<lb/>wart ir habe, dô teilten sie die kerzen. 
+<lb/>ze beiden henden swant ir guot, der zezwen unde der lerzen. 
+<lb/>der kerzen liechte schîn zebrast, daz muoste in lange smerzen. 
+<lb/>wê dem valschen herzen,     des rât vreude scheiden mac. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  9"/> 9
+<lb/>Ich enkan des vürsten edelicheit gelîche nicht gemezzen 
+<lb/>ze tieren noch ze würmen noch ze vogelen noch ze vischen, 
+<lb/>sît daz er ist ein mensch, ein man, ein ritter und ein helt. 
+<lb/>vil grœzer wirde her noch hât, der wil ich nicht vergezzen, 
+<lb/>her vil gerechter kristen, dâ von sîn lob muoz ervrischen, 
+<lb/>her ist ein adel hô gevürstet rîch unde ûz erwelt. 
+<lb/>arn unde valken unde lewen, 
+<lb/>lebart und pantis ich wol swîge, 
+<lb/>damit so wil ich ez nicht verhiewen; 
+<lb/>manlich lob dem herzogen Lodewîge 
+<lb/>in Beierlant vil wol gezimt. daz al sîn trûren sîge! 
+<lb/>sîn lob hât durch die werlt gebant vil strâzen unde stîge. 
+<lb/>daz vrou Êre im nîge,     daz ist sîner tugende gelt. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  10"/> 10
+<lb/>Alle kuninge, vürsten, herren, ritter, knaben, knechte 
+<lb/>in zwên unde sibenzich sprâchen; iuden, heiden, kristen elle, 
+<lb/>pfaffen unde leien, lant gebûr, al menschen diet, 
+<lb/>nu helfet rechen uns den mort: durch Got unde durch daz rechte 
+<lb/>vil mê wen durch des kuninges tôt. daz recht gericht erschelle 
+<lb/>dem kuninge, dem sîn selbes volc mortlîchen tôt geriet. 
+<lb/>getrûwen tensche liute, rechet 
+<lb/>ûwern kuninc, des habet ir lob und êre. 
+<lb/>die morder meldet unde sprechet 
+<lb/>an ir lîb, daz sich ir heil verkêre. 
+<lb/>swelich Tenscher wil unschuldich sîn, der tuo, daz ich in lêre: 
+<lb/>der sol die morder helfen telgen vîentlîchen sêre. 
+<lb/>daz ir laster mêre,     dâ von sing ich iu diz liet. 
+<lb/> 
+<lb/> 
+<lb/> 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  11"/> 11
+<lb/>Swen die lunze brichet gegen ir ûz erwelten vriunde, 
+<lb/>daz sie mit eim andern tiere tuot unzüchtichlîchen, 
+<lb/>daz ne kan sie nimmer mê verbergen sîner list. 
+<lb/>sêlich würde ein sünder noch, der daz geprüeben künde, 
+<lb/>wie sie tuot: sie muoz in sorgen vür ir meister slîchen, 
+<lb/>sie kan sich in wazzer waschen, dâ von hât sie vrist. 
+<lb/>her weiz wol, wie siez hât begangen. 
+<lb/>ob sie | nicht gewaschen vür in træte, 
+<lb/>daz gult ir antlitz unde ir wangen, 
+<lb/>went ir lîb vil schiere ein sterben hæte. 
+<lb/>mensche, swen dîn wille dich verkrieget in unvlæte, 
+<lb/>schaffe, daz dir bîcht mit rûwen zücke ûz sünden græte. 
+<lb/>wasch ab dîn unstæte,     dich wil vristen Ihesus Krist. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton VII</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton VII"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Got herre almechtich, 
+<lb/>vorbedechtich 
+<lb/>aller meisterschaft und aller dinge, 
+<lb/>du eine meisterscheffer bist, 
+<lb/>ân anegenge, ân ende ist dîn gewalt. 
+<lb/>du aller hêrste, 
+<lb/>dir daz êrste 
+<lb/>lob in dirre nûwen wîse ich singe. 
+<lb/>dîn wîsheit aller sinne list 
+<lb/>gemerket hât, gemezzen und gezalt. 
+<lb/>wol dir Got, Krist, der kristenheit, 
+<lb/>sô wol uns, daz wir kristen sint | geworden, 
+<lb/>wol uns des, daz du hâs geseit, 
+<lb/>daz die sint alle Gotes kint, 
+<lb/>die kristen sint in kristelîcher orden. 
+<lb/>wol dir, wol uns, daz wir dich müezen hie ûf erden loben, 
+<lb/>wol dir, daz aller engel schar 
+<lb/>und al dîn scheffenunge dir muoz hoben. 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Vür wâr, ich wânde, 
+<lb/>daz der gânde 
+<lb/>mich nicht spotten solde, swen ich rîte. 
+<lb/>nu prüebe ich, die dâ gên ze vuoz, 
+<lb/>die spotten mîn, doch rîte ich vaste hin. 
+<lb/>die lützel kunnen, 
+<lb/>die ne gunnen 
+<lb/>mir nicht, daz ich lenge, breite, wîte 
+<lb/>mit kunsten von in rîten muoz. 
+<lb/>mich treit die Gotes helfe unde ouch mîn sin. 
+<lb/>dar ûf sô rîte ich alsô snel, 
+<lb/>wil Got, dar mich kein blôzer gouch erloufet. 
+<lb/>ich mache ir itteslîchen grel, 
+<lb/>daz er mit schanden swîgen muoz, 
+<lb/>der mîne wâre mit sîme valsche koufet. 
+<lb/>ez schinfet sumelîcher mîne dœne unde mînen sanc: 
+<lb/>her singe unde tichte mê unde baz 
+<lb/>denne ich, des wizzen im die liute danc. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Swaz man gesprichet, 
+<lb/>uns nu brichet 
+<lb/>nicht sô vil an herren sô gerichtes. 
+<lb/>unrecht verdringet âne were 
+<lb/>die rechticheit, die ne kan sich nicht erneren. 
+<lb/>ze bœsen wichten 
+<lb/>richter phlichten, 
+<lb/>swie die sint. ich ne zîhe nieman nichtes; 
+<lb/>der sünden unde der schanden here 
+<lb/>wære nicht sô grôz, woltenz die richter weren. 
+<lb/>daz diebe, rouber, morder sint, 
+<lb/>verræter, trieger, valscher, wuocherære, 
+<lb/>sô vil der ungetrûwen kint, 
+<lb/>daz ist der bœsen herren schult, 
+<lb/>die sie beschirmen. daz sint bœse mære, 
+<lb/>swer tûsent marc diebroubet unde mordet unde stilt, 
+<lb/>daz er mit zwelven büezen mac 
+<lb/>dem richter, daz er sîne werc verhilt. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Vol arges muotes, 
+<lb/>rîch des guotes: 
+<lb/>valsche herren – daz in salde entwîche! 
+<lb/>den wære ich herzelîchen gram, 
+<lb/>wære nicht, daz ich vil ir unsælde weiz. 
+<lb/>sie sint verarmet: 
+<lb/>mich erbarmet, 
+<lb/>daz ir lîb ist ûzwendich rîche 
+<lb/>unde innerthalb arm unde lam 
+<lb/>der tugent, dar an sich kranc natûre vleiz. 
+<lb/>»wie mac er danne guot gesîn, 
+<lb/>den swach natiure an sîner state swachet? 
+<lb/>die gâbe der planêten schîn, 
+<lb/>lûne unde zît an der geburt, 
+<lb/>der sterne louf lîb unde site machet.« 
+<lb/>gewinnet, werden herren, guote site unde guoten muot. 
+<lb/>‹...› wonheit mit gewalt 
+<lb/>natûret wol, swer tugentlîchen tuot. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Slân die Franzoise 
+<lb/>vil tornoise 
+<lb/>grôz von silbere; ob ich rüegen türste: 
+<lb/>der weiz ich sumelîchen valsch, 
+<lb/>ich hân daz kopfer meil an im gesên. 
+<lb/>ob er guot wære 
+<lb/>nâch der swære, 
+<lb/>die er hât, sô hiez er wol ein vürste 
+<lb/>durch sîne münze valsch, 
+<lb/>ob man die rîcheit sol bî herren spên. 
+<lb/>ich enruoch, daz berner kopfer sîn 
+<lb/>unde ouch die heller: in sô lîchter münze 
+<lb/>die ne bergent nicht ir kopfer schîn. 
+<lb/>ze koufe engelten sie nicht vil 
+<lb/>(ich wæne, ir wüegen drîzich kûme ein unze). 
+<lb/>die kleine münze ist arm, als ich bescheiden wil; 
+<lb/>der valscheit hât vil kleine macht. 
+<lb/>der grozen herren valsch vermac ze vil. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton VIII</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton VIII"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Herre unde meisterscheffer mîn, 
+<lb/>Got, alle crêatûre dîn 
+<lb/>die hâstu dir ze lobe gedâcht. 
+<lb/>die engel unde diu liute, 
+<lb/>vische unde vogele, würme, tier 
+<lb/>hâstû ze lobe geschaffen dir. 
+<lb/>dîn wille werde an uns volbrâcht. 
+<lb/>nu helf mir, daz ich hiute 
+<lb/>gedenke dîner werdicheit, 
+<lb/>daz ich dîn lob gesinge. 
+<lb/>dîn êre ist grôz, ân ende breit. 
+<lb/>daz êrste lob in diser wîse erklinge 
+<lb/>dem herren, der ie was unde ist 
+<lb/>unde immer blîbet, Ihesus Krist, 
+<lb/>der schuof uns vride unde gibet uns vrist. 
+<lb/>Got aller scheffenunge list 
+<lb/>kan unde weiz, her meister aller dinge. 
+<lb/> 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Der sich sô hô gesetzet hât 
+<lb/>mit sange in meistersinger grât, 
+<lb/>daz ein durchgründet meister nicht 
+<lb/>müez' mit im kunst allieren, 
+<lb/>swie gar durchgründich wîs her sî, 
+<lb/>her gebe im spæher meister drî 
+<lb/>ze helfe: und solte ich halten phlicht, 
+<lb/>ich hieldez mit den vieren. 
+<lb/>Sing ûf, sing abe, sing hin, sing her! 
+<lb/>vier guote meistersinger 
+<lb/>die machent (des ich dich gewer!) 
+<lb/>die kunste dîn noch kleiner dan ein vinger. 
+<lb/>sich hielt ein engel alze hô, 
+<lb/>den Got verstiez, der wart unvrô. 
+<lb/>swer alsus tuot, deme schicht alsô. 
+<lb/>Got selber dreuwet dise drô: 
+<lb/>hôchvart vor Gote ne hât neheinen dinger. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>‹I›ch sage dir, Singûf, waz du tuost, 
+<lb/>des du ze iungest volgen muost: 
+<lb/>nu lobe den Mîsner, der kan 
+<lb/>wen du, her leset in buochen. 
+<lb/>drî spæhe meister, die noch leben, 
+<lb/>wiltu im die ze helfe geben, 
+<lb/>ir kunst tuot dîner kunste wê, 
+<lb/>daz soltu wol versuochen: 
+<lb/>von Werzeburch meister Conrât, 
+<lb/>der besten singer einer, 
+<lb/>der schrift in buochen kunde hât, 
+<lb/>dâ von ist sîn getichte vil die reiner; 
+<lb/>der Helleviur der ander sî; 
+<lb/>der Unverzagete, sô ist ir drî; 
+<lb/>stân sie dem Mîsnaere bî, 
+<lb/>mit helfe ich bin der sorge vrî: 
+<lb/>sie machent, daz dîn sanges prîs wirt kleiner [ 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Nu gnâde im Got, her was ein helt, 
+<lb/>ein vürste manlîch ûz erwelt 
+<lb/>tôt ist sîn lîb, noch lebet sîn lob, 
+<lb/>sîn name gestirbet nimmer. 
+<lb/>sîn tugent mit êren daz erwarb, 
+<lb/>ê dan sîn edelez vleisch erstarb, 
+<lb/>daz man in wünschet in den hob 
+<lb/>des lebendes lîbes immer. 
+<lb/>wâ tuot ein vürste im nu gelîch 
+<lb/>bî mâgen unde bi vriunden, 
+<lb/>herzoge Albrecht von Brunes|wîch, 
+<lb/>den tûsent zungen nicht vol klagen kün‹d›en. 
+<lb/>nu hân ich ofte hôrt gesaget, 
+<lb/>swen man nâch tôde hie beklaget, 
+<lb/>der sî von gnâden unveriaget. 
+<lb/>nu gnâde im, gnâden rîche maget, 
+<lb/>du Gotes muoter, vrî von allen sünden. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Mir ist in mîner zît geschên, 
+<lb/>daz ich die herren habe gesên, 
+<lb/>die sprechen einen widerspruch, 
+<lb/>der sie nicht wol beschœnet: 
+<lb/>in dienet maniger hande man, 
+<lb/>der nie ze lône heil gewan; 
+<lb/>sîn ungelücke hât den bruch, 
+<lb/>ob im nicht wirt gelœnet, 
+<lb/>sô wil der herre unschuldich sîn 
+<lb/>unde sprichet; »ungelücke 
+<lb/>dir schaden tuot. der schulde dîn 
+<lb/>der enweiz ich anders nicht an keime stücke.« 
+<lb/>gelücke schaffet lônes zît, 
+<lb/>ez machet engen dienest wît. 
+<lb/>ob daz gelücke an herren lît, 
+<lb/>swer dieneste nicht gelücken gît, 
+<lb/>der herren herze ist kranker dan ein mücke. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  6"/> 6
+<lb/>Der herren hulde ist sam ein îs. 
+<lb/>dar umme ist her nicht vollen wîs, 
+<lb/>swer ûf die beide bûwet 
+<lb/>mit kostelîchen sachen. 
+<lb/>doch treit daz îs vil swære last, 
+<lb/>swen es der winter vriuset vast. 
+<lb/>der herren hulde ist ouch alsô. 
+<lb/>daz kan diu sælde machen: 
+<lb/>der wîle der man gelücke hât, 
+<lb/>sô blîbet her bî hulden; 
+<lb/>wie danne, ob daz umme gât 
+<lb/>alsô der winter von des meien schulden? 
+<lb/>îs unde hulde ist beide kranc. 
+<lb/>swer ie nâch herren hulde ranc, 
+<lb/>dem wil ich singen disen sanc: 
+<lb/>hât er gelücke sunder wanc, 
+<lb/>dem wirt sîn arebeit vil wol vergulden. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  7"/> 7
+<lb/>Got hât in allen nicht gegeben 
+<lb/>gelîch den herren hêrlich leben; 
+<lb/>io ne hât her armen liuten nicht 
+<lb/>gelîche sælde erzeiget. 
+<lb/>die herren die sint ungelîch, 
+<lb/>ein teil ist arm, ein teil ist rîch. 
+<lb/>die wârheit guote rîcheit gi‹ch›t 
+<lb/>dem herren, der sich neiget 
+<lb/>diemüetichlîchen bî gewalt, 
+<lb/>der stêt in Gotes prîse; 
+<lb/>der dienest giltet unde galt 
+<lb/>nâch rechter schult, der mac wol heizen wîse. 
+<lb/>der muot in sulher stæte stât, 
+<lb/>daz er durch keiner hande rât 
+<lb/>getrûwen vriunt beliegen lât, 
+<lb/>der weiz, wer im gedienet hât: 
+<lb/>der herren hulde ist nicht gelîch dem îse. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  8"/> 8
+<lb/>Ich muoz der werlde werden gram: 
+<lb/>sît ich ze mînen iâren quam, 
+<lb/>daz mir die merke wart gegeben, 
+<lb/>sô merkich an den liuten 
+<lb/>bî giricheit haz unde nît. 
+<lb/>ich ne sach in aller mîner zît 
+<lb/>nicht menschen viunve, die so l‹e›ben, 
+<lb/>als | ich iu wil bediuten 
+<lb/>(vil rechte soldir merken daz): 
+<lb/>sie solten wesen âne 
+<lb/>der giricheit, nît unde haz 
+<lb/>die solt in verre entvliehen ûz dem wâne. 
+<lb/>vündich zer werlt nû menschen drî 
+<lb/>der drîer hande sache vrî, 
+<lb/>den wolt ich gerne wesen bî. 
+<lb/>swâ ioch der menschen einer sî, 
+<lb/>dem solte nîgen sun unde ouch der mâne. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  9"/> 9
+<lb/>Sich rüemet maniger sîner kunst 
+<lb/>sô vil, daz guoter liute gunst 
+<lb/>in vliuhet unde her wirbet haz; 
+<lb/>der dunket mich nicht kunstich. 
+<lb/>so rüemet sich ein tummer man, 
+<lb/>daz her vil minne erwerben kan 
+<lb/>von maniger vrouwen; umme daz 
+<lb/>sô wirt man im ungunstich. 
+<lb/>sich rüemet sumelîcher ouch, 
+<lb/>wie küene her sî des lîbes, 
+<lb/>daz man im iêt, her sî ein gouch 
+<lb/>ze rechter nôt, gewerdich nicht eines wîbes. 
+<lb/>sô prüebich, daz er ist versmât, 
+<lb/>swelich man sich selben werder hât 
+<lb/>wen im die menie bî gestât. 
+<lb/>swer bâgen unde rüemen lât, 
+<lb/>der wil behüeten sich vil maniges kîbes. 
+<lb/> 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  10"/> 10
+<lb/>Nicht wol ich sîn vergezzen mac, 
+<lb/>der mich sô manigen lieben tac 
+<lb/>gevreuwet hât mit sîner habe 
+<lb/>(nu vreuwe in Got), der werde! 
+<lb/>vil vreude ich wîlen was gewon 
+<lb/>bî im, dâ bin ich leider von 
+<lb/>gescheiden trûrichlîchen abe. 
+<lb/>sîn vleisch ist worden erde, 
+<lb/>sîn sêle müeze dem wesen bî, 
+<lb/>der sie von himele sande. 
+<lb/>nu helf im, Gotes muoter vrî, 
+<lb/>gevrîet sünden blôz unde aller schande, 
+<lb/>bit im dîn kint genædich sîn, 
+<lb/>dem ûz erwelten vriunde mîn, 
+<lb/>daz was der grâve Gunzelîn, 
+<lb/>der werde wîse von Zwerîn, 
+<lb/>den man durch sîne tugende verne erkande. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  11"/> 11
+<lb/>Got lobich unde vürchte Got. 
+<lb/>sîn ernest gêt vor allem spot, 
+<lb/>des lob ich sîne Gotes kraft 
+<lb/>unde dank im sîner milde. 
+<lb/>sîn gâbe ist alsô manichvalt, 
+<lb/>daz dâ nicht ende ist an gezalt; 
+<lb/>daz wîset uns sîn meisterschaft 
+<lb/>in maniger hande bilde. 
+<lb/>dem einen diz, dem andern daz, 
+<lb/>sus hât ez Got geteilet, 
+<lb/>swie sô her wil: nicht wirs, nicht baz. 
+<lb/>sîn gâbe ist uns in allen kouf geveilet, 
+<lb/>daz wir uns selben wol behagen; 
+<lb/>des welle wir Got genâde sagen. 
+<lb/>ich ensach in allen mînen tagen 
+<lb/>nie menschen, daz ich wolde tragen 
+<lb/>sîn herze vür daz mîn †in mir geheilet†. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  12"/> 12
+<lb/>Sêt an zwei edel zabeltier, 
+<lb/>die machen werde rîche zimmier 
+<lb/>den mantel, | dâ vrou Êre hât 
+<lb/>ir bruste mit bedecket. 
+<lb/>die Zabel haben ritter leben 
+<lb/>(swie vil der tôden zabel sweben 
+<lb/>vor maniger brust ûf rîcher wât, 
+<lb/>die blîben ungewecket): 
+<lb/>von Riddagesdorf vrouwen Êren Zabel, 
+<lb/>von Plâwe ein Zabele sô rîche, 
+<lb/>der trûwen anker unde kabel. 
+<lb/>zwêne alsô guote zabele den gelîche, 
+<lb/>die sach nie man vor vrouwen brust. 
+<lb/>vrou Êre selben hât die lust, 
+<lb/>daz sie die Zabele hât gekust, 
+<lb/>sô daz in laster milewen rust 
+<lb/>nicht nâhen muoz. al schande von in wîche! 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton IX</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton IX"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Daz êrste lob an diser wîse ich singe 
+<lb/>dir, süezer Got, du vater aller dinge, 
+<lb/>du volle gruft der gnâden unde aller güete; 
+<lb/>du eine scheffer aller creatiure, 
+<lb/>dîn kunst die schuof daz wazzer mit dem viure, 
+<lb/>erde unde luft, ursprinc der êren vlüete. 
+<lb/>sît her uns von den ungelîchen vieren 
+<lb/>gemachet hât 
+<lb/>unde her sich uns gelîche wolte zieren, 
+<lb/>mit rechter tât 
+<lb/>kunde her daz ordinieren. 
+<lb/>den süezen rât 
+<lb/>gab im sîn diemuot unversmât: 
+<lb/>sîn richeit uns vil armen nâ besippe stât. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Der ob alle rîcheit ist sô gewaltich, 
+<lb/>unde wære sîn güete nicht sô manichvaltich 
+<lb/>(sîn barmicheit, sîn gnâde sünde heilet), 
+<lb/>sô müeste wir vil manigen kumber dulden. 
+<lb/>enhulfe uns Got nicht baz denne wir ez verschulden, 
+<lb/>sorge unde leit des würde uns vil geteilet, 
+<lb/>wen daz in sîn barmunge unde die minne 
+<lb/>der trûwe mant. 
+<lb/>wie her ze menschen liebe sîne sinne 
+<lb/>rechte gewant 
+<lb/>mit guotem anbeginne, 
+<lb/>daz man ervant: 
+<lb/>her schuof den menschen mit der hant, 
+<lb/>her was ouch mensche drî und drîzich iâr bekant. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Got hât die nacht gewîet hô wînachte. 
+<lb/>vil hô gewîet Got die nacht gedâchte, 
+<lb/>dâ her sîn wort volbrâchte gegen den morgen, 
+<lb/>daz was ze Gotes muoter vor gesprochen. 
+<lb/>dô entfienc sie Got, den truoch sie vierzich wochen 
+<lb/>ê der burt, die uns nû brâchte ûz sorgen. 
+<lb/>der himelvater, alt ân anegenge 
+<lb/>unde ân ende ie grôz, 
+<lb/>der ungezalt an breite unde ouch an lenge, 
+<lb/>den ummeslôz 
+<lb/>ein kleine brust getwenge 
+<lb/>gar sünden blôz. 
+<lb/>maget Marîa, vol gnâden gôz 
+<lb/>dich, den dû gebæres menschen lîb genôz. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton X</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton X"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Untrûwe slîchet alsô ein mûs 
+<lb/>in valsches mannes herzen hûs, 
+<lb/>der sie mit willen hûset, 
+<lb/>der wænet, daz er werde rîch 
+<lb/>und slint den angel girichlîch. 
+<lb/>her vuxs, der wîle ir mûset, 
+<lb/>sô rât ich, daz ir umme sên, 
+<lb/>ir mügent beslichen werden ûf der weide, 
+<lb/>dâ ir verliesen ûwern balc. 
+<lb/>schint man den ungetrûwen schalc, 
+<lb/>ich trœste mich der leide. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Daz ein getrûwer stæter man 
+<lb/>vil schalkes list weiz unde kan, 
+<lb/>des wil ich im wol gunnen. 
+<lb/>»nicht, meister, tuo die sprüche hin! 
+<lb/>mîn trûwer muot, min stæter sin 
+<lb/>sol nimmer valscheit kunnen.« 
+<lb/>nein, stæter vriunt, getrûwer helt, 
+<lb/>du muost wol schalcheit wissen unde prüeben, 
+<lb/>sô kanstu schalken widerstân. 
+<lb/>hâstu ir liste, die sie hân, 
+<lb/>du ne solt ir doch nicht üeben. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  3"/> 3
+<lb/>Die tenschen morder haben den prîs, 
+<lb/>ze morde nieman ist sô wîs, 
+<lb/>dâ man sol kuninge morden. 
+<lb/>sie mordent gerne unde kunnenz wol. 
+<lb/>den hôesten mort man prîsen sol: 
+<lb/>ze Iûtlande in dem norden, 
+<lb/>dâr ist begangen mortlich mort. 
+<lb/>sie kunden iren kuninc unsanfte wecken 
+<lb/>ûf eime bette, dâ her slief 
+<lb/>sexs unde viunfzich wunden tief 
+<lb/>durchstâchen im die recken. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  4"/> 4
+<lb/>Sie mugen wol küene recken sîn, 
+<lb/>daz ist an irme leben[ ]e schîn, 
+<lb/>die ez mit den handen tâten. 
+<lb/>ir varwe und ir gelâz ist hin, 
+<lb/>sich hât verwandelt al ir sin. 
+<lb/>diez mit in haben gerâten, 
+<lb/>die ne wizzen sich nieheinen rât, 
+<lb/>die gerent dem iungen kuninge bî ze stânde. 
+<lb/>sie wellent sîn unschuldich noch 
+<lb/>unde bieten vür ir tenisch loch: 
+<lb/>nein, ez wirt anders gânde. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  5"/> 5
+<lb/>Ir morder, prüebent ûwern mort, 
+<lb/>wie grôz ein mortlich sünden hort 
+<lb/>in ûwer kameren hordet. 
+<lb/>sêt, ûwer kuninc was ûwer knecht, 
+<lb/>der iu gewalt gab unde recht, 
+<lb/>den habet ir gemordet. 
+<lb/>des sît ir immer mê versmât, 
+<lb/>von allen gnâden vreudelôs gescheiden. 
+<lb/>der mort ist ûwer heil vertrîb: 
+<lb/>man gît daz krûtze ûf ûweren lîb 
+<lb/>unde slêt ûch sam diu heiden. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton XI (Singauf-Ton)</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton XI (Singauf-Ton)"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Ebron daz velt die erden truoc, 
+<lb/>dâ Got nam erden ûz gevuoc, 
+<lb/>dâ von machte her Adâmen. 
+<lb/>der vater ist mit wîsheit kluoc, 
+<lb/>der einen sun ûz erden wuoc, 
+<lb/>dâ von wir alle quâmen. 
+<lb/>geschuof her in     ûz erden doch, 
+<lb/>diu erde ist ouch sîn muoter noch. 
+<lb/>sie nam ir teil, dô Âdam starb, 
+<lb/>der vater nam daz sîne, 
+<lb/>dô Got die sêle wider warb 
+<lb/>ûz herter helle pîne: 
+<lb/>mit dem gelouben ich hie bin. 
+<lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  2"/> 2
+<lb/>Si‹n›gûf vier meister hât bekürt, 
+<lb/>her hât in sînen sanc beschürt 
+<lb/>ze râten in dem sande. 
+<lb/>sô grôzer wort im nicht enbürt, 
+<lb/>sîn liet ist valsch, daz ist gespürt, 
+<lb/>des hât er selben schande. 
+<lb/>der slâf ist nicht     sô vollen alt 
+<lb/>alsô der man. – wie ist daz gestalt? 
+<lb/>der man was ê ûf erden wîs 
+<lb/>ê dan der slâf gewürde, 
+<lb/>dô brâchte in in daz paradîs 
+<lb/>Got. ‹dô er› sünden vürde 
+<lb/>gewuot, dâ wart der slâf geticht[ 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <author>Rumelant von Sachsen</author>
+        <title>Ton XII (Frauenlob, Langer Ton)</title>
+      </fileDesc>
+      <profileDesc>
+        <langUsage ident="mhd" usage="100"/>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><milestone type="text" n="Ton XII (Frauenlob, Langer Ton)"/><lb/> 
+<lb/>
+<milestone type="stanza" n="Strophe  1"/> 1
+<lb/>Der wîbe name grœzer ist den vrouwen lob. 
+<lb/>kleine oder grob, 
+<lb/>kurz oder lanc genennet, 
+<lb/>swie manz ioch bespennet, 
+<lb/>sint vrouwen wîp, wîp vrouwen lîb.     kieset unde erkennet: 
+<lb/>wie möchten vrouwen wîb gesîn,     die wîb ne wæren vrouwen? 
+<lb/>unvrouwen unde unwîb ist vil, waz wil ich des 
+<lb/>gemeldet? wes? 
+<lb/>möcht ich die baz der sprüche, 
+<lb/>daz ich rüege ir brüche? 
+<lb/>ir wandelname, ir wanc, ir wê,     ob daz vor mir krüche, 
+<lb/>doch sünge ich guoter wîbe lob,     der prîs nie wart verhouwen. 
+<lb/>man glôse es hin, man glôse ez her, 
+<lb/>mit reinen wîben ich gewer 
+<lb/>wol vrouwen, der 
+<lb/>muot hât die ger, 
+<lb/>daz êre in iren becher mer. 
+<lb/>ungerne ich sulher hulde enper. 
+<lb/>wîb ist ir êrste name, dâ von     sint vrouwen ûf gedrouwen. 
+<lb/> 
+</body>
+    </text>
+  </TEI>
+</teiCorpus>
