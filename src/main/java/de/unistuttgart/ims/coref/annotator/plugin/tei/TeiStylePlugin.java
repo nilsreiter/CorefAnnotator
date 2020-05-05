@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.tei;
 
+import java.awt.font.TextAttribute;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import de.unistuttgart.ims.coref.annotator.StyleManager;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
+import de.unistuttgart.ims.coref.annotator.api.format.WideSpacing;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 
 public class TeiStylePlugin implements StylePlugin {
@@ -55,6 +57,11 @@ public class TeiStylePlugin implements StylePlugin {
 		sas.addAttribute(StyleConstants.FontSize, (Integer) defaultStyle.getAttribute(StyleConstants.FontSize) + 6);
 		sas.addAttribute(StyleConstants.Bold, true);
 		map.put(sas, typeSystem.getType(Head.class.getCanonicalName()));
+
+		sas = new SimpleAttributeSet();
+		sas.addAttribute(TextAttribute.TRACKING, TextAttribute.TRACKING_LOOSE);
+		sas.addAttribute(StyleConstants.Family, "serif");
+		map.put(sas, typeSystem.getType(WideSpacing.class.getCanonicalName()));
 
 		return map;
 	}
