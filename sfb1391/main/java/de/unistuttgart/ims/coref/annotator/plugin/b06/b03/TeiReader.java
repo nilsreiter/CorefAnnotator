@@ -30,7 +30,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.tei.TeiStylePlugin;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -112,7 +112,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(DefaultStylePlugin.class.getName());
+		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
