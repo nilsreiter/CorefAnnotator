@@ -26,5 +26,10 @@
 			<supertypeName>de.unistuttgart.ims.coref.annotator.api.format.Format</supertypeName>
 			<description />
 		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.format.WideSpacing</name>
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.format.Format</supertypeName>
+			<description />
+		</typeDescription>
 	</types>
 </typeSystemDescription>
