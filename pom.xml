@@ -37,6 +37,7 @@
 								<typeSystemInclude>src/main/resources/types.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-v2.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-format.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-quadrama.xml</typeSystemInclude>
 							</typeSystemIncludes>
