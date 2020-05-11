@@ -3,6 +3,20 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.2
+
+- Fixed a bug what caused the auto-save to continue saving a file
+  even after the document had been closed #309
+
+## 1.14.1
+
+- Fixes a bug that prevented the export of full mention
+  tables to CSV or Excel #301
+- Export CSV/Excel files now contain segment information
+  (e.g., strophes) if included in the file #306
+- If no predefined line numbers are present, we fall back
+  to calculated line numbers #303
+
 ## 1.14.0
 
 - Added a new preference called `sticky markers`. If enabled, 
