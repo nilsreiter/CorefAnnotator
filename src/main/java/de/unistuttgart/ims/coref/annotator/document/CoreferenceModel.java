@@ -37,6 +37,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
 import de.unistuttgart.ims.coref.annotator.Span;
+import de.unistuttgart.ims.coref.annotator.Spans;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Comment;
@@ -44,6 +45,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -68,8 +70,8 @@ import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationUtil;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 /**
@@ -211,12 +213,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
-		Mention m = AnnotationFactory.createAnnotation(documentModel.getJcas(), b, e, Mention.class);
+		Mention m = UimaUtil.getMention(documentModel.getJcas(), b, e);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
-			m = AnnotationUtil.trim(m);
+			AnnotationUtil.trim(m.getSurface(0));
 		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
-			m = Util.extend(m);
-		registerAnnotation(m);
+			Util.extend(m.getSurface(0));
+		for (MentionSurface ms : m.getSurface())
+			registerAnnotation(ms);
 		return m;
 	}
 
@@ -230,8 +233,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	protected void edit(MergeMentions op) {
 		Mention firstMention = op.getMentions().getFirstOptional().get();
-		int begin = op.getMentions().getFirstOptional().get().getBegin();
-		int end = op.getMentions().getLastOptional().get().getEnd();
+		int begin = UimaUtil.getBegin(op.getMentions().getFirstOptional().get());
+		int end = UimaUtil.getEnd(op.getMentions().getLastOptional().get());
 		Mention newMention = addTo(firstMention.getEntity(), begin, end);
 
 		op.getMentions().forEach(m -> {
@@ -310,7 +313,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				Mention fst = addTo(op.getEntity(), span);
 				ms.add(fst);
 				if (op.getEntity().getLabel() == "") {
-					op.getEntity().setLabel(fst.getCoveredText());
+					op.getEntity().setLabel(UimaUtil.getCoveredText(fst));
 				}
 			}
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
@@ -392,7 +395,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	protected void edit(DuplicateMentions op) {
 		op.setNewMentions(op.getSourceMentions().collect(oldMention -> {
-			Mention newMention = addTo(oldMention.getEntity(), new Span(oldMention));
+			Mention newMention = addTo(oldMention.getEntity(), new Span(oldMention.getSurface(0)));
+			// TODO: re-create additional surfaces
 			try {
 				if (oldMention.getFlags() != null)
 					newMention.setFlags(UimaUtil.clone(oldMention.getFlags()));
@@ -416,10 +420,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
 		op.getEntities().forEach(e -> {
-			MutableListMultimap<Span, Mention> map = Multimaps.mutable.list.empty();
+			MutableListMultimap<Spans, Mention> map = Multimaps.mutable.list.empty();
 			MutableList<Mention> toRemove = Lists.mutable.empty();
 			for (Mention m : entityMentionMap.get(e)) {
-				Span s = new Span(m);
+				Spans s = new Spans(m);
 				if (map.containsKey(s)) {
 					for (Mention m2 : map.get(s)) {
 						if (m2.getDiscontinuous() == null && m.getDiscontinuous() == null) {
@@ -501,19 +505,19 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 			switch (operation.getStrategy()) {
 			case LAST:
-				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getBegin());
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> UimaUtil.getBegin(m));
 				break;
 			case LONGEST:
-				nameGiver = entityMentionMap.get(entity).maxBy(m -> m.getEnd() - m.getBegin());
+				nameGiver = entityMentionMap.get(entity).maxBy(m -> UimaUtil.getEnd(m) - UimaUtil.getBegin(m));
 				break;
 			case FIRST:
 			default:
-				nameGiver = entityMentionMap.get(entity).minBy(m -> m.getBegin());
+				nameGiver = entityMentionMap.get(entity).minBy(m -> UimaUtil.getBegin(m));
 				break;
 
 			}
 			operation.registerOldName(entity, getLabel(entity));
-			String newName = nameGiver.getCoveredText();
+			String newName = UimaUtil.getCoveredText(nameGiver);
 			entity.setLabel(newName);
 
 		}
@@ -593,11 +597,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		if (entity.getLabel() != null)
 			return entity.getLabel();
 
-		return get(entity).collect(m -> m.getCoveredText()).maxBy(s -> s.length());
+		return get(entity).collect(m -> UimaUtil.getCoveredText(m)).maxBy(s -> s.length());
 	}
 
 	public ImmutableSortedSet<Mention> getMentions() {
-		return SortedSets.immutable.withAll(new AnnotationComparator(), JCasUtil.select(getJCas(), Mention.class));
+		return SortedSets.immutable.withAll(new MentionComparator(), JCasUtil.select(getJCas(), Mention.class));
 	}
 
 	public ImmutableSet<Mention> getMentions(Entity entity) {
@@ -632,10 +636,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return this.characterPosition2AnnotationMap.get(position);
 	}
 
-	public ImmutableSet<Annotation> getMentionsBetween(int start, int end) {
-		MutableSet<Annotation> mentions = Sets.mutable.empty();
+	public ImmutableSet<Mention> getMentionsBetween(int start, int end) {
+		MutableSet<Mention> mentions = Sets.mutable.empty();
 		for (int i = start; i <= end; i++) {
-			mentions.addAll(characterPosition2AnnotationMap.get(i).select(a -> a instanceof Mention));
+			mentions.addAll(characterPosition2AnnotationMap.get(i).selectInstancesOf(MentionSurface.class)
+					.collect(ms -> ms.getMention()));
 		}
 		return mentions.toImmutable();
 	}
@@ -758,6 +763,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		characterPosition2AnnotationMap.add(a);
 	}
 
+	public void registerAnnotation(Mention a) {
+		for (MentionSurface ms : a.getSurface())
+			registerAnnotation(ms);
+	}
+
 	private void registerEdit(Operation operation) {
 		documentModel.fireDocumentChangedEvent();
 	}
@@ -781,7 +791,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		Annotator.logger.traceEntry();
 		fireEvent(Event.get(this, Event.Type.Remove, entity, entityMentionMap.get(entity).toList().toImmutable()));
 		for (Mention m : entityMentionMap.get(entity)) {
-			characterPosition2AnnotationMap.remove(m);
+			for (MentionSurface ms : m.getSurface())
+				characterPosition2AnnotationMap.remove(ms);
 			m.removeFromIndexes();
 			// TODO: remove parts
 		}
@@ -801,7 +812,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	private void remove(Mention m, boolean autoRemove) {
 		Entity entity = m.getEntity();
-		characterPosition2AnnotationMap.remove(m);
+		for (MentionSurface ms : m.getSurface())
+			characterPosition2AnnotationMap.remove(ms);
 		entityMentionMap.remove(entity, m);
 		m.removeFromIndexes();
 		if (autoRemove && entityMentionMap.get(entity).isEmpty() && getPreferences()
@@ -979,7 +991,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			m.addToIndexes();
 			m.setEntity(op.getEntity());
 			entityMentionMap.put(op.getEntity(), m);
-			characterPosition2AnnotationMap.add(m);
+			for (MentionSurface ms : m.getSurface())
+				characterPosition2AnnotationMap.add(ms);
 			if (m.getDiscontinuous() != null) {
 				m.getDiscontinuous().addToIndexes();
 				characterPosition2AnnotationMap.add(m.getDiscontinuous());
@@ -997,7 +1010,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		op.getFeatureStructures().forEach(e -> e.addToIndexes());
 		op.getMentions().forEach(m -> {
 			entityMentionMap.put(m.getEntity(), m);
-			characterPosition2AnnotationMap.add(m);
+			for (MentionSurface ms : m.getSurface())
+				characterPosition2AnnotationMap.add(ms);
 			m.addToIndexes();
 			m.getEntity().addToIndexes();
 			fireEvent(Event.get(this, Event.Type.Add, null, m.getEntity()));

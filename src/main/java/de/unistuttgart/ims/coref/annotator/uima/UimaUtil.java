@@ -100,4 +100,13 @@ public class UimaUtil {
 		mention.setSurface(0, sf);
 		return mention;
 	}
+
+	public static int compare(Mention m1, Mention m2) {
+		int returnValue = Integer.compare(UimaUtil.getBegin(m1), UimaUtil.getBegin(m2));
+		if (returnValue == 0)
+			returnValue = Integer.compare(UimaUtil.getEnd(m2), UimaUtil.getEnd(m1));
+		if (returnValue == 0)
+			returnValue = Integer.compare(m1.hashCode(), m2.hashCode());
+		return returnValue;
+	}
 }

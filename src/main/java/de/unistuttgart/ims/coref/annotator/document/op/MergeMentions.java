@@ -9,7 +9,7 @@ import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class MergeMentions implements CoreferenceModelOperation {
@@ -23,11 +23,11 @@ public class MergeMentions implements CoreferenceModelOperation {
 	Mention newMention;
 
 	public MergeMentions(Mention... mentions) {
-		this.mentions = SortedSets.immutable.of(new AnnotationComparator(), mentions);
+		this.mentions = SortedSets.immutable.of(new MentionComparator(), mentions);
 	}
 
 	public MergeMentions(Collection<Mention> mentions) {
-		this.mentions = SortedSets.immutable.withAll(new AnnotationComparator(), mentions);
+		this.mentions = SortedSets.immutable.withAll(new MentionComparator(), mentions);
 	}
 
 	public ImmutableSortedSet<Mention> getMentions() {
@@ -53,8 +53,8 @@ public class MergeMentions implements CoreferenceModelOperation {
 			if (!ms.allSatisfy(o -> o instanceof Mention))
 				return STATE_NOT_MENTIONS;
 
-			ImmutableSortedSet<Mention> sms = ms.selectInstancesOf(Mention.class)
-					.toSortedSet(new AnnotationComparator()).toImmutable();
+			ImmutableSortedSet<Mention> sms = ms.selectInstancesOf(Mention.class).toSortedSet(new MentionComparator())
+					.toImmutable();
 
 			Mention m1 = sms.getFirstOptional().get();
 			Mention m2 = sms.getLastOptional().get();

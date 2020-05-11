@@ -2,23 +2,23 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import org.eclipse.collections.api.list.ImmutableList;
 
-import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.Spans;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class RemoveMention extends AbstractRemoveOperation<Mention> implements CoreferenceModelOperation {
 	Entity entity;
-	ImmutableList<Span> spans;
+	ImmutableList<Spans> spans;
 
 	public RemoveMention(Mention... mention) {
 		super(mention);
-		this.spans = getFeatureStructures().collect(m -> new Span(m));
+		this.spans = getFeatureStructures().collect(m -> new Spans(m));
 		this.entity = getFeatureStructures().getFirst().getEntity();
 	}
 
 	public RemoveMention(Iterable<Mention> mention) {
 		super(mention);
-		this.spans = getFeatureStructures().collect(m -> new Span(m));
+		this.spans = getFeatureStructures().collect(m -> new Spans(m));
 		this.entity = getFeatureStructures().getFirst().getEntity();
 	}
 
@@ -30,11 +30,12 @@ public class RemoveMention extends AbstractRemoveOperation<Mention> implements C
 		return getFeatureStructures().getFirst();
 	}
 
-	public Span getSpan() {
+	@Deprecated
+	public Spans getSpan() {
 		return spans.getFirst();
 	}
 
-	public ImmutableList<Span> getSpans() {
+	public ImmutableList<Spans> getSpans() {
 		return spans;
 	}
 
