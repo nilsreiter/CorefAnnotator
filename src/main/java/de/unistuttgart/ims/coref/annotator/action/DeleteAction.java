@@ -26,15 +26,16 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements CaretListener, TreeSelectionListener {
 
@@ -70,7 +71,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 				MutableSet<? extends Annotation> annotations = Sets.mutable
 						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
 				MutableSet<Mention> mentions = annotations.selectInstancesOf(Mention.class)
-						.select(a -> a.getBegin() == low && a.getEnd() == high);
+						.select(a -> UimaUtil.getBegin(a) == low && UimaUtil.getEnd(a) == high);
 
 				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),
 						() -> Sets.mutable.empty(), (set, mention) -> {

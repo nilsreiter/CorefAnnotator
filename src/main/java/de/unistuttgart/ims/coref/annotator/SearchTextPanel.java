@@ -39,10 +39,11 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.TargetedOperationIkonAction;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class SearchTextPanel extends SearchPanel<SearchResult>
 		implements DocumentListener, WindowListener, HasDocumentModel {
@@ -343,8 +344,9 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 						Matcher matcher = p.matcher(m.getCoveredText());
 						if (matcher.find()) {
 							try {
-								listModel.addElement(new SearchResult(searchContainer, m.getBegin(), m.getEnd()));
-								highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+								listModel.addElement(
+										new SearchResult(searchContainer, UimaUtil.getBegin(m), UimaUtil.getEnd(m)));
+								highlights.add(hilit.addHighlight(UimaUtil.getBegin(m), UimaUtil.getEnd(m), painter));
 							} catch (BadLocationException e) {
 								Annotator.logger.catching(e);
 							}

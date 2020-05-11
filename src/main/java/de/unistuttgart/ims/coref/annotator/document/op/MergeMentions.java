@@ -8,8 +8,9 @@ import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class MergeMentions implements CoreferenceModelOperation {
 	public static final int STATE_OK = 0;
@@ -61,10 +62,10 @@ public class MergeMentions implements CoreferenceModelOperation {
 			if (m1.getEntity() != m2.getEntity())
 				return STATE_NOT_SAME_ENTITY;
 
-			if (m1.getEnd() == m2.getBegin())
+			if (UimaUtil.getEnd(m1) == UimaUtil.getBegin(m2))
 				return STATE_OK;
 
-			String between = m1.getCAS().getDocumentText().substring(m1.getEnd(), m2.getBegin());
+			String between = m1.getCAS().getDocumentText().substring(UimaUtil.getEnd(m1), UimaUtil.getBegin(m2));
 			if (!between.matches("^\\p{Space}*$"))
 				return STATE_NOT_ADJACENT;
 

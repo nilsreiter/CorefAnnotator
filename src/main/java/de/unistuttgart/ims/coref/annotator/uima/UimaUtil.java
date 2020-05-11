@@ -13,11 +13,15 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.text.AnnotationTreeNode;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.xml.sax.SAXException;
 
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
@@ -74,5 +78,26 @@ public class UimaUtil {
 		for (int i = 0; i < newArray.size(); i++)
 			newArray.set(i, arr.get(i));
 		return newArray;
+	}
+
+	public static String getCoveredText(Mention mention) {
+		return mention.getSurface(0).getCoveredText();
+	}
+
+	public static int getBegin(Mention mention) {
+		return mention.getSurface(0).getBegin();
+	}
+
+	public static int getEnd(Mention mention) {
+		return mention.getSurface(mention.getSurface().size() - 1).getEnd();
+	}
+
+	public static Mention getMention(JCas jcas, int begin, int end) {
+		MentionSurface sf = AnnotationFactory.createAnnotation(jcas, begin, end, MentionSurface.class);
+		Mention mention = new Mention(jcas);
+		sf.setMention(mention);
+		mention.setSurface(new FSArray<MentionSurface>(jcas, 1));
+		mention.setSurface(0, sf);
+		return mention;
 	}
 }

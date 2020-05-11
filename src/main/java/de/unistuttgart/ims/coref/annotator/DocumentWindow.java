@@ -1210,11 +1210,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			StringBuilder b = new StringBuilder();
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_SHOW_LINE_NUMBER_IN_TREE,
 					Defaults.CFG_SHOW_LINE_NUMBER_IN_TREE)) {
-				Segment segment = getDocumentModel().getSegmentModel().getSegmentAt(m.getBegin());
+				Segment segment = getDocumentModel().getSegmentModel().getSegmentAt(UimaUtil.getBegin(m));
 				AnnotationTreeNode<Segment> tn = getDocumentModel().getSegmentModel().getAnnotationTreeNode(segment);
 				String sep = "/";
 				String ln = UimaUtil.toString(tn, sep, 20);
-				Integer lineNumber = getDocumentModel().getLineNumber(m.getBegin());
+				Integer lineNumber = getDocumentModel().getLineNumber(UimaUtil.getBegin(m));
 				if (lineNumber != null)
 					ln = ln + sep + lineNumber.toString();
 				if (ln != null) {
