@@ -3,6 +3,20 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.2
+
+- Fixed a bug what caused the auto-save to continue saving a file
+  even after the document had been closed #309
+
+## 1.14.1
+
+- Fixes a bug that prevented the export of full mention
+  tables to CSV or Excel #301
+- Export CSV/Excel files now contain segment information
+  (e.g., strophes) if included in the file #306
+- If no predefined line numbers are present, we fall back
+  to calculated line numbers #303
+
 ## 1.14.0
 
 - Added a new preference called `sticky markers`. If enabled, 
@@ -40,6 +54,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   Nonnominal. #277
 - If line numbers are displayed in the tree, and a segmentation 
   exist, the segments are also displayed in the tree. #279
+- Added a new exporter that directly exports into MS Excel and 
+  is more configurable. #285
 
 ## 1.12.2
 
