@@ -38,6 +38,7 @@
 								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-format.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-quadrama.xml</typeSystemInclude>
 							</typeSystemIncludes>
 							<!-- true or false, default = false -->
 							<!-- if true, then although the complete merged type system will be 
@@ -244,54 +245,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>quadrama</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>quadrama-add-source</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>quadrama/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
-							<execution>
-								<id>quadrama-add-test-source</id>
-								<phase>generate-test-sources</phase>
-								<goals>
-									<goal>add-test-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>quadrama/test/java</source>
-									</sources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-					<version>1.0.0</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
 			<id>develop</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -306,54 +259,6 @@
 					</resource>
 				</resources>
 			</build>
-		</profile>
-		<profile>
-			<id>creta</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>creta-add-source</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>creta/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
-							<execution>
-								<id>creta-add-test-source</id>
-								<phase>generate-test-sources</phase>
-								<goals>
-									<goal>add-test-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>creta/test/java</source>
-									</sources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>creta.api</artifactId>
-					<version>1.3.0</version>
-				</dependency>
-			</dependencies>
 		</profile>
 		<profile>
 			<id>sfb1391</id>
