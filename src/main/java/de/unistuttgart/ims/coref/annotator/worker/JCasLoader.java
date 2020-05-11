@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
 import de.unistuttgart.ims.coref.annotator.uima.Fix131;
-import de.unistuttgart.ims.uimautil.SetJCasLanguage;
+import de.unistuttgart.ims.coref.annotator.uima.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 

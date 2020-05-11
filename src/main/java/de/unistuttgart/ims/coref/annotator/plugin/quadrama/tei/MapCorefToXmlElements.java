@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,11 +41,11 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		MutableMap<String, XMLElement> idMap = Maps.mutable.empty();
 
 		// contains all covering XMLElement annotations for each mention
-		Map<Mention, Collection<XMLElement>> coveringXMLElement = JCasUtil.indexCovering(jcas, Mention.class,
+		Map<Mention, List<XMLElement>> coveringXMLElement = JCasUtil.indexCovering(jcas, Mention.class,
 				XMLElement.class);
 
 		// contains covering Speaker annotations for each mention
-		Map<Mention, Collection<Speaker>> coveringSpeaker = JCasUtil.indexCovering(jcas, Mention.class, Speaker.class);
+		Map<Mention, List<Speaker>> coveringSpeaker = JCasUtil.indexCovering(jcas, Mention.class, Speaker.class);
 
 		// the <text>-element
 		XMLElement textElement = null;

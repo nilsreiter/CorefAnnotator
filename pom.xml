@@ -10,7 +10,7 @@
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.dkpro>1.9.0</version.dkpro>
+		<version.dkpro>2.1.0</version.dkpro>
 		<version.ikonli>2.1.1</version.ikonli>
 		<version.eclipse>9.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -22,7 +22,7 @@
 			<plugin>
 				<groupId>org.apache.uima</groupId>
 				<artifactId>jcasgen-maven-plugin</artifactId>
-				<version>2.8.1</version>  <!-- change this to the latest version -->
+				<version>3.1.1</version>  <!-- change this to the latest version -->
 				<executions>
 					<execution>
 						<id>1</id>
@@ -315,7 +315,7 @@
 					<plugin>
 						<groupId>org.apache.uima</groupId>
 						<artifactId>jcasgen-maven-plugin</artifactId>
-						<version>2.8.1</version>  <!-- change this to the latest version -->
+						<version>3.1.1</version>  <!-- change this to the latest version -->
 						<executions>
 							<execution>
 								<id>3</id>
@@ -355,52 +355,37 @@
 			<artifactId>commons-collections4</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.coref-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-coref-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.metadata-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-metadata-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.segmentation-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-segmentation-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.lexmorph-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-lexmorph-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.syntax-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-syntax-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.semantics-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-semantics-asl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.12.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -437,22 +422,16 @@
 			<artifactId>commons-math3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.xmi-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-xmi-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.text-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-text-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.conll-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-conll-asl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
@@ -465,16 +444,12 @@
 			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.tokit-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-tokit-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-stanfordnlp-gpl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -484,12 +459,7 @@
 		<dependency>
 			<groupId>de.unistuttgart.ims.uima.io</groupId>
 			<artifactId>generic-xml-reader</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.unistuttgart.ims</groupId>
-			<artifactId>uimautil</artifactId>
-			<version>1.1.0</version>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.lexicalscope.jewelcli</groupId>
@@ -527,23 +497,24 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>4.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-				<artifactId>
-					de.tudarmstadt.ukp.dkpro.core-asl
-				</artifactId>
+				<groupId>org.dkpro.core</groupId>
+				<artifactId>dkpro-core-asl</artifactId>
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-				<artifactId>
-					de.tudarmstadt.ukp.dkpro.core-gpl
-				</artifactId>
+				<groupId>org.dkpro.core</groupId>
+				<artifactId>dkpro-core-gpl</artifactId>
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>

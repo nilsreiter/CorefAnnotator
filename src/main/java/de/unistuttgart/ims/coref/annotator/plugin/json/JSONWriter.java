@@ -2,7 +2,6 @@ package de.unistuttgart.ims.coref.annotator.plugin.json;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class JSONWriter extends SingleFileWriter {
 	public void write(JCas jcas, Writer os) throws IOException {
 		JSONArray array = new JSONArray();
 
-		Map<Token, Collection<Mention>> indexed = JCasUtil.indexCovering(jcas, Token.class, Mention.class);
+		Map<Token, List<Mention>> indexed = JCasUtil.indexCovering(jcas, Token.class, Mention.class);
 
 		for (Token token : JCasUtil.select(jcas, Token.class)) {
 			JSONObject o = new JSONObject();
