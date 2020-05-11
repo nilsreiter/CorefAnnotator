@@ -75,7 +75,8 @@
 				</featureDescription>
 				<featureDescription>
 					<name>Surface</name>
-					<rangeTypeName>uima.cas.FSArrray</rangeTypeName>
+					<description></description>
+					<rangeTypeName>uima.cas.FSArray</rangeTypeName>
 					<elementType>de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface</elementType>
 					<multipleReferencesAllowed>false</multipleReferencesAllowed>
 				</featureDescription>
@@ -88,6 +89,7 @@
 			<features>
 				<featureDescription>
 					<name>Mention</name>
+					<description></description>
 					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v2.Mention</rangeTypeName>
 				</featureDescription>
 			</features>
