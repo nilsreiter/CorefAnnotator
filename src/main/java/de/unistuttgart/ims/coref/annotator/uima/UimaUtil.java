@@ -18,7 +18,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.StringArray;
 import org.xml.sax.SAXException;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
 	public static JCas readJCas(String filename)

@@ -10,8 +10,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 /**
  * Component to fix errors that result from conversion issues

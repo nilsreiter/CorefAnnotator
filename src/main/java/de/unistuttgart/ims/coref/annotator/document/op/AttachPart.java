@@ -1,8 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.document.op;
 
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class AttachPart implements CoreferenceModelOperation {
 	Mention mention;

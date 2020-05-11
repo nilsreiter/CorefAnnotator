@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 class SearchResultMention extends SearchResult {
 
