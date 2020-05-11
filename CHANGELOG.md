@@ -3,6 +3,13 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.3
+
+- Added that wide-spaced text is now displayed with a serif font #315
+- Fixed a bug with the alignment of line numbers #316
+- Fixed a bug that prevented formatting info (italic etc.) to
+  be displayed correctly in the SFB1391 importer #314
+
 ## 1.14.2
 
 - Fixed a bug what caused the auto-save to continue saving a file

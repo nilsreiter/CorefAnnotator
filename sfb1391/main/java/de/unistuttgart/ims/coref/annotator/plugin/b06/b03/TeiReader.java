@@ -23,13 +23,14 @@ import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
+import de.unistuttgart.ims.coref.annotator.api.format.WideSpacing;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.Line;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultStylePlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.tei.TeiStylePlugin;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -87,6 +88,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("emph", Italic.class);
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
+		gxr.addRule("[rend*=wide-spacing]", WideSpacing.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
 			ms.setN(element.attr(N));
@@ -110,7 +112,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(DefaultStylePlugin.class.getName());
+		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
 		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
