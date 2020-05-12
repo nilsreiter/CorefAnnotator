@@ -10,8 +10,8 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
 
@@ -30,8 +30,8 @@ public class PreceedingRanker implements EntityRankingPlugin {
 	@Override
 	public MutableSortedSet<Entity> rank(Span span, CoreferenceModel cModel, JCas jcas) {
 		return Sets.mutable
-				.ofAll(JCasUtil.selectPreceding(Mention.class, new Annotation(jcas, span.begin, span.end), 5))
-				.collect(m -> m.getEntity()).toSortedSet(new Comparator<Entity>() {
+				.ofAll(JCasUtil.selectPreceding(MentionSurface.class, new Annotation(jcas, span.begin, span.end), 5))
+				.collect(m -> m.getMention().getEntity()).toSortedSet(new Comparator<Entity>() {
 					@Override
 					public int compare(Entity o1, Entity o2) {
 						return cModel.getLabel(o1).compareTo(cModel.getLabel(o2));

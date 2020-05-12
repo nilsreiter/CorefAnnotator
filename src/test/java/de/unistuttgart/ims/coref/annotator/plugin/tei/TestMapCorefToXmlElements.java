@@ -16,8 +16,8 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class TestMapCorefToXmlElements {

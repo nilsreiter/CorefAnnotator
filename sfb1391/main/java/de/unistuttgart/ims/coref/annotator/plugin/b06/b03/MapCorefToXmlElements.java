@@ -13,8 +13,9 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
@@ -44,7 +45,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			Entity e = m.getEntity();
 			String xid = toXmlId(e);
-			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
+			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, UimaUtil.getBegin(m), UimaUtil.getEnd(m),
 					XMLElement.class);
 			newElement.setTag(RS);
 			newElement.setAttributes(" ref=\"#" + xid + "\"");

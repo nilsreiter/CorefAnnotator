@@ -8,12 +8,15 @@ import java.util.Map;
 
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
 
 public class JSONWriter extends SingleFileWriter {
@@ -24,14 +27,15 @@ public class JSONWriter extends SingleFileWriter {
 	public void write(JCas jcas, Writer os) throws IOException {
 		JSONArray array = new JSONArray();
 
-		Map<Token, List<Mention>> indexed = JCasUtil.indexCovering(jcas, Token.class, Mention.class);
+		Map<Token, List<MentionSurface>> indexed = JCasUtil.indexCovering(jcas, Token.class, MentionSurface.class);
 
 		for (Token token : JCasUtil.select(jcas, Token.class)) {
 			JSONObject o = new JSONObject();
 			o.put("s", token.getCoveredText());
 			if (indexed.containsKey(token)) {
 				JSONArray entities = new JSONArray();
-				for (Mention mention : indexed.get(token)) {
+				ImmutableList<MentionSurface> mss = Lists.immutable.ofAll(indexed.get(token));
+				for (Mention mention : mss.collect(ms -> ms.getMention())) {
 					entities.put(getEntityId(mention));
 				}
 				o.put("e", entities);

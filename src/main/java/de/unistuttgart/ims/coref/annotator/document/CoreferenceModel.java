@@ -610,7 +610,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	public Mention getNextMention(int position) {
 		for (int i = position; i < getDocumentModel().getJcas().getDocumentText().length(); i++) {
-			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i)
+					.selectInstancesOf(MentionSurface.class).collect(ms -> ms.getMention());
 			if (!mentions.isEmpty())
 				return mentions.iterator().next();
 		}
@@ -619,7 +620,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	public Mention getPreviousMention(int position) {
 		for (int i = position - 1; i >= 0; i--) {
-			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i).selectInstancesOf(Mention.class);
+			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i)
+					.selectInstancesOf(MentionSurface.class).collect(ms -> ms.getMention());
 			if (!mentions.isEmpty())
 				return mentions.iterator().next();
 		}

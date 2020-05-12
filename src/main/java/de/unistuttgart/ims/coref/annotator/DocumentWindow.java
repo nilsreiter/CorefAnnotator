@@ -149,6 +149,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
@@ -1062,7 +1063,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				try {
 					a = info.getTransferable().getTransferData(dataFlavor);
 					@SuppressWarnings("unchecked")
-					ImmutableList<Annotation> aList = (ImmutableList<Annotation>) a;
+					ImmutableList<FeatureStructure> aList = (ImmutableList<FeatureStructure>) a;
 					if (aList.anySatisfy(anno -> anno instanceof Mention) && targetFS instanceof Entity)
 						getDocumentModel().edit(
 								new MoveMentionsToEntity((Entity) targetFS, aList.selectInstancesOf(Mention.class)));
@@ -1314,9 +1315,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			if (cModel.getKeyMap().containsKey(e.getKeyChar())) {
 				e.consume();
 				if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
-						&& getSelectedAnnotations(Mention.class).size() == 1) {
-					getDocumentModel().edit(new MoveMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()),
-							getSelectedAnnotations(Mention.class)));
+						&& getSelectedMentions().size() == 1) {
+					getDocumentModel().edit(
+							new MoveMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()), getSelectedMentions()));
 				} else {
 					getDocumentModel()
 							.edit(new AddMentionsToEntity(cModel.getKeyMap().get(e.getKeyChar()), getSelection()));
@@ -1356,9 +1357,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		public Transferable createTransferable(JComponent comp) {
 			JTextComponent t = (JTextComponent) comp;
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
-					&& getSelectedAnnotations(Mention.class).size() == 1) {
-				Mention mention = getSelectedAnnotations(Mention.class).getOnly();
-				return new AnnotationTransfer(mention, getDocumentModel().getTreeModel().get(mention));
+					&& getSelectedMentions().size() == 1) {
+				Mention mention = getSelectedMentions().getOnly();
+				return new MentionTransfer(getDocumentModel().getTreeModel().get(mention), mention);
 			} else
 				return new PotentialAnnotationTransfer(textPane, t.getSelectionStart(), t.getSelectionEnd());
 		}
@@ -1368,18 +1369,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 				JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-				Collection<Annotation> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
+				Collection<Mention> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
 				if (mentions.size() > 0)
 					return true;
-			} else if (info.isDataFlavorSupported(AnnotationTransfer.dataFlavor)) {
-				try {
-					@SuppressWarnings("unchecked")
-					ImmutableList<Annotation> annoList = (ImmutableList<Annotation>) info.getTransferable()
-							.getTransferData(AnnotationTransfer.dataFlavor);
-					return annoList.anySatisfy(a -> a instanceof Mention);
-				} catch (UnsupportedFlavorException | IOException e) {
-					return false;
-				}
+			} else if (info.isDataFlavorSupported(MentionTransfer.dataFlavor)) {
+				return true;
 			}
 			return false;
 		}
@@ -1390,11 +1384,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				return false;
 			}
 			JTextComponent.DropLocation dl = (javax.swing.text.JTextComponent.DropLocation) info.getDropLocation();
-			Collection<Annotation> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
-			for (Annotation a : mentions) {
+			Collection<Mention> mentions = getDocumentModel().getCoreferenceModel().getMentions(dl.getIndex());
+			for (Mention a : mentions) {
 				if (a instanceof Mention) {
 					try {
-						Mention m = (Mention) a;
+						Mention m = a;
 						Transferable pat = info.getTransferable();
 						if (info.isDataFlavorSupported(PotentialAnnotationTransfer.dataFlavor)) {
 							@SuppressWarnings("unchecked")
@@ -1489,7 +1483,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
 
 				// nothing is selected: show all mentions cursor is part of
-				MutableSet<? extends Annotation> annotations = Sets.mutable
+				MutableSet<Mention> annotations = Sets.mutable
 						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
 				mentions = annotations.selectInstancesOf(Mention.class);
 
@@ -1569,22 +1563,16 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				exportActions.add(new ExampleExport(DocumentWindow.this, ExampleExport.Format.PLAINTEXT));
 			}
 
-			MutableSet<Annotation> localAnnotations = Sets.mutable
+			MutableSet<Mention> mentions = Sets.mutable
 					.withAll(getDocumentModel().getCoreferenceModel().getMentions(offset));
 
 			if (selection)
 				for (int i = textPane.getSelectionStart(); i <= textPane.getSelectionEnd(); i++)
-					localAnnotations.addAll(getDocumentModel().getCoreferenceModel().getMentions(i));
+					mentions.addAll(getDocumentModel().getCoreferenceModel().getMentions(i));
 
-			MutableSet<Annotation> mentions = localAnnotations
-					.select(m -> m instanceof Mention || m instanceof DetachedMentionPart);
-
-			for (Annotation anno : mentions) {
+			for (Mention anno : mentions) {
 				if (anno instanceof Mention)
-					mentionActions.add(this.getMentionItem((Mention) anno, ((Mention) anno).getDiscontinuous()));
-				else if (anno instanceof DetachedMentionPart)
-					mentionActions
-							.add(getMentionItem(((DetachedMentionPart) anno).getMention(), (DetachedMentionPart) anno));
+					mentionActions.add(this.getMentionItem(anno, anno.getDiscontinuous()));
 			}
 
 			Set<Entity> candidates = Sets.mutable.empty();
@@ -1647,7 +1635,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
-			String surf = m.getCoveredText();
+			String surf = UimaUtil.getCoveredText(m);
 			surf = StringUtils.abbreviateMiddle(surf, "...", 20);
 
 			if (dmp != null)
@@ -1692,8 +1680,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				annotationSelected(tsu.getAnnotation(0));
 			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();
-				getDocumentModel().getCoreferenceModel().getMentions(tsu.getEntity(0))
-						.forEach(m -> highlightManager.highlight(m, new Color(255, 255, 150)));
+				getDocumentModel().getCoreferenceModel().getMentions(tsu.getEntity(0)).forEach(m -> {
+					for (MentionSurface ms : m.getSurface())
+						highlightManager.highlight(ms, new Color(255, 255, 150));
+				});
 			} else
 				annotationSelected(null);
 		}

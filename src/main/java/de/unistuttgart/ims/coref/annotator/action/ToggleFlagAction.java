@@ -17,10 +17,11 @@ import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 import de.unistuttgart.ims.coref.annotator.Util;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> implements TreeSelectionListener {
 
@@ -44,7 +45,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 				.collect(tp -> ((CATreeNode) tp.getLastPathComponent()).getFeatureStructure());
 		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_STICKY_FLAGS, Defaults.CFG_STICKY_FLAGS)) {
 			targets.addAll(targets.selectInstancesOf(Mention.class).flatCollect(m -> getTarget().getDocumentModel()
-					.getCoreferenceModel().getMatchingMentions(m.getBegin(), m.getEnd())));
+					.getCoreferenceModel().getMatchingMentions(UimaUtil.getBegin(m), UimaUtil.getEnd(m))));
 		}
 		getTarget().getDocumentModel().edit(new ToggleGenericFlag(flag.getKey(), targets));
 	}

@@ -47,6 +47,10 @@ public class Span {
 		return (other.begin >= begin && other.end <= end);
 	}
 
+	public boolean contains(Spans other) {
+		return (other.getBegin() >= begin && other.getEnd() <= end);
+	}
+
 	public static ImmutableList<Span> getSpans(Mention m) {
 		return Lists.immutable.withAll(m.getSurface()).collect(ms -> new Span(ms));
 	}

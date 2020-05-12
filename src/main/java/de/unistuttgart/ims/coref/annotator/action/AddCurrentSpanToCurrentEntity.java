@@ -11,7 +11,6 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 
@@ -31,9 +30,9 @@ public class AddCurrentSpanToCurrentEntity extends TargetedIkonAction<DocumentWi
 				if (((CATreeNode) tp.getLastPathComponent()).isEntity()) {
 					CATreeNode etn = (CATreeNode) tp.getLastPathComponent();
 					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
-							&& getTarget().getSelectedAnnotations(Mention.class).size() == 1) {
-						getTarget().getDocumentModel().edit(new MoveMentionsToEntity(etn.getEntity(),
-								getTarget().getSelectedAnnotations(Mention.class)));
+							&& getTarget().getSelectedMentions().size() == 1) {
+						getTarget().getDocumentModel()
+								.edit(new MoveMentionsToEntity(etn.getEntity(), getTarget().getSelectedMentions()));
 					} else
 						getTarget().getDocumentModel().edit(new AddMentionsToEntity(etn.getEntity(), new Span(b, e)));
 				}

@@ -95,6 +95,14 @@ public class Spans implements ImmutableList<Span> {
 		spans = Lists.immutable.withAll(m.getSurface()).collect(ms -> new Span(ms));
 	}
 
+	public int getBegin() {
+		return spans.collect(s -> s.begin).min();
+	}
+
+	public int getEnd() {
+		return spans.collect(s -> s.end).max();
+	}
+
 	@Override
 	public void forEach(Procedure<? super Span> procedure) {
 		spans.forEach(procedure);

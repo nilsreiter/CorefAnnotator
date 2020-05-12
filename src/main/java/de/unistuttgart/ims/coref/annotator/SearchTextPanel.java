@@ -99,9 +99,11 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)) {
-				return new AnnotationTransfer(Lists.immutable.ofAll(list.getSelectedValuesList())
-						.collect(sr -> sr.getSpan()).flatCollect(span -> searchContainer.getDocumentWindow()
-								.getDocumentModel().getCoreferenceModel().getMentionsBetween(span.begin, span.end)));
+				return new MentionTransfer(
+						Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan())
+								.flatCollect(span -> searchContainer.getDocumentWindow().getDocumentModel()
+										.getCoreferenceModel().getMentionsBetween(span.begin, span.end))
+								.selectInstancesOf(Mention.class));
 
 			} else
 				return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),

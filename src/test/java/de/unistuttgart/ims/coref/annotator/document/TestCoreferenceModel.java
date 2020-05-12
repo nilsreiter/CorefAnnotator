@@ -41,6 +41,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsIn
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class TestCoreferenceModel {
 
@@ -115,7 +116,7 @@ public class TestCoreferenceModel {
 		assertFalse(cmodel.getMentions(2).isEmpty());
 		assertTrue(cmodel.getMentions(3).isEmpty());
 
-		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
+		Mention m = UimaUtil.selectMentionByIndex(jcas, 0);
 		assertEquals(e, m.getEntity());
 
 		assertEquals(2, listener.events.size());
@@ -531,8 +532,8 @@ public class TestCoreferenceModel {
 		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
 
 		model.edit(new AddMentionsToEntity(e, new Span(4, 6)));
-		Mention m1 = JCasUtil.selectByIndex(jcas, Mention.class, 0);
-		Mention m2 = JCasUtil.selectByIndex(jcas, Mention.class, 1);
+		Mention m1 = UimaUtil.selectMentionByIndex(jcas, 0);
+		Mention m2 = UimaUtil.selectMentionByIndex(jcas, 1);
 		ImmutableSet<Mention> em = model.getCoreferenceModel().get(e);
 		assertEquals(2, em.size());
 		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());

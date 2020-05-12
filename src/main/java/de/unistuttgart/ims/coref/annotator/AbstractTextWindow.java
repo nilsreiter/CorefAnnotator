@@ -267,10 +267,10 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
-		MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
+		MutableSet<Mention> annotations = getDocumentModel().getCoreferenceModel()
 				.getMentions(getTextPane().getSelectionStart())
-				.select(a -> a.getBegin() == getTextPane().getSelectionStart()
-						&& a.getEnd() == getTextPane().getSelectionEnd());
+				.select(a -> UimaUtil.getBegin(a) == getTextPane().getSelectionStart()
+						&& UimaUtil.getEnd(a) == getTextPane().getSelectionEnd());
 		return annotations.selectInstancesOf(clazz);
 	}
 

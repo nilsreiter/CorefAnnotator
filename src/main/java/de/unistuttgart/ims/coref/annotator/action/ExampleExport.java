@@ -16,11 +16,12 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericInlineWriter;
 import de.unistuttgart.ims.uima.io.xml.InlineTagFactory;
 
+// TODO: Update for typesystem v2
 public class ExampleExport extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;

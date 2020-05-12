@@ -15,8 +15,10 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -41,11 +43,12 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		MutableMap<String, XMLElement> idMap = Maps.mutable.empty();
 
 		// contains all covering XMLElement annotations for each mention
-		Map<Mention, List<XMLElement>> coveringXMLElement = JCasUtil.indexCovering(jcas, Mention.class,
+		Map<MentionSurface, List<XMLElement>> coveringXMLElement = JCasUtil.indexCovering(jcas, MentionSurface.class,
 				XMLElement.class);
 
 		// contains covering Speaker annotations for each mention
-		Map<Mention, List<Speaker>> coveringSpeaker = JCasUtil.indexCovering(jcas, Mention.class, Speaker.class);
+		Map<MentionSurface, List<Speaker>> coveringSpeaker = JCasUtil.indexCovering(jcas, MentionSurface.class,
+				Speaker.class);
 
 		// the <text>-element
 		XMLElement textElement = null;
@@ -85,7 +88,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			String xid = toXmlId(e);
 
 			// create new element annotation
-			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
+			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, UimaUtil.getBegin(m), UimaUtil.getEnd(m),
 					XMLElement.class);
 			newElement.setTag("rs");
 			newElement.setAttributes(" ref=\"#" + xid + "\"");

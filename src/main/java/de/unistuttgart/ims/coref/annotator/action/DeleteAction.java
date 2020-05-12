@@ -13,7 +13,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
@@ -68,7 +67,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 			if (e.getSource() == getTarget().getTextPane()) {
 				int low = getTarget().getTextPane().getSelectionStart();
 				int high = getTarget().getTextPane().getSelectionEnd();
-				MutableSet<? extends Annotation> annotations = Sets.mutable
+				MutableSet<Mention> annotations = Sets.mutable
 						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
 				MutableSet<Mention> mentions = annotations.selectInstancesOf(Mention.class)
 						.select(a -> UimaUtil.getBegin(a) == low && UimaUtil.getEnd(a) == high);

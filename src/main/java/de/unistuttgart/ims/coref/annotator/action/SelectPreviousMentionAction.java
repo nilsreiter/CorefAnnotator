@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class SelectPreviousMentionAction extends TargetedIkonAction<DocumentWindow> {
 
@@ -21,7 +21,7 @@ public class SelectPreviousMentionAction extends TargetedIkonAction<DocumentWind
 		Mention nextMention = getTarget().getDocumentModel().getCoreferenceModel().getPreviousMention(low);
 
 		if (nextMention != null)
-			getTarget().annotationSelected(nextMention);
+			getTarget().annotationSelected(nextMention.getSurface(0));
 
 	}
 

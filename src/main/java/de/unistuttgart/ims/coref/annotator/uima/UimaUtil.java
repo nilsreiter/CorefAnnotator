@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
@@ -116,6 +117,16 @@ public class UimaUtil {
 
 	public static MentionSurface getLast(Mention m) {
 		return m.getSurface(m.getSurface().size() - 1);
+	}
+
+	public static Mention selectMentionByIndex(JCas jcas, int index) {
+		Iterator<Mention> iterator = jcas.getIndexedFSs(Mention.class).iterator();
+		while (iterator.hasNext() && index-- >= 0) {
+			Mention m = iterator.next();
+			if (index == 0)
+				return m;
+		}
+		return null;
 	}
 
 }
