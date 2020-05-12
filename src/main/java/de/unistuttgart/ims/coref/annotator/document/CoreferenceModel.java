@@ -693,6 +693,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
 			try {
+				// TODO: Why do we do that?
 				mention.getEntity().addToIndexes();
 			} catch (CASRuntimeException e) {
 				Annotator.logger.catching(e);

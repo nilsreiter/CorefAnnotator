@@ -99,6 +99,7 @@ public class UimaUtil {
 		sf.setMention(mention);
 		mention.setSurface(new FSArray<MentionSurface>(jcas, 1));
 		mention.setSurface(0, sf);
+		mention.addToIndexes();
 		return mention;
 	}
 
