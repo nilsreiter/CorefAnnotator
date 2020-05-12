@@ -119,6 +119,7 @@ public class Spans implements ImmutableList<Span> {
 	}
 
 	@Override
+	@Deprecated
 	public void forEachWithIndex(ObjectIntProcedure<? super Span> objectIntProcedure) {
 		spans.forEachWithIndex(objectIntProcedure);
 	}
@@ -1055,11 +1056,13 @@ public class Spans implements ImmutableList<Span> {
 	}
 
 	@Override
+	@Deprecated
 	public <S, R extends Collection<Pair<Span, S>>> R zip(Iterable<S> that, R target) {
 		return spans.zip(that, target);
 	}
 
 	@Override
+	@Deprecated
 	public <R extends Collection<Pair<Span, Integer>>> R zipWithIndex(R target) {
 		return spans.zipWithIndex(target);
 	}
