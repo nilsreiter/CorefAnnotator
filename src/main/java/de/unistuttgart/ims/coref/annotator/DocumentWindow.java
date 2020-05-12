@@ -765,7 +765,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event)
 			if (fs instanceof Mention) {
-				highlightManager.unUnderline((Annotation) fs);
+				highlightManager.unUnderline((Mention) fs);
 				highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
 			}
 	}
