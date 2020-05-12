@@ -20,7 +20,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 class HighlightManager {
-	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
+	Map<Object, Object> underlineMap = new HashMap<Object, Object>();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
@@ -147,15 +147,6 @@ class HighlightManager {
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
-	public void underline(Mention m, boolean repaint) {
-		hilit.setDrawsLayeredHighlights(true);
-		for (MentionSurface ms : m.getSurface())
-			underline(ms, new Color(m.getEntity().getColor()), false, false);
-		if (m.getDiscontinuous() != null)
-			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
-		hilit.setDrawsLayeredHighlights(false);
-	}
-
 	public void unUnderline(Annotation a) {
 		Object hi = underlineMap.get(a);
 		Span span = new Span(a);
@@ -164,6 +155,11 @@ class HighlightManager {
 		if (hi != null)
 			hilit.removeHighlight(hi);
 
+	}
+
+	public void unUnderline(Mention a) {
+		for (MentionSurface ms : a.getSurface())
+			unUnderline(ms);
 	}
 
 	public void unHighlight() {

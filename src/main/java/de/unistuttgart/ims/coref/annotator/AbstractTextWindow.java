@@ -205,7 +205,9 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		Iterator<FeatureStructure> iter = event.iterator(1);
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+			if (fs instanceof Mention) {
+				highlightManager.underline((Mention) fs);
+			} else if (fs instanceof DetachedMentionPart) {
 				highlightManager.underline((Annotation) fs);
 			} else if (fs instanceof CommentAnchor) {
 				highlightManager.highlight((Annotation) fs);
@@ -220,7 +222,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (((Mention) fs).getDiscontinuous() != null)
 					highlightManager.unUnderline(((Mention) fs).getDiscontinuous());
-				highlightManager.unUnderline((Annotation) fs);
+				highlightManager.unUnderline((Mention) fs);
 			} else if (fs instanceof Annotation)
 				highlightManager.unUnderline((Annotation) fs);
 

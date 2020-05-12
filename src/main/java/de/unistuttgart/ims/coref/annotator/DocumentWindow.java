@@ -1676,7 +1676,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			actions.entityStatisticsAction.setEnabled(tsu.isEntity());
 
-			if (tsu.isSingle() && (tsu.isMention() || tsu.isDetachedMentionPart()))
+			if (tsu.isSingle() && tsu.isMention())
+				annotationSelected(tsu.getMention(0).getSurface(0));
+			else if (tsu.isSingle() && tsu.isDetachedMentionPart())
 				annotationSelected(tsu.getAnnotation(0));
 			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();

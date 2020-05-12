@@ -28,6 +28,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
@@ -68,6 +69,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			node = new CATreeNode(fs, ((Entity) fs).getLabel());
 		} else if (fs instanceof Annotation) {
 			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		} else if (fs instanceof Mention) {
+			node = new CATreeNode(fs, UimaUtil.getCoveredText((Mention) fs));
 		}
 		if (node != null)
 			fsMap.put(fs, node);
