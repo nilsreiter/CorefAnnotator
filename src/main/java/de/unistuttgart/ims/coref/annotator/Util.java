@@ -21,8 +21,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.Meta;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class Util {
 	private static String[] languageNames = null;
@@ -93,12 +93,12 @@ public class Util {
 		return nArr;
 	}
 
-	public static FSArray removeFrom(JCas jcas, FSArray arr, FeatureStructure fs) {
+	public static <T extends FeatureStructure> FSArray<T> removeFrom(JCas jcas, FSArray<T> arr, T fs) {
 		int i = 0, j = 0;
-		FSArray nArr = null;
+		FSArray<T> nArr = null;
 		arr.removeFromIndexes();
 		int oldSize = arr == null ? 0 : arr.size();
-		nArr = new FSArray(jcas, oldSize - 1);
+		nArr = new FSArray<T>(jcas, oldSize - 1);
 		for (; i < oldSize; i++, j++) {
 			if (!arr.get(i).equals(fs))
 				nArr.set(j, arr.get(i));
@@ -129,16 +129,16 @@ public class Util {
 
 	}
 
-	public static FSArray addTo(JCas jcas, FSArray arr, FeatureStructure fs) {
+	public static <T extends FeatureStructure> FSArray<T> addTo(JCas jcas, FSArray<T> arr, T fs) {
 		int i = 0;
-		FSArray nArr;
+		FSArray<T> nArr;
 		if (arr != null) {
-			nArr = new FSArray(jcas, arr.size() + 1);
+			nArr = new FSArray<T>(jcas, arr.size() + 1);
 			for (; i < arr.size(); i++) {
 				nArr.set(i, arr.get(i));
 			}
 		} else {
-			nArr = new FSArray(jcas, 1);
+			nArr = new FSArray<T>(jcas, 1);
 		}
 		nArr.set(i, fs);
 		arr.removeFromIndexes();
@@ -251,10 +251,9 @@ public class Util {
 		return JCasUtil.select(jcas, cl).size();
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T extends FeatureStructure> MutableList<T> toList(FSArray arr) {
+	public static <T extends FeatureStructure> MutableList<T> toList(FSArray<T> arr) {
 		MutableList<T> list = Lists.mutable.empty();
-		arr.forEach(fs -> list.add((T) fs));
+		arr.forEach(fs -> list.add(fs));
 		return list;
 	}
 

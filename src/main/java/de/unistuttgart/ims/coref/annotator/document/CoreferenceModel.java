@@ -191,7 +191,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		e.setLabel(l);
 		e.setFlags(new StringArray(documentModel.getJcas(), 0));
 		e.addToIndexes();
-		e.setMembers(new FSArray(documentModel.getJcas(), initialSize));
+		e.setMembers(new FSArray<Entity>(documentModel.getJcas(), initialSize));
 		return e;
 	}
 
@@ -290,7 +290,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 			op.setEntities(newMembers.toImmutable());
 
-			FSArray arr = new FSArray(documentModel.getJcas(),
+			FSArray<Entity> arr = new FSArray<Entity>(documentModel.getJcas(),
 					op.getEntityGroup().getMembers().size() + newMembers.size());
 			int i = 0;
 			for (; i < op.getEntityGroup().getMembers().size(); i++) {
@@ -841,8 +841,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @param entity
 	 */
 	private void removeFrom(EntityGroup eg, Entity entity) {
-		FSArray oldArray = eg.getMembers();
-		FSArray arr = new FSArray(documentModel.getJcas(), oldArray.size() - 1);
+		FSArray<Entity> oldArray = eg.getMembers();
+		FSArray<Entity> arr = new FSArray<Entity>(documentModel.getJcas(), oldArray.size() - 1);
 
 		for (int i = 0, j = 0; i < oldArray.size() - 1 && j < arr.size() - 1; i++, j++) {
 
@@ -946,8 +946,9 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getFeatureStructures()));
 		} else if (operation instanceof RemoveEntitiesFromEntityGroup) {
 			RemoveEntitiesFromEntityGroup op = (RemoveEntitiesFromEntityGroup) operation;
-			FSArray oldArr = op.getEntityGroup().getMembers();
-			FSArray newArr = new FSArray(documentModel.getJcas(), oldArr.size() + op.getEntities().size());
+			FSArray<Entity> oldArr = op.getEntityGroup().getMembers();
+			FSArray<Entity> newArr = new FSArray<Entity>(documentModel.getJcas(),
+					oldArr.size() + op.getEntities().size());
 			int i = 0;
 			for (; i < oldArr.size(); i++) {
 				newArr.set(i, oldArr.get(i));

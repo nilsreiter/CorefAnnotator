@@ -64,7 +64,7 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 			// handle entity groups
 			for (EntityGroup oldEntity : JCasUtil.select(jcas2, EntityGroup.class)) {
 				EntityGroup newEntity = (EntityGroup) entityMap.get(oldEntity);
-				FSArray arr = new FSArray(jcas, oldEntity.getMembers().size());
+				FSArray<Entity> arr = new FSArray<Entity>(jcas, oldEntity.getMembers().size());
 				arr.addToIndexes();
 				newEntity.setMembers(arr);
 				for (int i = 0; i < oldEntity.getMembers().size(); i++) {
