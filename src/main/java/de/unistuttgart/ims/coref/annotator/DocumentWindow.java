@@ -1223,7 +1223,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					b.append('(').append(ln).append(')').append(' ');
 				}
 			}
-			b.append(m.getCoveredText());
+			b.append(UimaUtil.getCoveredText(m));
 
 			lab1.setText(b.toString());
 			if (m.getFlags() != null)

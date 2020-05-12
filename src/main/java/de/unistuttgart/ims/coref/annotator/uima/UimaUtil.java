@@ -109,4 +109,13 @@ public class UimaUtil {
 			returnValue = Integer.compare(m1.hashCode(), m2.hashCode());
 		return returnValue;
 	}
+
+	public static MentionSurface getFirst(Mention m) {
+		return m.getSurface(0);
+	}
+
+	public static MentionSurface getLast(Mention m) {
+		return m.getSurface(m.getSurface().size() - 1);
+	}
+
 }

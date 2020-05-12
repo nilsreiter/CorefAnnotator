@@ -25,10 +25,10 @@ import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -76,7 +76,7 @@ public class TestCoreferenceModel {
 		assertTrue(cmodel.getMentions(2).isEmpty());
 		assertTrue(cmodel.getMentions(3).isEmpty());
 
-		Mention m = JCasUtil.selectByIndex(jcas, Mention.class, 0);
+		Mention m = jcas.getIndexedFSs(Mention.class).iterator().next();
 		assertNotNull(m.getEntity());
 		assertNotNull(m.getEntity().getLabel());
 		assertNotNull(m.getEntity().getColor());
@@ -303,7 +303,7 @@ public class TestCoreferenceModel {
 		model.edit(new AddMentionsToNewEntity(new Span(4, 5), new Span(6, 7)));
 		MutableList<Entity> entities = Lists.mutable.withAll(JCasUtil.select(jcas, Entity.class));
 
-		Mention m = ((Mention) cmodel.getMentions(0).iterator().next());
+		Mention m = (cmodel.getMentions(0).iterator().next());
 		assertNotEquals(entities.get(1), m.getEntity());
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));

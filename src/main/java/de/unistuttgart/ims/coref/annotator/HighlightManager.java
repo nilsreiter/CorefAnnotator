@@ -14,8 +14,9 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 class HighlightManager {
@@ -40,7 +41,8 @@ class HighlightManager {
 		underlineMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			highlight(m, new Color(m.getEntity().getColor()), false, false, null);
+			for (MentionSurface ms : m.getSurface())
+				highlight(ms, new Color(m.getEntity().getColor()), false, false, null);
 			if (m.getDiscontinuous() != null)
 				highlight(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
 
@@ -102,9 +104,7 @@ class HighlightManager {
 	}
 
 	public void underline(Annotation a) {
-		if (a instanceof Mention)
-			underline((Mention) a);
-		else if (a instanceof DetachedMentionPart)
+		if (a instanceof DetachedMentionPart)
 			underline((DetachedMentionPart) a);
 	}
 
@@ -125,25 +125,23 @@ class HighlightManager {
 				dotted = false;
 			}
 		}
-		underline(m, color, dotted, true);
+		for (MentionSurface ms : m.getSurface())
+			underline(ms, color, dotted, true);
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Annotation m, Color color) {
-		if (m instanceof Mention)
-			underline((Mention) m, color);
-		else {
-			hilit.setDrawsLayeredHighlights(true);
-			underline(m, color, false, true);
-			hilit.setDrawsLayeredHighlights(false);
-		}
+		hilit.setDrawsLayeredHighlights(true);
+		underline(m, color, false, true);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, Color color) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, color, false, true);
+		for (MentionSurface ms : m.getSurface())
+			underline(ms, color, false, false);
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), color, true, true);
 		hilit.setDrawsLayeredHighlights(false);
@@ -151,7 +149,8 @@ class HighlightManager {
 
 	public void underline(Mention m, boolean repaint) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, new Color(m.getEntity().getColor()), false, false);
+		for (MentionSurface ms : m.getSurface())
+			underline(ms, new Color(m.getEntity().getColor()), false, false);
 		if (m.getDiscontinuous() != null)
 			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
 		hilit.setDrawsLayeredHighlights(false);

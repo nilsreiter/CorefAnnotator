@@ -632,8 +632,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @param position The character position
 	 * @return A collection of annotations
 	 */
-	public MutableSet<Annotation> getMentions(int position) {
+	public MutableSet<Annotation> getMentionSurfaces(int position) {
 		return this.characterPosition2AnnotationMap.get(position);
+	}
+
+	public MutableSet<Mention> getMentions(int position) {
+		return this.characterPosition2AnnotationMap.get(position).selectInstancesOf(MentionSurface.class)
+				.collect(ms -> ms.getMention());
 	}
 
 	public ImmutableSet<Mention> getMentionsBetween(int start, int end) {

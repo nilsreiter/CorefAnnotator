@@ -62,10 +62,10 @@ import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.EntityLabel;
@@ -77,6 +77,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.StylePlugin;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 
 public class CompareMentionsWindow extends AbstractTextWindow
@@ -121,8 +122,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			length = jcas.getDocumentText().length();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 				mentions++;
-				if (m.getEnd() > lastMention)
-					lastMention = m.getEnd();
+				if (UimaUtil.getEnd(m) > lastMention)
+					lastMention = UimaUtil.getEnd(m);
 				cons.accept(m);
 			}
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
@@ -149,7 +150,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				int offset = textPane.viewToModel2D(e.getPoint());
 
 				ImmutableSet<Mention> intersectMentions = ism.getIntersection(documentModels.getFirst());
-				intersectMentions = intersectMentions.select(m -> m.getBegin() <= offset && offset <= m.getEnd());
+				intersectMentions = intersectMentions
+						.select(m -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m));
 
 				if (!intersectMentions.isEmpty()) {
 					pMenu.add(Annotator.getString(Strings.COMPARE_CONTEXTMENU_INTERSECTION));
@@ -163,7 +165,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 					RichIterable<Mention> mentions = ism.spanMentionMap.get(dm)
 							.reject((s, m) -> ism.getSpanIntersection().contains(s))
-							.select((s, m) -> m.getBegin() <= offset && offset <= m.getEnd()).valuesView();
+							.select((s, m) -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m))
+							.valuesView();
 					if (!mentions.isEmpty()) {
 						if (!intersectMentions.isEmpty())
 							pMenu.addSeparator();

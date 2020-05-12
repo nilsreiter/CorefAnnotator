@@ -341,7 +341,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 				if (restrictToMentions.isSelected()) {
 					for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()
 							.getMentions()) {
-						Matcher matcher = p.matcher(m.getCoveredText());
+						Matcher matcher = p.matcher(UimaUtil.getCoveredText(m));
 						if (matcher.find()) {
 							try {
 								listModel.addElement(
