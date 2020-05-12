@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
@@ -58,6 +59,7 @@ import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.CommentAnchor;
 import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
@@ -205,7 +207,10 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		Iterator<FeatureStructure> iter = event.iterator(1);
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention) {
+			if (fs instanceof MentionSurface) {
+				highlightManager.underline((Annotation) fs,
+						new Color(((Mention) event.getArgument(0)).getEntity().getColor()));
+			} else if (fs instanceof Mention) {
 				highlightManager.underline((Mention) fs);
 			} else if (fs instanceof DetachedMentionPart) {
 				highlightManager.underline((Annotation) fs);

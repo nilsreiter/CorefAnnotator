@@ -50,6 +50,7 @@ import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.document.op.AddSpanToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.DuplicateMentions;
@@ -154,6 +155,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @param end
 	 * @return
 	 */
+	@Deprecated
 	private DetachedMentionPart addTo(Mention m, int begin, int end) {
 		// document model
 		DetachedMentionPart d = createDetachedMentionPart(begin, end);
@@ -163,10 +165,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return d;
 	}
 
+	@Deprecated
 	private DetachedMentionPart addTo(Mention m, Span sp) {
 		return addTo(m, sp.begin, sp.end);
 	}
 
+	@Deprecated
 	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
 		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(documentModel.getJcas(), b, e,
 				DetachedMentionPart.class);
@@ -388,9 +392,23 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			edit((RenameAllEntities) operation);
 		} else if (operation instanceof DuplicateMentions) {
 			edit((DuplicateMentions) operation);
+		} else if (operation instanceof AddSpanToMention) {
+			edit((AddSpanToMention) operation);
 		} else {
 			throw new UnsupportedOperationException();
 		}
+	}
+
+	protected void edit(AddSpanToMention op) {
+		MentionSurface ms = AnnotationFactory.createAnnotation(getJCas(), op.getSpan().begin, op.getSpan().end,
+				MentionSurface.class);
+		op.setMentionSurface(ms);
+		ms.setMention(op.getTarget());
+
+		UimaUtil.addMentionSurface(op.getTarget(), ms);
+
+		fireEvent(Event.get(this, Event.Type.Add, op.getTarget(), ms));
+		registerEdit(op);
 	}
 
 	protected void edit(DuplicateMentions op) {

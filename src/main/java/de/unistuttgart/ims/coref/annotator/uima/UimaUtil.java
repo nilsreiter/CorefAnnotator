@@ -16,9 +16,11 @@ import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -82,7 +84,7 @@ public class UimaUtil {
 	}
 
 	public static String getCoveredText(Mention mention) {
-		return mention.getSurface(0).getCoveredText();
+		return StringUtils.join(JCasUtil.toText(mention.getSurface()), " | ");
 	}
 
 	public static int getBegin(Mention mention) {
@@ -112,6 +114,15 @@ public class UimaUtil {
 		return returnValue;
 	}
 
+	public static int compare(Annotation m1, Annotation m2) {
+		int returnValue = Integer.compare(m1.getBegin(), m2.getBegin());
+		if (returnValue == 0)
+			returnValue = Integer.compare(m2.getEnd(), m1.getEnd());
+		if (returnValue == 0)
+			returnValue = Integer.compare(m1.hashCode(), m2.hashCode());
+		return returnValue;
+	}
+
 	public static MentionSurface getFirst(Mention m) {
 		return m.getSurface(0);
 	}
@@ -128,6 +139,42 @@ public class UimaUtil {
 				return m;
 		}
 		return null;
+	}
+
+	public static void addMentionSurface(Mention mention, MentionSurface ms) {
+		FSArray<MentionSurface> oldArray = mention.getSurface();
+		FSArray<MentionSurface> newArray = new FSArray<MentionSurface>(mention.getJCas(), oldArray.size() + 1);
+
+		Iterator<MentionSurface> oldArrayIterator = oldArray.iterator();
+		int i = 0;
+		while (oldArrayIterator.hasNext()) {
+			MentionSurface surf = oldArrayIterator.next();
+
+			if (UimaUtil.compare(surf, ms) > 0)
+				newArray.set(i++, ms);
+			newArray.set(i++, surf);
+		}
+		if (i < newArray.size())
+			newArray.set(i++, ms);
+		mention.setSurface(newArray);
+
+	}
+
+	public static void removeMentionSurface(Mention mention, MentionSurface ms) {
+		FSArray<MentionSurface> oldArray = mention.getSurface();
+		FSArray<MentionSurface> newArray = new FSArray<MentionSurface>(mention.getJCas(), oldArray.size() - 1);
+
+		Iterator<MentionSurface> oldArrayIterator = oldArray.iterator();
+		int i = 0;
+		while (oldArrayIterator.hasNext()) {
+			MentionSurface surf = oldArrayIterator.next();
+
+			if (surf == ms)
+				continue;
+			newArray.set(i++, surf);
+		}
+		mention.setSurface(newArray);
+
 	}
 
 }

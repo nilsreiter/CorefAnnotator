@@ -170,7 +170,7 @@ import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
-import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
+import de.unistuttgart.ims.coref.annotator.document.op.AddSpanToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
@@ -1040,7 +1040,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					} else if (targetFS instanceof Entity) {
 						operation = new AddMentionsToEntity((Entity) targetFS, paList);
 					} else if (targetFS instanceof Mention) {
-						operation = new AttachPart((Mention) targetFS, paList.getFirst());
+						operation = new AddSpanToMention((Mention) targetFS, paList.getFirst());
+						// operation = new AttachPart((Mention) targetFS, paList.getFirst());
 					}
 					if (operation != null) {
 						getDocumentModel().edit(operation);

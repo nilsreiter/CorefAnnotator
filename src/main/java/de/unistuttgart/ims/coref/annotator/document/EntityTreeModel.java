@@ -26,6 +26,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
@@ -85,7 +86,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		case Add:
 			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
-				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
+				if (fs instanceof MentionSurface) {
+					nodeChanged(arg0);
+				} else if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
 					if (fs instanceof EntityGroup) {
