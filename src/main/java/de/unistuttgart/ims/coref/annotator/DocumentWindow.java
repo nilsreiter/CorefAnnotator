@@ -1653,6 +1653,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			mentionMenu.add('"' + surf + '"');
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteAction(DocumentWindow.this, m));
+			if (m.getSurface().size() > 0)
+				for (MentionSurface ms : m.getSurface()) {
+					JMenu mentionSurfaceMenu = new JMenu(StringUtils.abbreviateMiddle(ms.getCoveredText(), "...", 20));
+					mentionSurfaceMenu.add(new DeleteAction(DocumentWindow.this, ms));
+					mentionMenu.add(mentionSurfaceMenu);
+				}
 
 			return mentionMenu;
 		}

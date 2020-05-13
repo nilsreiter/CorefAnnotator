@@ -156,8 +156,8 @@ public class UimaUtil {
 		}
 		if (i < newArray.size())
 			newArray.set(i++, ms);
+		oldArray.removeFromIndexes();
 		mention.setSurface(newArray);
-
 	}
 
 	public static void removeMentionSurface(Mention mention, MentionSurface ms) {
@@ -173,6 +173,7 @@ public class UimaUtil {
 				continue;
 			newArray.set(i++, surf);
 		}
+		oldArray.removeFromIndexes();
 		mention.setSurface(newArray);
 
 	}

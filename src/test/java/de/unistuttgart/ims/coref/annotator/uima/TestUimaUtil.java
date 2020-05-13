@@ -54,6 +54,25 @@ public class TestUimaUtil {
 	}
 
 	@Test
+	public void testAddRemoveMentionSurface() {
+		Mention m = new Mention(jcas);
+		m.addToIndexes();
+		m.setSurface(new FSArray<MentionSurface>(jcas, 0));
+
+		MentionSurface[] ms = new MentionSurface[] {
+				AnnotationFactory.createAnnotation(jcas, 0, 2, MentionSurface.class),
+				AnnotationFactory.createAnnotation(jcas, 5, 6, MentionSurface.class),
+				AnnotationFactory.createAnnotation(jcas, 10, 12, MentionSurface.class) };
+
+		UimaUtil.addMentionSurface(m, ms[0]);
+		assertNotNull(m.getSurface());
+		assertEquals(1, m.getSurface().size());
+		UimaUtil.removeMentionSurface(m, ms[0]);
+		assertNotNull(m.getSurface());
+		assertEquals(0, m.getSurface().size());
+	}
+
+	@Test
 	public void testAddMentionSurface() {
 		Mention m = new Mention(jcas);
 		m.addToIndexes();

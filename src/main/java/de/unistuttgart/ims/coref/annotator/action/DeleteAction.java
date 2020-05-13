@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -29,10 +28,12 @@ import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveMentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
@@ -54,8 +55,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	public DeleteAction(DocumentWindow documentWindow, FeatureStructure featureStructure) {
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		this.featureStructure = featureStructure;
 	}
 
@@ -97,6 +96,8 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 					operations.add(new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs));
 				}
 			}
+		} else if (featureStructure instanceof MentionSurface) {
+			operations.add(new RemoveMentionSurface((MentionSurface) featureStructure));
 		} else if (featureStructure instanceof Mention) {
 			operations.add(new RemoveMention((Mention) featureStructure));
 		} else if (featureStructure instanceof Entity) {

@@ -64,6 +64,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsIn
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveMentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities;
@@ -378,6 +379,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			}
 			fireEvent(Event.get(this, Event.Type.Add, null, eg));
 			op.setEntityGroup(eg);
+		} else if (operation instanceof RemoveMentionSurface) {
+			edit((RemoveMentionSurface) operation);
 		} else if (operation instanceof RemoveMention) {
 			edit((RemoveMention) operation);
 		} else if (operation instanceof RemoveSingletons) {
@@ -406,6 +409,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		ms.setMention(op.getTarget());
 
 		UimaUtil.addMentionSurface(op.getTarget(), ms);
+		characterPosition2AnnotationMap.add(ms);
 
 		fireEvent(Event.get(this, Event.Type.Add, op.getTarget(), ms));
 		registerEdit(op);
@@ -488,6 +492,23 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
+		registerEdit(op);
+	}
+
+	protected void edit(RemoveMentionSurface op) {
+		MutableList<Mention> mentions = Lists.mutable.empty();
+		MutableList<Span> spans = Lists.mutable.empty();
+		op.getMentionSurface().forEach(ms -> {
+			Mention m = ms.getMention();
+			UimaUtil.removeMentionSurface(m, ms);
+			fireEvent(Event.get(this, Type.Remove, m, ms));
+			mentions.add(m);
+			spans.add(new Span(ms));
+			ms.removeFromIndexes();
+			characterPosition2AnnotationMap.remove(ms);
+		});
+		op.setMention(mentions.toImmutable());
+		op.setSpans(spans.toImmutable());
 		registerEdit(op);
 	}
 
@@ -875,6 +896,14 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		fireEvent(Event.get(this, Event.Type.Remove, eg, entity));
 	}
 
+	protected void undo(AddSpanToMention op) {
+		MentionSurface ms = op.getMentionSurface();
+		UimaUtil.removeMentionSurface(ms.getMention(), ms);
+		fireEvent(Event.get(this, Event.Type.Remove, ms.getMention(), ms));
+		ms.removeFromIndexes();
+		characterPosition2AnnotationMap.remove(ms);
+	}
+
 	protected void undo(CoreferenceModelOperation operation) {
 		Annotator.logger.traceEntry();
 		if (operation instanceof UpdateEntityName) {
@@ -1005,6 +1034,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			undo((MergeMentions) operation);
 		} else if (operation instanceof DuplicateMentions) {
 			undo((DuplicateMentions) operation);
+		} else if (operation instanceof RemoveMentionSurface) {
+			undo((RemoveMentionSurface) operation);
+		} else if (operation instanceof AddSpanToMention) {
+			undo((AddSpanToMention) operation);
 		}
 	}
 
@@ -1031,6 +1064,17 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		op.getFeatureStructures().select(m -> m.getDiscontinuous() != null)
 				.forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous())));
 
+	}
+
+	private void undo(RemoveMentionSurface op) {
+		for (int i = 0; i < op.getSpans().size(); i++) {
+			Mention m = op.getMention(i);
+			Span s = op.getSpan(i);
+			MentionSurface ms = AnnotationFactory.createAnnotation(getJCas(), s.begin, s.end, MentionSurface.class);
+			ms.setMention(m);
+			UimaUtil.addMentionSurface(m, ms);
+			fireEvent(Event.get(this, Event.Type.Add, m, ms));
+		}
 	}
 
 	private void undo(RemoveSingletons op) {
