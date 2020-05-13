@@ -14,7 +14,6 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
@@ -56,7 +55,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			fs.removeFromIndexes();
 		}
 
-		Meta meta = Util.getMeta(jcas);
+		Meta meta = UimaUtil.getMeta(jcas);
 		meta.setTypeSystemVersion(TypeSystemVersion.v2.name());
 	}
 

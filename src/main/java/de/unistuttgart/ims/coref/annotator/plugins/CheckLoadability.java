@@ -6,8 +6,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class CheckLoadability extends JCasAnnotator_ImplBase {
 
@@ -15,7 +15,7 @@ public class CheckLoadability extends JCasAnnotator_ImplBase {
 	public void process(JCas aJCas) throws AnalysisEngineProcessException {
 		TypeSystemVersion is = TypeSystemVersion.LEGACY;
 		if (JCasUtil.exists(aJCas, Meta.class)) {
-			Meta m = Util.getMeta(aJCas);
+			Meta m = UimaUtil.getMeta(aJCas);
 			if (m.getTypeSystemVersion() != null) {
 				is = TypeSystemVersion.valueOf(m.getTypeSystemVersion());
 				if (is == TypeSystemVersion.getCurrent())

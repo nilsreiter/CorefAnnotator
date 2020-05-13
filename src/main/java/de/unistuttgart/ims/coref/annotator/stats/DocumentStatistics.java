@@ -7,12 +7,12 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
-import de.unistuttgart.ims.coref.annotator.Util;
 import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class DocumentStatistics implements CoreferenceModelListener {
 	public static enum Property {
@@ -105,7 +105,7 @@ public class DocumentStatistics implements CoreferenceModelListener {
 	public void setDocumentModel(DocumentModel documentModel) {
 		this.documentModel = documentModel;
 		this.summaryStatistics = null;
-		this.numberOfTokens = Util.count(documentModel.getJcas(), Token.class);
+		this.numberOfTokens = UimaUtil.count(documentModel.getJcas(), Token.class);
 		this.numberOfCharacters = documentModel.getJcas().getDocumentText().length();
 
 	}

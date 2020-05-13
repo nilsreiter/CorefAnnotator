@@ -48,7 +48,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 			clearResults();
 			JCas jcas = searchContainer.getDocumentWindow().getDocumentModel().getJcas();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				if (Util.isX(m, flag)) {
+				if (UimaUtil.isX(m, flag)) {
 					listModel.addElement(new SearchResultMention(searchContainer, m));
 					try {
 						highlights.add(hilit.addHighlight(UimaUtil.getBegin(m), UimaUtil.getEnd(m), painter));

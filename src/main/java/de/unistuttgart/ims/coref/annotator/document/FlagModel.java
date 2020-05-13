@@ -28,6 +28,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -152,9 +153,9 @@ public class FlagModel extends SubModel implements Model {
 		ImmutableList<FeatureStructure> featureStructures = this.getFlaggedFeatureStructures(flag);
 		operation.setFeatureStructures(featureStructures);
 
-		featureStructures.select(fs -> Util.isX(fs, flag.getKey())).forEach(fs -> {
+		featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey())).forEach(fs -> {
 			Feature feature = fs.getType().getFeatureByBaseName("Flags");
-			StringArray nArr = Util.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
+			StringArray nArr = UimaUtil.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
 					flag.getKey());
 			((StringArray) fs.getFeatureValue(feature)).removeFromIndexes();
 			fs.setFeatureValue(feature, nArr);
@@ -183,8 +184,8 @@ public class FlagModel extends SubModel implements Model {
 		case KEY:
 			op.setOldValue(flag.getKey());
 			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				Util.removeFlagKey(fs, (String) op.getOldValue());
-				Util.addFlagKey(fs, (String) op.getNewValue());
+				UimaUtil.removeFlagKey(fs, (String) op.getOldValue());
+				UimaUtil.addFlagKey(fs, (String) op.getNewValue());
 			});
 			flag.setKey((String) op.getNewValue());
 			break;
@@ -213,7 +214,7 @@ public class FlagModel extends SubModel implements Model {
 			e.printStackTrace();
 		}
 
-		return featureStructures.select(fs -> Util.isX(fs, flag.getKey()));
+		return featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey()));
 	}
 
 	@Deprecated
@@ -331,8 +332,8 @@ public class FlagModel extends SubModel implements Model {
 			break;
 		case KEY:
 			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				Util.removeFlagKey(fs, (String) op.getNewValue());
-				Util.addFlagKey(fs, (String) op.getOldValue());
+				UimaUtil.removeFlagKey(fs, (String) op.getNewValue());
+				UimaUtil.addFlagKey(fs, (String) op.getOldValue());
 			});
 			flag.setKey((String) op.getOldValue());
 			break;

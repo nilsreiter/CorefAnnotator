@@ -233,7 +233,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventUpdate(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+				if (UimaUtil.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
 			}
 		}
@@ -242,7 +242,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+				if (UimaUtil.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
 			}
 		}
@@ -413,7 +413,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
+				UimaUtil.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());

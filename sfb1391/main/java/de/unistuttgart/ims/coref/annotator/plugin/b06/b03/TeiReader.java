@@ -19,7 +19,6 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
@@ -111,8 +110,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
-		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
+		UimaUtil.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
+		UimaUtil.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase(RS))
