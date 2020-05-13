@@ -10,8 +10,8 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class AddFlagAction extends TargetedOperationIkonAction<DocumentWindow> {

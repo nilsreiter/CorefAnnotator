@@ -10,8 +10,8 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 
 public class EntityLabel extends JLabel {
 

@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
@@ -55,10 +56,11 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -205,7 +207,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		Iterator<FeatureStructure> iter = event.iterator(1);
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
+			if (fs instanceof MentionSurface) {
+				highlightManager.underline((Annotation) fs,
+						new Color(((Mention) event.getArgument(0)).getEntity().getColor()));
+			} else if (fs instanceof Mention) {
+				highlightManager.underline((Mention) fs);
+			} else if (fs instanceof DetachedMentionPart) {
 				highlightManager.underline((Annotation) fs);
 			} else if (fs instanceof CommentAnchor) {
 				highlightManager.highlight((Annotation) fs);
@@ -220,7 +227,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (((Mention) fs).getDiscontinuous() != null)
 					highlightManager.unUnderline(((Mention) fs).getDiscontinuous());
-				highlightManager.unUnderline((Annotation) fs);
+				highlightManager.unUnderline((Mention) fs);
 			} else if (fs instanceof Annotation)
 				highlightManager.unUnderline((Annotation) fs);
 
@@ -267,10 +274,10 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
-		MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
+		MutableSet<Mention> annotations = getDocumentModel().getCoreferenceModel()
 				.getMentions(getTextPane().getSelectionStart())
-				.select(a -> a.getBegin() == getTextPane().getSelectionStart()
-						&& a.getEnd() == getTextPane().getSelectionEnd());
+				.select(a -> UimaUtil.getBegin(a) == getTextPane().getSelectionStart()
+						&& UimaUtil.getEnd(a) == getTextPane().getSelectionEnd());
 		return annotations.selectInstancesOf(clazz);
 	}
 

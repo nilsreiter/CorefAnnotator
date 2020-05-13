@@ -22,7 +22,7 @@ import org.eclipse.collections.impl.factory.Lists;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Line;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.AbstractExportPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.ConfigurableExportPlugin;

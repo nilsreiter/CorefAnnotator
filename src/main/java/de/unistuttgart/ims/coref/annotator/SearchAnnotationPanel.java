@@ -27,8 +27,9 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> implements WindowListener {
 
@@ -50,7 +51,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 				if (Util.isX(m, flag)) {
 					listModel.addElement(new SearchResultMention(searchContainer, m));
 					try {
-						highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+						highlights.add(hilit.addHighlight(UimaUtil.getBegin(m), UimaUtil.getEnd(m), painter));
 					} catch (BadLocationException e1) {
 						e1.printStackTrace();
 					}

@@ -19,5 +19,6 @@ public class Defaults {
 	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
 	public static final boolean CFG_UNDERLINE_SINGLETONS_IN_GRAY = false;
 	public static final boolean CFG_STICKY_FLAGS = false;
+	public static final String CFG_MENTIONSURFACE_SEPARATOR = " | ";
 
 }

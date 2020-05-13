@@ -20,7 +20,7 @@ public class EnsureMeta extends JCasAnnotator_ImplBase {
 
 	public static final String PARAM_TS_VERSION = "TS_VERSION";
 
-	@ConfigurationParameter(name = PARAM_TS_VERSION, mandatory = false, defaultValue = "v1")
+	@ConfigurationParameter(name = PARAM_TS_VERSION, mandatory = false, defaultValue = "v2")
 	String typeSystemVersion;
 
 	@Override

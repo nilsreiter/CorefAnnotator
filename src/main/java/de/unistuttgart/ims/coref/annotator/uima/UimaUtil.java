@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
@@ -13,12 +14,19 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.cas.text.AnnotationTreeNode;
+import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.xml.sax.SAXException;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.Defaults;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
 	public static JCas readJCas(String filename)
@@ -75,4 +83,103 @@ public class UimaUtil {
 			newArray.set(i, arr.get(i));
 		return newArray;
 	}
+
+	public static String getCoveredText(Mention mention) {
+		return StringUtils.join(JCasUtil.toText(mention.getSurface()), Defaults.CFG_MENTIONSURFACE_SEPARATOR);
+	}
+
+	public static int getBegin(Mention mention) {
+		return mention.getSurface(0).getBegin();
+	}
+
+	public static int getEnd(Mention mention) {
+		return mention.getSurface(mention.getSurface().size() - 1).getEnd();
+	}
+
+	public static Mention getMention(JCas jcas, int begin, int end) {
+		MentionSurface sf = AnnotationFactory.createAnnotation(jcas, begin, end, MentionSurface.class);
+		Mention mention = new Mention(jcas);
+		sf.setMention(mention);
+		mention.setSurface(new FSArray<MentionSurface>(jcas, 1));
+		mention.setSurface(0, sf);
+		mention.addToIndexes();
+		return mention;
+	}
+
+	public static int compare(Mention m1, Mention m2) {
+		int returnValue = Integer.compare(UimaUtil.getBegin(m1), UimaUtil.getBegin(m2));
+		if (returnValue == 0)
+			returnValue = Integer.compare(UimaUtil.getEnd(m2), UimaUtil.getEnd(m1));
+		if (returnValue == 0)
+			returnValue = Integer.compare(m1.hashCode(), m2.hashCode());
+		return returnValue;
+	}
+
+	public static int compare(Annotation m1, Annotation m2) {
+		int returnValue = Integer.compare(m1.getBegin(), m2.getBegin());
+		if (returnValue == 0)
+			returnValue = Integer.compare(m2.getEnd(), m1.getEnd());
+		if (returnValue == 0)
+			returnValue = Integer.compare(m1.hashCode(), m2.hashCode());
+		return returnValue;
+	}
+
+	public static MentionSurface getFirst(Mention m) {
+		return m.getSurface(0);
+	}
+
+	public static MentionSurface getLast(Mention m) {
+		return m.getSurface(m.getSurface().size() - 1);
+	}
+
+	public static Mention selectMentionByIndex(JCas jcas, int index) {
+		Iterator<Mention> iterator = jcas.getIndexedFSs(Mention.class).iterator();
+		while (iterator.hasNext() && index-- >= 0) {
+			Mention m = iterator.next();
+			if (index == 0)
+				return m;
+		}
+		return null;
+	}
+
+	public static void addMentionSurface(Mention mention, MentionSurface ms) {
+		FSArray<MentionSurface> oldArray = mention.getSurface();
+		FSArray<MentionSurface> newArray = new FSArray<MentionSurface>(mention.getJCas(), oldArray.size() + 1);
+
+		Iterator<MentionSurface> oldArrayIterator = oldArray.iterator();
+		int i = 0;
+		boolean added = false;
+		while (oldArrayIterator.hasNext()) {
+			MentionSurface surf = oldArrayIterator.next();
+
+			if (!added && UimaUtil.compare(surf, ms) > 0) {
+				newArray.set(i++, ms);
+				added = true;
+			}
+			newArray.set(i++, surf);
+		}
+		if (!added)
+			newArray.set(i++, ms);
+		oldArray.removeFromIndexes();
+		mention.setSurface(newArray);
+	}
+
+	public static void removeMentionSurface(Mention mention, MentionSurface ms) {
+		FSArray<MentionSurface> oldArray = mention.getSurface();
+		FSArray<MentionSurface> newArray = new FSArray<MentionSurface>(mention.getJCas(), oldArray.size() - 1);
+
+		Iterator<MentionSurface> oldArrayIterator = oldArray.iterator();
+		int i = 0;
+		while (oldArrayIterator.hasNext()) {
+			MentionSurface surf = oldArrayIterator.next();
+
+			if (surf == ms)
+				continue;
+			newArray.set(i++, surf);
+		}
+		oldArray.removeFromIndexes();
+		mention.setSurface(newArray);
+
+	}
+
 }

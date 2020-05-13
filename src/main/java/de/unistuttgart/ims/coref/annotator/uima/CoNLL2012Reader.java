@@ -19,8 +19,8 @@ import org.eclipse.collections.impl.factory.Maps;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 	ColorProvider colorProvider = new ColorProvider();

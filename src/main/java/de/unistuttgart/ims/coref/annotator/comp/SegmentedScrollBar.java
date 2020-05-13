@@ -23,7 +23,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.document.SegmentModel;
 
 public class SegmentedScrollBar<T extends Annotation> extends JScrollBar implements ListDataListener {

@@ -37,29 +37,9 @@
 								<typeSystemInclude>src/main/resources/types.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-v2.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-format.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-quadrama.xml</typeSystemInclude>
-							</typeSystemIncludes>
-							<!-- true or false, default = false -->
-							<!-- if true, then although the complete merged type system will be 
-								created internally, only those types whose definition is contained within 
-								this maven project will be generated. The others will be presumed to be available 
-								via other projects. -->
-							<!-- OPTIONAL -->
-							<limitToProject>true</limitToProject>
-						</configuration>
-					</execution>
-					<execution>
-						<id>2</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>  <!-- this is the only goal -->
-						<!-- runs in phase process-resources by default -->
-						<configuration>
-							<!-- REQUIRED -->
-							<typeSystemIncludes>
-								<!-- one or more ant-like file patterns identifying top level descriptors -->
-								<typeSystemInclude>src/main/resources/creta-coref.xml</typeSystemInclude>
 							</typeSystemIncludes>
 							<!-- true or false, default = false -->
 							<!-- if true, then although the complete merged type system will be 
