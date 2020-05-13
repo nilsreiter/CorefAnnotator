@@ -123,14 +123,6 @@
 					<description>A field to store the xml id of the entity, if it has been loaded from TEI/XML</description>
 					<rangeTypeName>uima.cas.String</rangeTypeName>
 				</featureDescription>
-			</features>
-		</typeDescription>
-		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup</name>
-			<description>Represents an entity group</description>
-			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v2.Entity
-			</supertypeName>
-			<features>
 				<featureDescription>
 					<name>Members</name>
 					<description>An array containin the members of the group</description>
@@ -141,6 +133,7 @@
 				</featureDescription>
 			</features>
 		</typeDescription>
+	
 		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v2.Comment</name>
 			<description />
