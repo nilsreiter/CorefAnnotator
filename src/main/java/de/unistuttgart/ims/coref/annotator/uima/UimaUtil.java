@@ -23,6 +23,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.xml.sax.SAXException;
 
+import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
@@ -84,7 +85,7 @@ public class UimaUtil {
 	}
 
 	public static String getCoveredText(Mention mention) {
-		return StringUtils.join(JCasUtil.toText(mention.getSurface()), " | ");
+		return StringUtils.join(JCasUtil.toText(mention.getSurface()), Defaults.CFG_MENTIONSURFACE_SEPARATOR);
 	}
 
 	public static int getBegin(Mention mention) {
