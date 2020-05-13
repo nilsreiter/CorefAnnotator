@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +26,7 @@ import org.eclipse.collections.api.bag.ImmutableBag;
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.bag.MutableBagIterable;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.HashingStrategy;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
@@ -68,6 +70,7 @@ import org.eclipse.collections.api.list.primitive.ImmutableLongList;
 import org.eclipse.collections.api.list.primitive.ImmutableShortList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.api.map.primitive.ImmutableObjectDoubleMap;
 import org.eclipse.collections.api.map.primitive.ImmutableObjectLongMap;
 import org.eclipse.collections.api.map.sorted.MutableSortedMap;
@@ -1045,12 +1048,6 @@ public class Spans implements ImmutableList<Span> {
 	}
 
 	@Override
-	public <V, R extends MutableMap<V, Span>> R groupByUniqueKey(Function<? super Span, ? extends V> function,
-			R target) {
-		return spans.groupByUniqueKey(function, target);
-	}
-
-	@Override
 	public String toString() {
 		return spans.toString();
 	}
@@ -1070,5 +1067,106 @@ public class Spans implements ImmutableList<Span> {
 	@Override
 	public RichIterable<RichIterable<Span>> chunk(int size) {
 		return spans.chunk(size);
+	}
+
+	/**
+	 * @param <V>
+	 * @param <R>
+	 * @param arg0
+	 * @param arg1
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#groupByUniqueKey(org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.map.MutableMapIterable)
+	 */
+	@Override
+	public <V, R extends MutableMapIterable<V, Span>> R groupByUniqueKey(Function<? super Span, ? extends V> arg0,
+			R arg1) {
+		return spans.groupByUniqueKey(arg0, arg1);
+	}
+
+	/**
+	 * @param <V>
+	 * @param <R>
+	 * @param function
+	 * @param target
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#countByEach(org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.bag.MutableBagIterable)
+	 */
+	@Override
+	public <V, R extends MutableBagIterable<V>> R countByEach(Function<? super Span, ? extends Iterable<V>> function,
+			R target) {
+		return spans.countByEach(function, target);
+	}
+
+	/**
+	 * @param <V>
+	 * @param function
+	 * @return
+	 * @see org.eclipse.collections.api.collection.ImmutableCollection#countByEach(org.eclipse.collections.api.block.function.Function)
+	 */
+	@Override
+	public <V> ImmutableBag<V> countByEach(Function<? super Span, ? extends Iterable<V>> function) {
+		return spans.countByEach(function);
+	}
+
+	/**
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#getAny()
+	 */
+	@Override
+	public Span getAny() {
+		return spans.getAny();
+	}
+
+	/**
+	 * @param <K>
+	 * @param <V>
+	 * @param <R>
+	 * @param groupByFunction
+	 * @param collectFunction
+	 * @param target
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#groupByAndCollect(org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.multimap.MutableMultimap)
+	 */
+	@Override
+	public <K, V, R extends MutableMultimap<K, V>> R groupByAndCollect(
+			Function<? super Span, ? extends K> groupByFunction, Function<? super Span, ? extends V> collectFunction,
+			R target) {
+		return spans.groupByAndCollect(groupByFunction, collectFunction, target);
+	}
+
+	/**
+	 * @param <NK>
+	 * @param <NV>
+	 * @param keyFunction
+	 * @param valueFunction
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#toBiMap(org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.block.function.Function)
+	 */
+	@Override
+	public <NK, NV> MutableBiMap<NK, NV> toBiMap(Function<? super Span, ? extends NK> keyFunction,
+			Function<? super Span, ? extends NV> valueFunction) {
+		return spans.toBiMap(keyFunction, valueFunction);
+	}
+
+	/**
+	 * @param <NK>
+	 * @param <NV>
+	 * @param <R>
+	 * @param keyFunction
+	 * @param valueFunction
+	 * @param target
+	 * @return
+	 * @see org.eclipse.collections.api.RichIterable#toMap(org.eclipse.collections.api.block.function.Function,
+	 *      org.eclipse.collections.api.block.function.Function, java.util.Map)
+	 */
+	@Override
+	public <NK, NV, R extends Map<NK, NV>> R toMap(Function<? super Span, ? extends NK> keyFunction,
+			Function<? super Span, ? extends NV> valueFunction, R target) {
+		return spans.toMap(keyFunction, valueFunction, target);
 	}
 }
