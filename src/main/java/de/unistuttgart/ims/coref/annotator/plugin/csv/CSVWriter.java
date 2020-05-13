@@ -137,8 +137,6 @@ public class CSVWriter extends SingleFileWriter {
 			for (Entity entity : entities) {
 				for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
 					String surface = UimaUtil.getCoveredText(mention);
-					if (mention.getDiscontinuous() != null)
-						surface += " " + mention.getDiscontinuous().getCoveredText();
 					if (optionReplaceNewlines)
 						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 					p.print(UimaUtil.getBegin(mention));

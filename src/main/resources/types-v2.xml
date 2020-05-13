@@ -63,12 +63,6 @@
 					</rangeTypeName>
 				</featureDescription>
 				<featureDescription>
-					<name>Discontinuous</name>
-					<description>If this mention is discontinuous, the detached part is stored here.</description>
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart
-					</rangeTypeName>
-				</featureDescription>
-				<featureDescription>
 					<name>Flags</name>
 					<description>An array of strings that stores flags</description>
 					<rangeTypeName>uima.cas.StringArray</rangeTypeName>
@@ -144,20 +138,6 @@
 					<elementType>de.unistuttgart.ims.coref.annotator.api.v2.Entity
 					</elementType>
 					<multipleReferencesAllowed>false</multipleReferencesAllowed>
-				</featureDescription>
-			</features>
-		</typeDescription>
-		<typeDescription>
-			<name>de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart
-			</name>
-			<description>For detached relative clauses etc., this is used to mark them</description>
-			<supertypeName>uima.tcas.Annotation</supertypeName>
-			<features>
-				<featureDescription>
-					<name>Mention</name>
-					<description>A pointer to the mention this detached part belongs to</description>
-					<rangeTypeName>de.unistuttgart.ims.coref.annotator.api.v2.Mention
-					</rangeTypeName>
 				</featureDescription>
 			</features>
 		</typeDescription>

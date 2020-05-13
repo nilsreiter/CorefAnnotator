@@ -144,7 +144,6 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
@@ -171,7 +170,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddSpanToMention;
-import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
@@ -1090,9 +1088,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					getDocumentModel().edit(new MoveMentionsToEntity((Entity) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Mention)
 									.collect(n -> n.getFeatureStructure())));
-			} else if (targetFS instanceof Mention)
-				operation = new MoveMentionPartToMention((Mention) targetFS, moved.getFirst().getFeatureStructure());
-			else
+			} else
 				return false;
 			if (operation != null)
 				getDocumentModel().edit(operation);
@@ -1110,7 +1106,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			ImmutableList<TreePath> paths = Lists.immutable.of(tree.getSelectionPaths());
 
 			ImmutableList<CATreeNode> nodes = paths.collect(tp -> (CATreeNode) tp.getLastPathComponent())
-					.select(n -> n.isEntity() || n.isMention() || n.isMentionPart());
+					.select(n -> n.isEntity() || n.isMention());
 			if (nodes.isEmpty())
 				return null;
 			return new NodeListTransferable(nodes);
@@ -1269,9 +1265,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			} else if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null
 					&& treeNode == tree.getModel().getRoot())
 				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
-			else if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null
-					&& treeNode.getFeatureStructure() instanceof DetachedMentionPart)
-				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_TREE));
 
 			return panel;
 		}
@@ -1573,7 +1566,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			for (Mention anno : mentions) {
 				if (anno instanceof Mention)
-					mentionActions.add(this.getMentionItem(anno, anno.getDiscontinuous()));
+					mentionActions.add(this.getMentionItem(anno));
 			}
 
 			Set<Entity> candidates = Sets.mutable.empty();
@@ -1632,15 +1625,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		}
 
-		protected JMenu getMentionItem(Mention m, DetachedMentionPart dmp) {
+		protected JMenu getMentionItem(Mention m) {
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
 			String surf = UimaUtil.getCoveredText(m);
 			surf = StringUtils.abbreviateMiddle(surf, "...", 20);
 
-			if (dmp != null)
-				surf += " [,] " + dmp.getCoveredText();
 			if (m.getEntity().getLabel() != null)
 				b.append(": ")
 						.append(StringUtils.abbreviateMiddle(
@@ -1685,8 +1676,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			if (tsu.isSingle() && tsu.isMention())
 				annotationSelected(tsu.getMention(0).getSurface(0));
-			else if (tsu.isSingle() && tsu.isDetachedMentionPart())
-				annotationSelected(tsu.getAnnotation(0));
 			else if (tsu.isSingle() && tsu.isEntity()) {
 				highlightManager.unHighlight();
 				getDocumentModel().getCoreferenceModel().getMentions(tsu.getEntity(0)).forEach(m -> {

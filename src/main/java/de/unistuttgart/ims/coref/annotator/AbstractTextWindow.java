@@ -57,7 +57,6 @@ import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
@@ -212,8 +211,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 						new Color(((Mention) event.getArgument(0)).getEntity().getColor()));
 			} else if (fs instanceof Mention) {
 				highlightManager.underline((Mention) fs);
-			} else if (fs instanceof DetachedMentionPart) {
-				highlightManager.underline((Annotation) fs);
 			} else if (fs instanceof CommentAnchor) {
 				highlightManager.highlight((Annotation) fs);
 			}
@@ -225,8 +222,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
 			if (fs instanceof Mention) {
-				if (((Mention) fs).getDiscontinuous() != null)
-					highlightManager.unUnderline(((Mention) fs).getDiscontinuous());
+
 				highlightManager.unUnderline((Mention) fs);
 			} else if (fs instanceof Annotation)
 				highlightManager.unUnderline((Annotation) fs);
@@ -239,8 +235,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
 			}
 		}
 	}
@@ -250,8 +244,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
 			}
 		}
 	}
@@ -268,8 +260,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		CoreferenceModel cm = (CoreferenceModel) event.getSource();
 		for (Mention m : cm.getMentions()) {
 			highlightManager.underline(m);
-			if (m.getDiscontinuous() != null)
-				highlightManager.underline(m.getDiscontinuous());
 		}
 	}
 

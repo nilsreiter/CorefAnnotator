@@ -12,10 +12,9 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 @Deprecated
 public abstract class CAAbstractTreeSelectionListener implements TreeSelectionListener {
@@ -69,10 +68,6 @@ public abstract class CAAbstractTreeSelectionListener implements TreeSelectionLi
 
 	public boolean isEntity() {
 		return featureStructures.allSatisfy(f -> f instanceof Entity);
-	}
-
-	public boolean isDetachedMentionPart() {
-		return featureStructures.allSatisfy(f -> f instanceof DetachedMentionPart);
 	}
 
 	public boolean isMention() {

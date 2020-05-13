@@ -22,7 +22,6 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -88,7 +87,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			for (FeatureStructure fs : event.iterable(1)) {
 				if (fs instanceof MentionSurface) {
 					nodeChanged(arg0);
-				} else if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
+				} else if (fs instanceof Mention || fs instanceof Entity) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
 					if (fs instanceof EntityGroup) {
@@ -223,8 +222,6 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
 			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
-			if (m.getDiscontinuous() != null)
-				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}

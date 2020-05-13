@@ -15,7 +15,6 @@ import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.xml.sax.SAXException;
 
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -85,12 +84,6 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 				}
 				newMention.setEntity(entityMap.get(m.getEntity()));
 				newMention.addToIndexes();
-				if (m.getDiscontinuous() != null) {
-					DetachedMentionPart dmp = AnnotationFactory.createAnnotation(jcas, m.getDiscontinuous().getBegin(),
-							m.getDiscontinuous().getEnd(), DetachedMentionPart.class);
-					newMention.setDiscontinuous(dmp);
-					dmp.setMention(newMention);
-				}
 
 				if (m.getFlags() != null) {
 					StringArray flags = new StringArray(jcas, m.getFlags().size());

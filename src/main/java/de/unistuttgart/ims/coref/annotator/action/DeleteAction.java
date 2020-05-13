@@ -24,7 +24,6 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -34,7 +33,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMentionSurface;
-import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements CaretListener, TreeSelectionListener {
@@ -92,8 +90,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 				} else if (fs instanceof Mention) {
 					operations.add(new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
 							.collect(tn -> (Mention) tn.getFeatureStructure())));
-				} else if (fs instanceof DetachedMentionPart) {
-					operations.add(new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs));
 				}
 			}
 		} else if (featureStructure instanceof MentionSurface) {
@@ -102,9 +98,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 			operations.add(new RemoveMention((Mention) featureStructure));
 		} else if (featureStructure instanceof Entity) {
 			operations.add(new RemoveEntities((Entity) featureStructure));
-		} else if (featureStructure instanceof DetachedMentionPart) {
-			DetachedMentionPart dmp = (DetachedMentionPart) featureStructure;
-			operations.add(new RemovePart(dmp.getMention(), dmp));
 		}
 		if (!operations.isEmpty())
 			operations.forEach(op -> getTarget().getDocumentModel().edit(op));
@@ -122,8 +115,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreeSelectionUtil tsu = new TreeSelectionUtil();
 		tsu.collectData(e);
-		enabledByTree = tsu.isDetachedMentionPart() || tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf())
-				|| (tsu.isEntity() && tsu.isLeaf());
+		enabledByTree = tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf()) || (tsu.isEntity() && tsu.isLeaf());
 		disabledByModel = tsu.getFeatureStructures().collect(fs -> getOperation(fs))
 				.collect(op -> getTarget().getDocumentModel().isBlocked(op)).contains(true);
 		setStatus();
@@ -139,8 +131,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 			return RemoveMention.class;
 		else if (fs instanceof Entity)
 			return RemoveEntities.class;
-		else if (fs instanceof DetachedMentionPart)
-			return RemovePart.class;
 		return null;
 	}
 

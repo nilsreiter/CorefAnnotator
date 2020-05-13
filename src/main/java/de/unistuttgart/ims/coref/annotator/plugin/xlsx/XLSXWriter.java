@@ -143,8 +143,6 @@ public class XLSXWriter extends SingleFileStream {
 				row = sheet.createRow(rowNum++);
 				cellNum = 0;
 				String surface = UimaUtil.getCoveredText(mention);
-				if (mention.getDiscontinuous() != null)
-					surface += " " + mention.getDiscontinuous().getCoveredText();
 				if (optionReplaceNewlines)
 					surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
 				row.createCell(cellNum++).setCellValue(UimaUtil.getBegin(mention));

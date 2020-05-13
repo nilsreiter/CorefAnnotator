@@ -41,7 +41,6 @@ import de.unistuttgart.ims.coref.annotator.Spans;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Comment;
-import de.unistuttgart.ims.coref.annotator.api.v2.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -51,13 +50,11 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddSpanToMention;
-import de.unistuttgart.ims.coref.annotator.document.op.AttachPart;
 import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.DuplicateMentions;
 import de.unistuttgart.ims.coref.annotator.document.op.GroupEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.MergeMentions;
-import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionPartToMention;
 import de.unistuttgart.ims.coref.annotator.document.op.MoveMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveDuplicateMentionsInEntities;
@@ -65,7 +62,6 @@ import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMentionSurface;
-import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
@@ -148,39 +144,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return addTo(e, span.begin, span.end);
 	}
 
-	/**
-	 * does not fire events
-	 * 
-	 * @param m
-	 * @param begin
-	 * @param end
-	 * @return
-	 */
-	@Deprecated
-	private DetachedMentionPart addTo(Mention m, int begin, int end) {
-		// document model
-		DetachedMentionPart d = createDetachedMentionPart(begin, end);
-		d.setMention(m);
-		m.setDiscontinuous(d);
-
-		return d;
-	}
-
-	@Deprecated
-	private DetachedMentionPart addTo(Mention m, Span sp) {
-		return addTo(m, sp.begin, sp.end);
-	}
-
-	@Deprecated
-	protected DetachedMentionPart createDetachedMentionPart(int b, int e) {
-		DetachedMentionPart dmp = AnnotationFactory.createAnnotation(documentModel.getJcas(), b, e,
-				DetachedMentionPart.class);
-		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, true))
-			dmp = AnnotationUtil.trim(dmp);
-		registerAnnotation(dmp);
-		return dmp;
-	}
-
 	protected Entity createEntity(String l) {
 		Entity e = new Entity(documentModel.getJcas());
 		e.setColor(colorMap.getNextColor().getRGB());
@@ -244,11 +207,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 		op.getMentions().forEach(m -> {
 			remove(m, false);
-			if (m.getDiscontinuous() != null) {
-				DetachedMentionPart dmp = m.getDiscontinuous();
-				remove(dmp);
-				fireEvent(Event.get(this, Type.Remove, m, dmp));
-			}
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, firstMention.getEntity(), op.getMentions()));
 		fireEvent(Event.get(this, Type.Add, newMention.getEntity(), newMention));
@@ -329,23 +287,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				return addTo(op.getEntity(), sp);
 			}));
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
-		} else if (operation instanceof AttachPart) {
-			AttachPart op = (AttachPart) operation;
-			op.setPart(addTo(op.getMention(), op.getSpan()));
-			fireEvent(Event.get(this, Event.Type.Add, op.getMention(), op.getPart()));
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getMentions()));
-		} else if (operation instanceof MoveMentionPartToMention) {
-			MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
-			op.getObjects().forEach(d -> {
-				d.setMention(op.getTarget());
-				op.getTarget().setDiscontinuous(d);
-				op.getSource().setDiscontinuous(null);
-			});
-			fireEvent(op.toEvent());
-			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getObjects()));
 		} else if (operation instanceof RemoveEntities) {
 			boolean keepTreeSortedSetting = getPreferences().getBoolean(Constants.CFG_KEEP_TREE_SORTED,
 					Defaults.CFG_KEEP_TREE_SORTED);
@@ -365,10 +310,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				removeFrom(op.getEntityGroup(), e);
 				updateEntityGroupLabel(op.getEntityGroup());
 			});
-		} else if (operation instanceof RemovePart) {
-			RemovePart op = (RemovePart) operation;
-			remove(op.getPart());
-			fireEvent(Event.get(this, Type.Remove, op.getMention(), op.getPart()));
 		} else if (operation instanceof GroupEntities) {
 			GroupEntities op = (GroupEntities) operation;
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
@@ -425,13 +366,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			} catch (CASException e) {
 				Annotator.logger.catching(e);
 			}
-			if (oldMention.getDiscontinuous() != null) {
-				DetachedMentionPart dmp = AnnotationFactory.createAnnotation(getJCas(),
-						oldMention.getDiscontinuous().getBegin(), oldMention.getDiscontinuous().getEnd(),
-						DetachedMentionPart.class);
-				dmp.setMention(newMention);
-				newMention.setDiscontinuous(dmp);
-			}
 			return newMention;
 		}));
 		op.getNewMentions().forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m)));
@@ -448,19 +382,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				Spans s = new Spans(m);
 				if (map.containsKey(s)) {
 					for (Mention m2 : map.get(s)) {
-						if (m2.getDiscontinuous() == null && m.getDiscontinuous() == null) {
-							toRemove.add(m);
-						} else if (m2.getDiscontinuous() != null && m.getDiscontinuous() != null) {
-							Span s1 = new Span(m.getDiscontinuous());
-							Span s2 = new Span(m2.getDiscontinuous());
-							if (s1.equals(s2)) {
-								toRemove.add(m);
-							} else {
-								map.put(s, m);
-							}
-						} else {
-							map.put(s, m);
-						}
+						map.put(s, m);
 					}
 				} else {
 					map.put(s, m);
@@ -469,11 +391,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 			toRemove.forEach(m -> {
 				remove(m, false);
-				if (m.getDiscontinuous() != null) {
-					DetachedMentionPart dmp = m.getDiscontinuous();
-					remove(dmp);
-					fireEvent(Event.get(this, Type.Remove, m, dmp));
-				}
 			});
 			fireEvent(Event.get(this, Event.Type.Remove, e, toRemove.toImmutable()));
 			allRemoved.addAll(toRemove);
@@ -485,11 +402,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	protected void edit(RemoveMention op) {
 		op.getFeatureStructures().forEach(m -> {
 			remove(m, false);
-			if (m.getDiscontinuous() != null) {
-				DetachedMentionPart dmp = m.getDiscontinuous();
-				remove(dmp);
-				fireEvent(Event.get(this, Type.Remove, m, dmp));
-			}
+			// TODO: remove surfaces
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
 		registerEdit(op);
@@ -738,9 +651,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				Annotator.logger.catching(e);
 			}
 			registerAnnotation(mention);
-			if (mention.getDiscontinuous() != null) {
-				registerAnnotation(mention.getDiscontinuous());
-			}
 		}
 	}
 
@@ -758,10 +668,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			mention.getEntity().addToIndexes();
 			registerAnnotation(mention);
 			fireEvent(Event.get(this, Event.Type.Add, mention.getEntity(), mention));
-			if (mention.getDiscontinuous() != null) {
-				registerAnnotation(mention.getDiscontinuous());
-				fireEvent(Event.get(this, Event.Type.Add, mention, mention.getDiscontinuous()));
-			}
+
 		}
 		initialized = true;
 	}
@@ -818,16 +725,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	private void registerEdit(Operation operation) {
 		documentModel.fireDocumentChangedEvent();
 	}
-
-	/**
-	 * does not fire evetns
-	 * 
-	 * @param dmp
-	 */
-	private void remove(DetachedMentionPart dmp) {
-		dmp.removeFromIndexes();
-		characterPosition2AnnotationMap.remove(dmp);
-	};
 
 	/**
 	 * Removes entity and fires events
@@ -946,18 +843,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
 			fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
-		} else if (operation instanceof AttachPart) {
-			AttachPart op = (AttachPart) operation;
-			remove(op.getPart());
-			fireEvent(Event.get(this, Event.Type.Remove, op.getMention(), op.getPart()));
-		} else if (operation instanceof MoveMentionPartToMention) {
-			MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
-			op.getObjects().forEach(d -> {
-				op.getSource().setDiscontinuous(d);
-				d.setMention(op.getSource());
-				op.getTarget().setDiscontinuous(null);
-			});
-			fireEvent(op.toReversedEvent());
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
@@ -972,11 +857,6 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				registerAnnotation(m);
 				fireEvent(Event.get(this, Type.Add, m.getEntity(), m));
 			});
-		} else if (operation instanceof RemovePart) {
-			RemovePart op = (RemovePart) operation;
-			op.getPart().setMention(op.getMention());
-			op.getMention().setDiscontinuous(op.getPart());
-			fireEvent(Event.get(this, Type.Add, op.getMention(), op.getPart()));
 		} else if (operation instanceof RemoveMention) {
 			undo((RemoveMention) operation);
 		} else if (operation instanceof RemoveEntities) {
@@ -1053,17 +933,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			entityMentionMap.put(op.getEntity(), m);
 			for (MentionSurface ms : m.getSurface())
 				characterPosition2AnnotationMap.add(ms);
-			if (m.getDiscontinuous() != null) {
-				m.getDiscontinuous().addToIndexes();
-				characterPosition2AnnotationMap.add(m.getDiscontinuous());
-			}
 		});
 		// fire event to draw them
 		fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getFeatureStructures()));
 		// re-create attached parts (if any)
-		op.getFeatureStructures().select(m -> m.getDiscontinuous() != null)
-				.forEach(m -> fireEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous())));
-
+		// TODO: re-create surfaces
 	}
 
 	private void undo(RemoveMentionSurface op) {
