@@ -158,22 +158,25 @@ public class XLSXWriter extends SingleFileStream {
 								.min(new AnnotationLengthComparator<Segment>());
 						row.createCell(cellNum++).setCellValue(segment.getLabel());
 					}
+
+					int lineNumberBegin = -1, lineNumberEnd = -1;
 					try {
-						row.createCell(cellNum++).setCellValue(
-								JCasUtil.selectPreceding(Line.class, mention.getSurface(0), 1).get(0).getNumber());
+						lineNumberBegin = JCasUtil.selectPreceding(Line.class, mention.getSurface(0), 1).get(0)
+								.getNumber();
 					} catch (Exception e) {
-						row.createCell(cellNum++).setCellValue(-1);
+						// catch silently
 					}
+					row.createCell(cellNum++).setCellValue(lineNumberBegin);
 					try {
 						Annotation a = new Annotation(jcas);
 						a.setBegin(UimaUtil.getEnd(mention));
 						a.setEnd(UimaUtil.getEnd(mention));
 
-						row.createCell(cellNum++)
-								.setCellValue(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
+						lineNumberEnd = JCasUtil.selectFollowing(Line.class, a, 1).get(0).getNumber();
 					} catch (Exception e) {
-						row.createCell(cellNum++).setCellValue(-1);
+						// catch silently
 					}
+					row.createCell(cellNum++).setCellValue(lineNumberEnd);
 				}
 				if (optionContextWidth > 0) {
 					try {

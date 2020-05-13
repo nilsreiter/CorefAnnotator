@@ -44,6 +44,7 @@ public class SegmentModel extends SubModel implements ListModel<Segment>, TreeMo
 		JCas jcas = getDocumentModel().getJcas();
 
 		rootSegment = AnnotationFactory.createAnnotation(jcas, 0, jcas.getDocumentText().length(), Segment.class);
+		rootSegment.setLabel("document");
 		tree = jcas.getAnnotationIndex(Segment.class).tree(rootSegment);
 		for (Segment s : JCasUtil.select(jcas, Segment.class))
 			position2Segment.add(s);
