@@ -147,14 +147,17 @@ public class UimaUtil {
 
 		Iterator<MentionSurface> oldArrayIterator = oldArray.iterator();
 		int i = 0;
+		boolean added = false;
 		while (oldArrayIterator.hasNext()) {
 			MentionSurface surf = oldArrayIterator.next();
 
-			if (UimaUtil.compare(surf, ms) > 0)
+			if (!added && UimaUtil.compare(surf, ms) > 0) {
 				newArray.set(i++, ms);
+				added = true;
+			}
 			newArray.set(i++, surf);
 		}
-		if (i < newArray.size())
+		if (!added)
 			newArray.set(i++, ms);
 		oldArray.removeFromIndexes();
 		mention.setSurface(newArray);
