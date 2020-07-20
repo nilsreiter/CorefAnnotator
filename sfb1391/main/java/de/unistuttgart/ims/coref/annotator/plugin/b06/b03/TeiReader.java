@@ -22,6 +22,7 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
+import de.unistuttgart.ims.coref.annotator.api.format.WideSpacing;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
@@ -87,6 +88,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("emph", Italic.class);
 		gxr.addRule("[rend*=bold]", Bold.class);
 		gxr.addRule("[rend*=italic]", Italic.class);
+		gxr.addRule("[rend*=wide-spacing]", WideSpacing.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
 			ms.setN(element.attr(N));
