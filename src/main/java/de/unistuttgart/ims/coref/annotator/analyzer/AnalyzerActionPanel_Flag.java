@@ -18,13 +18,13 @@ import org.eclipse.collections.impl.factory.Maps;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.comp.TranslatedListCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class AnalyzerActionPanel_Flag extends AnalyzerActionPanel_ChartTable {
 
@@ -95,14 +95,14 @@ public class AnalyzerActionPanel_Flag extends AnalyzerActionPanel_ChartTable {
 		if (unit == Entity.class) {
 			for (Flag f : documentModel.getFlagModel().getFlags()
 					.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()))) {
-				cts.put(f.getLabel(), Lists.mutable.withAll(entities).select(e -> Util.isX(e, f.getKey())).size());
+				cts.put(f.getLabel(), Lists.mutable.withAll(entities).select(e -> UimaUtil.isX(e, f.getKey())).size());
 			}
 		} else if (unit == Mention.class) {
 			MutableList<Mention> mentions = Lists.mutable.withAll(entities)
 					.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
 			for (Flag f : documentModel.getFlagModel().getFlags()
 					.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()))) {
-				cts.put(f.getLabel(), mentions.select(e -> Util.isX(e, f.getKey())).size());
+				cts.put(f.getLabel(), mentions.select(e -> UimaUtil.isX(e, f.getKey())).size());
 			}
 		}
 

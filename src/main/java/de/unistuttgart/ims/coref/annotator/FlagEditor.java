@@ -35,9 +35,8 @@ import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
@@ -72,7 +71,6 @@ public class FlagEditor extends AbstractWindow {
 		JComboBox<Class<?>> combobox = new JComboBox<Class<?>>();
 		combobox.addItem(Mention.class);
 		combobox.addItem(Entity.class);
-		combobox.addItem(DetachedMentionPart.class);
 		combobox.setRenderer(new TargetClassListCellRenderer());
 
 		JComboBox<Ikon> iconBox = new JComboBox<Ikon>();

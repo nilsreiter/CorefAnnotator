@@ -33,19 +33,19 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.HasDocumentModel;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectAnalyzeAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.ProcessAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 
@@ -165,7 +165,7 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
-			boolean isGrey = Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
+			boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
 			Color entityColor = new Color(entity.getColor());
 
 			if (isGrey) {

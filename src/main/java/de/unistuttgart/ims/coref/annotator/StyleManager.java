@@ -23,6 +23,7 @@ public class StyleManager {
 		if (defaultCharacterStyle == null) {
 			defaultCharacterStyle = new SimpleAttributeSet();// StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 			defaultCharacterStyle.addAttribute(StyleConstants.FontFamily, Font.DIALOG);
+			defaultCharacterStyle.addAttribute(StyleConstants.LineSpacing, 0.5f);
 			defaultCharacterStyle.addAttribute(StyleConstants.FontSize, UIManager.getFont("TextPane.font").getSize());
 		}
 		return defaultCharacterStyle;

@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -19,18 +20,20 @@ import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.comp.TranslatedListCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTable {
 
 	private static final long serialVersionUID = 1L;
 
 	int n = 1;
-	Class<? extends Annotation> neighbourType = Mention.class;
+	Class<? extends FeatureStructure> neighbourType = MentionSurface.class;
 	DIRECTION direction = DIRECTION.RIGHT;
 	GroupBy toText = GroupBy.ENTITY;
 
@@ -120,10 +123,9 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 				.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
 		ImmutableList<? extends Annotation> followers;
 		if (direction == DIRECTION.RIGHT) {
-			followers = mentions.flatCollect(m -> JCasUtil.selectFollowing(neighbourType, m, n));
+			followers = mentions.flatCollect(m -> ((Iterable) UimaUtil.selectFollowing(m, n)));
 		} else {
-			followers = mentions.flatCollect(m -> JCasUtil.selectPreceding(neighbourType, m, n));
-
+			followers = mentions.flatCollect(m -> ((Iterable) UimaUtil.selectPreceding(m, n)));
 		}
 
 		if (neighbourType != Mention.class)

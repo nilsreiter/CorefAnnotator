@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document.op;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 
 public class UpdateFlag extends UpdateOperation<Flag> implements FlagModelOperation {
 	public enum FlagProperty {

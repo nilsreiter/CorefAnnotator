@@ -20,7 +20,7 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
 
 public class SegmentModel extends SubModel implements ListModel<Segment>, TreeModel {
@@ -44,6 +44,7 @@ public class SegmentModel extends SubModel implements ListModel<Segment>, TreeMo
 		JCas jcas = getDocumentModel().getJcas();
 
 		rootSegment = AnnotationFactory.createAnnotation(jcas, 0, jcas.getDocumentText().length(), Segment.class);
+		rootSegment.setLabel("document");
 		tree = jcas.getAnnotationIndex(Segment.class).tree(rootSegment);
 		for (Segment s : JCasUtil.select(jcas, Segment.class))
 			position2Segment.add(s);

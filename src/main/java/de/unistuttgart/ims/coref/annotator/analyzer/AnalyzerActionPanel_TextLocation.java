@@ -12,9 +12,10 @@ import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.LegendLayout;
 import org.knowm.xchart.style.Styler.LegendPosition;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 
@@ -53,9 +54,9 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 			List<Integer> yData = new ArrayList<Integer>();
 			List<String> labels = new ArrayList<String>();
 			for (Mention m : documentModel.getCoreferenceModel().getMentions(e)) {
-				xData.add(m.getBegin());
+				xData.add(UimaUtil.getBegin(m));
 				yData.add(y);
-				labels.add(m.getCoveredText());
+				labels.add(UimaUtil.getCoveredText(m));
 			}
 
 			if (xData.isEmpty())

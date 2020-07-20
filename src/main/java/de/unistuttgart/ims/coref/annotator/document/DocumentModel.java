@@ -21,8 +21,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -39,6 +38,7 @@ import de.unistuttgart.ims.coref.annotator.profile.EntityType;
 import de.unistuttgart.ims.coref.annotator.profile.FlagType;
 import de.unistuttgart.ims.coref.annotator.profile.PreferenceType;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -195,7 +195,7 @@ public class DocumentModel implements Model {
 
 	@SuppressWarnings("unchecked")
 	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+		return (Class<? extends StylePlugin>) Class.forName(UimaUtil.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {

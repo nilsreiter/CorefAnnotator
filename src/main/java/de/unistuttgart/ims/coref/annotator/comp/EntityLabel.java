@@ -9,9 +9,9 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityLabel extends JLabel {
 
@@ -20,7 +20,7 @@ public class EntityLabel extends JLabel {
 	public EntityLabel(Entity entity) {
 		Color entityColor = new Color(entity.getColor());
 
-		boolean isGrey = Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
+		boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
 		if (isGrey)
 			this.setForeground(Color.GRAY);
 		else

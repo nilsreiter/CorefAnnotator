@@ -1,6 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 public class AnalyzerActionPanel_Dummy extends AnalyzerActionPanel {
