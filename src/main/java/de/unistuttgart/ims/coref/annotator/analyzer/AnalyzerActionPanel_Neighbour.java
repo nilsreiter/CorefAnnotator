@@ -121,7 +121,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 	void calculateCounts() {
 		ImmutableList<Mention> mentions = Lists.immutable.withAll(entities)
 				.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
-		ImmutableList<? extends Annotation> followers;
+		ImmutableList<Mention> followers;
 		if (direction == DIRECTION.RIGHT) {
 			followers = mentions.flatCollect(m -> ((Iterable) UimaUtil.selectFollowing(m, n)));
 		} else {
@@ -137,7 +137,7 @@ public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTabl
 			break;
 		case COVEREDTEXT:
 		default:
-			cts = followers.countBy(m -> m.getCoveredText()).toMapOfItemToCount();
+			cts = followers.countBy(m -> UimaUtil.getCoveredText(m)).toMapOfItemToCount();
 
 		}
 
