@@ -39,12 +39,12 @@ public class Plugin extends AbstractImportPlugin implements UimaImportPlugin {
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.xmi;
+		return FileFilters.xmi_gz;
 	}
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.xmi;
+		return ExtensionFilters.xmi_gz;
 	}
 
 	@Override
