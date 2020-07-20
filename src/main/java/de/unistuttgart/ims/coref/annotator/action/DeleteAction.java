@@ -1,6 +1,5 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -13,7 +12,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
@@ -26,15 +24,16 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.RemoveMention;
-import de.unistuttgart.ims.coref.annotator.document.op.RemovePart;
+import de.unistuttgart.ims.coref.annotator.document.op.RemoveMentionSurface;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements CaretListener, TreeSelectionListener {
 
@@ -54,8 +53,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	public DeleteAction(DocumentWindow documentWindow, FeatureStructure featureStructure) {
 		super(documentWindow, Strings.ACTION_DELETE, MaterialDesign.MDI_DELETE);
 		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_DELETE_TOOLTIP));
-		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		this.featureStructure = featureStructure;
 	}
 
@@ -67,10 +64,10 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 			if (e.getSource() == getTarget().getTextPane()) {
 				int low = getTarget().getTextPane().getSelectionStart();
 				int high = getTarget().getTextPane().getSelectionEnd();
-				MutableSet<? extends Annotation> annotations = Sets.mutable
+				MutableSet<Mention> annotations = Sets.mutable
 						.withAll(getTarget().getDocumentModel().getCoreferenceModel().getMentions(low));
 				MutableSet<Mention> mentions = annotations.selectInstancesOf(Mention.class)
-						.select(a -> a.getBegin() == low && a.getEnd() == high);
+						.select(a -> UimaUtil.getBegin(a) == low && UimaUtil.getEnd(a) == high);
 
 				MutableMap<Entity, MutableSet<Mention>> mentionsByEntity = mentions.aggregateBy(m -> m.getEntity(),
 						() -> Sets.mutable.empty(), (set, mention) -> {
@@ -93,17 +90,14 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 				} else if (fs instanceof Mention) {
 					operations.add(new RemoveMention(selection.collect(tp -> (CATreeNode) tp.getLastPathComponent())
 							.collect(tn -> (Mention) tn.getFeatureStructure())));
-				} else if (fs instanceof DetachedMentionPart) {
-					operations.add(new RemovePart(((DetachedMentionPart) fs).getMention(), (DetachedMentionPart) fs));
 				}
 			}
+		} else if (featureStructure instanceof MentionSurface) {
+			operations.add(new RemoveMentionSurface((MentionSurface) featureStructure));
 		} else if (featureStructure instanceof Mention) {
 			operations.add(new RemoveMention((Mention) featureStructure));
 		} else if (featureStructure instanceof Entity) {
 			operations.add(new RemoveEntities((Entity) featureStructure));
-		} else if (featureStructure instanceof DetachedMentionPart) {
-			DetachedMentionPart dmp = (DetachedMentionPart) featureStructure;
-			operations.add(new RemovePart(dmp.getMention(), dmp));
 		}
 		if (!operations.isEmpty())
 			operations.forEach(op -> getTarget().getDocumentModel().edit(op));
@@ -121,8 +115,7 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 	public void valueChanged(TreeSelectionEvent e) {
 		TreeSelectionUtil tsu = new TreeSelectionUtil();
 		tsu.collectData(e);
-		enabledByTree = tsu.isDetachedMentionPart() || tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf())
-				|| (tsu.isEntity() && tsu.isLeaf());
+		enabledByTree = tsu.isMention() || (tsu.isEntityGroup() && tsu.isLeaf()) || (tsu.isEntity() && tsu.isLeaf());
 		disabledByModel = tsu.getFeatureStructures().collect(fs -> getOperation(fs))
 				.collect(op -> getTarget().getDocumentModel().isBlocked(op)).contains(true);
 		setStatus();
@@ -138,8 +131,6 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 			return RemoveMention.class;
 		else if (fs instanceof Entity)
 			return RemoveEntities.class;
-		else if (fs instanceof DetachedMentionPart)
-			return RemovePart.class;
 		return null;
 	}
 
