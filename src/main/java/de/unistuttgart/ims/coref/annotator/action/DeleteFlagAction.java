@@ -13,7 +13,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 
 public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow> implements ListSelectionListener {

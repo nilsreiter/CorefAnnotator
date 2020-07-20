@@ -21,6 +21,7 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.uima.io.xml.GenericInlineWriter;
 import de.unistuttgart.ims.uima.io.xml.InlineTagFactory;
 
+// TODO: Update for typesystem v2
 public class ExampleExport extends DocumentWindowAction {
 
 	private static final long serialVersionUID = 1L;

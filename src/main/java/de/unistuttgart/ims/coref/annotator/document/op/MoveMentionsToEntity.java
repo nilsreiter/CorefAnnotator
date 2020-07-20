@@ -2,8 +2,8 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 
 import org.eclipse.collections.api.list.ImmutableList;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class MoveMentionsToEntity extends MoveOperation<Mention, Entity> {
 
