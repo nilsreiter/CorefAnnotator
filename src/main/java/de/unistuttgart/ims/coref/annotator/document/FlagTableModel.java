@@ -11,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
 public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListener {

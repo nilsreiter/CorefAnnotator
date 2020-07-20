@@ -1,6 +1,7 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
@@ -36,8 +37,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.jcas.JCas;
@@ -55,10 +56,10 @@ import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -205,8 +206,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		Iterator<FeatureStructure> iter = event.iterator(1);
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-				highlightManager.underline((Annotation) fs);
+			if (fs instanceof MentionSurface) {
+				highlightManager.underline((Annotation) fs,
+						new Color(((Mention) event.getArgument(0)).getEntity().getColor()));
+			} else if (fs instanceof Mention) {
+				highlightManager.underline((Mention) fs);
 			} else if (fs instanceof CommentAnchor) {
 				highlightManager.highlight((Annotation) fs);
 			}
@@ -218,9 +222,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
 			if (fs instanceof Mention) {
-				if (((Mention) fs).getDiscontinuous() != null)
-					highlightManager.unUnderline(((Mention) fs).getDiscontinuous());
-				highlightManager.unUnderline((Annotation) fs);
+
+				highlightManager.unUnderline((Mention) fs);
 			} else if (fs instanceof Annotation)
 				highlightManager.unUnderline((Annotation) fs);
 
@@ -232,8 +235,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
 			}
 		}
 	}
@@ -243,8 +244,6 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 			if (fs instanceof Mention) {
 				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
 					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
 			}
 		}
 	}
@@ -261,16 +260,14 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		CoreferenceModel cm = (CoreferenceModel) event.getSource();
 		for (Mention m : cm.getMentions()) {
 			highlightManager.underline(m);
-			if (m.getDiscontinuous() != null)
-				highlightManager.underline(m.getDiscontinuous());
 		}
 	}
 
 	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
-		MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
+		MutableSet<Mention> annotations = getDocumentModel().getCoreferenceModel()
 				.getMentions(getTextPane().getSelectionStart())
-				.select(a -> a.getBegin() == getTextPane().getSelectionStart()
-						&& a.getEnd() == getTextPane().getSelectionEnd());
+				.select(a -> UimaUtil.getBegin(a) == getTextPane().getSelectionStart()
+						&& UimaUtil.getEnd(a) == getTextPane().getSelectionEnd());
 		return annotations.selectInstancesOf(clazz);
 	}
 

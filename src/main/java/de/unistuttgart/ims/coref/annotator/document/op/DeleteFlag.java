@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.list.ImmutableList;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 
 public class DeleteFlag implements FlagModelOperation {
 	Flag flag;

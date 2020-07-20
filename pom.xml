@@ -4,25 +4,25 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>coref.annotator</artifactId>
-	<version>1.14.1-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>CorefAnnotator</name>
 	<url>https://github.com/nilsreiter/CorefAnnotator/</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.dkpro>1.9.0</version.dkpro>
+		<version.dkpro>2.1.0</version.dkpro>
 		<version.ikonli>2.1.1</version.ikonli>
-		<version.eclipse>9.2.0</version.eclipse>
+		<version.eclipse>10.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13.0.1</version.javafx>
+		<version.javafx>13.0.2</version.javafx>
 	</properties>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.uima</groupId>
 				<artifactId>jcasgen-maven-plugin</artifactId>
-				<version>2.8.1</version>  <!-- change this to the latest version -->
+				<version>3.1.1</version>  <!-- change this to the latest version -->
 				<executions>
 					<execution>
 						<id>1</id>
@@ -37,28 +37,9 @@
 								<typeSystemInclude>src/main/resources/types.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-meta.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-v1.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-v2.xml</typeSystemInclude>
 								<typeSystemInclude>src/main/resources/types-format.xml</typeSystemInclude>
-							</typeSystemIncludes>
-							<!-- true or false, default = false -->
-							<!-- if true, then although the complete merged type system will be 
-								created internally, only those types whose definition is contained within 
-								this maven project will be generated. The others will be presumed to be available 
-								via other projects. -->
-							<!-- OPTIONAL -->
-							<limitToProject>true</limitToProject>
-						</configuration>
-					</execution>
-					<execution>
-						<id>2</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>  <!-- this is the only goal -->
-						<!-- runs in phase process-resources by default -->
-						<configuration>
-							<!-- REQUIRED -->
-							<typeSystemIncludes>
-								<!-- one or more ant-like file patterns identifying top level descriptors -->
-								<typeSystemInclude>src/main/resources/creta-coref.xml</typeSystemInclude>
+								<typeSystemInclude>src/main/resources/types-quadrama.xml</typeSystemInclude>
 							</typeSystemIncludes>
 							<!-- true or false, default = false -->
 							<!-- if true, then although the complete merged type system will be 
@@ -244,54 +225,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>quadrama</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>quadrama-add-source</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>quadrama/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
-							<execution>
-								<id>quadrama-add-test-source</id>
-								<phase>generate-test-sources</phase>
-								<goals>
-									<goal>add-test-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>quadrama/test/java</source>
-									</sources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>de.unistuttgart.ims.drama.api</artifactId>
-					<version>1.0.0</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
 			<id>develop</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -306,54 +239,6 @@
 					</resource>
 				</resources>
 			</build>
-		</profile>
-		<profile>
-			<id>creta</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>creta-add-source</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>creta/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
-							<execution>
-								<id>creta-add-test-source</id>
-								<phase>generate-test-sources</phase>
-								<goals>
-									<goal>add-test-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>creta/test/java</source>
-									</sources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<dependencies>
-				<dependency>
-					<groupId>de.unistuttgart.ims</groupId>
-					<artifactId>creta.api</artifactId>
-					<version>1.3.0</version>
-				</dependency>
-			</dependencies>
 		</profile>
 		<profile>
 			<id>sfb1391</id>
@@ -410,7 +295,7 @@
 					<plugin>
 						<groupId>org.apache.uima</groupId>
 						<artifactId>jcasgen-maven-plugin</artifactId>
-						<version>2.8.1</version>  <!-- change this to the latest version -->
+						<version>3.1.1</version>  <!-- change this to the latest version -->
 						<executions>
 							<execution>
 								<id>3</id>
@@ -450,40 +335,28 @@
 			<artifactId>commons-collections4</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.coref-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-coref-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.metadata-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-metadata-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.segmentation-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-segmentation-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.lexmorph-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-lexmorph-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.syntax-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-syntax-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.api.semantics-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-api-semantics-asl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -493,13 +366,11 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.12.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>28.1-jre</version>
+			<version>29.0-jre</version>
 		</dependency>
 
 		<dependency>
@@ -525,29 +396,23 @@
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
-			<version>0.9.11</version>
+			<version>0.9.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.xmi-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-xmi-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.text-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-text-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.io.conll-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-io-conll-asl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.collections</groupId>
@@ -560,16 +425,12 @@
 			<version>${version.eclipse}</version>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.tokit-asl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-tokit-asl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-			<artifactId>
-				de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl
-			</artifactId>
+			<groupId>org.dkpro.core</groupId>
+			<artifactId>dkpro-core-stanfordnlp-gpl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -579,12 +440,7 @@
 		<dependency>
 			<groupId>de.unistuttgart.ims.uima.io</groupId>
 			<artifactId>generic-xml-reader</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.unistuttgart.ims</groupId>
-			<artifactId>uimautil</artifactId>
-			<version>1.1.0</version>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.lexicalscope.jewelcli</groupId>
@@ -608,11 +464,6 @@
 			<version>${version.javafx}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>2.3.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>4.1.1</version>
@@ -622,23 +473,24 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>4.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-				<artifactId>
-					de.tudarmstadt.ukp.dkpro.core-asl
-				</artifactId>
+				<groupId>org.dkpro.core</groupId>
+				<artifactId>dkpro-core-asl</artifactId>
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>de.tudarmstadt.ukp.dkpro.core</groupId>
-				<artifactId>
-					de.tudarmstadt.ukp.dkpro.core-gpl
-				</artifactId>
+				<groupId>org.dkpro.core</groupId>
+				<artifactId>dkpro-core-gpl</artifactId>
 				<version>${version.dkpro}</version>
 				<type>pom</type>
 				<scope>import</scope>

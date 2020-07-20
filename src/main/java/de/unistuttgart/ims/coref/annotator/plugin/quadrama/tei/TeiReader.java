@@ -8,22 +8,23 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.dkpro.core.api.io.ResourceCollectionReaderBase;
+import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jsoup.nodes.Element;
 
-import de.tudarmstadt.ukp.dkpro.core.api.io.ResourceCollectionReaderBase;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
-import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
@@ -86,7 +87,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
+				entity.setLabel(UimaUtil.getCoveredText(m));
 				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
@@ -101,7 +102,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
+				entity.setLabel(UimaUtil.getCoveredText(m));
 				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
@@ -116,7 +117,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				if (entity == null) {
 					entity = new Entity(jcas);
 					entity.addToIndexes();
-					entity.setLabel(m.getCoveredText());
+					entity.setLabel(UimaUtil.getCoveredText(m));
 					entity.setColor(colorProvider.getNextColor().getRGB());
 					entityMap.put(id, entity);
 				}

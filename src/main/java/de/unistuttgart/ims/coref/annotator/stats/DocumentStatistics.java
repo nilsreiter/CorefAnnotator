@@ -8,8 +8,8 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
