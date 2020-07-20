@@ -91,7 +91,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=wide-spacing]", WideSpacing.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
-			ms.setN(element.attr(N));
+			if (element.hasAttr(N))
+				ms.setN(element.attr(N));
 			ms.setMilestoneType(element.attr(TYPE));
 		});
 		gxr.addRule("teiCorpus > TEI", Segment.class, (segment, element) -> {
