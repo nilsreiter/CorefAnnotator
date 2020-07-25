@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
@@ -226,7 +227,7 @@ public class UimaUtil {
 			arr.removeFromIndexes();
 		nArr.addToIndexes();
 		return nArr;
-	
+
 	}
 
 	public static <T extends FeatureStructure> FSArray<T> addTo(JCas jcas, FSArray<T> arr, T fs) {
@@ -244,7 +245,7 @@ public class UimaUtil {
 		arr.removeFromIndexes();
 		nArr.addToIndexes();
 		return nArr;
-	
+
 	}
 
 	public static void removeFlagKey(FeatureStructure fs, String flagKey) {
@@ -255,7 +256,7 @@ public class UimaUtil {
 		} catch (CASRuntimeException | CASException e) {
 			e.printStackTrace();
 		}
-	
+
 	}
 
 	public static StringArray removeFrom(JCas jcas, StringArray arr, String fs) {
@@ -312,9 +313,9 @@ public class UimaUtil {
 		char[] text = annotation.getCAS().getDocumentText().toCharArray();
 		if (s.length == 0)
 			return annotation;
-	
+
 		int b = annotation.getBegin(), e = annotation.getEnd();
-	
+
 		if (b > 0) {
 			char prev = text[b - 1];
 			while (b > 0 && Character.isLetter(prev)) {
@@ -327,7 +328,7 @@ public class UimaUtil {
 					prev = text[b - 1];
 			}
 		}
-	
+
 		if (e < text.length) {
 			char next = text[e];
 			while (e < text.length && Character.isLetter(next)) {
@@ -338,7 +339,7 @@ public class UimaUtil {
 					next = text[e];
 			}
 		}
-	
+
 		annotation.setBegin(b);
 		annotation.setEnd(e);
 		return annotation;
@@ -386,6 +387,15 @@ public class UimaUtil {
 			return;
 		else
 			fs.setFeatureValue(feature, arr);
+	}
+
+	public static boolean isGroup(Object o) {
+		if (!(o instanceof Entity))
+			return false;
+		Entity e = (Entity) o;
+		if (e.getMembers() == null)
+			return false;
+		return e.getMembers().size() > 0;
 	}
 
 }

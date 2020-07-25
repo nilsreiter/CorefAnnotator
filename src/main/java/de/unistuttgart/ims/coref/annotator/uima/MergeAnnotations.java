@@ -16,7 +16,6 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 
@@ -40,11 +39,8 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 			// handle entities
 			for (Entity oldEntity : JCasUtil.select(jcas2, Entity.class)) {
 				Entity newEntity;
-				if (oldEntity instanceof EntityGroup) {
-					newEntity = new EntityGroup(jcas);
-				} else {
-					newEntity = new Entity(jcas);
-				}
+
+				newEntity = new Entity(jcas);
 				newEntity.setLabel(oldEntity.getLabel());
 				newEntity.setColor(oldEntity.getColor());
 				newEntity.addToIndexes();
@@ -58,17 +54,15 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 					}
 				}
 
-			}
-
-			// handle entity groups
-			for (EntityGroup oldEntity : JCasUtil.select(jcas2, EntityGroup.class)) {
-				EntityGroup newEntity = (EntityGroup) entityMap.get(oldEntity);
-				FSArray<Entity> arr = new FSArray<Entity>(jcas, oldEntity.getMembers().size());
-				arr.addToIndexes();
-				newEntity.setMembers(arr);
-				for (int i = 0; i < oldEntity.getMembers().size(); i++) {
-					newEntity.setMembers(i, entityMap.get(oldEntity.getMembers(i)));
+				if (UimaUtil.isGroup(oldEntity)) {
+					FSArray<Entity> arr = new FSArray<Entity>(jcas, oldEntity.getMembers().size());
+					arr.addToIndexes();
+					newEntity.setMembers(arr);
+					for (int i = 0; i < oldEntity.getMembers().size(); i++) {
+						newEntity.setMembers(i, entityMap.get(oldEntity.getMembers(i)));
+					}
 				}
+
 			}
 
 			// handle mentions
