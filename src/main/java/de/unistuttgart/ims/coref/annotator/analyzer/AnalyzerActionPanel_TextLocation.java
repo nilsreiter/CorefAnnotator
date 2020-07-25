@@ -26,6 +26,22 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_GenericChartTable {
+	public class MyTableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Class<?> getColumnClass(int c) {
+			switch (c) {
+			case 0:
+				return Entity.class;
+			default:
+				return String.class;
+			}
+		}
+	}
+
+	private static final long serialVersionUID = 1L;
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
@@ -34,7 +50,17 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 	}
 
-	private static final long serialVersionUID = 1L;
+	@Override
+	protected String[] getColumnNames() {
+		return new String[] { Annotator.getString(Strings.ANALYZER_ENTITY),
+				Annotator.getString(Strings.ANALYZER_KWIC_LEFT), Annotator.getString(Strings.ANALYZER_KWIC_CENTER),
+				Annotator.getString(Strings.ANALYZER_KWIC_RIGHT) };
+	}
+
+	@Override
+	protected MyTableModel getTableModel() {
+		return new MyTableModel();
+	}
 
 	@Override
 	public AnalysisAction getType() {
@@ -99,33 +125,6 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 		revalidate();
 
-	}
-
-	@Override
-	protected MyTableModel getTableModel() {
-		return new MyTableModel();
-	}
-
-	public class MyTableModel extends DefaultTableModel {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Class<?> getColumnClass(int c) {
-			switch (c) {
-			case 0:
-				return Entity.class;
-			default:
-				return String.class;
-			}
-		}
-	}
-
-	@Override
-	protected String[] getColumnNames() {
-		return new String[] { Annotator.getString(Strings.ANALYZER_ENTITY),
-				Annotator.getString(Strings.ANALYZER_KWIC_LEFT), Annotator.getString(Strings.ANALYZER_KWIC_CENTER),
-				Annotator.getString(Strings.ANALYZER_KWIC_RIGHT) };
 	}
 
 }
