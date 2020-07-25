@@ -3,19 +3,18 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 
 public class RemoveEntitiesFromEntityGroup implements CoreferenceModelOperation {
 	ImmutableList<Entity> entities;
-	EntityGroup entityGroup;
+	Entity entityGroup;
 
-	public RemoveEntitiesFromEntityGroup(EntityGroup entityGroup, Iterable<Entity> entities) {
+	public RemoveEntitiesFromEntityGroup(Entity entityGroup, Iterable<Entity> entities) {
 		this.entities = Lists.immutable.withAll(entities);
 		this.entityGroup = entityGroup;
 	}
 
-	public RemoveEntitiesFromEntityGroup(EntityGroup entityGroup, Entity... entities) {
+	public RemoveEntitiesFromEntityGroup(Entity entityGroup, Entity... entities) {
 		this.entities = Lists.immutable.of(entities);
 		this.entityGroup = entityGroup;
 	}
@@ -28,11 +27,11 @@ public class RemoveEntitiesFromEntityGroup implements CoreferenceModelOperation 
 		this.entities = entities;
 	}
 
-	public EntityGroup getEntityGroup() {
+	public Entity getEntityGroup() {
 		return entityGroup;
 	}
 
-	public void setEntityGroup(EntityGroup entityGroup) {
+	public void setEntityGroup(Entity entityGroup) {
 		this.entityGroup = entityGroup;
 	}
 

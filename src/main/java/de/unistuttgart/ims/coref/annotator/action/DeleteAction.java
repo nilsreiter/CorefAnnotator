@@ -25,7 +25,6 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
@@ -82,8 +81,8 @@ public class DeleteAction extends TargetedIkonAction<DocumentWindow> implements 
 
 				if (fs instanceof Entity) {
 					FeatureStructure parentFs = node.getParent().getFeatureStructure();
-					if (parentFs instanceof EntityGroup) {
-						operations.add(new RemoveEntitiesFromEntityGroup((EntityGroup) parentFs, node.getEntity()));
+					if (UimaUtil.isGroup(parentFs)) {
+						operations.add(new RemoveEntitiesFromEntityGroup((Entity) parentFs, node.getEntity()));
 					} else if (node.isLeaf()) {
 						operations.add(new RemoveEntities(getTarget().getSelectedEntities()));
 					}

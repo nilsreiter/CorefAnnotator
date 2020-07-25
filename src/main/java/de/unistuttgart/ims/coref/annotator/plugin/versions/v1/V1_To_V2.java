@@ -16,7 +16,6 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
@@ -94,18 +93,14 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 		if (oldEntity == null)
 			return null;
 		if (!entityMap.containsKey(oldEntity)) {
-			Entity newEntity;
+			Entity newEntity = new Entity(jcas);
 			if (oldEntity instanceof de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup) {
 				de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup oldEntityGroup = (de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup) oldEntity;
-				EntityGroup newEntityG = new EntityGroup(jcas);
-				newEntityG.setMembers(new FSArray<Entity>(jcas, oldEntityGroup.getMembers().size()));
-				newEntityG.getMembers().addToIndexes();
-				for (int i = 0; i < newEntityG.getMembers().size(); i++) {
-					newEntityG.setMembers(i, getEntity(jcas, oldEntityGroup.getMembers(i)));
+				newEntity.setMembers(new FSArray<Entity>(jcas, oldEntityGroup.getMembers().size()));
+				newEntity.getMembers().addToIndexes();
+				for (int i = 0; i < newEntity.getMembers().size(); i++) {
+					newEntity.setMembers(i, getEntity(jcas, oldEntityGroup.getMembers(i)));
 				}
-				newEntity = newEntityG;
-			} else {
-				newEntity = new Entity(jcas);
 			}
 			newEntity.addToIndexes();
 			if (oldEntity.getLabel() != null)

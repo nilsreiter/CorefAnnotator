@@ -11,9 +11,9 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Tooltipable {
 
@@ -95,9 +95,9 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	@Override
 	public String getToolTip() {
-		if (getUserObject() instanceof EntityGroup) {
+		if (UimaUtil.isGroup((Entity) getUserObject())) {
 			StringBuilder b = new StringBuilder();
-			EntityGroup entityGroup = (EntityGroup) getUserObject();
+			Entity entityGroup = (Entity) getUserObject();
 			if (entityGroup.getMembers().size() > 0) {
 				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
 					b.append(entityGroup.getMembers(0).getLabel());
