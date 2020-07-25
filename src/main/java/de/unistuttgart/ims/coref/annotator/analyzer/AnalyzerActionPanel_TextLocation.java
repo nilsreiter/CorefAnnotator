@@ -18,6 +18,8 @@ import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.LegendLayout;
 import org.knowm.xchart.style.Styler.LegendPosition;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
@@ -56,13 +58,15 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		chart.getStyler().setYAxisTitleVisible(false);
 		chart.getStyler().setLegendVisible(false);
 
-		MutableList<String[]> mentionLines = Lists.mutable.empty();
+		MutableList<Object[]> mentionLines = Lists.mutable.empty();
 		int width = 50;
 
 		// Series
 
 		int y = 0;
 		for (Entity e : entities) {
+			Color entityColor = new Color(e.getColor());
+
 			List<Integer> xData = new ArrayList<Integer>();
 			List<Integer> yData = new ArrayList<Integer>();
 			List<String> labels = new ArrayList<String>();
@@ -75,19 +79,18 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 				String left = documentModel.getJcas().getDocumentText().substring(begin - width, begin);
 				String center = UimaUtil.getCoveredText(m);
 				String right = documentModel.getJcas().getDocumentText().substring(end, end + width);
-				mentionLines.add(new String[] { left, center, right });
+				mentionLines.add(new Object[] { e, left, center, right });
 			}
 
 			if (xData.isEmpty())
 				continue;
 			XYSeries series = chart.addSeries(e.getLabel(), xData, yData);
 			series.setToolTips(labels.toArray(new String[labels.size()]));
-			series.setFillColor(new Color(e.getColor()));
+			series.setFillColor(entityColor);
 			y++;
 		}
 
-		tableModel.setDataVector(mentionLines.toArray(new Object[mentionLines.size()][]),
-				new String[] { "left", "center", "right" });
+		tableModel.setDataVector(mentionLines.toArray(new Object[mentionLines.size()][]), this.getColumnNames());
 
 		XChartPanel<XYChart> chartPanel = new XChartPanel<XYChart>(chart);
 		chartPanel.setPreferredSize(new Dimension(chartWidth, chartHeight));
@@ -110,12 +113,19 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		@Override
 		public Class<?> getColumnClass(int c) {
 			switch (c) {
-//			case 0:
-//				return Color.class;
+			case 0:
+				return Entity.class;
 			default:
 				return String.class;
 			}
 		}
+	}
+
+	@Override
+	protected String[] getColumnNames() {
+		return new String[] { Annotator.getString(Strings.ANALYZER_ENTITY),
+				Annotator.getString(Strings.ANALYZER_KWIC_LEFT), Annotator.getString(Strings.ANALYZER_KWIC_CENTER),
+				Annotator.getString(Strings.ANALYZER_KWIC_RIGHT) };
 	}
 
 }

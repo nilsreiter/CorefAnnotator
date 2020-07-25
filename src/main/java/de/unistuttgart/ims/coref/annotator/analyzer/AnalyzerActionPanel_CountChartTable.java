@@ -61,12 +61,6 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 		super(documentModel, entity);
 	}
 
-	@Override
-	protected void init() {
-		super.init();
-		jtable.setDefaultRenderer(Color.class, new ColorTableCellRenderer());
-	}
-
 	abstract void calculateCounts();
 
 	int getTotalNumber() {
@@ -156,8 +150,7 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 		// TABLE
 		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { seriesMap.get(s).getFillColor(), s, i }, null))
 				.keysView().toArray(new Object[cts.size()][]);
-		tableModel.setDataVector(dv, new String[] { "Color", Annotator.getString(Strings.ANALYZER_DATATABLE_MENTIONS),
-				Annotator.getString(Strings.ANALYZER_DATATABLE_COUNT) });
+		tableModel.setDataVector(dv, this.getColumnNames());
 
 		revalidate();
 	}
@@ -248,6 +241,13 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 				return Integer.class;
 			}
 		}
+	}
+
+	@Override
+	protected String[] getColumnNames() {
+		return new String[] { Annotator.getString(Strings.ANALYZER_COLOR),
+				Annotator.getString(Strings.ANALYZER_DATATABLE_MENTIONS),
+				Annotator.getString(Strings.ANALYZER_DATATABLE_COUNT) };
 	}
 
 }

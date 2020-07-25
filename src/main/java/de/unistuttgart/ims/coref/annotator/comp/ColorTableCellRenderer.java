@@ -1,4 +1,4 @@
-package de.unistuttgart.ims.coref.annotator.analyzer;
+package de.unistuttgart.ims.coref.annotator.comp;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -6,8 +6,6 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 
 public class ColorTableCellRenderer extends DefaultTableCellRenderer {
 
