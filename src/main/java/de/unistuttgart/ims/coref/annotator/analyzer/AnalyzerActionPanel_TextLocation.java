@@ -64,6 +64,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 						Mention rowMention = (Mention) jtable.getValueAt(r, 0);
 						if (rowMention == m) {
 							jtable.setRowSelectionInterval(r, r);
+							jtable.scrollRectToVisible(jtable.getCellRect(r, 0, false));
 						}
 					}
 				}
@@ -88,12 +89,6 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			}
 		}
 
-	}
-
-	public class SeriesWrapper {
-		Entity entity;
-		ImmutableSet<Mention> mentions;
-		XYSeries series;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -148,6 +143,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		chart.getStyler().setChartBackgroundColor(getBackground());
 		chart.getStyler().setToolTipsAlwaysVisible(false);
 		chart.getStyler().setYAxisTitleVisible(false);
+		chart.getStyler().setYAxisTicksVisible(false);
 		chart.getStyler().setLegendVisible(false);
 		chart.getStyler().setInfoPanelVisible(false);
 		chart.setInfoContent(Lists.immutable.of("bla", "blubb").castToList());
