@@ -943,7 +943,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
+				UimaUtil.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -1172,7 +1172,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
-			boolean isGrey = Util.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50;
+			boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50;
 			Color entityColor = new Color(entity.getColor());
 
 			if (isGrey) {

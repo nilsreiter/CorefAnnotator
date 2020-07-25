@@ -25,7 +25,6 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
@@ -207,10 +206,10 @@ public class XLSXWriter extends SingleFileStream {
 				row.createCell(cellNum++).setCellValue(entity.getLabel());
 				row.createCell(cellNum++).setCellValue((entity instanceof EntityGroup));
 				for (Flag flag : entityFlags) {
-					row.createCell(cellNum++).setCellValue(Util.isX(entity, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(entity, flag.getKey()));
 				}
 				for (Flag flag : mentionFlags) {
-					row.createCell(cellNum++).setCellValue(Util.isX(mention, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(mention, flag.getKey()));
 				}
 			}
 			entityNum++;

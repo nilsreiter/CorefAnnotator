@@ -16,7 +16,6 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.TreeSelectionUtil;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
@@ -58,7 +57,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 			en = tsu.isClass(flagModel.getTargetClass(flag));
 			setEnabled(en);
 			putValue(Action.SELECTED_KEY,
-					en && tsu.getFeatureStructures().allSatisfy(fs -> Util.isX(fs, flag.getKey())));
+					en && tsu.getFeatureStructures().allSatisfy(fs -> UimaUtil.isX(fs, flag.getKey())));
 		} catch (ClassNotFoundException ex) {
 			Annotator.logger.catching(ex);
 			setEnabled(false);

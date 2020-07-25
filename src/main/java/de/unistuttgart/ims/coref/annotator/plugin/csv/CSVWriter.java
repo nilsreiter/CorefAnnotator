@@ -18,7 +18,6 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
@@ -195,10 +194,10 @@ public class CSVWriter extends SingleFileWriter {
 					p.print(entity.getLabel());
 					p.print((entity instanceof EntityGroup));
 					for (Flag flag : entityFlags) {
-						p.print(Util.isX(entity, flag.getKey()));
+						p.print(UimaUtil.isX(entity, flag.getKey()));
 					}
 					for (Flag flag : mentionFlags) {
-						p.print(Util.isX(mention, flag.getKey()));
+						p.print(UimaUtil.isX(mention, flag.getKey()));
 					}
 					p.println();
 				}

@@ -12,10 +12,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.dkpro>2.1.0</version.dkpro>
 		<version.ikonli>2.1.1</version.ikonli>
-		<version.eclipse>9.2.0</version.eclipse>
+		<version.eclipse>10.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13.0.1</version.javafx>
+		<version.javafx>13.0.2</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -212,7 +212,7 @@
 							<dependency>
 								<groupId>org.codehaus.plexus</groupId>
 								<artifactId>plexus-archiver</artifactId>
-								<version>4.1.0</version>
+								<version>4.2.2</version>
 							</dependency>
 							<dependency>
 								<groupId>org.apache.velocity</groupId>
@@ -361,15 +361,17 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
+			<version>2.13.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>28.1-jre</version>
+			<version>29.0-jre</version>
 		</dependency>
 
 		<dependency>
@@ -395,7 +397,7 @@
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
-			<version>0.9.11</version>
+			<version>0.9.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -449,7 +451,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.1.0</version>
+			<version>3.4.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -461,11 +463,6 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-swing</artifactId>
 			<version>${version.javafx}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>2.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
