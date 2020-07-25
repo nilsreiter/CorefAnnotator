@@ -1,9 +1,15 @@
 package de.unistuttgart.ims.coref.annotator.analyzer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.table.DefaultTableModel;
+
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.MutableList;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -17,14 +23,16 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
-public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
-
-	private static final long serialVersionUID = 1L;
+public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_GenericChartTable {
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
+
 		init();
+
 	}
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public AnalysisAction getType() {
@@ -32,8 +40,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 	}
 
 	@Override
-	void refresh() {
-		removeAll();
+	public void refresh() {
+		chartPanelContainer.removeAll();
 
 		XYChart chart = new XYChartBuilder().width(chartWidth).height(chartHeight).build();
 
@@ -46,17 +54,28 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 		chart.getStyler().setChartBackgroundColor(getBackground());
 		chart.getStyler().setToolTipsAlwaysVisible(false);
 		chart.getStyler().setYAxisTitleVisible(false);
+		chart.getStyler().setLegendVisible(false);
+
+		MutableList<String[]> mentionLines = Lists.mutable.empty();
+		int width = 50;
 
 		// Series
+
 		int y = 0;
 		for (Entity e : entities) {
 			List<Integer> xData = new ArrayList<Integer>();
 			List<Integer> yData = new ArrayList<Integer>();
 			List<String> labels = new ArrayList<String>();
 			for (Mention m : documentModel.getCoreferenceModel().getMentions(e)) {
-				xData.add(UimaUtil.getBegin(m));
+				int begin = UimaUtil.getBegin(m), end = UimaUtil.getEnd(m);
+				xData.add(begin);
 				yData.add(y);
 				labels.add(UimaUtil.getCoveredText(m));
+
+				String left = documentModel.getJcas().getDocumentText().substring(begin - width, begin);
+				String center = UimaUtil.getCoveredText(m);
+				String right = documentModel.getJcas().getDocumentText().substring(end, end + width);
+				mentionLines.add(new String[] { left, center, right });
 			}
 
 			if (xData.isEmpty())
@@ -67,56 +86,36 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel {
 			y++;
 		}
 
-		// JList<Mention> exampleSentences = new JList<Mention>();
-		// DefaultListModel<Mention> listModel = new DefaultListModel<Mention>();
-		// exampleSentences.setModel(listModel);
-		/*
-		 * exampleSentences.setCellRenderer(new DefaultListCellRenderer() {
-		 * 
-		 * private static final long serialVersionUID = 1L;
-		 * 
-		 * @Override public Component getListCellRendererComponent(JList<?> list, Object
-		 * value, int index, boolean isSelected, boolean cellHasFocus) { return
-		 * super.getListCellRendererComponent(list, ((Annotation)
-		 * value).getCoveredText(), index, isSelected, cellHasFocus); }
-		 * 
-		 * });
-		 */
+		tableModel.setDataVector(mentionLines.toArray(new Object[mentionLines.size()][]),
+				new String[] { "left", "center", "right" });
 
 		XChartPanel<XYChart> chartPanel = new XChartPanel<XYChart>(chart);
-		/*
-		 * chartPanel.addMouseListener(new MouseListener() {
-		 * 
-		 * @Override public void mouseClicked(MouseEvent e) { listModel.clear(); int x =
-		 * (int) Math.ceil(chart.getChartXFromCoordinate(e.getX()));
-		 * MutableSet<Annotation> ms = documentModel.getCoreferenceModel().getMentions(x
-		 * + 1); for (Annotation a : ms) { listModel.addElement((Mention) a); } }
-		 * 
-		 * @Override public void mousePressed(MouseEvent e) {
-		 * 
-		 * }
-		 * 
-		 * @Override public void mouseReleased(MouseEvent e) {
-		 * 
-		 * }
-		 * 
-		 * @Override public void mouseEntered(MouseEvent e) { }
-		 * 
-		 * @Override public void mouseExited(MouseEvent e) {
-		 * 
-		 * }
-		 * 
-		 * });
-		 */
-		add(chartPanel);
-		chartConstraints(chartPanel);
+		chartPanel.setPreferredSize(new Dimension(chartWidth, chartHeight));
 
-		// add(exampleSentences);
-		// layout.putConstraint(SpringLayout.SOUTH, exampleSentences, -2 * gap,
-		// SpringLayout.SOUTH, this);
+		chartPanelContainer.add(chartPanel, BorderLayout.CENTER);
 
 		revalidate();
 
+	}
+
+	@Override
+	protected MyTableModel getTableModel() {
+		return new MyTableModel();
+	}
+
+	public class MyTableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Class<?> getColumnClass(int c) {
+			switch (c) {
+//			case 0:
+//				return Color.class;
+			default:
+				return String.class;
+			}
+		}
 	}
 
 }

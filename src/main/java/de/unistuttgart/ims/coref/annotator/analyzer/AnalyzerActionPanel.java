@@ -19,8 +19,8 @@ public abstract class AnalyzerActionPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	DocumentModel documentModel;
-	int gap = 5;
-	SpringLayout layout;
+	protected int gap = 5;
+	protected SpringLayout layout;
 	JPanel optionPanel;
 	int chartWidth = 700;
 	int chartHeight = 500;
@@ -32,13 +32,13 @@ public abstract class AnalyzerActionPanel extends JPanel {
 		this.entities = entity;
 	}
 
-	void chartConstraints(Component c) {
+	protected void chartConstraints(Component c) {
 		layout.putConstraint(SpringLayout.WEST, c, gap, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, c, gap, SpringLayout.SOUTH, optionPanel);
 		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, c);
 	}
 
-	void init() {
+	protected void init() {
 		setPreferredSize(new Dimension(700, 800));
 
 		layout = new SpringLayout();

@@ -12,14 +12,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import org.eclipse.collections.api.map.MutableMap;
@@ -27,6 +24,7 @@ import org.eclipse.collections.api.map.MutableMapIterable;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle;
 import org.knowm.xchart.PieChart;
@@ -35,7 +33,6 @@ import org.knowm.xchart.PieSeries;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.internal.series.Series;
 import org.knowm.xchart.style.Styler.LegendPosition;
-import org.knowm.xchart.style.XChartTheme;
 import org.knowm.xchart.style.colors.XChartSeriesColors;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -43,11 +40,10 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel {
+public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerActionPanel_GenericChartTable {
 
 	enum ChartType {
 		PIE, BAR
@@ -59,37 +55,19 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 	double limit = 0.01;
 
-	JTable jtable = new JTable();
-	MyTableModel tableModel = new MyTableModel();
-	JScrollPane tableScroller = new JScrollPane(jtable);
-	JPanel chartPanelContainer = new JPanel();
 	ChartType chartType = ChartType.BAR;
 
-	public AnalyzerActionPanel_ChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
+	public AnalyzerActionPanel_CountChartTable(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
 	}
 
-	abstract void calculateCounts();
-
 	@Override
-	void init() {
+	protected void init() {
 		super.init();
-
-		chartPanelContainer.setLayout(new BorderLayout());
-		add(chartPanelContainer);
-		chartConstraints(chartPanelContainer);
-
-		jtable.setAutoCreateRowSorter(true);
-		jtable.setModel(tableModel);
-		jtable.setShowGrid(true);
 		jtable.setDefaultRenderer(Color.class, new ColorTableCellRenderer());
-		add(tableScroller);
-
-		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, this, gap, SpringLayout.EAST, tableScroller);
-		layout.putConstraint(SpringLayout.SOUTH, this, gap, SpringLayout.SOUTH, tableScroller);
-		layout.putConstraint(SpringLayout.NORTH, tableScroller, gap, SpringLayout.SOUTH, chartPanelContainer);
 	}
+
+	abstract void calculateCounts();
 
 	int getTotalNumber() {
 		if (this.cts == null)
@@ -118,12 +96,14 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 		switch (chartType) {
 		case BAR:
-			CategoryChart categoryChart = new CategoryChart(chartWidth, chartHeight, new MyTheme());
+			CategoryChart categoryChart = new CategoryChartBuilder().width(chartWidth).height(chartHeight)
+					.title(getClass().getSimpleName()).build();
 
 			categoryChart.getStyler().setLegendPosition(LegendPosition.OutsideE);
 			categoryChart.getStyler().setChartBackgroundColor(getBackground());
 			categoryChart.getStyler().setChartTitleVisible(false);
 			categoryChart.getStyler().setDefaultSeriesRenderStyle(CategorySeriesRenderStyle.Bar);
+			categoryChart.getStyler().setLegendVisible(false);
 
 			// Series
 			int snum = 0;
@@ -152,6 +132,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			pieChart.getStyler().setLegendPosition(LegendPosition.OutsideE);
 			pieChart.getStyler().setChartBackgroundColor(getBackground());
 			pieChart.getStyler().setChartTitleVisible(false);
+			pieChart.getStyler().setLegendVisible(false);
 
 			// Series
 			snum = 0;
@@ -181,35 +162,9 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		revalidate();
 	}
 
-	public class MyTableModel extends DefaultTableModel {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Class<?> getColumnClass(int c) {
-			switch (c) {
-			case 0:
-				return Color.class;
-			case 1:
-				return String.class;
-			default:
-				return Integer.class;
-			}
-		}
-	}
-
-	public class ColorTableCellRenderer extends DefaultTableCellRenderer {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			c.setText(null);
-			c.setIcon(new ColorIcon(10, 10, (Color) value));
-			return c;
-		}
+	@Override
+	protected MyTableModel getTableModel() {
+		return new MyTableModel();
 	}
 
 	@Override
@@ -278,11 +233,21 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		return pan;
 	}
 
-	class MyTheme extends XChartTheme {
+	public class MyTableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = 1L;
+
 		@Override
-		public boolean isLegendVisible() {
-			return false;
-		};
+		public Class<?> getColumnClass(int c) {
+			switch (c) {
+			case 0:
+				return Color.class;
+			case 1:
+				return String.class;
+			default:
+				return Integer.class;
+			}
+		}
 	}
 
 }

@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.comp.TranslatedListCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
-public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_ChartTable {
+public class AnalyzerActionPanel_Neighbour extends AnalyzerActionPanel_CountChartTable {
 
 	private static final long serialVersionUID = 1L;
 

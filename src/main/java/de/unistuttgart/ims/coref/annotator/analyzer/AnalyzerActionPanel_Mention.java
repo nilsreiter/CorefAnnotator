@@ -19,7 +19,7 @@ import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.comp.TranslatedListCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
-public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_ChartTable {
+public class AnalyzerActionPanel_Mention extends AnalyzerActionPanel_CountChartTable {
 
 	private static final long serialVersionUID = 1L;
 
