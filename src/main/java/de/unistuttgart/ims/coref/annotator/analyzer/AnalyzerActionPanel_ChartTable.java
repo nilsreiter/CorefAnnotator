@@ -19,25 +19,31 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.map.MutableMapIterable;
+import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle;
 import org.knowm.xchart.PieChart;
 import org.knowm.xchart.PieChartBuilder;
 import org.knowm.xchart.PieSeries;
 import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.internal.series.Series;
 import org.knowm.xchart.style.Styler.LegendPosition;
+import org.knowm.xchart.style.XChartTheme;
+import org.knowm.xchart.style.colors.XChartSeriesColors;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
@@ -76,6 +82,7 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		jtable.setAutoCreateRowSorter(true);
 		jtable.setModel(tableModel);
 		jtable.setShowGrid(true);
+		jtable.setDefaultRenderer(Color.class, new ColorTableCellRenderer());
 		add(tableScroller);
 
 		layout.putConstraint(SpringLayout.WEST, tableScroller, gap, SpringLayout.WEST, this);
@@ -105,10 +112,13 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			cts2.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
 					(int) smallest.valuesView().sumOfInt(i -> i));
 
+		MutableMap<String, Series> seriesMap = Maps.mutable.empty();
+
+		Color[] colors = new XChartSeriesColors().getSeriesColors();
+
 		switch (chartType) {
 		case BAR:
-			CategoryChart categoryChart = new CategoryChartBuilder().width(chartWidth).height(chartHeight)
-					.title(getClass().getSimpleName()).build();
+			CategoryChart categoryChart = new CategoryChart(chartWidth, chartHeight, new MyTheme());
 
 			categoryChart.getStyler().setLegendPosition(LegendPosition.OutsideE);
 			categoryChart.getStyler().setChartBackgroundColor(getBackground());
@@ -121,7 +131,11 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 				CategorySeries series = categoryChart.addSeries(c, new int[] { snum++ }, new int[] { cts2.get(c) });
 				if (c.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
 					series.setFillColor(Color.lightGray);
+				} else {
+					series.setFillColor(colors[snum % colors.length]);
 				}
+
+				seriesMap.put(c, series);
 			}
 			XChartPanel<CategoryChart> categoryChartPanel;
 			categoryChartPanel = new XChartPanel<CategoryChart>(categoryChart);
@@ -140,13 +154,17 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 			pieChart.getStyler().setChartTitleVisible(false);
 
 			// Series
-
-			cts2.forEach((s, i) -> {
-				PieSeries series = pieChart.addSeries(s, i);
+			snum = 0;
+			for (String s : cts2.keySet()) {
+				PieSeries series = pieChart.addSeries(s, cts2.get(s));
 				if (s.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
 					series.setFillColor(Color.lightGray);
+				} else {
+					series.setFillColor(colors[snum++ % colors.length]);
 				}
-			});
+				seriesMap.put(s, series);
+
+			}
 
 			XChartPanel<PieChart> chartPanel;
 			chartPanel = new XChartPanel<PieChart>(pieChart);
@@ -155,9 +173,9 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 		}
 
 		// TABLE
-		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { s, i }, null)).keysView()
-				.toArray(new Object[cts.size()][]);
-		tableModel.setDataVector(dv, new String[] { Annotator.getString(Strings.ANALYZER_DATATABLE_MENTIONS),
+		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { seriesMap.get(s).getFillColor(), s, i }, null))
+				.keysView().toArray(new Object[cts.size()][]);
+		tableModel.setDataVector(dv, new String[] { "Color", Annotator.getString(Strings.ANALYZER_DATATABLE_MENTIONS),
 				Annotator.getString(Strings.ANALYZER_DATATABLE_COUNT) });
 
 		revalidate();
@@ -169,10 +187,28 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 
 		@Override
 		public Class<?> getColumnClass(int c) {
-			if (c == 0)
+			switch (c) {
+			case 0:
+				return Color.class;
+			case 1:
 				return String.class;
-			else
+			default:
 				return Integer.class;
+			}
+		}
+	}
+
+	public class ColorTableCellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			c.setText(null);
+			c.setIcon(new ColorIcon(10, 10, (Color) value));
+			return c;
 		}
 	}
 
@@ -240,6 +276,13 @@ public abstract class AnalyzerActionPanel_ChartTable extends AnalyzerActionPanel
 				5, 5);// xPad, yPad
 
 		return pan;
+	}
+
+	class MyTheme extends XChartTheme {
+		@Override
+		public boolean isLegendVisible() {
+			return false;
+		};
 	}
 
 }
