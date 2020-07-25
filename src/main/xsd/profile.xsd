@@ -43,6 +43,14 @@
     					</sequence>
     				</complexType>
     			</element>
+    			<element name="guidelines" maxOccurs="1"
+    				minOccurs="0">
+    				<complexType>
+    					<attribute name="url" type="anyURI" use="required"></attribute>
+    					<attribute name="title" type="string" use="optional"></attribute>
+    					<attribute name="version" type="string" use="optional"></attribute>
+    				</complexType>
+    			</element>
     		</all>
     		<attribute name="name" type="string" use="required"></attribute>
     	</complexType>
