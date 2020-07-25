@@ -9,10 +9,16 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -53,7 +59,6 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 				int begin = UimaUtil.getBegin(m) - 10;
 				int end = UimaUtil.getEnd(m) + 10;
 				if (begin <= x && end >= x /* && Math.abs(yLevel - y) < 0.1 */) {
-					System.err.println("Mention " + UimaUtil.getCoveredText(m) + " selected.");
 					jtable.clearSelection();
 					for (int r = 0; r < jtable.getRowCount(); r++) {
 						Mention rowMention = (Mention) jtable.getValueAt(r, 0);
@@ -76,6 +81,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			switch (c) {
 			case 0:
 				return Mention.class;
+			case 1:
+				return Integer.class;
 			default:
 				return String.class;
 			}
@@ -83,7 +90,14 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 	}
 
+	public class SeriesWrapper {
+		Entity entity;
+		ImmutableSet<Mention> mentions;
+		XYSeries series;
+	}
+
 	private static final long serialVersionUID = 1L;
+	ListSelectionModel tableSelectionModel = new DefaultListSelectionModel();
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
@@ -95,8 +109,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 	@Override
 	protected String[] getColumnNames() {
 		return new String[] { Annotator.getString(Strings.ANALYZER_ENTITY),
-				Annotator.getString(Strings.ANALYZER_KWIC_LEFT), Annotator.getString(Strings.ANALYZER_KWIC_CENTER),
-				Annotator.getString(Strings.ANALYZER_KWIC_RIGHT) };
+				Annotator.getString(Strings.ANALYZER_POSITION), Annotator.getString(Strings.ANALYZER_KWIC_LEFT),
+				Annotator.getString(Strings.ANALYZER_KWIC_CENTER), Annotator.getString(Strings.ANALYZER_KWIC_RIGHT) };
 	}
 
 	@Override
@@ -113,6 +127,10 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 	protected void init() {
 		super.init();
 		jtable.setDefaultRenderer(Mention.class, new EntityFromMentionTableCellRenderer());
+		jtable.setSelectionModel(tableSelectionModel);
+
+		tableSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 	}
 
 	@Override
@@ -135,6 +153,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		chart.setInfoContent(Lists.immutable.of("bla", "blubb").castToList());
 
 		MutableList<Object[]> mentionLines = Lists.mutable.empty();
+		MutableMap<Mention, Integer> mentionIndex = Maps.mutable.empty();
 		int width = 50;
 
 		// Series
@@ -158,7 +177,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 				String left = documentModel.getJcas().getDocumentText().substring(begin - width, begin);
 				String center = UimaUtil.getCoveredText(m);
 				String right = documentModel.getJcas().getDocumentText().substring(end, end + width);
-				mentionLines.add(new Object[] { m, left, center, right });
+				mentionLines.add(new Object[] { m, begin, left, center, right });
+				mentionIndex.put(m, i);
 				i++;
 			}
 
@@ -170,6 +190,23 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			series.setCustomToolTips(true);
 			series.setFillColor(entityColor);
 			listeners.add(new EntityMouseListener(chart, e, series, y));
+			tableSelectionModel.addListSelectionListener(new ListSelectionListener() {
+
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					if (e.getValueIsAdjusting())
+						return;
+					// chart.resetFilter();
+					int row = e.getFirstIndex();
+					Mention m = (Mention) jtable.getValueAt(row, 0);
+					int seriesX = mentionIndex.get(m);
+					// chart.filterXByIndex(seriesX - 10, seriesX + 10);
+					// TODO: highlight data point or region in plot
+
+					// repaint();
+				}
+
+			});
 			y++;
 		}
 

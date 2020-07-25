@@ -121,8 +121,8 @@ public class Strings {
 	public static final String ANALYZER_ENTITY = "analyzer.entity";
 	public static final String ANALYZER_GROUPBY = "analyzer.groupby";
 	public static final String ANALYZER_GROUPBY_ = "analyzer.groupby.";
-	public static final String ANALYZER_KWIC_LEFT = "analyzer.kwic.left";
 	public static final String ANALYZER_KWIC_CENTER = "analyzer.kwic.center";
+	public static final String ANALYZER_KWIC_LEFT = "analyzer.kwic.left";
 	public static final String ANALYZER_KWIC_RIGHT = "analyzer.kwic.right";
 	public static final String ANALYZER_NEIGHBOUR_DIRECTION = "analyzer.neighbour.direction";
 	public static final String ANALYZER_NEIGHBOUR_DIRECTION_ = "analyzer.neighbour.direction.";
@@ -131,6 +131,7 @@ public class Strings {
 	public static final String ANALYZER_PLOT_PLOT_TYPE_PIE = "analyzer.plot.plot_type.pie";
 	public static final String ANALYZER_PLOT_REST_CATEGORY = "analyzer.plot.rest_category";
 	public static final String ANALYZER_PLOT_REST_LIMIT = "analyzer.plot.rest_limit";
+	public static final String ANALYZER_POSITION = "analyzer.position";
 	public static final String ANALYZER_UNIT = "analyzer.neighbour.unit";
 	public static final String ANALYZER_UNIT_ = "analyzer.neighbour.unit.";
 	public static final String ANALZYER_ACTIONS = "analyzer.actions";
