@@ -145,7 +145,6 @@ import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
@@ -1079,8 +1078,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			Operation operation = null;
 			if (targetFS instanceof Entity) {
 				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Entity)
-						&& targetFS instanceof EntityGroup) {
-					operation = new AddEntityToEntityGroup((EntityGroup) targetFS,
+						&& UimaUtil.isGroup((Entity) targetFS)) {
+					operation = new AddEntityToEntityGroup((Entity) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
 				}
@@ -1189,7 +1188,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				lab1.setText(visLabel + " [" + entity.getKey() + "] (" + treeNode.getChildCount() + ")");
 			} else if (!(treeNode.getParent().isEntity()))
 				lab1.setText(visLabel + " (" + treeNode.getChildCount() + ")");
-			if (entity instanceof EntityGroup) {
+			if (UimaUtil.isGroup(entity)) {
 				panel.add(Box.createRigidArea(new Dimension(5, 5)));
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}

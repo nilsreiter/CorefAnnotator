@@ -23,7 +23,6 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
@@ -90,8 +89,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				} else if (fs instanceof Mention || fs instanceof Entity) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
-					if (fs instanceof EntityGroup) {
-						EntityGroup eg = (EntityGroup) fs;
+					if (fs instanceof Entity && UimaUtil.isGroup((Entity) fs)) {
+						Entity eg = (Entity) fs;
 						for (int j = 0; j < eg.getMembers().size(); j++)
 							try {
 								insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
@@ -104,7 +103,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			optResort();
 			break;
 		case Remove:
-			if (event.getArgument1() instanceof EntityGroup) {
+			if (UimaUtil.isGroup((Entity) event.getArgument1())) {
 				CATreeNode gn = fsMap.get(event.getArgument1());
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
 						.collect(n -> n.getFeatureStructure());

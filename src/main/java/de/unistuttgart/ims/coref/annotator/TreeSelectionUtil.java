@@ -12,8 +12,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class TreeSelectionUtil {
 	TreeSelectionEvent currentEvent = null;
@@ -76,7 +76,7 @@ public class TreeSelectionUtil {
 	}
 
 	public boolean isEntityGroup() {
-		return featureStructures.allSatisfy(f -> f instanceof EntityGroup);
+		return featureStructures.allSatisfy(f -> UimaUtil.isGroup(f));
 	}
 
 	public boolean isLeaf() {

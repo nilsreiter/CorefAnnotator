@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
@@ -399,6 +400,15 @@ public class UimaUtil {
 		ImmutableList<MentionSurface> mss = Lists.immutable
 				.withAll(JCasUtil.selectPreceding(MentionSurface.class, UimaUtil.getFirst(m), n));
 		return mss.collect(ms -> ms.getMention()).toSet().toList();
+	}
+
+	public static boolean isGroup(Object o) {
+		if (!(o instanceof Entity))
+			return false;
+		Entity e = (Entity) o;
+		if (e.getMembers() == null)
+			return false;
+		return e.getMembers().size() > 0;
 	}
 
 }

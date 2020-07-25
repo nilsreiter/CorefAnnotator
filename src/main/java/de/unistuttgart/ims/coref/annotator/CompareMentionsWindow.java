@@ -63,7 +63,6 @@ import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
@@ -129,7 +128,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			}
 			for (Entity e : JCasUtil.select(jcas, Entity.class)) {
 				entities++;
-				if (e instanceof EntityGroup)
+				if (UimaUtil.isGroup(e))
 					entityGroups++;
 			}
 		}

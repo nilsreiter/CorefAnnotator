@@ -9,8 +9,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityLabel extends JLabel {
@@ -27,7 +26,7 @@ public class EntityLabel extends JLabel {
 			this.setForeground(Color.BLACK);
 
 		this.setText(StringUtils.abbreviate(entity.getLabel(), Constants.UI_MAX_STRING_WIDTH_IN_STATUSBAR));
-		if (entity instanceof EntityGroup) {
+		if (UimaUtil.isGroup(entity)) {
 			this.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE, (isGrey ? Color.GRAY : entityColor)));
 		} else {
 			this.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, (isGrey ? Color.GRAY : entityColor)));

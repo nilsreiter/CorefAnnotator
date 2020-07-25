@@ -41,7 +41,6 @@ import de.unistuttgart.ims.coref.annotator.Spans;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v2.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
@@ -102,7 +101,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	MutableSetMultimap<Entity, Mention> entityMentionMap = Multimaps.mutable.set.empty();
 
-	MutableSetMultimap<Entity, EntityGroup> entityEntityGroupMap = Multimaps.mutable.set.empty();
+	MutableSetMultimap<Entity, Entity> entityEntityGroupMap = Multimaps.mutable.set.empty();
 
 	Map<Character, Entity> keyMap = Maps.mutable.empty();
 
@@ -148,17 +147,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
 		e.setFlags(new StringArray(documentModel.getJcas(), 0));
+		e.setMembers(new FSArray<Entity>(documentModel.getJcas(), 0));
 		e.addToIndexes();
-		return e;
-	}
-
-	protected EntityGroup createEntityGroup(String l, int initialSize) {
-		EntityGroup e = new EntityGroup(documentModel.getJcas());
-		e.setColor(colorMap.getNextColor().getRGB());
-		e.setLabel(l);
-		e.setFlags(new StringArray(documentModel.getJcas(), 0));
-		e.addToIndexes();
-		e.setMembers(new FSArray<Entity>(documentModel.getJcas(), initialSize));
 		return e;
 	}
 
@@ -312,7 +302,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		} else if (operation instanceof GroupEntities) {
 			GroupEntities op = (GroupEntities) operation;
 			Annotator.logger.trace("Forming entity group with {}.", op.getEntities());
-			EntityGroup eg = createEntityGroup(createEntityGroupLabel(op.getEntities()), op.getEntities().size());
+			Entity eg = createEntity(createEntityGroupLabel(op.getEntities()));
+			eg.setMembers(new FSArray<Entity>(documentModel.getJcas(), op.getEntities().size()));
 			for (int i = 0; i < op.getEntities().size(); i++) {
 				eg.setMembers(i, op.getEntities().get(i));
 				entityEntityGroupMap.put(op.getEntities().get(i), eg);
@@ -615,22 +606,20 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	public String getToolTipText(FeatureStructure featureStructure) {
-		if (featureStructure instanceof EntityGroup) {
-			StringBuilder b = new StringBuilder();
-			EntityGroup entityGroup = (EntityGroup) featureStructure;
-			if (entityGroup.getMembers().size() > 0) {
-				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
-					b.append(entityGroup.getMembers(0).getLabel());
-				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+		if (featureStructure instanceof Entity) {
+			Entity e = (Entity) featureStructure;
+			if (!e.getMembers().isEmpty()) {
+				StringBuilder b = new StringBuilder();
+				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
+					b.append(e.getMembers(0).getLabel());
+				for (int i = 1; i < e.getMembers().size(); i++) {
 					b.append(", ");
-					b.append(entityGroup.getMembers(i).getLabel());
+					b.append(e.getMembers(i).getLabel());
 				}
 				return b.toString();
-			} else {
-				return null;
-			}
-		} else if (featureStructure instanceof Entity) {
-			return ((Entity) featureStructure).getLabel();
+			} else
+				return e.getLabel();
+
 		}
 		return null;
 	}
@@ -739,7 +728,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			m.removeFromIndexes();
 			// TODO: remove parts
 		}
-		for (EntityGroup group : entityEntityGroupMap.get(entity)) {
+		for (Entity group : entityEntityGroupMap.get(entity)) {
 			group.setMembers(UimaUtil.removeFrom(documentModel.getJcas(), group.getMembers(), entity));
 			updateEntityGroupLabel(group);
 			fireEvent(Event.get(this, Event.Type.Remove, group, entity));
@@ -776,7 +765,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @param eg
 	 * @param entity
 	 */
-	private void removeFrom(EntityGroup eg, Entity entity) {
+	private void removeFrom(Entity eg, Entity entity) {
 		FSArray<Entity> oldArray = eg.getMembers();
 		FSArray<Entity> arr = new FSArray<Entity>(documentModel.getJcas(), oldArray.size() - 1);
 
@@ -863,7 +852,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			op.getFeatureStructures().forEach(e -> {
 				e.addToIndexes();
 				if (op.entityEntityGroupMap.containsKey(e)) {
-					for (EntityGroup group : op.entityEntityGroupMap.get(e)) {
+					for (Entity group : op.entityEntityGroupMap.get(e)) {
 						group.setMembers(UimaUtil.addTo(documentModel.getJcas(), group.getMembers(), e));
 						entityEntityGroupMap.put(e, group);
 						updateEntityGroupLabel(group);
@@ -997,7 +986,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		fireEvent(Event.get(this, Type.Remove, operation.getNewMention().getEntity(), operation.getNewMention()));
 	}
 
-	private void updateEntityGroupLabel(EntityGroup entityGroup) {
+	private void updateEntityGroupLabel(Entity entityGroup) {
 		entityGroup.setLabel(createEntityGroupLabel(
 				Lists.immutable.ofAll(entityGroup.getMembers()).selectInstancesOf(Entity.class)));
 
