@@ -866,7 +866,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + "Unknown");
 		miscLabel2.repaint();
 
-		if (model.getProfile().getGuidelines() != null) {
+		if (model.getProfile() != null && model.getProfile().getGuidelines() != null) {
 			Action glAction = new ShowGuidelinesAction(model.getProfile());
 			menu_help.add(glAction);
 			controls.add(glAction);
