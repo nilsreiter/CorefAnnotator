@@ -18,6 +18,10 @@ CorefAnnotator can be customized a bit, using preferences. They are stored in th
 <li><code>CFG_CREATE_DEFAULT_FLAGS</code> (default: <code>false</code>). In older versions of CorefAnnotator flags were built into the program and not changeable. For coreference annotation, a few flags were pre-defined. If this is set to true, they are created automatically when a new document is created.</li>
 <li><code>CFG_DELETE_EMPTY_ENTITIES</code> (default: <code>false</code>). If set to true, as soon as an entity is empty (i.e., doesn't have any mentions) it is removed.</li>
 <li><code>CFG_FULL_TOKENS</code> (default: <code>true</code>). If true, annotated a new mention will automatically expand the selection so that the full token is annotated. A token, in this case, is delimited by whatever matches on <code>\\b</code> in a regular expression. This works mostly, but not always, to user satisfaction. If it doesn't (or you need sub-token annotations), you can always disable this on the fly -- the next mention will not be expanded.</li>
+<li><code>CFG_TRIM_WHITESPACE</code> (default: <code>true</code>). Annotators do not always pay attention not to include a space character into their selection. If this setting is set to true, whitespace at the beginning or end of the selection is not included in the annotation.</li>
+<li><code>CFG_SHOW_TEXT_LABELS</code> (default: <code>true</code>). This setting controls whether flags in the tree view are shown as symbols only. If set to false, only the symbol is shown. By default, text and symbol are visible.</li>
+<li><code>CFG_SHOW_TOC</code> (default: <code>true</code>). If the document contains segments (chapters, texts, or acts/scenes), they can be displayed as a table of contents. The TOC is shown to the left of the text.</li>
+<li>
 </ul>
 
 
@@ -25,13 +29,9 @@ String CFG_ANNOTATOR_ID = "Unknown annotator";
 	public static final int CFG_AUTOSAVE_TIMER = 300000;
 	public static final EntitySortOrder CFG_ENTITY_SORT_ORDER = EntitySortOrder.Mentions;
 	public static final boolean CFG_ENTITY_SORT_DESCENDING = true;
-	public static final boolean CFG_FULL_TOKENS = true;
 	public static final boolean CFG_KEEP_TREE_SORTED = true;
 	public static final int CFG_SEARCH_RESULTS_CONTEXT = 50;
-	public static final boolean CFG_SHOW_TEXT_LABELS = true;
-	public static final boolean CFG_SHOW_TOC = true;
 	public static final boolean CFG_SHOW_LINE_NUMBER_IN_TREE = true;
-	public static final boolean CFG_TRIM_WHITESPACE = true;
 	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;
 	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
 	public static final boolean CFG_UNDERLINE_SINGLETONS_IN_GRAY = false;
