@@ -10,6 +10,7 @@ import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Maps;
@@ -52,11 +53,15 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 				if (first) {
 					if (m.getSurface().size() > 1)
-						newElement.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\""
-								+ (m.getFlags().getLength() > 0 ? " ana=\"" + StringUtils.join(m.getFlags(), ",") + "\""
-										: ""));
+						newElement
+								.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\""
+										+ (m.getFlags().getLength() > 0 ? " ana=\"" + StringUtils.join(
+												Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
+												+ "\"" : ""));
 					else
-						newElement.setAttributes(" ref=\"#" + xid + "\"");
+						newElement.setAttributes(" ref=\"#" + xid + "\" ana=\""
+								+ StringUtils.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
+								+ "\"");
 					first = false;
 				} else {
 					newElement.setAttributes(" ref=\"#" + xid + "\" prev=\"" + mentionId + "\"");

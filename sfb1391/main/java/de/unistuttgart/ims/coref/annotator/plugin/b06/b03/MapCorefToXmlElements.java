@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -11,6 +12,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
@@ -56,9 +58,15 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 				if (first) {
 					if (m.getSurface().size() > 1)
-						newElement.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\"");
+						newElement
+								.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\""
+										+ (m.getFlags().getLength() > 0 ? " ana=\"" + StringUtils.join(
+												Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
+												+ "\"" : ""));
 					else
-						newElement.setAttributes(" ref=\"#" + xid + "\"");
+						newElement.setAttributes(" ref=\"#" + xid + "\" ana=\""
+								+ StringUtils.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
+								+ "\"");
 					first = false;
 				} else {
 					newElement.setAttributes(" ref=\"#" + xid + "\" prev=\"" + mentionId + "\"");
