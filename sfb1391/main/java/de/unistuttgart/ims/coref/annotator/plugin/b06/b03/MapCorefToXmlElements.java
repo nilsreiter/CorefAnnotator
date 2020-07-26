@@ -56,21 +56,20 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 						XMLElement.class);
 				newElement.setTag("rs");
 
+				StringBuilder b = new StringBuilder();
+				b.append(' ').append("ref=\"#").append(xid).append('"');
 				if (first) {
 					if (m.getSurface().size() > 1)
-						newElement
-								.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\""
-										+ (m.getFlags().getLength() > 0 ? " ana=\"" + StringUtils.join(
-												Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
-												+ "\"" : ""));
-					else
-						newElement.setAttributes(" ref=\"#" + xid + "\" ana=\""
-								+ StringUtils.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ",")
-								+ "\"");
+						b.append(" id=\"").append(mentionId).append('"');
+					if (m.getFlags() != null && !m.getFlags().isEmpty())
+						b.append(" ana=\"").append(
+								StringUtils.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ","))
+								.append('"');
 					first = false;
 				} else {
-					newElement.setAttributes(" ref=\"#" + xid + "\" prev=\"" + mentionId + "\"");
+					b.append(' ').append("prev=\"").append(mentionId).append("\"");
 				}
+				newElement.setAttributes(b.toString());
 			}
 
 		}
