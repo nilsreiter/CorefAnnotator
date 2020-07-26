@@ -37,6 +37,7 @@ public class HelpWindow extends JFrame {
 		public static final HelpTopic FLAGS = topics[4];
 		public static final HelpTopic IO = topics[5];
 		public static final HelpTopic SEARCH = topics[6];
+		public static final HelpTopic PREFERENCES = topics[7];
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -46,7 +47,7 @@ public class HelpWindow extends JFrame {
 			new HelpTopic("How to annotate", "howto"), new HelpTopic("Compare annotations", "compare"),
 			new HelpTopic("Automatic processing", "processing"), new HelpTopic("Flag editing", "flags"),
 			new HelpTopic("Input/Output", "io", s -> new JScrollPane(loadIOPlugins())),
-			new HelpTopic("Search", "search") };
+			new HelpTopic("Search", "search"), new HelpTopic("Preferences", "preferences") };
 
 	JList<String> topicList;
 
@@ -80,7 +81,7 @@ public class HelpWindow extends JFrame {
 
 	}
 
-	protected static JEditorPane load(String path) {
+	protected static Component load(String path) {
 		JEditorPane textArea;
 		try {
 			if (!path.endsWith(".html"))
@@ -107,7 +108,7 @@ public class HelpWindow extends JFrame {
 					}
 				}
 			});
-			return textArea;
+			return new JScrollPane(textArea);
 		} catch (IOException e) {
 			Annotator.logger.catching(e);
 		}
