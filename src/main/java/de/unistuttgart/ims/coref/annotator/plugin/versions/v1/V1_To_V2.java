@@ -5,6 +5,7 @@ import org.apache.uima.fit.descriptor.TypeCapability;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.eclipse.collections.api.map.MutableMap;
@@ -16,6 +17,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
@@ -32,11 +34,17 @@ import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 public class V1_To_V2 extends TypeSystemVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Mention, Mention> mentionMap = Maps.mutable.empty();
+	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Flag, Flag> flagMap = Maps.mutable.empty();
 	MutableSet<TOP> toRemove = Sets.mutable.empty();
 
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 		Annotator.logger.info("Converting type system from v1 to v2");
+
+		for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : JCasUtil.select(jcas,
+				de.unistuttgart.ims.coref.annotator.api.v1.Flag.class)) {
+			getFlag(jcas, oldFlag);
+		}
 
 		// map entities and entity groups
 		for (de.unistuttgart.ims.coref.annotator.api.v1.Entity oldEntity : JCasUtil.select(jcas,
@@ -58,6 +66,15 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 		meta.setTypeSystemVersion(TypeSystemVersion.v2.name());
 	}
 
+	Flag getFlag(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag) {
+		Flag newFlag = new Flag(jcas);
+		newFlag.setIcon(oldFlag.getIcon());
+		newFlag.setKey(oldFlag.getKey());
+		newFlag.setLabel(oldFlag.getLabel());
+		flagMap.put(oldFlag, newFlag);
+		return newFlag;
+	}
+
 	protected Mention getMention(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Mention oldMention) {
 		if (!mentionMap.containsKey(oldMention)) {
 			Mention mention = UimaUtil.createMention(jcas, oldMention.getBegin(), oldMention.getEnd());
@@ -73,7 +90,13 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 				newEntity.setLabel(UimaUtil.getCoveredText(mention));
 				mention.setEntity(newEntity);
 			}
-			mention.setFlags(oldMention.getFlags());
+			mention.setFlags(new EmptyFSList<Flag>(jcas));
+			for (String flagKey : oldMention.getFlags()) {
+				for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
+					if (oldFlag.getKey().equalsIgnoreCase(flagKey))
+						mention.getFlags().push(flagMap.get(oldFlag));
+				}
+			}
 			if (oldMention.getDiscontinuous() != null) {
 				MentionSurface ms = AnnotationFactory.createAnnotation(jcas, oldMention.getDiscontinuous().getBegin(),
 						oldMention.getDiscontinuous().getEnd(), MentionSurface.class);
@@ -105,7 +128,13 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			newEntity.addToIndexes();
 			if (oldEntity.getLabel() != null)
 				newEntity.setLabel(oldEntity.getLabel());
-			newEntity.setFlags(oldEntity.getFlags());
+			newEntity.setFlags(new EmptyFSList<Flag>(jcas));
+			for (String flagKey : oldEntity.getFlags()) {
+				for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
+					if (oldFlag.getKey().equalsIgnoreCase(flagKey))
+						newEntity.getFlags().push(flagMap.get(oldFlag));
+				}
+			}
 			newEntity.setColor(oldEntity.getColor());
 			newEntity.setKey(oldEntity.getKey());
 			newEntity.setXmlId(oldEntity.getXmlId());

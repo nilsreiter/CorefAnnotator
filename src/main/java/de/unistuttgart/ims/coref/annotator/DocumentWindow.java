@@ -1196,8 +1196,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (entity.getFlags() != null)
-				for (String flagKey : entity.getFlags()) {
-					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+				for (Flag flag : entity.getFlags()) {
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
 				}
 			return panel;
@@ -1227,8 +1226,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			lab1.setText(b.toString());
 			if (m.getFlags() != null)
-				for (String flagKey : m.getFlags()) {
-					Flag flag = fm.getFlag(flagKey);
+				for (Flag flag : m.getFlags()) {
 					addFlag(panel, flag, Color.black);
 				}
 
