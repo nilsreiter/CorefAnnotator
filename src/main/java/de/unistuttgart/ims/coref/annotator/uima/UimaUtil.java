@@ -398,4 +398,13 @@ public class UimaUtil {
 		return e.getMembers().size() > 0;
 	}
 
+	public static Mention createMention(JCas jcas, int begin, int end) {
+		MentionSurface ms = AnnotationFactory.createAnnotation(jcas, begin, end, MentionSurface.class);
+		Mention m = new Mention(jcas);
+		m.addToIndexes();
+		m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+		m.setSurface(0, ms);
+		ms.setMention(m);
+		return m;
+	}
 }
