@@ -388,13 +388,13 @@ public class UimaUtil {
 		return nArr;
 	}
 
-	public static <T extends TOP> FSList<T> removeFrom(JCas jcas, FSList<T> list, FeatureStructure fs) {
-		FSList<T> retList = new EmptyFSList<T>(jcas);
+	public static <T extends TOP> FSList<T> removeFrom(FSList<T> list, FeatureStructure fs) {
+		FSList<T> retList = new EmptyFSList<T>(list.getJCas());
 		Iterator<T> iter = list.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();
 			if (element != fs)
-				retList.push(element);
+				retList = retList.push(element);
 		}
 		return retList;
 	}

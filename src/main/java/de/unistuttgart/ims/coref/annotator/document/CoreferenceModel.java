@@ -480,13 +480,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			FSList<Flag> flags = (FSList<Flag>) fs.getFeatureValue(feature);
 
 			if (UimaUtil.isX(fs, operation.getFlag())) {
-
-				fs.setFeatureValue(feature, UimaUtil.removeFrom(documentModel.getJcas(), flags, operation.getFlag()));
+				fs.setFeatureValue(feature, UimaUtil.removeFrom(flags, operation.getFlag()));
 			} else {
 				if (flags == null) {
 					fs.setFeatureValue(feature, new NonEmptyFSList<Flag>(documentModel.getJcas(), operation.getFlag()));
 				} else {
-					flags.push(operation.getFlag());
+					fs.setFeatureValue(feature, flags.push(operation.getFlag()));
 				}
 			}
 		});
