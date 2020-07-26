@@ -133,9 +133,9 @@ public class UimaUtil {
 
 	public static Mention selectMentionByIndex(JCas jcas, int index) {
 		Iterator<Mention> iterator = jcas.getIndexedFSs(Mention.class).iterator();
-		while (iterator.hasNext() && index-- >= 0) {
+		while (iterator.hasNext() && index >= 0) {
 			Mention m = iterator.next();
-			if (index == 0)
+			if (index-- == 0)
 				return m;
 		}
 		return null;
@@ -394,6 +394,7 @@ public class UimaUtil {
 		m.addToIndexes();
 		m.setSurface(new FSArray<MentionSurface>(jcas, 1));
 		m.setSurface(0, ms);
+		m.getSurface().addToIndexes();
 		ms.setMention(m);
 		return m;
 	}
