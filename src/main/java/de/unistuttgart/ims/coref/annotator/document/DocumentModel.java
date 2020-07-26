@@ -83,16 +83,16 @@ public class DocumentModel implements Model {
 		return documentStateListeners.add(e);
 	}
 
-	public void edit(Operation operation) {
+	public <T extends Operation> T edit(T operation) {
 		Annotator.logger.trace(operation);
-		edit(operation, true);
+		return edit(operation, true);
 	}
 
-	private void edit(Operation operation, boolean addToHistory) {
+	private <T extends Operation> T edit(T operation, boolean addToHistory) {
 
 		if (isBlocked(operation.getClass())) {
 			Annotator.logger.info("Operation {} blocked.", operation.getClass().getCanonicalName());
-			return;
+			return operation;
 		}
 
 		if (operation instanceof DocumentModelOperation)
@@ -105,6 +105,7 @@ public class DocumentModel implements Model {
 		if (addToHistory)
 			history.push(operation);
 		fireDocumentChangedEvent();
+		return operation;
 	}
 
 	protected void edit(DocumentModelOperation operation) {

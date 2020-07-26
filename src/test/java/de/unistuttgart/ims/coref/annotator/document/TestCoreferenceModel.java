@@ -286,14 +286,12 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveDuplicates() {
-		model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4)));
+		Entity e = model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4))).getEntity();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
-
-		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
 
 		model.edit(new RemoveDuplicateMentionsInEntities(e));
 
@@ -312,14 +310,14 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveEntityThatIsInGroup() {
-		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
-		model.edit(new AddMentionsToNewEntity(new Span(1, 2)));
+		Entity e1 = model.edit(new AddMentionsToNewEntity(new Span(0, 1))).getEntity();
+		Entity e2 = model.edit(new AddMentionsToNewEntity(new Span(1, 2))).getEntity();
 
 		ImmutableList<Entity> entities = Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class));
 		ImmutableList<Mention> mentions = Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class));
 
-		assertEquals(entities.getFirst(), mentions.getFirst().getEntity());
-		assertEquals(entities.getLast(), mentions.getLast().getEntity());
+		assertEquals(e2, mentions.getFirst().getEntity());
+		assertEquals(e1, mentions.getLast().getEntity());
 
 		GroupEntities ge = new GroupEntities(entities.get(0), entities.get(1));
 		model.edit(ge);

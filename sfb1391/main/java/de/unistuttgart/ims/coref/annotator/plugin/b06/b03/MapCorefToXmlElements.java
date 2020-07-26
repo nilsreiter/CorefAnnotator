@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.plugin.b06.b03;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +16,7 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
@@ -45,10 +46,25 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			Entity e = m.getEntity();
 			String xid = toXmlId(e);
-			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, UimaUtil.getBegin(m), UimaUtil.getEnd(m),
-					XMLElement.class);
-			newElement.setTag(RS);
-			newElement.setAttributes(" ref=\"#" + xid + "\"");
+
+			boolean first = true;
+			String mentionId = UUID.randomUUID().toString();
+			for (MentionSurface ms : m.getSurface()) {
+				XMLElement newElement = AnnotationFactory.createAnnotation(jcas, ms.getBegin(), ms.getEnd(),
+						XMLElement.class);
+				newElement.setTag("rs");
+
+				if (first) {
+					if (m.getSurface().size() > 1)
+						newElement.setAttributes(" ref=\"#" + xid + "\" id=\"" + mentionId + "\"");
+					else
+						newElement.setAttributes(" ref=\"#" + xid + "\"");
+					first = false;
+				} else {
+					newElement.setAttributes(" ref=\"#" + xid + "\" prev=\"" + mentionId + "\"");
+				}
+			}
+
 		}
 	}
 

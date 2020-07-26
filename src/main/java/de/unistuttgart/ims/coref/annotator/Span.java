@@ -4,8 +4,6 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import com.google.common.base.Objects;
-
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class Span {
@@ -26,7 +24,7 @@ public class Span {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(this.begin, this.end);
+		return begin * 31 + end;
 	}
 
 	@Override

@@ -563,7 +563,16 @@ public class Spans implements ImmutableList<Span> {
 
 	@Override
 	public boolean equals(Object o) {
-		return spans.equals(o);
+		if (!(o instanceof Spans))
+			return false;
+		Spans other = (Spans) o;
+		if (spans.size() != other.spans.size())
+			return false;
+		for (int i = 0; i < spans.size(); i++) {
+			if (!spans.get(i).equals(other.spans.get(i)))
+				return false;
+		}
+		return true;
 	}
 
 	@Override

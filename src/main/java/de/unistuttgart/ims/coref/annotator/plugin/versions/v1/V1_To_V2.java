@@ -60,7 +60,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 
 	protected Mention getMention(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Mention oldMention) {
 		if (!mentionMap.containsKey(oldMention)) {
-			Mention mention = UimaUtil.getMention(jcas, oldMention.getBegin(), oldMention.getEnd());
+			Mention mention = UimaUtil.createMention(jcas, oldMention.getBegin(), oldMention.getEnd());
 			mention.addToIndexes();
 			mention.setEntity(getEntity(jcas, oldMention.getEntity()));
 

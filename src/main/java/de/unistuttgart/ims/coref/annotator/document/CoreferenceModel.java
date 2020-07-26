@@ -170,7 +170,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
-		Mention m = UimaUtil.getMention(documentModel.getJcas(), b, e);
+		Mention m = UimaUtil.createMention(documentModel.getJcas(), b, e);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			AnnotationUtil.trim(m.getSurface(0));
 		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
@@ -366,16 +366,14 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
 		op.getEntities().forEach(e -> {
-			MutableListMultimap<Spans, Mention> map = Multimaps.mutable.list.empty();
+			MutableListMultimap<Spans, Mention> spanMentionMap = Multimaps.mutable.list.empty();
 			MutableList<Mention> toRemove = Lists.mutable.empty();
 			for (Mention m : entityMentionMap.get(e)) {
 				Spans s = new Spans(m);
-				if (map.containsKey(s)) {
-					for (Mention m2 : map.get(s)) {
-						map.put(s, m);
-					}
+				if (spanMentionMap.containsKey(s)) {
+					toRemove.add(m);
 				} else {
-					map.put(s, m);
+					spanMentionMap.put(s, m);
 				}
 			}
 
@@ -608,7 +606,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	public String getToolTipText(FeatureStructure featureStructure) {
 		if (featureStructure instanceof Entity) {
 			Entity e = (Entity) featureStructure;
-			if (!e.getMembers().isEmpty()) {
+			if (UimaUtil.isGroup(featureStructure)) {
 				StringBuilder b = new StringBuilder();
 				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
 					b.append(e.getMembers(0).getLabel());
