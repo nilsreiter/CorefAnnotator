@@ -608,7 +608,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	public String getToolTipText(FeatureStructure featureStructure) {
 		if (featureStructure instanceof Entity) {
 			Entity e = (Entity) featureStructure;
-			if (!e.getMembers().isEmpty()) {
+			if (UimaUtil.isGroup(featureStructure)) {
 				StringBuilder b = new StringBuilder();
 				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
 					b.append(e.getMembers(0).getLabel());
