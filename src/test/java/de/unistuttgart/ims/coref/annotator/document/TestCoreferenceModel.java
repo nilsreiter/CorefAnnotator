@@ -312,14 +312,14 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveEntityThatIsInGroup() {
-		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
-		model.edit(new AddMentionsToNewEntity(new Span(1, 2)));
+		Entity e1 = model.edit(new AddMentionsToNewEntity(new Span(0, 1))).getEntity();
+		Entity e2 = model.edit(new AddMentionsToNewEntity(new Span(1, 2))).getEntity();
 
 		ImmutableList<Entity> entities = Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class));
 		ImmutableList<Mention> mentions = Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class));
 
-		assertEquals(entities.getFirst(), mentions.getFirst().getEntity());
-		assertEquals(entities.getLast(), mentions.getLast().getEntity());
+		assertEquals(e2, mentions.getFirst().getEntity());
+		assertEquals(e1, mentions.getLast().getEntity());
 
 		GroupEntities ge = new GroupEntities(entities.get(0), entities.get(1));
 		model.edit(ge);
