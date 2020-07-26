@@ -18,6 +18,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.FSList;
+import org.apache.uima.jcas.cas.NonEmptyFSList;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -470,6 +471,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	protected void edit(ToggleGenericFlag operation) {
 		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
 		operation.getObjects().forEach(fs -> {
+
 			Feature feature = fs.getType().getFeatureByBaseName("Flags");
 
 			featureStructures.add(fs);
@@ -482,10 +484,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				fs.setFeatureValue(feature, UimaUtil.removeFrom(documentModel.getJcas(), flags, operation.getFlag()));
 			} else {
 				if (flags == null) {
-					fs.setFeatureValue(feature, new EmptyFSList<Flag>(documentModel.getJcas()));
-					flags = (FSList<Flag>) fs.getFeatureValue(feature);
+					fs.setFeatureValue(feature, new NonEmptyFSList<Flag>(documentModel.getJcas(), operation.getFlag()));
+				} else {
+					flags.push(operation.getFlag());
 				}
-				flags.push(operation.getFlag());
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
