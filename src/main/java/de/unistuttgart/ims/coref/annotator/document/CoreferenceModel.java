@@ -170,7 +170,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
-		Mention m = UimaUtil.getMention(documentModel.getJcas(), b, e);
+		Mention m = UimaUtil.createMention(documentModel.getJcas(), b, e);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			AnnotationUtil.trim(m.getSurface(0));
 		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))

@@ -105,16 +105,6 @@ public class UimaUtil {
 		return mention.getSurface(mention.getSurface().size() - 1).getEnd();
 	}
 
-	public static Mention getMention(JCas jcas, int begin, int end) {
-		MentionSurface sf = AnnotationFactory.createAnnotation(jcas, begin, end, MentionSurface.class);
-		Mention mention = new Mention(jcas);
-		sf.setMention(mention);
-		mention.setSurface(new FSArray<MentionSurface>(jcas, 1));
-		mention.setSurface(0, sf);
-		mention.addToIndexes();
-		return mention;
-	}
-
 	public static int compare(Mention m1, Mention m2) {
 		int returnValue = Integer.compare(UimaUtil.getBegin(m1), UimaUtil.getBegin(m2));
 		if (returnValue == 0)

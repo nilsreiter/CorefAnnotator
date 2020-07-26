@@ -25,7 +25,7 @@ public class ImportDKpro extends JCasAnnotator_ImplBase {
 			int maxLength = 0;
 			String maxLabel = null;
 			while (link != null) {
-				Mention m = UimaUtil.getMention(jcas, link.getBegin(), link.getEnd());
+				Mention m = UimaUtil.createMention(jcas, link.getBegin(), link.getEnd());
 				m.setEntity(e);
 				if (link.getCoveredText().length() > maxLength) {
 					maxLabel = link.getCoveredText();
