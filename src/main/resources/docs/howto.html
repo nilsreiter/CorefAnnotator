@@ -15,6 +15,7 @@ tree with a specific color, and the text segment you marked in the text is now
 underlined with the same color. The name of the entity will be the same as 
 the text segment. Both name and color can be changed at any time.</p>
 
+
 <h2>By keyboard</h2>
 
 <p>CorefAnnotator can be used by keyboard. To annotate, mark a text segment 
@@ -38,6 +39,11 @@ key can be pressed to assign the mention to an existing entity.</p>
 pressing the space bar on the keyboard) shows a context menu that
 contains candidates. The candidates are based on the previous mentions
 as well as textual overlap with the mentions of any other entities.</p>
+
+<h2>Discontinuous mentions</h2>
+
+<p>Since version 2.0, a mention can be non-continuous. To add a second text span to mention, simply select it in the text and drag it onto the existing mention in the tree. The label of the mention will now consist of the different spans, separated by a pipe symbol: |. There is no upper limit on the number of discontinous elements in a mention. Please note that there is no further relation between the different parts, except for their textual ordering.</p>
+
 
 </body>
 </html>
