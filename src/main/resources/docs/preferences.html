@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>CorefAnnotator Help</title>
+</head>
+<body style="font-family:sans-serif;font-size:12pt;">
+<h1>Preferences</h1>
+
+CorefAnnotator can be customized a bit, using preferences. They are stored in the home directory of the computer the program is running on. This page documents and explains the customization options.
+
+<h2>Setting preferences</h2>
+<p>Most preferences can be set via the menu "Settings" in the menu bar. Some need to/can be set in a .ini file. Preferences are meant to be persistent.</p>
+
+<h2>Overview</h2>
+<p>Each preference is listed with their internal key (an all-caps string starting with <code>CFG_</code>), their their default value and a brief explanation.</p>
+
+<ul>
+<li><code>CFG_COMPARE_BY_ENTITY_NAME</code> (default: <code>true</code>). This setting controls how the compare view works. If true, two mentions are considered equal if they have the same extent and refer to an entity with the same name. If false, they are considered equal if they only have the same extent.</li>
+<li><code>CFG_CREATE_DEFAULT_FLAGS</code> (default: <code>false</code>). In older versions of CorefAnnotator flags were built into the program and not changeable. For coreference annotation, a few flags were pre-defined. If this is set to true, they are created automatically when a new document is created.</li>
+<li><code>CFG_DELETE_EMPTY_ENTITIES</code> (default: <code>false</code>). If set to true, as soon as an entity is empty (i.e., doesn't have any mentions) it is removed.</li>
+<li><code>CFG_FULL_TOKENS</code> (default: <code>true</code>). If true, annotated a new mention will automatically expand the selection so that the full token is annotated. A token, in this case, is delimited by whatever matches on <code>\\b</code> in a regular expression. This works mostly, but not always, to user satisfaction. If it doesn't (or you need sub-token annotations), you can always disable this on the fly -- the next mention will not be expanded.</li>
+</ul>
+
+
+String CFG_ANNOTATOR_ID = "Unknown annotator";
+	public static final int CFG_AUTOSAVE_TIMER = 300000;
+	public static final EntitySortOrder CFG_ENTITY_SORT_ORDER = EntitySortOrder.Mentions;
+	public static final boolean CFG_ENTITY_SORT_DESCENDING = true;
+	public static final boolean CFG_FULL_TOKENS = true;
+	public static final boolean CFG_KEEP_TREE_SORTED = true;
+	public static final int CFG_SEARCH_RESULTS_CONTEXT = 50;
+	public static final boolean CFG_SHOW_TEXT_LABELS = true;
+	public static final boolean CFG_SHOW_TOC = true;
+	public static final boolean CFG_SHOW_LINE_NUMBER_IN_TREE = true;
+	public static final boolean CFG_TRIM_WHITESPACE = true;
+	public static final boolean CFG_ASK_BEFORE_FILE_OVERWRITE = true;
+	public static final boolean CFG_IGNORE_SINGLETONS_WHEN_COMPARING = true;
+	public static final boolean CFG_UNDERLINE_SINGLETONS_IN_GRAY = false;
+	public static final boolean CFG_STICKY_FLAGS = false;
+	public static final String CFG_MENTIONSURFACE_SEPARATOR = " | ";
+
+
+</body>
+</html>
