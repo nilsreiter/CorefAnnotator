@@ -17,7 +17,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -474,12 +474,18 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 			featureStructures.add(fs);
 
+			@SuppressWarnings("unchecked")
+			FSList<Flag> flags = (FSList<Flag>) fs.getFeatureValue(feature);
+
 			if (UimaUtil.isX(fs, operation.getFlag())) {
-				fs.setFeatureValue(feature, UimaUtil.removeFrom(documentModel.getJcas(),
-						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+
+				fs.setFeatureValue(feature, UimaUtil.removeFrom(documentModel.getJcas(), flags, operation.getFlag()));
 			} else {
-				fs.setFeatureValue(feature, UimaUtil.addTo(documentModel.getJcas(),
-						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+				if (flags == null) {
+					fs.setFeatureValue(feature, new EmptyFSList<Flag>(documentModel.getJcas()));
+					flags = (FSList<Flag>) fs.getFeatureValue(feature);
+				}
+				flags.push(operation.getFlag());
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));

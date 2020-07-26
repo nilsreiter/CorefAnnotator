@@ -287,6 +287,7 @@ public class UimaUtil {
 		return e.getMembers().size() > 0;
 	}
 
+	@Deprecated
 	public static boolean isX(FeatureStructure fs, String flag) {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		return contains((StringArray) fs.getFeatureValue(feature), flag);
@@ -297,7 +298,7 @@ public class UimaUtil {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		FeatureStructure flagsFS = fs.getFeatureValue(feature);
 		if (flagsFS instanceof FSList)
-			return contains((FSList<Flag>) fs, flag);
+			return contains((FSList<Flag>) flagsFS, flag);
 		return false;
 	}
 
@@ -385,6 +386,17 @@ public class UimaUtil {
 				j--;
 		}
 		return nArr;
+	}
+
+	public static <T extends TOP> FSList<T> removeFrom(JCas jcas, FSList<T> list, FeatureStructure fs) {
+		FSList<T> retList = new EmptyFSList<T>(jcas);
+		Iterator<T> iter = list.iterator();
+		while (iter.hasNext()) {
+			T element = iter.next();
+			if (element != fs)
+				retList.push(element);
+		}
+		return retList;
 	}
 
 	public static void removeMentionSurface(Mention mention, MentionSurface ms) {
