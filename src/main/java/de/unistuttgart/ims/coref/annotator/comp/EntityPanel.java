@@ -17,8 +17,8 @@ import org.kordamp.ikonli.swing.FontIcon;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
@@ -66,7 +66,7 @@ public class EntityPanel extends JPanel implements PreferenceChangeListener, Cor
 		if (color != null)
 			l.setForeground(color);
 		if (isShowText())
-			l.setText(Annotator.getString(flag.getLabel(), flag.getLabel()));
+			l.setText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
 		l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
 		panel.add(Box.createRigidArea(new Dimension(5, 5)));
 		panel.add(l);

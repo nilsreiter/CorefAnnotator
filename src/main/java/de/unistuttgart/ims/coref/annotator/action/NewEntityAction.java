@@ -14,7 +14,7 @@ import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 
-public class NewEntityAction extends TargetedIkonAction<DocumentWindow> {
+public class NewEntityAction extends TargetedOperationIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,6 +24,7 @@ public class NewEntityAction extends TargetedIkonAction<DocumentWindow> {
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
+		operationClass = AddMentionsToNewEntity.class;
 	}
 
 	@Override

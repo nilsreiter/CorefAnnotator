@@ -11,4 +11,7 @@ public class Constants {
 	public static final String FLOW_KEY_TOKENIZER = "Tokenizer";
 	public static final String FLOW_KEY_SENTENCE_SPLITTER = "Sentencer";
 	public static final String FLOW_KEY_CLEANER = "Cleaner";
+
+	public static final String DESCRIPTION = "Import from and Export into CoNLL 2012 format. All columns except surface, sentence and coreference are empty.";
+	public static final String NAME = "CoNLL 2012";
 }

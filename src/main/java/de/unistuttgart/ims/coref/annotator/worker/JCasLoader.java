@@ -25,22 +25,21 @@ import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
-import de.unistuttgart.ims.coref.annotator.plugins.IOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
-import de.unistuttgart.ims.coref.annotator.uima.Fix131;
-import de.unistuttgart.ims.uimautil.SetJCasLanguage;
+import de.unistuttgart.ims.coref.annotator.uima.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
 	InputStream inputStream = null;
 	TypeSystemDescription typeSystemDescription;
-	IOPlugin flavor;
+	UimaImportPlugin flavor;
 	File file = null;
 	String language = null;
 	Consumer<JCas> success = null;
 	Consumer<Exception> failConsumer = null;
 
-	public JCasLoader(File file, IOPlugin flavor, String language, Consumer<JCas> consumer,
+	public JCasLoader(File file, UimaImportPlugin flavor, String language, Consumer<JCas> consumer,
 			Consumer<Exception> failConsumer) {
 		this.success = consumer;
 		this.failConsumer = failConsumer;
@@ -87,7 +86,7 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 		}
 		try {
 			Annotator.logger.info("Applying importer from {}", flavor.getClass().getName());
-			SimplePipeline.runPipeline(jcas, flavor.getImporter(),
+			SimplePipeline.runPipeline(jcas, (flavor).getImporter(),
 					AnalysisEngineFactory.createEngineDescription(EnsureMeta.class));
 
 		} catch (AnalysisEngineProcessException | ResourceInitializationException e1) {
@@ -107,7 +106,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
 						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
 			b.add(flavor.getImporter());
-			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
 			SimplePipeline.runPipeline(jcas, b.createAggregateDescription());
 			return jcas;
@@ -119,7 +117,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
 						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
 			b.add(flavor.getImporter());
-			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
 			iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
 			if (iter.hasNext()) {

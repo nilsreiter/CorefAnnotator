@@ -3,10 +3,101 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.3
+
+- Added that wide-spaced text is now displayed with a serif font #315
+- Fixed a bug with the alignment of line numbers #316
+- Fixed a bug that prevented formatting info (italic etc.) to
+  be displayed correctly in the SFB1391 importer #314
+
+## 1.14.2
+
+- Fixed a bug what caused the auto-save to continue saving a file
+  even after the document had been closed #309
+
+## 1.14.1
+
+- Fixes a bug that prevented the export of full mention
+  tables to CSV or Excel #301
+- Export CSV/Excel files now contain segment information
+  (e.g., strophes) if included in the file #306
+- If no predefined line numbers are present, we fall back
+  to calculated line numbers #303
+
+## 1.14.0
+
+- Added a new preference called `sticky markers`. If enabled, 
+  changing the markers of any mention *also* changes the markers
+  of *all* mentions that cover the (exact) same span. Thus, the 
+  markers are "sticky" to their position. New mentions in other 
+  entities do *not* automatically get all the flags, but it's now 
+  possible to duplicate mentions and then move them to a new entity.
+  #271
+- Added a new view to show simple summary statistics, and an 
+  exporter that exports the same info as CSV file. #286
+- Automatic saving every 5 minutes #294
+
+## 1.13.0
+
+- CSV export has been improved in multiple ways
+  - Can now be done for the entire file
+  - It's possible so specify lines as context #261
+  - Line numbers can be included in the export #268
+- Line numbers in which mentions appear can now be shown 
+  in the tree #266
+- Segment annotations (e.g., stanzas or chapters) can now be 
+  displayed as a table of contents on the left of the text. 
+  The TOC is fully interactive and can be used to navigate in 
+  long texts i#263
+- Compare view now supports comparing the actual entity assignment.
+  This behavior can be enabled via the settings menu is only 
+  available if both files are loaded with the same profile, which 
+  also means they have to be in the same directory.
+  #272 #267
+- Opening multiple files at once is now much faster by using
+  the default dialog for opening files #275
+- Opening or importing a new document should no longer auto-
+  create the coreference-related flags ambiguous, difficult and 
+  Nonnominal. #277
+- If line numbers are displayed in the tree, and a segmentation 
+  exist, the segments are also displayed in the tree. #279
+- Added a new exporter that directly exports into MS Excel and 
+  is more configurable. #285
+
+## 1.12.2
+
+- Fixed the bug that the compare view hid some annotations if 
+  more than two annotators were compared, and more than two, but
+  not all of them had annotated something. #279
+
+## 1.12.1
+
+- Line numbers are now in sync with the lines they number #273
+
 ## 1.12.0
 
 - The app now includes a command line tool to convert multiple 
   files at once. #242
+- Added a SFB1391 specific importer than interprets `<lb>` tags 
+  properly #255
+- Export mention statistics now has some configuration options. 
+  Import and export plugins can have that as well now. #76
+- Sorting of entities in the tree is now case insensitive #257
+- Shortcut keys are now displayed in brackets #256
+- We can now specify a profile when loading the application #249. 
+  The profile is stored in an XML file called `profile.xml` in the same
+  directory as the XMI file to be loaded. The profile can
+  - pre-define flags and entities
+  - disallow operations
+  - set configuration options
+- Singletons can now be displayed in light gray #177
+  
+
+## 1.11.2
+
+- Using the QuaDramA/TEI importer no longer generates files in the
+  old format #246
+- Flags can now be deleted properly #247
 
 ## 1.11.1
 

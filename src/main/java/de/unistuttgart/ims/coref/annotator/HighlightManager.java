@@ -14,16 +14,18 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 
 class HighlightManager {
-	Map<Annotation, Object> underlineMap = new HashMap<Annotation, Object>();
+	Map<Object, Object> underlineMap = new HashMap<Object, Object>();
 	Map<Annotation, Object> highlightMap = new HashMap<Annotation, Object>();
 	DefaultHighlighter hilit;
 
 	RangedCounter spanCounter = new RangedCounter();
 	JTextComponent textComponent;
+	DocumentModel documentModel;
 
 	public HighlightManager(JTextComponent component) {
 		hilit = new DefaultHighlighter();
@@ -38,9 +40,8 @@ class HighlightManager {
 		underlineMap.clear();
 		spanCounter.clear();
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			highlight(m, new Color(m.getEntity().getColor()), false, false, null);
-			if (m.getDiscontinuous() != null)
-				highlight(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false, null);
+			for (MentionSurface ms : m.getSurface())
+				highlight(ms, new Color(m.getEntity().getColor()), false, false, null);
 
 		}
 		textComponent.repaint();
@@ -99,50 +100,32 @@ class HighlightManager {
 		highlight(a, c, false, false, new DefaultHighlighter.DefaultHighlightPainter(c));
 	}
 
-	public void underline(Annotation a) {
-		if (a instanceof Mention)
-			underline((Mention) a);
-		else if (a instanceof DetachedMentionPart)
-			underline((DetachedMentionPart) a);
-	}
-
-	public void underline(DetachedMentionPart dmp) {
-		hilit.setDrawsLayeredHighlights(true);
-		underline(dmp, new Color(dmp.getMention().getEntity().getColor()), true, true);
-		hilit.setDrawsLayeredHighlights(false);
-	}
-
 	public void underline(Mention m) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, new Color(m.getEntity().getColor()), false, true);
-		if (m.getDiscontinuous() != null)
-			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, true);
+		Color color = new Color(m.getEntity().getColor());
+		boolean dotted = false;
+		if (Annotator.app.getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
+				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			if (documentModel != null && documentModel.getCoreferenceModel().getMentions(m.getEntity()).size() == 1) {
+				color = Color.LIGHT_GRAY;
+				dotted = false;
+			}
+		}
+		for (MentionSurface ms : m.getSurface())
+			underline(ms, color, dotted, true);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Annotation m, Color color) {
-		if (m instanceof Mention)
-			underline((Mention) m, color);
-		else {
-			hilit.setDrawsLayeredHighlights(true);
-			underline(m, color, false, true);
-			hilit.setDrawsLayeredHighlights(false);
-		}
+		hilit.setDrawsLayeredHighlights(true);
+		underline(m, color, false, true);
+		hilit.setDrawsLayeredHighlights(false);
 	}
 
 	public void underline(Mention m, Color color) {
 		hilit.setDrawsLayeredHighlights(true);
-		underline(m, color, false, true);
-		if (m.getDiscontinuous() != null)
-			underline(m.getDiscontinuous(), color, true, true);
-		hilit.setDrawsLayeredHighlights(false);
-	}
-
-	public void underline(Mention m, boolean repaint) {
-		hilit.setDrawsLayeredHighlights(true);
-		underline(m, new Color(m.getEntity().getColor()), false, false);
-		if (m.getDiscontinuous() != null)
-			underline(m.getDiscontinuous(), new Color(m.getEntity().getColor()), true, false);
+		for (MentionSurface ms : m.getSurface())
+			underline(ms, color, false, false);
 		hilit.setDrawsLayeredHighlights(false);
 	}
 
@@ -154,6 +137,11 @@ class HighlightManager {
 		if (hi != null)
 			hilit.removeHighlight(hi);
 
+	}
+
+	public void unUnderline(Mention a) {
+		for (MentionSurface ms : a.getSurface())
+			unUnderline(ms);
 	}
 
 	public void unHighlight() {
@@ -175,6 +163,14 @@ class HighlightManager {
 			spanCounter.subtract(span, hi);
 		if (hi != null)
 			hilit.removeHighlight(hi);
+	}
+
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
+
+	public void setDocumentModel(DocumentModel documentModel) {
+		this.documentModel = documentModel;
 	}
 
 }

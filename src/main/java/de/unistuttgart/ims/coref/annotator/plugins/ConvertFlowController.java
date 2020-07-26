@@ -10,8 +10,8 @@ import org.apache.uima.flow.Step;
 import org.apache.uima.jcas.JCas;
 
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class ConvertFlowController extends JCasFlowController_ImplBase {
 
@@ -20,7 +20,7 @@ public class ConvertFlowController extends JCasFlowController_ImplBase {
 		return new JCasFlow_ImplBase() {
 			@Override
 			public Step next() throws AnalysisEngineProcessException {
-				Meta metaData = Util.getMeta(jcas);
+				Meta metaData = UimaUtil.getMeta(jcas);
 				if (metaData.getTypeSystemVersion() == null) {
 					return new SimpleStep(TypeSystemVersion.v1.name());
 				} else {

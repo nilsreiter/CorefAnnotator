@@ -22,12 +22,12 @@ import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
@@ -45,6 +45,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	Map<FeatureStructure, CATreeNode> fsMap = Maps.mutable.empty();
 
 	String currentSearchString = null;
+
+	MutableList<EntitySortOrderListener> entitySortOrderListeners = Lists.mutable.empty();
 
 	public EntityTreeModel(CoreferenceModel docMod) {
 		super(new CATreeNode(null, Annotator.getString("tree.root")));
@@ -66,6 +68,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			node = new CATreeNode(fs, ((Entity) fs).getLabel());
 		} else if (fs instanceof Annotation) {
 			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		} else if (fs instanceof Mention) {
+			node = new CATreeNode(fs, UimaUtil.getCoveredText((Mention) fs));
 		}
 		if (node != null)
 			fsMap.put(fs, node);
@@ -80,11 +84,13 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		case Add:
 			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
-				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
+				if (fs instanceof MentionSurface) {
+					nodeChanged(arg0);
+				} else if (fs instanceof Mention || fs instanceof Entity) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
-					if (fs instanceof EntityGroup) {
-						EntityGroup eg = (EntityGroup) fs;
+					if (fs instanceof Entity && UimaUtil.isGroup((Entity) fs)) {
+						Entity eg = (Entity) fs;
 						for (int j = 0; j < eg.getMembers().size(); j++)
 							try {
 								insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
@@ -97,7 +103,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			optResort();
 			break;
 		case Remove:
-			if (event.getArgument1() instanceof EntityGroup) {
+			if (UimaUtil.isGroup((Entity) event.getArgument1())) {
 				CATreeNode gn = fsMap.get(event.getArgument1());
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
 						.collect(n -> n.getFeatureStructure());
@@ -215,8 +221,6 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
 			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
-			if (m.getDiscontinuous() != null)
-				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
 		}
 		Annotator.logger.debug("Added all mentions");
 	}
@@ -304,11 +308,16 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 
 	public void setEntitySortOrder(EntitySortOrder entitySortOrder) {
 		this.entitySortOrder = entitySortOrder;
+		entitySortOrderListeners.forEach(l -> l.entitySortEvent(entitySortOrder, entitySortOrder.descending));
 	}
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
 		coreferenceModel.getDocumentModel()
 				.edit(new UpdateEntityName(((CATreeNode) path.getLastPathComponent()).getEntity(), (String) newValue));
+	}
+
+	public boolean addEntitySortOrderListener(EntitySortOrderListener e) {
+		return entitySortOrderListeners.add(e);
 	}
 }

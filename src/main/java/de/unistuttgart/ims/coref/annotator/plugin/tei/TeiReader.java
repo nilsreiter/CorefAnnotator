@@ -8,36 +8,41 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.dkpro.core.api.io.ResourceCollectionReaderBase;
+import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.tudarmstadt.ukp.dkpro.core.api.io.ResourceCollectionReaderBase;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
-import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
-import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIBody;
-import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIHeader;
-import de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIText;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIText;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class TeiReader extends ResourceCollectionReaderBase {
 
 	public static final String PARAM_DOCUMENT_ID = "Document Id";
+	public static final String PARAM_TEXT_ROOT_SELECTOR = "Root Selector";
 
 	@ConfigurationParameter(name = PARAM_DOCUMENT_ID, mandatory = true)
 	String documentId = null;
+
+	@ConfigurationParameter(name = PARAM_TEXT_ROOT_SELECTOR, mandatory = false, defaultValue = "")
+	String rootSelector = null;
 
 	@Override
 	public void getNext(CAS aCAS) {
@@ -54,13 +59,14 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
-		gxr.setTextRootSelector(null);
+		gxr.setTextRootSelector(rootSelector.isEmpty() ? null : rootSelector);
 		gxr.setPreserveWhitespace(true);
 
 		// set the document title
 		gxr.addGlobalRule("titleStmt > title", (d, e) -> d.setDocumentTitle(e.text()));
 
-		gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
+		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
+			gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
 
 		gxr.addRule("[ref]", Mention.class, (m, e) -> {
 			String id = e.attr("ref").substring(1);
@@ -69,7 +75,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
+				entity.setLabel(UimaUtil.getCoveredText(m));
 				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
@@ -106,9 +112,12 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
-		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
+		if (jcas.getDocumentLanguage().equalsIgnoreCase(Constants.X_UNSPECIFIED))
+			jcas.setDocumentLanguage(getLanguage());
 
+		UimaUtil.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
+		UimaUtil.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
+		// TODO: Remove <rs> elements
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase("rs"))
 				element.removeFromIndexes();

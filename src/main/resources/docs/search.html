@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>CorefAnnotator Help</title>
+</head>
+<body style="font-family:sans-serif;font-size:12pt;">
+<h1>Search</h1>
+
+<img src="screenshots/search-dialog.png" width="275" height="200"/>
+
+<p>The search window can be activated by pressing <code>CMD/CTRL f</code>, or via the menu bar. 
+After entering a few characters, search results start to appear below. 
+The search results are organized as a <a href="https://en.wikipedia.org/wiki/Key_Word_in_Context">keyword-in-context (KWIC)</a> list: 
+The found string is shown in the center (and bold), accompanied by left and right context.</p>
+
+<img src="screenshots/search-dialog.png" width="300" height="200"/>
+
+
+<p>Individual findings can be selected with mouse and keyboard. 
+If one or more finding is selected, the buttons on the left become active. They allow three operations:</p>
+<ul>
+<li>Add to existing entity: Adds all selected findings (without their context) to the entity 
+that is selected in the tree of the main window.</li>
+<li>Add to new entity: Creates a new entity and adds all selected findings to it.</li>
+<li>Clear: Removes all findings</li>
+</ul>
+
+<h2>Regular Expressions</h2>
+
+<p>The search interface can be used with regular expressions, making it very powerful. 
+Regular expressions allow the definition of patterns involving some variability. 
+They can become very complex, as the full range of <a href="https://docs.oracle.com/javase/7/docs/api/index.html?java/util/regex/Pattern.html">Java-based regular expressions</a> can be used.</p>
+
+<p>As a quick reference, the following table contains the most important bits:
+</p>
+
+<table>
+<thead>
+<tr><th>Symbol</th><th>Description</th><th>Example Expression</th><th>Example Findings</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.</code></td><td>Matches any single symbol</td><td><code>d.g</code></td><td>"dog", "deg", "d g", ...</td>
+</tr>
+<tr><td><code>[ ]</code></td><td>Matches any of the characters in brackets alternatively</td><td><code>b[au]nk</code></td><td>"bank", "bunk"</td></tr>
+<tr><td><code>[^ ]</code></td><td>Matches none of the characters in brackets</td><td><code>a[^bc]*d</code></td><td>"ad", "aefghd", "axd"</td></tr>
+<tr><td><code>?</code></td><td>Makes the preceding character optional</td><td><code>s?he</code></td><td>"she", "he"</td></tr>
+<tr><td><code>*</code></td><td>Matches the preceding character 0 or more times</td><td><code>dog*</code></td><td>"do", "dog", "dogg", "doggg", ...</td></tr>
+</tbody>
+</table>
+
+<h3>Example Expressions</h3>
+
+<p>The following list shows a few examples that are useful for annotation purposes:</p>
+<ul>
+<li><code>\b[^a]+\b</code>: Find words that do not contain the letter "a"</li>
+<li><code>\bdogs?\b</code>: Find singular and plural forms of the word "dog"</li>
+<li><code>\b[A-Z][a-z]*\b</code>: Find words starting with upper case</li>
+</ul>
+
+
+</body>
+
+
+</html>

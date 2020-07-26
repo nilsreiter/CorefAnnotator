@@ -13,7 +13,7 @@ import org.apache.uima.jcas.JCas;
 import de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 
 public class FlowController extends JCasFlowController_ImplBase {
 

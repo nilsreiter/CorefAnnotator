@@ -9,13 +9,16 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 import org.eclipse.collections.impl.factory.SortedSets;
+import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.plugins.EntityRankingPlugin;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class MatchingRanker implements EntityRankingPlugin {
 	Pattern pattern;
@@ -54,8 +57,9 @@ public class MatchingRanker implements EntityRankingPlugin {
 	}
 
 	protected boolean wasRecent(JCas jcas, Entity o1, int begin) {
-		for (Mention m : JCasUtil.selectPreceding(Mention.class, new Annotation(jcas, begin, begin), 20)) {
-			if (m.getEntity() == o1)
+		for (MentionSurface m : JCasUtil.selectPreceding(MentionSurface.class, new Annotation(jcas, begin, begin),
+				20)) {
+			if (m.getMention().getEntity() == o1)
 				return true;
 		}
 		return false;
@@ -70,7 +74,7 @@ public class MatchingRanker implements EntityRankingPlugin {
 				return true;
 		}
 		for (Mention child : model.get(e)) {
-			String mc = ((Annotation) child).getCoveredText();
+			String mc = UimaUtil.getCoveredText(child);
 			m = pattern.matcher(mc);
 			if (m.find())
 				return true;
@@ -78,5 +82,10 @@ public class MatchingRanker implements EntityRankingPlugin {
 		}
 		return false;
 
+	}
+
+	@Override
+	public Ikon getIkon() {
+		return null;
 	}
 }

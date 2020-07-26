@@ -12,8 +12,9 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.impl.factory.Maps;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class Exporter extends JCasAnnotator_ImplBase {
 
@@ -34,7 +35,7 @@ public class Exporter extends JCasAnnotator_ImplBase {
 		}
 
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			AnnotationFS a = jcas.getCas().createAnnotation(linkType, m.getBegin(), m.getEnd());
+			AnnotationFS a = jcas.getCas().createAnnotation(linkType, UimaUtil.getBegin(m), UimaUtil.getEnd(m));
 			jcas.addFsToIndexes(a);
 			FeatureStructure prev = next.get(m.getEntity());
 			if (prev.getType() == chainType) {

@@ -1,17 +1,17 @@
 package de.unistuttgart.ims.coref.annotator.document.op;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 
 public class UpdateEntityKey extends UpdateOperation<Entity> implements CoreferenceModelOperation {
 	Character oldKey = null;
 	Character newKey;
 	Entity previousOwner;
 
-	public UpdateEntityKey(char newKey, Entity entity) {
+	public UpdateEntityKey(Entity entity, Character string) {
 		super(entity);
 		if (entity.getKey() != null)
 			oldKey = entity.getKey().charAt(0);
-		this.newKey = newKey;
+		this.newKey = string;
 	}
 
 	public UpdateEntityKey(Entity entity) {

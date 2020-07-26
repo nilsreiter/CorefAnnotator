@@ -16,18 +16,19 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 /**
  * <h2>Mapping of features to columns</h2>
@@ -64,7 +65,8 @@ public class FlagModel extends SubModel implements Model {
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
 
-		if (!JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
+		if (preferences.getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS, Defaults.CFG_CREATE_DEFAULT_FLAGS)
+				&& !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
 			initialiseDefaultFlags();
 		}
 	}
@@ -136,13 +138,12 @@ public class FlagModel extends SubModel implements Model {
 		keys.add(key);
 
 		operation.setAddedFlag(f);
-		fireFlagEvent(Event.get(this, Type.Add, f));
 		documentModel.fireDocumentChangedEvent();
+		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
 	protected void edit(DeleteFlag operation) {
 		Flag flag = operation.getFlag();
-		fireFlagEvent(Event.get(this, Type.Remove, flag));
 
 		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
 				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
@@ -152,15 +153,17 @@ public class FlagModel extends SubModel implements Model {
 		ImmutableList<FeatureStructure> featureStructures = this.getFlaggedFeatureStructures(flag);
 		operation.setFeatureStructures(featureStructures);
 
-		featureStructures.select(fs -> Util.isX(fs, flag.getKey())).forEach(fs -> {
+		featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey())).forEach(fs -> {
 			Feature feature = fs.getType().getFeatureByBaseName("Flags");
-			StringArray nArr = Util.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
+			StringArray nArr = UimaUtil.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
 					flag.getKey());
 			((StringArray) fs.getFeatureValue(feature)).removeFromIndexes();
 			fs.setFeatureValue(feature, nArr);
 		});
 
 		flag.removeFromIndexes();
+		fireFlagEvent(Event.get(this, Type.Remove, flag));
+
 	}
 
 	protected void edit(UpdateFlag op) {
@@ -181,8 +184,8 @@ public class FlagModel extends SubModel implements Model {
 		case KEY:
 			op.setOldValue(flag.getKey());
 			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				Util.removeFlagKey(fs, (String) op.getOldValue());
-				Util.addFlagKey(fs, (String) op.getNewValue());
+				UimaUtil.removeFlagKey(fs, (String) op.getOldValue());
+				UimaUtil.addFlagKey(fs, (String) op.getNewValue());
 			});
 			flag.setKey((String) op.getNewValue());
 			break;
@@ -204,9 +207,6 @@ public class FlagModel extends SubModel implements Model {
 		try {
 			if (getTargetClass(flag) == Mention.class) {
 				featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Mention.class));
-			} else if (getTargetClass(flag) == DetachedMentionPart.class) {
-				featureStructures = Lists.immutable
-						.ofAll(JCasUtil.select(documentModel.getJcas(), DetachedMentionPart.class));
 			} else if (getTargetClass(flag) == Entity.class) {
 				featureStructures = Lists.immutable.ofAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
 			}
@@ -214,9 +214,10 @@ public class FlagModel extends SubModel implements Model {
 			e.printStackTrace();
 		}
 
-		return featureStructures.select(fs -> Util.isX(fs, flag.getKey()));
+		return featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey()));
 	}
 
+	@Deprecated
 	protected void initialiseDefaultFlags() {
 		Flag flag;
 
@@ -331,8 +332,8 @@ public class FlagModel extends SubModel implements Model {
 			break;
 		case KEY:
 			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				Util.removeFlagKey(fs, (String) op.getNewValue());
-				Util.addFlagKey(fs, (String) op.getOldValue());
+				UimaUtil.removeFlagKey(fs, (String) op.getNewValue());
+				UimaUtil.addFlagKey(fs, (String) op.getOldValue());
 			});
 			flag.setKey((String) op.getOldValue());
 			break;

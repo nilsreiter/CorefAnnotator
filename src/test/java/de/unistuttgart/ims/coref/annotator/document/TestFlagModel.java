@@ -17,10 +17,9 @@ import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
-import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
@@ -53,19 +52,11 @@ public class TestFlagModel {
 	}
 
 	@Test
-	public void testInitialFlagModel() throws ClassNotFoundException {
-		assertEquals(5, fmodel.getFlags().size());
-		Flag flag = fmodel.getFlag(Constants.MENTION_FLAG_AMBIGUOUS);
-		assertEquals(Mention.class, fmodel.getTargetClass(flag));
-		assertEquals(Strings.MENTION_FLAG_AMBIGUOUS, fmodel.getLabel(flag));
-	}
-
-	@Test
 	public void testAddFlag() throws ClassNotFoundException {
 		AddFlag op = new AddFlag(Entity.class);
 
 		model.edit(op);
-		assertEquals(6, fmodel.getFlags().size());
+		assertEquals(1, fmodel.getFlags().size());
 		Flag flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
@@ -73,7 +64,7 @@ public class TestFlagModel {
 
 		op = new AddFlag(Mention.class);
 		model.edit(op);
-		assertEquals(7, fmodel.getFlags().size());
+		assertEquals(2, fmodel.getFlags().size());
 		flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Mention.class, fmodel.getTargetClass(flag));
@@ -81,14 +72,14 @@ public class TestFlagModel {
 
 		model.undo();
 
-		assertEquals(6, fmodel.getFlags().size());
+		assertEquals(1, fmodel.getFlags().size());
 		flag = fmodel.getFlags().getLast();
 		assertNotNull(flag);
 		assertEquals(Entity.class, fmodel.getTargetClass(flag));
 		assertEquals("New flag", flag.getLabel());
 
 		model.undo();
-		assertEquals(5, fmodel.getFlags().size());
+		assertEquals(0, fmodel.getFlags().size());
 	}
 
 	@Test

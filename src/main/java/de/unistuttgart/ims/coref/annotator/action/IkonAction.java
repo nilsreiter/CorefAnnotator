@@ -50,7 +50,7 @@ public abstract class IkonAction extends AbstractAction {
 		if (isKey)
 			putValue(Action.NAME, Annotator.getString(stringKey));
 		else
-			putValue(Action.NAME, Annotator.getString(stringKey, stringKey));
+			putValue(Action.NAME, Annotator.getStringWithDefault(stringKey, stringKey));
 		try {
 			if (icon != null) {
 				putValue(Action.LARGE_ICON_KEY, getIcon());

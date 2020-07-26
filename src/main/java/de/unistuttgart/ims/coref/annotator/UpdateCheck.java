@@ -60,7 +60,7 @@ public class UpdateCheck {
 		private static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT";
 
 		private enum Tag {
-			ALPHA, BETA, SNAPSHOT
+			ALPHA, BETA, SNAPSHOT, RC
 		};
 
 		static Pattern numbers = Pattern.compile("\\d+");

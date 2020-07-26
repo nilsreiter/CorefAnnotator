@@ -16,7 +16,7 @@ import org.eclipse.collections.impl.factory.Multimaps;
 
 import com.lexicalscope.jewel.cli.CliFactory;
 
-import de.unistuttgart.ims.coref.annotator.plugins.DefaultIOPlugin;
+import de.unistuttgart.ims.coref.annotator.plugins.DefaultImportPlugin;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
@@ -37,7 +37,7 @@ public class Fixer {
 			public void run() {
 				switch (options.getFix()) {
 				case RemoveCarriageReturn:
-					JCasLoader worker = new JCasLoader(options.getInput(), new DefaultIOPlugin(), options.getLanguage(),
+					JCasLoader worker = new JCasLoader(options.getInput(), new DefaultImportPlugin(), options.getLanguage(),
 							new RemoveCarriageReturn(), null);
 					worker.execute();
 					break;

@@ -1,20 +1,20 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.apache.uima.UIMAException;
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
+import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow.NotComparableException;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.comp.SelectTwoFiles;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
 
 public class FileCompareOpenAction extends IkonAction {
@@ -28,39 +28,32 @@ public class FileCompareOpenAction extends IkonAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JDialog dialog = new SelectTwoFiles(new RunComparisonAction());
-		dialog.setVisible(true);
-		dialog.pack();
-	}
-
-	class RunComparisonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public RunComparisonAction() {
-			putValue(Action.NAME, "Compare");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			SelectTwoFiles stf = (SelectTwoFiles) SwingUtilities.getWindowAncestor((Component) e.getSource());
-
+		Annotator.app.fileOpenDialog(null, Annotator.app.getPluginManager().getDefaultIOPlugin(), true, f -> {
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
-					CompareMentionsWindow cmw;
+					ImmutableList<File> files = Lists.immutable.of(f);
 
+					CompareMentionsWindow cmw;
 					try {
-						cmw = new CompareMentionsWindow(Annotator.app, stf.getFiles().size());
+						cmw = new CompareMentionsWindow(Annotator.app, f.length);
 						cmw.setIndeterminateProgress();
 						cmw.setVisible(true);
-						cmw.setFiles(stf.getFiles());
+						cmw.setFiles(files);
 
-						for (int i = 0; i < stf.getFiles().size(); i++) {
+						for (int i = 0; i < f.length; i++) {
 							final int j = i;
-							new JCasLoader(stf.getFiles().get(i), jcas -> {
-								cmw.setJCas(jcas, stf.getNames().get(j), j);
+
+							new JCasLoader(f[i], jcas -> {
+								try {
+									cmw.setJCas(jcas, files.collect(file -> file.getName()).get(j), j);
+								} catch (NotComparableException e) {
+									Annotator.logger.catching(e);
+									cmw.setVisible(false);
+									cmw.dispose();
+									Annotator.app.warnDialog(e.getLocalizedMessage(), "Loading Error");
+								}
 							}, ex -> {
 								cmw.setVisible(false);
 								cmw.dispose();
@@ -70,16 +63,14 @@ public class FileCompareOpenAction extends IkonAction {
 						}
 						cmw.setVisible(true);
 						cmw.pack();
-						SwingUtilities.getWindowAncestor((Component) e.getSource()).setVisible(false);
 					} catch (UIMAException e1) {
 						Annotator.logger.catching(e1);
 					}
 				}
 
 			});
-
-		}
-
+		}, o -> {
+		}, "");
 	}
 
 }

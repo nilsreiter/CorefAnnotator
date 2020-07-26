@@ -3,44 +3,48 @@ package de.unistuttgart.ims.coref.annotator.action;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.util.function.Consumer;
 
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CSVWriter;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Constants;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.Defaults;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin;
+import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 
 public class EntityStatisticsAction extends DocumentWindowAction {
 
-	private static final String ENTITY_GROUP = "entityGroup";
-	private static final String ENTITY_LABEL = "entityLabel";
-	private static final String ENTITY_NUM = "entityNum";
-	private static final String SURFACE = "surface";
-	private static final String END = "end";
-	private static final String BEGIN = "begin";
-
 	private static final long serialVersionUID = 1L;
+
+	// initial option values
+	int optionContextWidth = 0;
+	boolean optionTrimWhitespace = true;
+	boolean optionReplaceNewlines = true;
 
 	public EntityStatisticsAction(DocumentWindow dw) {
 		super(dw, Strings.ACTION_ENTITY_STATISTICS, MaterialDesign.MDI_CHART_BAR);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
+	protected void optionDialog(Consumer<EntityStatisticsAction> callback) {
+
+		CsvExportPlugin csvPlugin = Annotator.app.getPluginManager().getPlugin(CsvExportPlugin.class);
+
+		csvPlugin.showExportConfigurationDialog(getTarget(), getTarget().getDocumentModel(), p -> {
+			callback.accept(EntityStatisticsAction.this);
+		});
+
+	}
+
+	protected void saveDialog() {
 		JFileChooser chooser = new JFileChooser(Annotator.app.getCurrentDirectory());
 		chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 		chooser.setFileFilter(FileFilters.csv);
@@ -56,55 +60,27 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 
 				@Override
 				protected Object doInBackground() throws Exception {
+
 					getDocumentWindow().setMessage(Annotator.getString(Strings.ENTITY_STATISTICS_STATUS));
 					getDocumentWindow().setIndeterminateProgress();
-					FlagModel flagModel = getDocumentWindow().getDocumentModel().getFlagModel();
-					ImmutableList<Flag> mentionFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()));
-					ImmutableList<Flag> entityFlags = flagModel.getFlags()
-							.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()));
 
-					try (CSVPrinter p = new CSVPrinter(new FileWriter(chooser.getSelectedFile()), CSVFormat.EXCEL)) {
-						// this is the header row
-						p.print(BEGIN);
-						p.print(END);
-						p.print(SURFACE);
-						p.print(ENTITY_NUM);
-						p.print(ENTITY_LABEL);
-						p.print(ENTITY_GROUP);
-						for (Flag flag : entityFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						for (Flag flag : mentionFlags) {
-							p.print(Annotator.getString(flag.getLabel(), flag.getLabel()));
-						}
-						p.println();
-						int entityNum = 0;
-						for (Entity entity : getDocumentWindow().getSelectedEntities()) {
-							for (Mention mention : getDocumentWindow().getDocumentModel().getCoreferenceModel()
-									.get(entity)) {
-								String surface = mention.getCoveredText();
-								if (mention.getDiscontinuous() != null)
-									surface += " " + mention.getDiscontinuous().getCoveredText();
-								p.print(mention.getBegin());
-								p.print(mention.getEnd());
-								p.print(surface);
-								p.print(entityNum);
-								p.print(entity.getLabel());
-								p.print((entity instanceof EntityGroup));
-								for (Flag flag : entityFlags) {
-									p.print(Util.isX(entity, flag.getKey()));
-								}
-								for (Flag flag : mentionFlags) {
-									p.print(Util.isX(mention, flag.getKey()));
-								}
-								p.println();
-							}
-							entityNum++;
-						}
-					} catch (IOException e1) {
-						Annotator.logger.catching(e1);
+					CSVWriter csvWriter = new CSVWriter();
+					csvWriter.setEntities(getDocumentWindow().getSelectedEntities());
+					csvWriter.setOptionContextWidth(Annotator.app.getPreferences()
+							.getInt(Constants.PLUGIN_CSV_CONTEXT_WIDTH, Defaults.CFG_OPTION_CONTEXT_WIDTH));
+					csvWriter.setOptionReplaceNewlines(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_REPLACE_NEWLINES, Defaults.CFG_OPTION_REPLACE_NEWLINES));
+					csvWriter.setOptionTrimWhitespace(Annotator.app.getPreferences()
+							.getBoolean(Constants.PLUGIN_CSV_TRIM, Defaults.CFG_OPTION_TRIM));
+					csvWriter.setOptionContextUnit(ContextUnit.valueOf(Annotator.app.getPreferences()
+							.get(Constants.PLUGIN_CSV_CONTEXT_UNIT, Defaults.CFG_OPTION_CONTEXT_UNIT.name())));
+					csvWriter.setOptionIncludeLineNumbers(Annotator.app.getPreferences().getBoolean(
+							Constants.PLUGIN_CSV_INCLUDE_LINE_NUMBERS, Defaults.CFG_OPTION_INCLUDE_LINE_NUMBERS));
+					csvWriter.configure();
+					try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
+						csvWriter.write(getDocumentWindow().getDocumentModel().getJcas(), fw);
 					}
+
 					return null;
 				}
 
@@ -116,7 +92,17 @@ public class EntityStatisticsAction extends DocumentWindowAction {
 			}.execute();
 
 		}
+	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		optionDialog(a -> a.saveDialog());
+	}
+
+	protected JLabel getLabel(String text, String tooltip) {
+		JLabel lab = new JLabel(text);
+		lab.setToolTipText(tooltip);
+		return lab;
 	}
 
 }
