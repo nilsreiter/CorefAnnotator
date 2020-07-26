@@ -9,13 +9,14 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.xml.sax.SAXException;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 
@@ -45,13 +46,11 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 				newEntity.setColor(oldEntity.getColor());
 				newEntity.addToIndexes();
 				entityMap.put(oldEntity, newEntity);
+				newEntity.setFlags(new EmptyFSList<Flag>(jcas));
 
 				if (oldEntity.getFlags() != null) {
-					StringArray flags = new StringArray(jcas, oldEntity.getFlags().size());
-					newEntity.setFlags(flags);
-					for (int i = 0; i < oldEntity.getFlags().size(); i++) {
-						newEntity.setFlags(i, oldEntity.getFlags(i));
-					}
+					for (Flag flag : oldEntity.getFlags())
+						newEntity.getFlags().push(flag);
 				}
 
 				if (UimaUtil.isGroup(oldEntity)) {
@@ -78,13 +77,12 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 				}
 				newMention.setEntity(entityMap.get(m.getEntity()));
 				newMention.addToIndexes();
+				newMention.setFlags(new EmptyFSList<Flag>(jcas));
 
 				if (m.getFlags() != null) {
-					StringArray flags = new StringArray(jcas, m.getFlags().size());
-					newMention.setFlags(flags);
-					for (i = 0; i < m.getFlags().size(); i++) {
-						newMention.setFlags(i, m.getFlags(i));
-					}
+					for (Flag flag : m.getFlags())
+						newMention.getFlags().push(flag);
+
 				}
 			}
 

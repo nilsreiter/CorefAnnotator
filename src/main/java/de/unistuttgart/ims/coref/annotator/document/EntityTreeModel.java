@@ -11,7 +11,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -23,6 +23,7 @@ import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
@@ -89,7 +90,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 				} else if (fs instanceof Mention || fs instanceof Entity) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
-					if (fs instanceof Entity && UimaUtil.isGroup((Entity) fs)) {
+					if (fs instanceof Entity && UimaUtil.isGroup(fs)) {
 						Entity eg = (Entity) fs;
 						for (int j = 0; j < eg.getMembers().size(); j++)
 							try {
@@ -103,7 +104,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			optResort();
 			break;
 		case Remove:
-			if (UimaUtil.isGroup((Entity) event.getArgument1())) {
+			if (UimaUtil.isGroup(event.getArgument1())) {
 				CATreeNode gn = fsMap.get(event.getArgument1());
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
 						.collect(n -> n.getFeatureStructure());
@@ -235,10 +236,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			if (m.find())
 				return true;
 		}
-		StringArray flags = e.getEntity().getFlags();
+		FSList<Flag> flags = e.getEntity().getFlags();
 		if (flags != null)
-			for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
-				m = pattern.matcher(e.getEntity().getFlags(i));
+			for (int i = 0; i < e.getEntity().getFlags().getLength(); i++) {
+				m = pattern.matcher(flags.getNthElement(i).getLabel());
 				if (m.find())
 					return true;
 			}

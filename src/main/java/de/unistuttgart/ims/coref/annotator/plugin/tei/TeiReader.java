@@ -28,6 +28,9 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Line;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIText;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
@@ -117,6 +120,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		});
 		gxr.addRule("l", Line.class,
 				(line, element) -> line.setNumber(element.hasAttr("n") ? Integer.valueOf(element.attr("n")) : -1));
+
+		gxr.addRule("TEI > text", TEIText.class);
+		gxr.addRule("TEI > teiHeader", TEIHeader.class);
+		gxr.addRule("TEI > text > body", TEIBody.class);
 
 		Resource res = nextFile();
 

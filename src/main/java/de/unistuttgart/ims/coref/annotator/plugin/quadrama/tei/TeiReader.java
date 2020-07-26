@@ -22,6 +22,9 @@ import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIText;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.drama.api.Speaker;
@@ -76,7 +79,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(cf);
 		});
 
-		gxr.addRule("speaker", Speaker.class);
+		gxr.addRule("text speaker", Speaker.class);
+		gxr.addRule("TEI > text", TEIText.class);
+		gxr.addRule("TEI > teiHeader", TEIHeader.class);
+		gxr.addRule("TEI > text > body", TEIBody.class);
 
 		// entity references
 		gxr.addRule("text rs[ref]", Mention.class, (m, e) -> {
@@ -108,6 +114,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(entity);
 		});
 
+		// identify speaker tags
 		gxr.addRule("text speaker", Mention.class, (m, e) -> {
 			Element parent = e.parent();
 			if (parent.hasAttr("who")) {

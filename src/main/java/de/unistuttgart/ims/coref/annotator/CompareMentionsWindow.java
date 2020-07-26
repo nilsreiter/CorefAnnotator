@@ -725,18 +725,12 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			add(mainLabel);
 			if (includeEntityFlags)
 				if (entity.getFlags() != null && documentModel != null)
-					for (String flagKey : entity.getFlags()) {
-						if (flagKey == Constants.ENTITY_FLAG_HIDDEN)
-							continue;
-						Flag flag = documentModel.getFlagModel().getFlag(flagKey);
+					for (Flag flag : entity.getFlags()) {
 						addFlag(this, flag, Color.BLACK);
 					}
 			if (includeMentionFlags)
 				if (mention.getFlags() != null && documentModel != null)
-					for (String flagKey : mention.getFlags()) {
-						if (flagKey == Constants.ENTITY_FLAG_HIDDEN)
-							continue;
-						Flag flag = documentModel.getFlagModel().getFlag(flagKey);
+					for (Flag flag : mention.getFlags()) {
 						addFlag(this, flag, Color.BLACK);
 					}
 		}

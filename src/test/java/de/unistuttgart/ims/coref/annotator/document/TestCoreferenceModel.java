@@ -12,7 +12,7 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
@@ -26,6 +26,7 @@ import org.junit.Test;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -101,7 +102,7 @@ public class TestCoreferenceModel {
 		Entity e = new Entity(jcas);
 		e.setLabel("Test");
 		e.setColor(0);
-		e.setFlags(new StringArray(jcas, 0));
+		e.setFlags(new EmptyFSList<Flag>(jcas));
 		e.addToIndexes();
 
 		model.edit(new AddMentionsToEntity(e, new Span(1, 3)));

@@ -46,7 +46,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 			targets.addAll(targets.selectInstancesOf(Mention.class).flatCollect(m -> getTarget().getDocumentModel()
 					.getCoreferenceModel().getMatchingMentions(UimaUtil.getBegin(m), UimaUtil.getEnd(m))));
 		}
-		getTarget().getDocumentModel().edit(new ToggleGenericFlag(flag.getKey(), targets));
+		getTarget().getDocumentModel().edit(new ToggleGenericFlag(flag, targets));
 	}
 
 	@Override
@@ -56,8 +56,7 @@ public class ToggleFlagAction extends TargetedIkonAction<DocumentWindow> impleme
 		try {
 			en = tsu.isClass(flagModel.getTargetClass(flag));
 			setEnabled(en);
-			putValue(Action.SELECTED_KEY,
-					en && tsu.getFeatureStructures().allSatisfy(fs -> UimaUtil.isX(fs, flag.getKey())));
+			putValue(Action.SELECTED_KEY, en && tsu.getFeatureStructures().allSatisfy(fs -> UimaUtil.isX(fs, flag)));
 		} catch (ClassNotFoundException ex) {
 			Annotator.logger.catching(ex);
 			setEnabled(false);

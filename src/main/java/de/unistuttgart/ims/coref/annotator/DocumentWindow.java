@@ -164,7 +164,6 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -1174,7 +1173,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
-			boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50;
+			boolean isGrey = entity.getHidden() || treeNode.getRank() < 50;
 			Color entityColor = new Color(entity.getColor());
 
 			if (isGrey) {
@@ -1196,15 +1195,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (entity.getFlags() != null)
-				for (String flagKey : entity.getFlags()) {
-					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+				for (Flag flag : entity.getFlags()) {
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
 				}
 			return panel;
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
-			FlagModel fm = getDocumentModel().getFlagModel();
 
 			// constructing text
 			StringBuilder b = new StringBuilder();
@@ -1227,8 +1224,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			lab1.setText(b.toString());
 			if (m.getFlags() != null)
-				for (String flagKey : m.getFlags()) {
-					Flag flag = fm.getFlag(flagKey);
+				for (Flag flag : m.getFlags()) {
 					addFlag(panel, flag, Color.black);
 				}
 
