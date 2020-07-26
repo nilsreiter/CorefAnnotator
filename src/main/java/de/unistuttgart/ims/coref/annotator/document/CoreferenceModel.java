@@ -366,16 +366,14 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
 		op.getEntities().forEach(e -> {
-			MutableListMultimap<Spans, Mention> map = Multimaps.mutable.list.empty();
+			MutableListMultimap<Spans, Mention> spanMentionMap = Multimaps.mutable.list.empty();
 			MutableList<Mention> toRemove = Lists.mutable.empty();
 			for (Mention m : entityMentionMap.get(e)) {
 				Spans s = new Spans(m);
-				if (map.containsKey(s)) {
-					for (Mention m2 : map.get(s)) {
-						map.put(s, m);
-					}
+				if (spanMentionMap.containsKey(s)) {
+					toRemove.add(m);
 				} else {
-					map.put(s, m);
+					spanMentionMap.put(s, m);
 				}
 			}
 

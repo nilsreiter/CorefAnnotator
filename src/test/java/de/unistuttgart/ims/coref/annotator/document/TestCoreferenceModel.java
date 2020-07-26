@@ -286,14 +286,12 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveDuplicates() {
-		model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4)));
+		Entity e = model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4))).getEntity();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
-
-		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
 
 		model.edit(new RemoveDuplicateMentionsInEntities(e));
 
