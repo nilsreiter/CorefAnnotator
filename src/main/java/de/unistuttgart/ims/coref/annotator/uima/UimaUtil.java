@@ -38,6 +38,19 @@ import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
+
+	public static String join(StringArray arr, String sep) {
+		if (arr.isEmpty())
+			return "";
+		StringBuilder b = new StringBuilder();
+		b.append(arr.get(0));
+		for (int i = 0; i < arr.size(); i++) {
+			b.append(sep);
+			b.append(arr.get(i));
+		}
+		return b.toString();
+	}
+
 	public static JCas readJCas(String filename)
 			throws UIMAException, FileNotFoundException, SAXException, IOException {
 		if (filename.endsWith(".gz")) {
