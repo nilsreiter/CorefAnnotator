@@ -7,10 +7,6 @@ import java.util.Locale;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
-import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
-import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
-
 public class Util {
 	private static String[] languageNames = null;
 
@@ -34,26 +30,6 @@ public class Util {
 		}
 		return b.toString();
 
-	}
-
-	@Deprecated
-	public static boolean isGeneric(Entity e) {
-		return UimaUtil.contains(e.getFlags(), Constants.ENTITY_FLAG_GENERIC);
-	}
-
-	@Deprecated
-	public static boolean isDifficult(Mention m) {
-		return UimaUtil.contains(m.getFlags(), Constants.MENTION_FLAG_DIFFICULT);
-	}
-
-	@Deprecated
-	public static boolean isNonNominal(Mention m) {
-		return UimaUtil.contains(m.getFlags(), Constants.MENTION_FLAG_NON_NOMINAL);
-	}
-
-	@Deprecated
-	public static boolean isAmbiguous(Mention m) {
-		return UimaUtil.contains(m.getFlags(), Constants.MENTION_FLAG_AMBIGUOUS);
 	}
 
 	public static String[] getSupportedLanguageNames() {

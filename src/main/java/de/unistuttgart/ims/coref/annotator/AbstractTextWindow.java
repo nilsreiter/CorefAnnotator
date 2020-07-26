@@ -233,7 +233,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventUpdate(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (UimaUtil.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+				if (((Mention) fs).getEntity().getHidden())
 					highlightManager.unUnderline((Annotation) fs);
 			}
 		}
@@ -242,7 +242,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (UimaUtil.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+				if (((Mention) fs).getEntity().getHidden())
 					highlightManager.unUnderline((Annotation) fs);
 			}
 		}

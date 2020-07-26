@@ -310,8 +310,7 @@ public class FlagModel extends SubModel implements Model {
 
 	protected void undo(DeleteFlag fmo) {
 		fmo.getFlag().addToIndexes();
-		documentModel.getCoreferenceModel()
-				.edit(new ToggleGenericFlag(fmo.getFlag().getKey(), fmo.getFeatureStructures()));
+		documentModel.getCoreferenceModel().edit(new ToggleGenericFlag(fmo.getFlag(), fmo.getFeatureStructures()));
 
 		fireFlagEvent(Event.get(this, Type.Add, fmo.getFlag()));
 		documentModel.getCoreferenceModel().fireEvent(Event.get(this, Event.Type.Update, fmo.getFeatureStructures()));

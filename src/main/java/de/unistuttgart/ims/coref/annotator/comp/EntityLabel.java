@@ -19,7 +19,7 @@ public class EntityLabel extends JLabel {
 	public EntityLabel(Entity entity) {
 		Color entityColor = new Color(entity.getColor());
 
-		boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
+		boolean isGrey = entity.getHidden();
 		if (isGrey)
 			this.setForeground(Color.GRAY);
 		else
