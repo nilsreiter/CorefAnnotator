@@ -42,6 +42,13 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
 
+	public static void addFlag(FeatureStructure fs, Flag flag) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		FSList<Flag> flagList = UimaUtil.getFlags(fs);
+
+		fs.setFeatureValue(feature, flagList.push(flag));
+	}
+
 	@Deprecated
 	public static void addFlagKey(FeatureStructure fs, String flagKey) {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
@@ -233,15 +240,15 @@ public class UimaUtil {
 		return m.getSurface(0);
 	}
 
-	@Deprecated
-	public static StringArray getFlags(FeatureStructure fs) throws CASException {
+	public static FSList<Flag> getFlags(FeatureStructure fs) {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		if (feature == null)
-			return new StringArray(fs.getCAS().getJCas(), 0);
+			return new EmptyFSList<Flag>(fs.getJCas());
 		else {
-			StringArray sa = (StringArray) fs.getFeatureValue(feature);
+			@SuppressWarnings("unchecked")
+			FSList<Flag> sa = (FSList<Flag>) fs.getFeatureValue(feature);
 			if (sa == null)
-				return new StringArray(fs.getCAS().getJCas(), 0);
+				return new EmptyFSList<Flag>(fs.getJCas());
 			else
 				return sa;
 		}
@@ -345,6 +352,13 @@ public class UimaUtil {
 				return readJCas(is);
 			}
 		}
+	}
+
+	public static void removeFlag(FeatureStructure fs, Flag flag) {
+		Feature feature = fs.getType().getFeatureByBaseName("Flags");
+		FSList<Flag> flagList = getFlags(fs);
+		flagList = removeFrom(flagList, flag);
+		fs.setFeatureValue(feature, flagList);
 	}
 
 	@Deprecated

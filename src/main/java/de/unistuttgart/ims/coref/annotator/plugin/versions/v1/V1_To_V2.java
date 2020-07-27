@@ -69,7 +69,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 	Flag getFlag(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag) {
 		Flag newFlag = new Flag(jcas);
 		newFlag.setIcon(oldFlag.getIcon());
-		newFlag.setKey(oldFlag.getKey());
+		newFlag.setUuid(oldFlag.getKey());
 		newFlag.setLabel(oldFlag.getLabel());
 		flagMap.put(oldFlag, newFlag);
 		return newFlag;

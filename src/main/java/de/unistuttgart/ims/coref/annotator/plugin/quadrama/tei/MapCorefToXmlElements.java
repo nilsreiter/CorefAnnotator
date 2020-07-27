@@ -143,8 +143,9 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 					if (m.getSurface().size() > 1)
 						b.append(" id=\"").append(mentionId).append('"');
 					if (m.getFlags() != null && !m.getFlags().isEmpty())
-						b.append(" ana=\"").append(
-								StringUtils.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getKey()), ","))
+						b.append(" ana=\"")
+								.append(StringUtils
+										.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getUuid()), ","))
 								.append('"');
 					first = false;
 				} else {

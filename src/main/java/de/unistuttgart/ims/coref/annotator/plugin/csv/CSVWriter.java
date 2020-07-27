@@ -193,10 +193,10 @@ public class CSVWriter extends SingleFileWriter {
 					p.print(entity.getLabel());
 					p.print(UimaUtil.isGroup(entity));
 					for (Flag flag : entityFlags) {
-						p.print(UimaUtil.isX(entity, flag.getKey()));
+						p.print(UimaUtil.isX(entity, flag));
 					}
 					for (Flag flag : mentionFlags) {
-						p.print(UimaUtil.isX(mention, flag.getKey()));
+						p.print(UimaUtil.isX(mention, flag));
 					}
 					p.println();
 				}

@@ -36,9 +36,9 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 	class SearchFlaggedMentions extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
-		String flag;
+		Flag flag;
 
-		public SearchFlaggedMentions(String s, String key, Ikon ik) {
+		public SearchFlaggedMentions(Flag s, String key, Ikon ik) {
 			super(key, ik);
 			this.flag = s;
 		}
@@ -106,7 +106,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 		for (Flag flag : sd.getDocumentWindow().getDocumentModel().getFlagModel().getFlags()) {
 			if (flag.getTargetClass().equalsIgnoreCase(Mention.class.getName())) {
-				AbstractAction action = new SearchFlaggedMentions(flag.getKey(), flag.getLabel(),
+				AbstractAction action = new SearchFlaggedMentions(flag, flag.getLabel(),
 						MaterialDesign.valueOf(flag.getIcon()));
 				JToggleButton b = new JToggleButton(action);
 				bg.add(b);

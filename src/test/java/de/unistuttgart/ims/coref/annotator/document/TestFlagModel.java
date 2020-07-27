@@ -85,7 +85,7 @@ public class TestFlagModel {
 	@Test
 	public void testDeleteFlag() {
 		Flag f = model.edit(new AddFlag(Mention.class)).getAddedFlag();
-		f.setKey("bla");
+		f.setUuid("bla");
 		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
 		Mention m = JCasUtil.select(jcas, Mention.class).iterator().next();
 		model.edit(new ToggleGenericFlag(f, Lists.fixedSize.of(m)));

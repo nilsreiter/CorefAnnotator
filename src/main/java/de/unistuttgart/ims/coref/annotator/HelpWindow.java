@@ -47,7 +47,8 @@ public class HelpWindow extends JFrame {
 			new HelpTopic("How to annotate", "howto"), new HelpTopic("Compare annotations", "compare"),
 			new HelpTopic("Automatic processing", "processing"), new HelpTopic("Flag editing", "flags"),
 			new HelpTopic("Input/Output", "io", s -> new JScrollPane(loadIOPlugins())),
-			new HelpTopic("Search", "search"), new HelpTopic("Preferences", "preferences") };
+			new HelpTopic("Search", "search"), new HelpTopic("Preferences", "preferences"),
+			new HelpTopic("Profiles", "profile") };
 
 	JList<String> topicList;
 
