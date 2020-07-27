@@ -16,6 +16,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   appear directly in the Help menu. #12
 - Files are now saved with a specific file extension to avoid confusion
   and accidental decompression. The file extension is .ca2 #335
+- Search is now case-insensitive by default #320
 - Updated Dependencies
   - log4j: 2.12.1 -> 2.13.3
   - guava: 28.1-jre -> 29.0-jre
