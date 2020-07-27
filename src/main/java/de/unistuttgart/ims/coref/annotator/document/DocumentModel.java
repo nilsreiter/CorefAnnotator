@@ -230,7 +230,7 @@ public class DocumentModel implements Model {
 			if (getFlagModel().getFlag(ft.getUuid()) != null)
 				continue;
 			try {
-				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v1." + ft.getTargetClass().value();
+				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v2." + ft.getTargetClass().value();
 
 				Class<?> tClass = Class.forName(targetClassName);
 				@SuppressWarnings("unchecked")
