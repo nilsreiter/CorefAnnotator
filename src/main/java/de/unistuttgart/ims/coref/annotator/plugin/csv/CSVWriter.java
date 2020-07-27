@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
@@ -18,17 +18,16 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileWriter;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class CSVWriter extends SingleFileWriter {
 
@@ -82,8 +81,8 @@ public class CSVWriter extends SingleFileWriter {
 	@Override
 	public void write(JCas jcas, Writer os) throws IOException {
 
-		ImmutableList<Mention> allMentions = Lists.mutable.withAll(JCasUtil.select(jcas, Mention.class))
-				.sortThis(new AnnotationComparator()).toImmutable();
+		ImmutableList<Mention> allMentions = Lists.mutable.withAll(jcas.getIndexedFSs(Mention.class))
+				.sortThis(new MentionComparator()).toImmutable();
 		ImmutableList<Flag> allFlags = Lists.immutable.withAll(JCasUtil.select(jcas, Flag.class));
 
 		ImmutableList<Flag> mentionFlags = allFlags
@@ -135,34 +134,32 @@ public class CSVWriter extends SingleFileWriter {
 			int entityNum = 0;
 			for (Entity entity : entities) {
 				for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
-					String surface = mention.getCoveredText();
-					if (mention.getDiscontinuous() != null)
-						surface += " " + mention.getDiscontinuous().getCoveredText();
+					String surface = UimaUtil.getCoveredText(mention);
 					if (optionReplaceNewlines)
 						surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-					p.print(mention.getBegin());
-					p.print(mention.getEnd());
+					p.print(UimaUtil.getBegin(mention));
+					p.print(UimaUtil.getEnd(mention));
 
 					if (optionIncludeLineNumbers) {
 						if (segmentIndex.notEmpty()) {
-							Segment segment = Lists.mutable.ofAll(segmentIndex.get(mention.getBegin()))
+							Segment segment = Lists.mutable.ofAll(segmentIndex.get(UimaUtil.getBegin(mention)))
 									.min(new AnnotationLengthComparator<Segment>());
 							p.print(segment.getLabel());
 
-							segment = Lists.mutable.ofAll(segmentIndex.get(mention.getEnd()))
+							segment = Lists.mutable.ofAll(segmentIndex.get(UimaUtil.getEnd(mention)))
 									.min(new AnnotationLengthComparator<Segment>());
 							p.print(segment.getLabel());
 						}
 
 						try {
-							p.print(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
+							p.print(JCasUtil.selectPreceding(Line.class, mention.getSurface(0), 1).get(0).getNumber());
 						} catch (Exception e) {
 							p.print(-1);
 						}
 						try {
 							Annotation a = new Annotation(jcas);
-							a.setBegin(mention.getEnd());
-							a.setEnd(mention.getEnd());
+							a.setBegin(UimaUtil.getBegin(mention));
+							a.setEnd(UimaUtil.getEnd(mention));
 							p.print(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
 						} catch (Exception e) {
 							p.print(-1);
@@ -194,12 +191,12 @@ public class CSVWriter extends SingleFileWriter {
 					}
 					p.print(entityNum);
 					p.print(entity.getLabel());
-					p.print((entity instanceof EntityGroup));
+					p.print(UimaUtil.isGroup(entity));
 					for (Flag flag : entityFlags) {
-						p.print(Util.isX(entity, flag.getKey()));
+						p.print(UimaUtil.isX(entity, flag));
 					}
 					for (Flag flag : mentionFlags) {
-						p.print(Util.isX(mention, flag.getKey()));
+						p.print(UimaUtil.isX(mention, flag));
 					}
 					p.println();
 				}
@@ -213,33 +210,34 @@ public class CSVWriter extends SingleFileWriter {
 		switch (optionContextUnit) {
 		case LINE:
 			if (backward) {
-				int leftEnd = Lists.immutable.withAll(JCasUtil.selectPreceding(Line.class, mention, optionContextWidth))
+				int leftEnd = Lists.immutable
+						.withAll(JCasUtil.selectPreceding(Line.class, mention.getSurface(0), optionContextWidth))
 						.collect(l -> l.getBegin()).min();
 				if (optionTrimWhitespace) {
-					return text.substring(leftEnd, mention.getBegin()).trim();
+					return text.substring(leftEnd, UimaUtil.getBegin(mention)).trim();
 				} else {
-					return text.substring(leftEnd, mention.getBegin());
+					return text.substring(leftEnd, UimaUtil.getBegin(mention));
 				}
 			} else {
 				int rightEnd = Lists.immutable
-						.withAll(JCasUtil.selectFollowing(Line.class, mention, optionContextWidth))
+						.withAll(JCasUtil.selectFollowing(Line.class, UimaUtil.getLast(mention), optionContextWidth))
 						.collect(l -> l.getEnd()).max();
 				if (optionTrimWhitespace) {
-					return text.substring(mention.getEnd(), rightEnd).trim();
+					return text.substring(UimaUtil.getEnd(mention), rightEnd).trim();
 				} else {
-					return text.substring(mention.getEnd(), rightEnd);
+					return text.substring(UimaUtil.getEnd(mention), rightEnd);
 				}
 			}
 		default:
 			if (backward)
 				if (optionTrimWhitespace) {
-					return StringUtils.right(text.substring(0, mention.getBegin()).trim(), optionContextWidth);
+					return StringUtils.right(text.substring(0, UimaUtil.getBegin(mention)).trim(), optionContextWidth);
 
 				} else {
 					return StringUtils.right(text, optionContextWidth);
 				}
 			else if (optionTrimWhitespace) {
-				return StringUtils.left(text.substring(mention.getEnd()).trim(), optionContextWidth);
+				return StringUtils.left(text.substring(UimaUtil.getEnd(mention)).trim(), optionContextWidth);
 			} else {
 				return StringUtils.left(text, optionContextWidth);
 			}

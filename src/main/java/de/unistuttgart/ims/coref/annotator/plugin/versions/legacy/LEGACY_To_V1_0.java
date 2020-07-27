@@ -13,13 +13,13 @@ import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.Meta;
 import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 @TypeCapability(inputs = { "de.unistuttgart.ims.coref.annotator.api.Entity",
 		"de.unistuttgart.ims.coref.annotator.api.EntityGroup", "de.unistuttgart.ims.coref.annotator.api.Mention",
@@ -53,7 +53,7 @@ public class LEGACY_To_V1_0 extends TypeSystemVersionConverter {
 			fs.removeFromIndexes();
 		}
 
-		Meta meta = Util.getMeta(jcas);
+		Meta meta = UimaUtil.getMeta(jcas);
 		meta.setTypeSystemVersion(TypeSystemVersion.v1.name());
 	}
 

@@ -8,22 +8,25 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.dkpro.core.api.io.ResourceCollectionReaderBase;
+import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jsoup.nodes.Element;
 
-import de.tudarmstadt.ukp.dkpro.core.api.io.ResourceCollectionReaderBase;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
-import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIBody;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIHeader;
+import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIText;
 import de.unistuttgart.ims.coref.annotator.plugin.quadrama.QDStylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
@@ -76,7 +79,10 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			m.setEntity(cf);
 		});
 
-		gxr.addRule("speaker", Speaker.class);
+		gxr.addRule("text speaker", Speaker.class);
+		gxr.addRule("TEI > text", TEIText.class);
+		gxr.addRule("TEI > teiHeader", TEIHeader.class);
+		gxr.addRule("TEI > text > body", TEIBody.class);
 
 		// entity references
 		gxr.addRule("text rs[ref]", Mention.class, (m, e) -> {
@@ -86,7 +92,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
+				entity.setLabel(UimaUtil.getCoveredText(m));
 				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
@@ -101,13 +107,14 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
+				entity.setLabel(UimaUtil.getCoveredText(m));
 				entity.setXmlId(id);
 				entityMap.put(id, entity);
 			}
 			m.setEntity(entity);
 		});
 
+		// identify speaker tags
 		gxr.addRule("text speaker", Mention.class, (m, e) -> {
 			Element parent = e.parent();
 			if (parent.hasAttr("who")) {
@@ -116,7 +123,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 				if (entity == null) {
 					entity = new Entity(jcas);
 					entity.addToIndexes();
-					entity.setLabel(m.getCoveredText());
+					entity.setLabel(UimaUtil.getCoveredText(m));
 					entity.setColor(colorProvider.getNextColor().getRGB());
 					entityMap.put(id, entity);
 				}
@@ -154,8 +161,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
 		// set meta data
-		Util.getMeta(jcas).setStylePlugin(QDStylePlugin.class.getName());
-		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
+		UimaUtil.getMeta(jcas).setStylePlugin(QDStylePlugin.class.getName());
+		UimaUtil.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		// Remove <rs> und <name> elements from XML structure (they'll be added later)
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {

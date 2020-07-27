@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.awt.Color;
+import java.lang.reflect.Field;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +22,8 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
@@ -29,6 +31,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -38,6 +41,7 @@ import de.unistuttgart.ims.coref.annotator.profile.EntityType;
 import de.unistuttgart.ims.coref.annotator.profile.FlagType;
 import de.unistuttgart.ims.coref.annotator.profile.PreferenceType;
 import de.unistuttgart.ims.coref.annotator.profile.Profile;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 /**
  * This class represents an opened document. Individual aspects are stored in
@@ -83,16 +87,16 @@ public class DocumentModel implements Model {
 		return documentStateListeners.add(e);
 	}
 
-	public void edit(Operation operation) {
+	public <T extends Operation> T edit(T operation) {
 		Annotator.logger.trace(operation);
-		edit(operation, true);
+		return edit(operation, true);
 	}
 
-	private void edit(Operation operation, boolean addToHistory) {
+	private <T extends Operation> T edit(T operation, boolean addToHistory) {
 
 		if (isBlocked(operation.getClass())) {
 			Annotator.logger.info("Operation {} blocked.", operation.getClass().getCanonicalName());
-			return;
+			return operation;
 		}
 
 		if (operation instanceof DocumentModelOperation)
@@ -105,6 +109,7 @@ public class DocumentModel implements Model {
 		if (addToHistory)
 			history.push(operation);
 		fireDocumentChangedEvent();
+		return operation;
 	}
 
 	protected void edit(DocumentModelOperation operation) {
@@ -192,7 +197,7 @@ public class DocumentModel implements Model {
 
 	@SuppressWarnings("unchecked")
 	public Class<? extends StylePlugin> getStylePlugin() throws ClassNotFoundException {
-		return (Class<? extends StylePlugin>) Class.forName(Util.getMeta(jcas).getStylePlugin());
+		return (Class<? extends StylePlugin>) Class.forName(UimaUtil.getMeta(jcas).getStylePlugin());
 	}
 
 	public EntityTreeModel getTreeModel() {
@@ -229,7 +234,7 @@ public class DocumentModel implements Model {
 			if (getFlagModel().getFlag(ft.getUuid()) != null)
 				continue;
 			try {
-				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v1." + ft.getTargetClass().value();
+				String targetClassName = "de.unistuttgart.ims.coref.annotator.api.v2." + ft.getTargetClass().value();
 
 				Class<?> tClass = Class.forName(targetClassName);
 				@SuppressWarnings("unchecked")
@@ -248,12 +253,31 @@ public class DocumentModel implements Model {
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity();
 			edit(op, false);
 			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
-			if (et.getColor() != null)
-				edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
-			else
+			if (et.getColor() != null) {
+				Color c = new Color(0);
+				if (et.getColor().matches("^\\d+$")) {
+					c = new Color(Integer.parseInt(et.getColor()));
+				} else {
+					Field field;
+					try {
+						field = Class.forName("java.awt.Color").getField(et.getColor());
+						c = (Color) field.get(null);
+					} catch (NoSuchFieldException | SecurityException | ClassNotFoundException
+							| IllegalArgumentException | IllegalAccessException e1) {
+						e1.printStackTrace();
+					}
+				}
+				edit(new UpdateEntityColor(op.getEntity(), c.getRGB()), false);
+			} else
 				edit(new UpdateEntityColor(op.getEntity(), 0), false);
 			if (et.getShortcut() != null)
 				edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
+			if (et.getFlags() != null && !et.getFlags().isBlank()) {
+				for (String uuid : et.getFlags().split("\\s+")) {
+					Flag flag = getFlagModel().getFlag(uuid);
+					edit(new ToggleGenericFlag(flag, Lists.immutable.of(op.getEntity())));
+				}
+			}
 		}
 
 		for (PreferenceType pt : profile.getPreferences().getPreference()) {

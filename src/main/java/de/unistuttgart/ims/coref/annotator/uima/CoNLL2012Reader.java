@@ -12,16 +12,17 @@ import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.factory.JCasBuilder;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
+import org.dkpro.core.api.io.JCasResourceCollectionReader_ImplBase;
+import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.impl.factory.Maps;
 
-import de.tudarmstadt.ukp.dkpro.core.api.io.JCasResourceCollectionReader_ImplBase;
-import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.uimautil.AnnotationUtil;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 
 public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 	ColorProvider colorProvider = new ColorProvider();
@@ -65,7 +66,12 @@ public class CoNLL2012Reader extends JCasResourceCollectionReader_ImplBase {
 						Matcher m = pattern.matcher(cr);
 						if (m.find() && cr.endsWith(")")) {
 							int id = Integer.valueOf(m.group());
-							Mention mention = b.add(beginMentionMap.get(id), Mention.class);
+							MentionSurface surface = b.add(beginMentionMap.get(id), MentionSurface.class);
+							Mention mention = new Mention(aJCas);
+							mention.addToIndexes();
+							mention.setSurface(new FSArray<MentionSurface>(aJCas, 1));
+							mention.setSurface(0, surface);
+							surface.setMention(mention);
 							Entity e = getOrCreate(aJCas, entityMap, id);
 							mention.setEntity(e);
 						}

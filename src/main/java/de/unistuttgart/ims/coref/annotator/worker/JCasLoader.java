@@ -27,8 +27,7 @@ import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.plugins.DirectFileIOPlugin;
 import de.unistuttgart.ims.coref.annotator.plugins.UimaImportPlugin;
 import de.unistuttgart.ims.coref.annotator.uima.EnsureMeta;
-import de.unistuttgart.ims.coref.annotator.uima.Fix131;
-import de.unistuttgart.ims.uimautil.SetJCasLanguage;
+import de.unistuttgart.ims.coref.annotator.uima.SetJCasLanguage;
 
 public class JCasLoader extends SwingWorker<JCas, Object> {
 
@@ -107,7 +106,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
 						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
 			b.add(flavor.getImporter());
-			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
 			SimplePipeline.runPipeline(jcas, b.createAggregateDescription());
 			return jcas;
@@ -119,7 +117,6 @@ public class JCasLoader extends SwingWorker<JCas, Object> {
 				b.add(AnalysisEngineFactory.createEngineDescription(SetJCasLanguage.class,
 						SetJCasLanguage.PARAM_LANGUAGE, getLanguage()));
 			b.add(flavor.getImporter());
-			b.add(AnalysisEngineFactory.createEngineDescription(Fix131.class));
 
 			iter = SimplePipeline.iteratePipeline(crd, b.createAggregateDescription()).iterator();
 			if (iter.hasNext()) {
