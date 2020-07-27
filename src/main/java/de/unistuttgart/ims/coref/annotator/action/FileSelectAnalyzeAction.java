@@ -1,11 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
-import javax.swing.KeyStroke;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
@@ -19,10 +16,8 @@ public class FileSelectAnalyzeAction extends IkonAction {
 	private static final long serialVersionUID = 1L;
 
 	public FileSelectAnalyzeAction() {
-		super(MaterialDesign.MDI_OPEN_IN_APP);
+		super(MaterialDesign.MDI_CHART_LINE);
 		putValue(Action.NAME, Annotator.getString("action.analyze"));
-		putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 	}
 
 	@Override

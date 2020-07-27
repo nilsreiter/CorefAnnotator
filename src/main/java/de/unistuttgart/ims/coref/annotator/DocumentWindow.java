@@ -101,6 +101,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import de.unistuttgart.ims.coref.annotator.action.AddCurrentSpanToCurrentEntity;
+import de.unistuttgart.ims.coref.annotator.action.AnalyzeAction;
 import de.unistuttgart.ims.coref.annotator.action.ChangeColorForEntity;
 import de.unistuttgart.ims.coref.annotator.action.ChangeKeyForEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
@@ -332,6 +333,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		controls.add(actions.mergeSelectedEntitiesAction);
 		controls.add(actions.showSearchPanelAction);
 		controls.add(actions.showDocumentStatistics);
+		controls.add(actions.analyze);
 
 		getContentPane().add(controls, BorderLayout.NORTH);
 
@@ -434,6 +436,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		actions.undoAction.setEnabled(false);
 		actions.entityStatisticsAction.setEnabled(false);
 		actions.fileSaveAction.setEnabled(false);
+		actions.analyze.setEnabled(false);
 
 		// connect listeners
 		documentStateListeners.add(actions.undoAction);
@@ -767,6 +770,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	@Override
 	public void setDocumentModel(DocumentModel model) {
 		super.setDocumentModel(model);
+		model.setFile(getFile());
 
 		MyTreeModelListener modelHandler = new MyTreeModelListener();
 
@@ -785,6 +789,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
 		actions.changeKeyAction.setEnabled(true);
+		actions.analyze.setEnabled(true);
 		highlightManager.setDocumentModel(model);
 
 		// listeners to the coref model
@@ -1780,7 +1785,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	class ActionContainer {
-
+		AnalyzeAction analyze = new AnalyzeAction(DocumentWindow.this);
 		MergeAdjacentMentions mergeMentions = new MergeAdjacentMentions(DocumentWindow.this);
 		ClearAction clearAction = new ClearAction(DocumentWindow.this);
 		AbstractAction closeAction = new de.unistuttgart.ims.coref.annotator.action.CloseAction();

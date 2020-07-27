@@ -164,7 +164,7 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
-			boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN);
+			boolean isGrey = entity.getHidden();
 			Color entityColor = new Color(entity.getColor());
 
 			if (isGrey) {
