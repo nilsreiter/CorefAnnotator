@@ -6,18 +6,142 @@
 <h1>Profiles</h1>
 
 <h2>Usage scenario</h2>
-<p>The exact annotation possibilities for an annotator depend on the annotation task. To support different kinds of annotation tasks, and to prevent annotation mistakes, a profile for the task can be created to disable some functions and enforce certain settings. Profiles are defined in an XML file called <code>profile.xml</code>. If this file is present in the same directory as an annotation file, it is loaded and activated.</p>
+<p>The exact annotation possibilities for an annotator depend on the annotation 
+task. To support different kinds of annotation tasks, and to prevent annotation 
+mistakes, a profile for the task can be created to disable some functions and 
+enforce certain settings. Profiles are defined in an XML file called 
+<code>profile.xml</code>. If this file is present in the same directory as an 
+annotation file, it is loaded and activated.</p>
 
 <h2>Capabilities</h2>
-<p>Profiles can influence the following aspects of the annotation: Pre-defining entities and flags, disabling some or all user operations, change default values for all preferences, and provide information on the annotation guidelines.</p>
-
-<h3>Predefining entities and flags</h3>
+<p>Profiles can influence the following aspects of the annotation: Pre-defining 
+entities and flags, disabling some or all user operations, change default values 
+for all preferences, and provide information on the annotation guidelines.</p>
 
 <h3>Blocking of operations</h3>
+<code>&lt;forbidden&gt;<br/>
+&nbsp;&nbsp;&lt;operation class="OPERATION" /&gt;<br/>
+&lt;/forbidden&gt;
+</code>
+
+<p>The above snippet shows how to disallow an operation. Multiple operations can
+be specified in this way (with multiple 
+<code>&lt;operation&gt;</code>-elements). The placeholder <code>OPERATION</code>
+can be replaced by any class name in the package 
+<code>de.unistuttgart.ims.coref.annotator.document.op</code> 
+(<a href="https://github.com/nilsreiter/CorefAnnotator/tree/master/src/main/java/de/unistuttgart/ims/coref/annotator/document/op">follow this link</a>).</p>
+
+<h3>Predefining entities and flags</h3>
+<code>&lt;entities&gt;<br/>
+&nbsp;&lt;entity label="PER" color="0" shortcut="p" flags="" /&gt;
+&nbsp;&lt;entity label="LOC" color="blue" shortcut="l" flags="" /&gt;
+&lt;/entities&gt;
+</code>
+
+<p>Entities can be defined as shown above. The only mandatory field is 
+<code>label</code>, all others are optional. The <code>label</code> can be any 
+string, it is displayed directly in the UI (and, if not prevented, can be 
+changed by an annotator). <br/>
+The <code>color</code> should be specified as a single 
+integer value, as expected by class <code>java.awt.Color</code>. Alternatively, 
+any color name listed 
+<a href="https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html">here 
+under fields</a> can be used.<br/>
+The <code>shortcut</code> should be a single letter or number. If it's longer,
+ only the first character will be used.<br/>
+The attribute <code>flags</code> can be used to assign flags to entities. To do
+this, the attribute value should be space-separated list of UUIDs, as defined
+in the flags section.
+ </p>
+
+
+<code>&lt;flags&gt;<br/>
+&nbsp;&lt;flag label="deriv" uuid="deriv" icon="" targetClass="Mention" /&gt;
+&nbsp;&lt;flag label="part"  uuid="part"  icon="" targetClass="Mention" /&gt;
+&lt;/entities&gt;
+</code>
+
+<p>Flags can specified as shown above. Of the attributes, only <code>icon</code>
+is optional, all others are mandatory.</p>
+
+<ul>
+<li><code>label</code>: The text shown to annotators in menus and tree.</li>
+<li><code>uuid</code>: A unique identifier for the flag. Used internally. 
+Despite its name, it does not have be an UUID, any (unique) string will do.</li>
+<li><code>icon</code>: An icon to be used. The icon needs to be one of 
+<a href="http://materialdesignicons.com">these</a> and should be given as an
+ upper case string of the form <code>MDI_<i>ICONNAME</i></code>. The icon named 'flag', for
+ instance, is used by speciying <code>MDI_FLAG</code>.
+</li>
+<li><code>targetClass</code>: Can be either <code>Mention</code> or 
+<code>Entity</code> and describes to which type these flags can be attached.</li>
+</ul>
 
 <h3>Guidelines</h3>
 <code>&lt;guidelines url="http://example.com/guidelines-1.0" title="My guidelines" version="1.0" /&gt;</code>
 
-<p>The above snippet demonstrates how to include a guideline link. The attribute <code>url</code> is mandatory, <code>title</code> and <code>version</code> are optional. The URL will be handed over to the system and opened by a browser. Thus any URL that a browser can open can be supplied here (most common are <code>http</code> and <code>https</code> links).</p>
+<p>The above snippet demonstrates how to include a guideline link. The 
+attribute <code>url</code> is mandatory, <code>title</code> and 
+<code>version</code> are optional. The URL will be handed over to the system and
+ opened by a browser. Thus any URL that a browser can open can be supplied here
+  (most common are <code>http</code> and <code>https</code> links).</p>
+  
+  
+<h2>Example file</h2>
+
+<p>The example below (tailored to do NER annotation) can be found as an XML file in the repository
+under 
+<a href="https://github.com/nilsreiter/CorefAnnotator/blob/master/src/test/resources/profile-ner.xml">src/test/resources/profile-ner.xml</a>.
+
+<code><pre>
+<?xml version="1.0" encoding="UTF-8"?>
+<profile xmlns="https://nilsreiter.de/code/corefannotator-1.12.0/profile" name="NER">
+<forbidden>
+    <!-- flags -->
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddFlag" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag" />
+
+    <!-- entities -->
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons" />
+    
+    <!-- entity groups -->
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.GroupEntities" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.MergeEntities" />
+
+    <!-- misc -->
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities" />
+    <operation class="de.unistuttgart.ims.coref.annotator.document.op.Clear" />
+</forbidden>
+<entities>
+    <entity label="PER" color="red" shortcut="p" flags="" />
+    <entity label="LOC" color="green" shortcut="l" flags="" />
+    <entity label="ORG" color="blue" shortcut="o" flags="" />
+    <entity label="OTH" color="yellow" shortcut="x" flags="" />
+</entities>
+<flags>
+    <flag label="deriv" uuid="deriv" icon="MDI_FLAG" targetClass="Mention" />
+    <flag label="part" uuid="part" icon="MDI_FLAG" targetClass="Mention" />
+    <flag label="virtual" uuid="virtual" icon="MDI_FLAG" targetClass="Mention" />
+</flags>
+<preferences>
+    <!-- Default setting is sort entities alphabetically -->
+    <preference key="CFG_ENTITY_SORT_ORDER" value="Alphabet" />
+    <!-- Default setting is sort entities alphabetically -->
+    <preference key="CFG_ENTITY_SORT_DESCENDING" value="false" />
+    <!-- The entity tree is kept in alphabetical order -->
+    <preference key="CFG_KEEP_TREE_SORTED" value="true" />
+    <!--  Flags for coreference should not be created -->
+    <preference key="CFG_CREATE_DEFAULT_FLAGS" value="false" />
+</preferences>
+<guidelines url="https://www.linguistik.hu-berlin.de/de/institut/professuren/korpuslinguistik/forschung/nosta-d/nosta-d-ner-1.5" />
+</profile>
+</pre></code>
+
 </body>
 </html>
