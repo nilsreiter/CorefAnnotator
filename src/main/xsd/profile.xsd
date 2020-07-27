@@ -58,7 +58,7 @@
 
     <complexType name="entityType">
     	<attribute name="label" type="string"></attribute>
-    	<attribute name="color" type="int"></attribute>
+    	<attribute name="color" type="string"></attribute>
     	<attribute name="shortcut">
     		<simpleType>
     			<restriction base="string">

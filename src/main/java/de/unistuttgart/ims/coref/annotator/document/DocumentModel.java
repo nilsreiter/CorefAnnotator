@@ -1,5 +1,7 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.awt.Color;
+import java.lang.reflect.Field;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Line;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
@@ -28,6 +31,7 @@ import de.unistuttgart.ims.coref.annotator.document.op.CoreferenceModelOperation
 import de.unistuttgart.ims.coref.annotator.document.op.DocumentModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.FlagModelOperation;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
+import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateDocumentProperty;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityColor;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityKey;
@@ -249,12 +253,31 @@ public class DocumentModel implements Model {
 			AddMentionsToNewEntity op = new AddMentionsToNewEntity();
 			edit(op, false);
 			edit(new UpdateEntityName(op.getEntity(), et.getLabel()), false);
-			if (et.getColor() != null)
-				edit(new UpdateEntityColor(op.getEntity(), et.getColor()), false);
-			else
+			if (et.getColor() != null) {
+				Color c = new Color(0);
+				if (et.getColor().matches("^\\d+$")) {
+					c = new Color(Integer.parseInt(et.getColor()));
+				} else {
+					Field field;
+					try {
+						field = Class.forName("java.awt.Color").getField(et.getColor());
+						c = (Color) field.get(null);
+					} catch (NoSuchFieldException | SecurityException | ClassNotFoundException
+							| IllegalArgumentException | IllegalAccessException e1) {
+						e1.printStackTrace();
+					}
+				}
+				edit(new UpdateEntityColor(op.getEntity(), c.getRGB()), false);
+			} else
 				edit(new UpdateEntityColor(op.getEntity(), 0), false);
 			if (et.getShortcut() != null)
 				edit(new UpdateEntityKey(op.getEntity(), et.getShortcut().charAt(0)), false);
+			if (et.getFlags() != null && !et.getFlags().isBlank()) {
+				for (String uuid : et.getFlags().split("\\s+")) {
+					Flag flag = getFlagModel().getFlag(uuid);
+					edit(new ToggleGenericFlag(flag, Lists.immutable.of(op.getEntity())));
+				}
+			}
 		}
 
 		for (PreferenceType pt : profile.getPreferences().getPreference()) {
