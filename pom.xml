@@ -15,7 +15,7 @@
 		<version.eclipse>10.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13.0.2</version.javafx>
+		<version.javafx>14.0.2.1</version.javafx>
 	</properties>
 	<build>
 		<plugins>
@@ -68,7 +68,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.2.4</version>
 				<configuration>
 					<transformers>
 						<transformer
@@ -468,12 +468,12 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>4.1.1</version>
+			<version>4.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>4.1.1</version>
+			<version>4.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

@@ -24,7 +24,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   - dkpro: 1.9.0 -> 2.1.0
   - uima: 2.10.2 -> 3.1.0
   - eclipse collections: 9.2.0 -> 10.2.0
-  - javafx: 13.0.1 -> 13.0.2
+  - javafx: 13.0.1 -> 14.0.2.1
+  - ikonli: 2.1.1 -> 11.5.0
+  - poi: 4.1.1 -> 4.1.2
   
 
 
