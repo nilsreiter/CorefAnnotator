@@ -71,10 +71,10 @@
     </complexType>
 
     <complexType name="flagType">
-    	<attribute name="label" type="string"></attribute>
-    	<attribute name="icon" type="string"></attribute>
-    	<attribute name="uuid" type="string"></attribute>
-    	<attribute name="targetClass" type="Q1:targetClassType"></attribute>
+    	<attribute name="label" type="string" use="required"></attribute>
+    	<attribute name="icon" type="string" use="optional"></attribute>
+    	<attribute name="uuid" type="string" use="required"></attribute>
+    	<attribute name="targetClass" type="Q1:targetClassType" use="required"></attribute>
     </complexType>
 
     <simpleType name="targetClassType">
