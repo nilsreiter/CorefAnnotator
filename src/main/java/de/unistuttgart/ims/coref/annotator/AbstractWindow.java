@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
@@ -38,7 +39,7 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
 	protected JMenuBar menuBar = new JMenuBar();
-
+	JMenu menu_help = new JMenu(Annotator.getString(Strings.MENU_HELP));
 	JMenu menu_settings = null;
 
 	public AbstractWindow() {
@@ -46,6 +47,8 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	}
 
 	protected void initializeWindow() {
+		menu_help.add(new HelpAction());
+
 		SpringLayout springs = new SpringLayout();
 		statusBar = new JPanel();
 		statusBar.setPreferredSize(new Dimension(800, 20));

@@ -41,8 +41,8 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 					File f = fileChooser.showSaveDialog(null);
 
 					if (f != null) {
-						if (!f.getName().endsWith(".xmi") && !f.getName().endsWith(".xmi.gz"))
-							f = new File(f.getAbsolutePath() + ".xmi.gz");
+						if (!f.getName().endsWith(".ca2"))
+							f = new File(f.getAbsolutePath() + ".ca2");
 
 						SaveJCasWorker worker = new SaveJCasWorker(f, target.getDocumentModel().getJcas(),
 								SaveJCasWorker.getConsumer(getTarget()));
@@ -66,8 +66,8 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:
 				File f = saveDialog.getSelectedFile();
-				if (!f.getName().endsWith(".xmi") && !f.getName().endsWith(".xmi.gz"))
-					f = new File(f.getAbsolutePath() + ".xmi.gz");
+				if (!f.getName().endsWith(".ca2"))
+					f = new File(f.getAbsolutePath() + ".ca2");
 
 				SaveJCasWorker worker = new SaveJCasWorker(f, target.getDocumentModel().getJcas(),
 						SaveJCasWorker.getConsumer(getTarget()));

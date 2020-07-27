@@ -180,8 +180,7 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (entity.getFlags() != null)
-				for (String flagKey : entity.getFlags()) {
-					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+				for (Flag flag : entity.getFlags()) {
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
 				}
 			return panel;

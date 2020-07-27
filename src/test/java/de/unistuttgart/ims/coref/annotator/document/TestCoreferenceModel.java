@@ -12,7 +12,7 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
@@ -26,6 +26,7 @@ import org.junit.Test;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -101,7 +102,7 @@ public class TestCoreferenceModel {
 		Entity e = new Entity(jcas);
 		e.setLabel("Test");
 		e.setColor(0);
-		e.setFlags(new StringArray(jcas, 0));
+		e.setFlags(new EmptyFSList<Flag>(jcas));
 		e.addToIndexes();
 
 		model.edit(new AddMentionsToEntity(e, new Span(1, 3)));
@@ -286,14 +287,12 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveDuplicates() {
-		model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4)));
+		Entity e = model.edit(new AddMentionsToNewEntity(new Span(1, 3), new Span(1, 3), new Span(2, 4))).getEntity();
 
 		assertTrue(JCasUtil.exists(jcas, Mention.class));
 		assertTrue(JCasUtil.exists(jcas, Entity.class));
 		assertEquals(3, JCasUtil.select(jcas, Mention.class).size());
 		assertEquals(1, JCasUtil.select(jcas, Entity.class).size());
-
-		Entity e = JCasUtil.selectSingle(jcas, Entity.class);
 
 		model.edit(new RemoveDuplicateMentionsInEntities(e));
 
@@ -312,14 +311,14 @@ public class TestCoreferenceModel {
 
 	@Test
 	public void testRemoveEntityThatIsInGroup() {
-		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
-		model.edit(new AddMentionsToNewEntity(new Span(1, 2)));
+		Entity e1 = model.edit(new AddMentionsToNewEntity(new Span(0, 1))).getEntity();
+		Entity e2 = model.edit(new AddMentionsToNewEntity(new Span(1, 2))).getEntity();
 
 		ImmutableList<Entity> entities = Lists.immutable.withAll(JCasUtil.select(jcas, Entity.class));
 		ImmutableList<Mention> mentions = Lists.immutable.withAll(JCasUtil.select(jcas, Mention.class));
 
-		assertEquals(entities.getFirst(), mentions.getFirst().getEntity());
-		assertEquals(entities.getLast(), mentions.getLast().getEntity());
+		assertEquals(e2, mentions.getFirst().getEntity());
+		assertEquals(e1, mentions.getLast().getEntity());
 
 		GroupEntities ge = new GroupEntities(entities.get(0), entities.get(1));
 		model.edit(ge);

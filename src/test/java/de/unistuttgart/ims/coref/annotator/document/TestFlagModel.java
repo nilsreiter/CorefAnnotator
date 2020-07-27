@@ -10,16 +10,16 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.api.factory.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Span;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.ToggleGenericFlag;
@@ -84,10 +84,11 @@ public class TestFlagModel {
 
 	@Test
 	public void testDeleteFlag() {
-		model.edit(new AddFlag(Mention.class));
+		Flag f = model.edit(new AddFlag(Mention.class)).getAddedFlag();
+		f.setUuid("bla");
 		model.edit(new AddMentionsToNewEntity(new Span(0, 1)));
 		Mention m = JCasUtil.select(jcas, Mention.class).iterator().next();
-		model.edit(new ToggleGenericFlag("", Lists.fixedSize.of(m)));
+		model.edit(new ToggleGenericFlag(f, Lists.fixedSize.of(m)));
 	}
 
 }

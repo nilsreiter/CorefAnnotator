@@ -48,6 +48,8 @@ public class Strings {
 	public static final String ACTION_FLAG_MENTION_NON_NOMINAL_TOOLTIP = "action.flag_mention_non_nominal.tooltip";
 	public static final String ACTION_GROUP = "action.group";
 	public static final String ACTION_GROUP_TOOLTIP = "action.group.tooltip";
+	public static final String ACTION_GUIDELINES = "action.guidelines";
+	public static final String ACTION_GUIDELINES_TOOLTIP = "action.guidelines.tooltip";
 	public static final String ACTION_MERGE = "action.merge";
 	public static final String ACTION_MERGE_ADJACENT_MENTIONS = "action.merge.adjacent_mentions";
 	public static final String ACTION_MERGE_ADJACENT_MENTIONS_TOOLTIP = "action.merge.adjacent_mentions.tooltip.ok";
@@ -234,6 +236,8 @@ public class Strings {
 	public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 	public static final String MESSAGE_SAVING = "message.saving";
 	public static final String NAME_MS_EXCEL = "name.ms.excel";
+	public static final String SEARCH_WINDOW_CASE_INSENSITIVE = "search.window.case_insensitive";
+	public static final String SEARCH_WINDOW_CASE_INSENSITIVE_TOOLTIP = "search.window.case_insensitive.tooltip";
 	public static final String SEARCH_WINDOW_RESTRICT_TO_MENTIONS = "search.window.restrict_to_mentions";
 	public static final String SEARCH_WINDOW_TAB_STRUCTURE = "search.window.tab.structure";
 	public static final String SEARCH_WINDOW_TAB_TEXT = "search.window.tab.text";

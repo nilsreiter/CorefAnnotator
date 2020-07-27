@@ -79,7 +79,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		case 0:
 			return MaterialDesign.valueOf(f.getIcon());
 		case 1:
-			return f.getKey();
+			return f.getUuid();
 		case 2:
 			return f.getLabel();
 		case 3:

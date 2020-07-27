@@ -95,14 +95,14 @@ public class AnalyzerActionPanel_Flag extends AnalyzerActionPanel_CountChartTabl
 		if (unit == Entity.class) {
 			for (Flag f : documentModel.getFlagModel().getFlags()
 					.select(f -> f.getTargetClass().equalsIgnoreCase(Entity.class.getName()))) {
-				cts.put(f.getLabel(), Lists.mutable.withAll(entities).select(e -> UimaUtil.isX(e, f.getKey())).size());
+				cts.put(f.getLabel(), Lists.mutable.withAll(entities).select(e -> UimaUtil.isX(e, f)).size());
 			}
 		} else if (unit == Mention.class) {
 			MutableList<Mention> mentions = Lists.mutable.withAll(entities)
 					.flatCollect(e -> documentModel.getCoreferenceModel().getMentions(e));
 			for (Flag f : documentModel.getFlagModel().getFlags()
 					.select(f -> f.getTargetClass().equalsIgnoreCase(Mention.class.getName()))) {
-				cts.put(f.getLabel(), mentions.select(e -> UimaUtil.isX(e, f.getKey())).size());
+				cts.put(f.getLabel(), mentions.select(e -> UimaUtil.isX(e, f)).size());
 			}
 		}
 

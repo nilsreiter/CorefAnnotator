@@ -143,6 +143,38 @@
 			</features>
 		</typeDescription>
 		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIElement</name>
+			<description>Root type for TEI markup representation</description>
+			<supertypeName>uima.tcas.Annotation</supertypeName>
+			<!-- <features>
+				<featureDescription>
+					<name>XMLElement</name>
+					<description>Corresponding XMLElement annotation</description>
+					<rangeTypeName>de.unistuttgart.ims.uima.io.xml.type.XMLElement</rangeTypeName>
+				</featureDescription>
+			</features> -->
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIHeader</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIElement</supertypeName>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIText</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIElement</supertypeName>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIBody</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIElement</supertypeName>
+		</typeDescription>
+		<typeDescription>
+			<name>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIDiv</name>
+			<description />
+			<supertypeName>de.unistuttgart.ims.coref.annotator.api.v1.tei.TEIElement</supertypeName>
+		</typeDescription>
+		<typeDescription>
 			<name>de.unistuttgart.ims.coref.annotator.api.v1.Comment</name>
 			<description />
 			<supertypeName>uima.cas.TOP</supertypeName>

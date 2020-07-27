@@ -2,23 +2,26 @@ package de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
-import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.drama.api.Speaker;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -27,7 +30,7 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 	/**
 	 * Pattern to extract xml ids from a string representation of the xml attributes
 	 */
-	Pattern pattern = Pattern.compile("xml:id=\"([^\"]+)\"");
+	Pattern xmlIdPattern = Pattern.compile("xml:id=\"([^\"]+)\"");
 
 	/**
 	 * This will be used to ensure that ids are unique within a document
@@ -52,11 +55,14 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 
 		// the <text>-element
 		XMLElement textElement = null;
+		XMLElement teiHeaderElement = null;
+
+		MutableList<XMLElement> spElements = Lists.mutable.empty();
 
 		for (XMLElement xmlElement : JCasUtil.select(jcas, XMLElement.class)) {
 
 			// if the xmlElement has an xml:id attribute
-			Matcher m = pattern.matcher(xmlElement.getAttributes());
+			Matcher m = xmlIdPattern.matcher(xmlElement.getAttributes());
 			if (m.find()) {
 				String id = m.group(1);
 
@@ -68,12 +74,48 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			// we assume it's unique
 			if (xmlElement.getTag().equalsIgnoreCase("text"))
 				textElement = xmlElement;
+
+			// identify <teiHeader>-element
+			if (xmlElement.getTag().equalsIgnoreCase("teiHeader"))
+				teiHeaderElement = xmlElement;
+
+			// scrub all who= attributes in <sp>-elements
+			if (xmlElement.getTag().equalsIgnoreCase("sp") && xmlElement.getAttributes().contains("who=")) {
+				xmlElement.setAttributes(
+						Pattern.compile("who=\"[^\"]*\"").matcher(xmlElement.getAttributes()).replaceFirst(""));
+				spElements.add(xmlElement);
+			}
+
 		}
 
-		// TODO: Handle who= elements
+		// handle <sp>-elements separately
+		for (XMLElement spElement : spElements) {
+
+			// we first collect all mentions that designate speaker tags
+			MutableSet<Mention> speakerMentions = Sets.mutable.empty();
+			for (Speaker speaker : JCasUtil.selectCovered(Speaker.class, spElement)) {
+				speakerMentions.addAll(Lists.mutable.withAll(JCasUtil.selectCovered(MentionSurface.class, speaker))
+						.collect(ms -> ms.getMention()));
+			}
+
+			// skip if <sp> doesn't contain a single <speaker> element
+			if (speakerMentions.isEmpty())
+				continue;
+
+			// generate the new string for the who attribute
+			String newAttributeString = spElement.getAttributes();
+			if (!(newAttributeString.isEmpty() || newAttributeString.endsWith(" ")))
+				newAttributeString += " ";
+			newAttributeString += "who=\"" + speakerMentions.collect(m -> "#" + toXmlId(m.getEntity())).makeString(" ")
+					+ "\"";
+
+			// add id to the xml element
+			spElement.setAttributes(newAttributeString);
+		}
+
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 
-			// we skip all mentions in the tei header
+			// we skip all mentions not in the text
 			if (!coveringXMLElement.get(m).contains(textElement))
 				continue;
 
@@ -88,10 +130,29 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 			String xid = toXmlId(e);
 
 			// create new element annotation
-			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, UimaUtil.getBegin(m), UimaUtil.getEnd(m),
-					XMLElement.class);
-			newElement.setTag("rs");
-			newElement.setAttributes(" ref=\"#" + xid + "\"");
+			boolean first = true;
+			String mentionId = UUID.randomUUID().toString();
+			for (MentionSurface ms : m.getSurface()) {
+				XMLElement newElement = AnnotationFactory.createAnnotation(jcas, ms.getBegin(), ms.getEnd(),
+						XMLElement.class);
+				newElement.setTag("rs");
+
+				StringBuilder b = new StringBuilder();
+				b.append(' ').append("ref=\"#").append(xid).append('"');
+				if (first) {
+					if (m.getSurface().size() > 1)
+						b.append(" id=\"").append(mentionId).append('"');
+					if (m.getFlags() != null && !m.getFlags().isEmpty())
+						b.append(" ana=\"")
+								.append(StringUtils
+										.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getUuid()), ","))
+								.append('"');
+					first = false;
+				} else {
+					b.append(' ').append("prev=\"").append(mentionId).append("\"");
+				}
+				newElement.setAttributes(b.toString());
+			}
 		}
 	}
 

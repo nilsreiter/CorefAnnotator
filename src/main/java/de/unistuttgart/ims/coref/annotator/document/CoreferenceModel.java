@@ -15,8 +15,10 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
+import org.apache.uima.jcas.cas.NonEmptyFSList;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -41,6 +43,7 @@ import de.unistuttgart.ims.coref.annotator.Spans;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v2.Comment;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.document.Event.Type;
@@ -146,7 +149,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		Entity e = new Entity(documentModel.getJcas());
 		e.setColor(colorMap.getNextColor().getRGB());
 		e.setLabel(l);
-		e.setFlags(new StringArray(documentModel.getJcas(), 0));
+		e.setFlags(new EmptyFSList<Flag>(documentModel.getJcas()));
 		e.setMembers(new FSArray<Entity>(documentModel.getJcas(), 0));
 		e.addToIndexes();
 		return e;
@@ -170,7 +173,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 * @return the created mention
 	 */
 	protected Mention createMention(int b, int e) {
-		Mention m = UimaUtil.getMention(documentModel.getJcas(), b, e);
+		Mention m = UimaUtil.createMention(documentModel.getJcas(), b, e);
 		if (getPreferences().getBoolean(Constants.CFG_TRIM_WHITESPACE, Defaults.CFG_TRIM_WHITESPACE))
 			AnnotationUtil.trim(m.getSurface(0));
 		if (getPreferences().getBoolean(Constants.CFG_FULL_TOKENS, Defaults.CFG_FULL_TOKENS))
@@ -366,16 +369,14 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MutableSet<Mention> allRemoved = Sets.mutable.empty();
 
 		op.getEntities().forEach(e -> {
-			MutableListMultimap<Spans, Mention> map = Multimaps.mutable.list.empty();
+			MutableListMultimap<Spans, Mention> spanMentionMap = Multimaps.mutable.list.empty();
 			MutableList<Mention> toRemove = Lists.mutable.empty();
 			for (Mention m : entityMentionMap.get(e)) {
 				Spans s = new Spans(m);
-				if (map.containsKey(s)) {
-					for (Mention m2 : map.get(s)) {
-						map.put(s, m);
-					}
+				if (spanMentionMap.containsKey(s)) {
+					toRemove.add(m);
 				} else {
-					map.put(s, m);
+					spanMentionMap.put(s, m);
 				}
 			}
 
@@ -470,16 +471,22 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	protected void edit(ToggleGenericFlag operation) {
 		MutableSet<FeatureStructure> featureStructures = Sets.mutable.empty();
 		operation.getObjects().forEach(fs -> {
+
 			Feature feature = fs.getType().getFeatureByBaseName("Flags");
 
 			featureStructures.add(fs);
 
+			@SuppressWarnings("unchecked")
+			FSList<Flag> flags = (FSList<Flag>) fs.getFeatureValue(feature);
+
 			if (UimaUtil.isX(fs, operation.getFlag())) {
-				fs.setFeatureValue(feature, UimaUtil.removeFrom(documentModel.getJcas(),
-						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+				fs.setFeatureValue(feature, UimaUtil.removeFrom(flags, operation.getFlag()));
 			} else {
-				fs.setFeatureValue(feature, UimaUtil.addTo(documentModel.getJcas(),
-						(StringArray) fs.getFeatureValue(feature), operation.getFlag()));
+				if (flags == null) {
+					fs.setFeatureValue(feature, new NonEmptyFSList<Flag>(documentModel.getJcas(), operation.getFlag()));
+				} else {
+					fs.setFeatureValue(feature, flags.push(operation.getFlag()));
+				}
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Update, operation.getObjects()));
@@ -608,7 +615,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	public String getToolTipText(FeatureStructure featureStructure) {
 		if (featureStructure instanceof Entity) {
 			Entity e = (Entity) featureStructure;
-			if (!e.getMembers().isEmpty()) {
+			if (UimaUtil.isGroup(featureStructure)) {
 				StringBuilder b = new StringBuilder();
 				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
 					b.append(e.getMembers(0).getLabel());

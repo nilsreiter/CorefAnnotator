@@ -5,8 +5,8 @@ import java.util.Random;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class Constants {
@@ -113,6 +113,7 @@ public class Constants {
 	 * 
 	 * @since 1.13
 	 */
+	@Deprecated
 	public static final String CFG_CREATE_DEFAULT_FLAGS = "CFG_CREATE_DEFAULT_FLAGS";
 
 	/**

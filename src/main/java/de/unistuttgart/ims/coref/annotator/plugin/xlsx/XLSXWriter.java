@@ -205,10 +205,10 @@ public class XLSXWriter extends SingleFileStream {
 				row.createCell(cellNum++).setCellValue(entity.getLabel());
 				row.createCell(cellNum++).setCellValue(UimaUtil.isGroup(entity));
 				for (Flag flag : entityFlags) {
-					row.createCell(cellNum++).setCellValue(UimaUtil.isX(entity, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(entity, flag));
 				}
 				for (Flag flag : mentionFlags) {
-					row.createCell(cellNum++).setCellValue(UimaUtil.isX(mention, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(mention, flag));
 				}
 			}
 			entityNum++;

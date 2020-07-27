@@ -95,27 +95,30 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	@Override
 	public String getToolTip() {
-		if (UimaUtil.isGroup((Entity) getUserObject())) {
-			StringBuilder b = new StringBuilder();
-			Entity entityGroup = (Entity) getUserObject();
-			if (entityGroup.getMembers().size() > 0) {
-				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
-					b.append(entityGroup.getMembers(0).getLabel());
-				else {
-					System.out.println();
+		if (getUserObject() instanceof Entity) {
+			if (UimaUtil.isGroup(getUserObject())) {
+				StringBuilder b = new StringBuilder();
+				Entity entityGroup = (Entity) getUserObject();
+				if (entityGroup.getMembers().size() > 0) {
+					if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+						b.append(entityGroup.getMembers(0).getLabel());
+					else {
+						System.out.println();
+					}
+					for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+						b.append(", ");
+						Entity member = entityGroup.getMembers(i);
+						if (member != null)
+							b.append(member.getLabel());
+					}
+					return b.toString();
+				} else {
+					return null;
 				}
-				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
-					b.append(", ");
-					Entity member = entityGroup.getMembers(i);
-					if (member != null)
-						b.append(member.getLabel());
-				}
-				return b.toString();
 			} else {
-				return null;
+				return getEntity().getLabel();
 			}
-		} else if (getUserObject() instanceof Entity) {
-			return getEntity().getLabel();
+
 		}
 		return null;
 	}

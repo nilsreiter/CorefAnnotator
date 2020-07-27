@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
@@ -16,8 +15,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class TestMapCorefToXmlElements {
@@ -29,15 +29,15 @@ public class TestMapCorefToXmlElements {
 		jcas = JCasFactory.createText("the dog barks");
 		entity = new Entity(jcas);
 		entity.addToIndexes();
-		Mention m = AnnotationFactory.createAnnotation(jcas, 0, 1, Mention.class);
+		Mention m = UimaUtil.createMention(jcas, 0, 1);
 		m.setEntity(entity);
-		m = AnnotationFactory.createAnnotation(jcas, 1, 2, Mention.class);
+		m = UimaUtil.createMention(jcas, 1, 2);
 		m.setEntity(entity);
 
 		entity2 = new Entity(jcas);
 		entity2.addToIndexes();
-		AnnotationFactory.createAnnotation(jcas, 2, 3, Mention.class).setEntity(entity2);
-		AnnotationFactory.createAnnotation(jcas, 3, 4, Mention.class).setEntity(entity2);
+		UimaUtil.createMention(jcas, 2, 3).setEntity(entity2);
+		UimaUtil.createMention(jcas, 3, 4).setEntity(entity2);
 
 	}
 
@@ -58,22 +58,22 @@ public class TestMapCorefToXmlElements {
 		assertEquals("rs", e.getTag());
 		assertEquals(0, e.getBegin());
 		assertEquals(1, e.getEnd());
-		assertEquals(" ref=\"#e1\"", e.getAttributes());
+		assertEquals(" ref=\"#e2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 1);
 
 		assertEquals("rs", e.getTag());
 		assertEquals(1, e.getBegin());
 		assertEquals(2, e.getEnd());
-		assertEquals(" ref=\"#e1\"", e.getAttributes());
+		assertEquals(" ref=\"#e2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 2);
 		assertEquals("rs", e.getTag());
-		assertEquals(" ref=\"#e2\"", e.getAttributes());
+		assertEquals(" ref=\"#e1\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 3);
 		assertEquals("rs", e.getTag());
-		assertEquals(" ref=\"#e2\"", e.getAttributes());
+		assertEquals(" ref=\"#e1\"", e.getAttributes());
 	}
 
 	@Test
@@ -87,22 +87,22 @@ public class TestMapCorefToXmlElements {
 		assertEquals("rs", e.getTag());
 		assertEquals(0, e.getBegin());
 		assertEquals(1, e.getEnd());
-		assertEquals(" ref=\"#dog\"", e.getAttributes());
+		assertEquals(" ref=\"#dog2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 1);
 
 		assertEquals("rs", e.getTag());
 		assertEquals(1, e.getBegin());
 		assertEquals(2, e.getEnd());
-		assertEquals(" ref=\"#dog\"", e.getAttributes());
+		assertEquals(" ref=\"#dog2\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 2);
 		assertEquals("rs", e.getTag());
-		assertEquals(" ref=\"#dog2\"", e.getAttributes());
+		assertEquals(" ref=\"#dog\"", e.getAttributes());
 
 		e = JCasUtil.selectByIndex(jcas, XMLElement.class, 3);
 		assertEquals("rs", e.getTag());
-		assertEquals(" ref=\"#dog2\"", e.getAttributes());
+		assertEquals(" ref=\"#dog\"", e.getAttributes());
 
 	}
 

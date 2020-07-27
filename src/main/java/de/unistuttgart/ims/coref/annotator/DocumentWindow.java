@@ -130,6 +130,7 @@ import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowDocumentStatistics;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
+import de.unistuttgart.ims.coref.annotator.action.ShowGuidelinesAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowSearchPanelAction;
@@ -163,7 +164,6 @@ import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
-import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
 import de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
@@ -206,6 +206,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	ActionContainer actions = new ActionContainer();
 
 	// Window components
+	JToolBar controls = new JToolBar();
 	JTree tree;
 	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
@@ -320,7 +321,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		// tool bar
-		JToolBar controls = new JToolBar();
 		controls.setFocusable(false);
 		controls.setRollover(true);
 		controls.add(actions.newEntityAction);
@@ -617,9 +617,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	protected void initialiseMenu() {
 
-		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
-		helpMenu.add(Annotator.app.helpAction);
-
 		menuBar.add(initialiseMenuFile());
 		menuBar.add(initialiseMenuEntity());
 		menuBar.add(initialiseMenuView());
@@ -629,7 +626,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// if (segmentAnnotation != null)
 		// menuBar.add(documentMenu);
 		// menuBar.add(windowsMenu);
-		menuBar.add(helpMenu);
+		menuBar.add(menu_help);
 
 		setJMenuBar(menuBar);
 
@@ -868,6 +865,12 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				miscLabel2.setText(Annotator.getString(Strings.STATUS_PROFILE) + ": " + "Unknown");
 		miscLabel2.repaint();
 
+		if (model.getProfile() != null && model.getProfile().getGuidelines() != null) {
+			Action glAction = new ShowGuidelinesAction(model.getProfile());
+			menu_help.add(glAction);
+			controls.add(glAction);
+		}
+
 		// final
 		setMessage("");
 		pack();
@@ -1077,8 +1080,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			Annotator.logger.debug("Moving {} things", moved.size());
 			Operation operation = null;
 			if (targetFS instanceof Entity) {
-				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Entity)
-						&& UimaUtil.isGroup((Entity) targetFS)) {
+				if (moved.anySatisfy(n -> n.getFeatureStructure() instanceof Entity) && UimaUtil.isGroup(targetFS)) {
 					operation = new AddEntityToEntityGroup((Entity) targetFS,
 							moved.select(n -> n.getFeatureStructure() instanceof Entity)
 									.collect(n -> n.getFeatureStructure()));
@@ -1171,7 +1173,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
-			boolean isGrey = UimaUtil.isX(entity, Constants.ENTITY_FLAG_HIDDEN) || treeNode.getRank() < 50;
+			boolean isGrey = entity.getHidden() || treeNode.getRank() < 50;
 			Color entityColor = new Color(entity.getColor());
 
 			if (isGrey) {
@@ -1193,15 +1195,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				panel.add(new JLabel(FontIcon.of(MaterialDesign.MDI_ACCOUNT_MULTIPLE)));
 			}
 			if (entity.getFlags() != null)
-				for (String flagKey : entity.getFlags()) {
-					Flag flag = getDocumentModel().getFlagModel().getFlag(flagKey);
+				for (Flag flag : entity.getFlags()) {
 					addFlag(panel, flag, isGrey ? Color.GRAY : Color.BLACK);
 				}
 			return panel;
 		}
 
 		protected JPanel handleMention(JPanel panel, JLabel lab1, Mention m) {
-			FlagModel fm = getDocumentModel().getFlagModel();
 
 			// constructing text
 			StringBuilder b = new StringBuilder();
@@ -1224,8 +1224,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			lab1.setText(b.toString());
 			if (m.getFlags() != null)
-				for (String flagKey : m.getFlags()) {
-					Flag flag = fm.getFlag(flagKey);
+				for (Flag flag : m.getFlags()) {
 					addFlag(panel, flag, Color.black);
 				}
 

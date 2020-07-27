@@ -180,6 +180,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 	private static final long serialVersionUID = 1L;
 	JTextField textField;
 	JCheckBox restrictToMentions;
+	JCheckBox caseInsensitive;
 	JList<SearchResult> text_list;
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
@@ -209,11 +210,25 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			}
 
 		});
+
+		caseInsensitive = new JCheckBox(Annotator.getString(Strings.SEARCH_WINDOW_CASE_INSENSITIVE));
+		caseInsensitive.setSelected(true);
+		caseInsensitive.setToolTipText(Annotator.getString(Strings.SEARCH_WINDOW_CASE_INSENSITIVE_TOOLTIP));
+		caseInsensitive.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				search(textField.getText());
+			}
+
+		});
+
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
 		behaviourBar.add(new HelpAction(HelpWindow.Topic.SEARCH));
 		behaviourBar.add(restrictToMentions);
+		behaviourBar.add(caseInsensitive);
 
 		JToolBar actionBar = new JToolBar();
 		actionBar.setLayout(new BoxLayout(actionBar, BoxLayout.Y_AXIS));
@@ -338,7 +353,8 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			annotateSelectedFindingsAsNew.setEnabled(false);
 			clearResults();
 			if (searchString.length() > 0) {
-				Pattern p = Pattern.compile(searchString);
+				Pattern p = Pattern.compile(searchString,
+						(caseInsensitive.isSelected() ? Pattern.CASE_INSENSITIVE : 0));
 
 				if (restrictToMentions.isSelected()) {
 					for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()

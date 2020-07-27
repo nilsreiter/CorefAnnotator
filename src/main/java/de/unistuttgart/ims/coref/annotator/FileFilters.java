@@ -5,6 +5,19 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 public class FileFilters {
+	static public FileFilter ca2 = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".ca2");
+		}
+
+		@Override
+		public String getDescription() {
+			return "CorefAnnotator files";
+		}
+	};
+
 	static public FileFilter xmi = new FileFilter() {
 
 		@Override

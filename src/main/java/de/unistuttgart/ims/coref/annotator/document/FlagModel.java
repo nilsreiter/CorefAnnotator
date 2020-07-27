@@ -6,7 +6,7 @@ import java.util.prefs.Preferences;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
@@ -15,8 +15,6 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
-import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
@@ -64,35 +62,6 @@ public class FlagModel extends SubModel implements Model {
 
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
-
-		if (preferences.getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS, Defaults.CFG_CREATE_DEFAULT_FLAGS)
-				&& !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
-			initialiseDefaultFlags();
-		}
-	}
-
-	@Deprecated
-	protected void addFlag(String label, Class<? extends FeatureStructure> targetClass) {
-		addFlag(label, targetClass, null);
-	}
-
-	@Deprecated
-	protected synchronized void addFlag(String label, Class<? extends FeatureStructure> targetClass, Ikon ikon) {
-		Flag f = new Flag(documentModel.getJcas());
-		f.addToIndexes();
-		f.setLabel(label);
-		String key = UUID.randomUUID().toString();
-		while (keys.contains(key)) {
-			key = UUID.randomUUID().toString();
-		}
-		f.setKey(key);
-
-		if (ikon != null)
-			f.setIcon(ikon.toString());
-		f.setTargetClass(targetClass.getName());
-		f.addToIndexes();
-		keys.add(key);
-		fireFlagEvent(Event.get(this, Type.Add, f));
 	}
 
 	protected void edit(FlagModelOperation fmo) {
@@ -122,7 +91,7 @@ public class FlagModel extends SubModel implements Model {
 		while (keys.contains(key)) {
 			key = UUID.randomUUID().toString();
 		}
-		f.setKey(key);
+		f.setUuid(key);
 
 		if (operation.getIcon() != null)
 			f.setIcon(operation.getIcon().toString());
@@ -145,19 +114,12 @@ public class FlagModel extends SubModel implements Model {
 	protected void edit(DeleteFlag operation) {
 		Flag flag = operation.getFlag();
 
-		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
-			return;
 		ImmutableList<FeatureStructure> featureStructures = this.getFlaggedFeatureStructures(flag);
 		operation.setFeatureStructures(featureStructures);
 
-		featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey())).forEach(fs -> {
+		featureStructures.select(fs -> UimaUtil.isX(fs, flag)).forEach(fs -> {
 			Feature feature = fs.getType().getFeatureByBaseName("Flags");
-			StringArray nArr = UimaUtil.removeFrom(documentModel.getJcas(), (StringArray) fs.getFeatureValue(feature),
-					flag.getKey());
-			((StringArray) fs.getFeatureValue(feature)).removeFromIndexes();
+			FSList<Flag> nArr = UimaUtil.removeFrom(UimaUtil.getFlags(fs), flag);
 			fs.setFeatureValue(feature, nArr);
 		});
 
@@ -182,12 +144,8 @@ public class FlagModel extends SubModel implements Model {
 			flag.setTargetClass((String) op.getNewValue());
 			break;
 		case KEY:
-			op.setOldValue(flag.getKey());
-			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				UimaUtil.removeFlagKey(fs, (String) op.getOldValue());
-				UimaUtil.addFlagKey(fs, (String) op.getNewValue());
-			});
-			flag.setKey((String) op.getNewValue());
+			op.setOldValue(flag.getUuid());
+			flag.setUuid((String) op.getNewValue());
 			break;
 		}
 		Annotator.logger.traceEntry();
@@ -214,57 +172,7 @@ public class FlagModel extends SubModel implements Model {
 			e.printStackTrace();
 		}
 
-		return featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey()));
-	}
-
-	@Deprecated
-	protected void initialiseDefaultFlags() {
-		Flag flag;
-
-		// ambiguous
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_AMBIGUOUS);
-		flag.setLabel(Strings.MENTION_FLAG_AMBIGUOUS);
-		flag.setIcon("MDI_SHARE_VARIANT");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_AMBIGUOUS);
-
-		// difficult
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_DIFFICULT);
-		flag.setLabel(Strings.MENTION_FLAG_DIFFICULT);
-		flag.setIcon("MDI_ALERT_BOX");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_DIFFICULT);
-
-		// non-nominal
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_NON_NOMINAL);
-		flag.setLabel(Strings.MENTION_FLAG_NON_NOMINAL);
-		flag.setIcon("MDI_FLAG");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_NON_NOMINAL);
-
-		// generic
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.ENTITY_FLAG_GENERIC);
-		flag.setLabel(Strings.ACTION_FLAG_ENTITY_GENERIC);
-		flag.setIcon("MDI_CLOUD");
-		flag.setTargetClass(Entity.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.ENTITY_FLAG_GENERIC);
-
-		// hidden
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.ENTITY_FLAG_HIDDEN);
-		flag.setLabel(Strings.ACTION_TOGGLE_ENTITY_VISIBILITY);
-		flag.setIcon("MDI_ACCOUNT_OUTLINE");
-		flag.setTargetClass(Entity.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.ENTITY_FLAG_HIDDEN);
+		return featureStructures.select(fs -> UimaUtil.isX(fs, flag));
 	}
 
 	public Class<?> getTargetClass(Flag f) throws ClassNotFoundException {
@@ -310,8 +218,7 @@ public class FlagModel extends SubModel implements Model {
 
 	protected void undo(DeleteFlag fmo) {
 		fmo.getFlag().addToIndexes();
-		documentModel.getCoreferenceModel()
-				.edit(new ToggleGenericFlag(fmo.getFlag().getKey(), fmo.getFeatureStructures()));
+		documentModel.getCoreferenceModel().edit(new ToggleGenericFlag(fmo.getFlag(), fmo.getFeatureStructures()));
 
 		fireFlagEvent(Event.get(this, Type.Add, fmo.getFlag()));
 		documentModel.getCoreferenceModel().fireEvent(Event.get(this, Event.Type.Update, fmo.getFeatureStructures()));
@@ -331,11 +238,7 @@ public class FlagModel extends SubModel implements Model {
 			flag.setTargetClass((String) op.getOldValue());
 			break;
 		case KEY:
-			getFlaggedFeatureStructures(flag).forEach(fs -> {
-				UimaUtil.removeFlagKey(fs, (String) op.getNewValue());
-				UimaUtil.addFlagKey(fs, (String) op.getOldValue());
-			});
-			flag.setKey((String) op.getOldValue());
+			flag.setUuid((String) op.getOldValue());
 			break;
 		}
 		updateFlag(flag);
@@ -350,7 +253,7 @@ public class FlagModel extends SubModel implements Model {
 
 	public Flag getFlag(String key) {
 		for (Flag f : getFlags())
-			if (f.getKey().equals(key))
+			if (f.getUuid().equals(key))
 				return f;
 		return null;
 	}
