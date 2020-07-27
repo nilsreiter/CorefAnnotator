@@ -28,7 +28,7 @@ import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
-public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener {
+public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener, HasDocumentModel {
 
 	private static final long serialVersionUID = 1L;
 	JPanel statusBar = new JPanel();
@@ -38,7 +38,7 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	JLabel miscLabel2 = new JLabel();
 	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
-	JMenuBar menuBar = new JMenuBar();
+	protected JMenuBar menuBar = new JMenuBar();
 	JMenu menu_help = new JMenu(Annotator.getString(Strings.MENU_HELP));
 	JMenu menu_settings = null;
 

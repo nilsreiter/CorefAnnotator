@@ -27,6 +27,7 @@ import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.xml.sax.SAXException;
@@ -284,6 +285,18 @@ public class UimaUtil {
 			Annotator.logger.catching(e);
 			return null;
 		}
+	}
+
+	public static Iterable<Mention> selectFollowing(Mention m, int n) {
+		ImmutableList<MentionSurface> mss = Lists.immutable
+				.withAll(JCasUtil.selectFollowing(MentionSurface.class, UimaUtil.getLast(m), n));
+		return mss.collect(ms -> ms.getMention()).toSet().toList();
+	}
+
+	public static Iterable<Mention> selectPreceding(Mention m, int n) {
+		ImmutableList<MentionSurface> mss = Lists.immutable
+				.withAll(JCasUtil.selectPreceding(MentionSurface.class, UimaUtil.getFirst(m), n));
+		return mss.collect(ms -> ms.getMention()).toSet().toList();
 	}
 
 	public static boolean isGroup(Object o) {

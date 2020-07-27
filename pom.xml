@@ -186,7 +186,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
+					<!-- <plugin>
 						<groupId>sh.tak.appbundler</groupId>
 						<artifactId>appbundle-maven-plugin</artifactId>
 						<version>1.2.0</version>
@@ -220,7 +220,7 @@
 								<version>2.0</version>
 							</dependency>
 						</dependencies>
-					</plugin>
+					</plugin> -->
 				</plugins>
 			</build>
 		</profile>
@@ -476,6 +476,11 @@
 			<version>4.1.2</version>
 		</dependency>
 		<dependency>
+        	<groupId>org.knowm.xchart</groupId>
+        	<artifactId>xchart</artifactId>
+        	<version>3.6.4</version>
+    	</dependency>
+    	<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.8</version>

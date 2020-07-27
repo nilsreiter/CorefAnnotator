@@ -311,4 +311,9 @@ public class FlagEditor extends AbstractWindow {
 		}
 
 	}
+
+	@Override
+	public DocumentModel getDocumentModel() {
+		return documentModel;
+	}
 }

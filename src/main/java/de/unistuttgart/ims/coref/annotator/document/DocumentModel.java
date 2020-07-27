@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator.document;
 
+import java.io.File;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.Deque;
@@ -75,6 +76,8 @@ public class DocumentModel implements Model {
 	Preferences preferences;
 
 	Profile profile;
+
+	File file = null;
 
 	transient int savedHistoryHash = history.hashCode();
 
@@ -467,5 +470,13 @@ public class DocumentModel implements Model {
 
 	public void setProfile(Profile profile) {
 		this.profile = profile;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }
