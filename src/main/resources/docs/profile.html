@@ -94,53 +94,53 @@ under
 <a href="https://github.com/nilsreiter/CorefAnnotator/blob/master/src/test/resources/profile-ner.xml">src/test/resources/profile-ner.xml</a>.
 
 <code><pre>
-<?xml version="1.0" encoding="UTF-8"?>
-<profile xmlns="https://nilsreiter.de/code/corefannotator-1.12.0/profile" name="NER">
-<forbidden>
-    <!-- flags -->
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddFlag" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag" />
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;profile xmlns=&quot;https://nilsreiter.de/code/corefannotator-1.12.0/profile&quot; name=&quot;NER&quot;&gt;
+&lt;forbidden&gt;
+    &lt;!-- flags --&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.AddFlag&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag&quot; /&gt;
 
-    <!-- entities -->
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons" />
+    &lt;!-- entities --&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons&quot; /&gt;
     
-    <!-- entity groups -->
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.GroupEntities" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.MergeEntities" />
+    &lt;!-- entity groups --&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.GroupEntities&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.MergeEntities&quot; /&gt;
 
-    <!-- misc -->
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities" />
-    <operation class="de.unistuttgart.ims.coref.annotator.document.op.Clear" />
-</forbidden>
-<entities>
-    <entity label="PER" color="red" shortcut="p" flags="" />
-    <entity label="LOC" color="green" shortcut="l" flags="" />
-    <entity label="ORG" color="blue" shortcut="o" flags="" />
-    <entity label="OTH" color="yellow" shortcut="x" flags="" />
-</entities>
-<flags>
-    <flag label="deriv" uuid="deriv" icon="MDI_FLAG" targetClass="Mention" />
-    <flag label="part" uuid="part" icon="MDI_FLAG" targetClass="Mention" />
-    <flag label="virtual" uuid="virtual" icon="MDI_FLAG" targetClass="Mention" />
-</flags>
-<preferences>
-    <!-- Default setting is sort entities alphabetically -->
-    <preference key="CFG_ENTITY_SORT_ORDER" value="Alphabet" />
-    <!-- Default setting is sort entities alphabetically -->
-    <preference key="CFG_ENTITY_SORT_DESCENDING" value="false" />
-    <!-- The entity tree is kept in alphabetical order -->
-    <preference key="CFG_KEEP_TREE_SORTED" value="true" />
-    <!--  Flags for coreference should not be created -->
-    <preference key="CFG_CREATE_DEFAULT_FLAGS" value="false" />
-</preferences>
-<guidelines url="https://www.linguistik.hu-berlin.de/de/institut/professuren/korpuslinguistik/forschung/nosta-d/nosta-d-ner-1.5" />
-</profile>
+    &lt;!-- misc --&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities&quot; /&gt;
+    &lt;operation class=&quot;de.unistuttgart.ims.coref.annotator.document.op.Clear&quot; /&gt;
+&lt;/forbidden&gt;
+&lt;entities&gt;
+    &lt;entity label=&quot;PER&quot; color=&quot;red&quot; shortcut=&quot;p&quot; flags=&quot;&quot; /&gt;
+    &lt;entity label=&quot;LOC&quot; color=&quot;green&quot; shortcut=&quot;l&quot; flags=&quot;&quot; /&gt;
+    &lt;entity label=&quot;ORG&quot; color=&quot;blue&quot; shortcut=&quot;o&quot; flags=&quot;&quot; /&gt;
+    &lt;entity label=&quot;OTH&quot; color=&quot;yellow&quot; shortcut=&quot;x&quot; flags=&quot;&quot; /&gt;
+&lt;/entities&gt;
+&lt;flags&gt;
+    &lt;flag label=&quot;deriv&quot; uuid=&quot;deriv&quot; icon=&quot;MDI_FLAG&quot; targetClass=&quot;Mention&quot; /&gt;
+    &lt;flag label=&quot;part&quot; uuid=&quot;part&quot; icon=&quot;MDI_FLAG&quot; targetClass=&quot;Mention&quot; /&gt;
+    &lt;flag label=&quot;virtual&quot; uuid=&quot;virtual&quot; icon=&quot;MDI_FLAG&quot; targetClass=&quot;Mention&quot; /&gt;
+&lt;/flags&gt;
+&lt;preferences&gt;
+    &lt;!-- Default setting is sort entities alphabetically --&gt;
+    &lt;preference key=&quot;CFG_ENTITY_SORT_ORDER&quot; value=&quot;Alphabet&quot; /&gt;
+    &lt;!-- Default setting is sort entities alphabetically --&gt;
+    &lt;preference key=&quot;CFG_ENTITY_SORT_DESCENDING&quot; value=&quot;false&quot; /&gt;
+    &lt;!-- The entity tree is kept in alphabetical order --&gt;
+    &lt;preference key=&quot;CFG_KEEP_TREE_SORTED&quot; value=&quot;true&quot; /&gt;
+    &lt;!--  Flags for coreference should not be created --&gt;
+    &lt;preference key=&quot;CFG_CREATE_DEFAULT_FLAGS&quot; value=&quot;false&quot; /&gt;
+&lt;/preferences&gt;
+&lt;guidelines url=&quot;https://www.linguistik.hu-berlin.de/de/institut/professuren/korpuslinguistik/forschung/nosta-d/nosta-d-ner-1.5&quot; /&gt;
+&lt;/profile&gt;
 </pre></code>
 
 </body>
