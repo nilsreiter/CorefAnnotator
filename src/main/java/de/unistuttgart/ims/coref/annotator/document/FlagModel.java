@@ -204,57 +204,7 @@ public class FlagModel extends SubModel implements Model {
 			e.printStackTrace();
 		}
 
-		return featureStructures.select(fs -> UimaUtil.isX(fs, flag.getKey()));
-	}
-
-	@Deprecated
-	protected void initialiseDefaultFlags() {
-		Flag flag;
-
-		// ambiguous
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_AMBIGUOUS);
-		flag.setLabel(Strings.MENTION_FLAG_AMBIGUOUS);
-		flag.setIcon("MDI_SHARE_VARIANT");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_AMBIGUOUS);
-
-		// difficult
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_DIFFICULT);
-		flag.setLabel(Strings.MENTION_FLAG_DIFFICULT);
-		flag.setIcon("MDI_ALERT_BOX");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_DIFFICULT);
-
-		// non-nominal
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.MENTION_FLAG_NON_NOMINAL);
-		flag.setLabel(Strings.MENTION_FLAG_NON_NOMINAL);
-		flag.setIcon("MDI_FLAG");
-		flag.setTargetClass(Mention.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.MENTION_FLAG_NON_NOMINAL);
-
-		// generic
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.ENTITY_FLAG_GENERIC);
-		flag.setLabel(Strings.ACTION_FLAG_ENTITY_GENERIC);
-		flag.setIcon("MDI_CLOUD");
-		flag.setTargetClass(Entity.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.ENTITY_FLAG_GENERIC);
-
-		// hidden
-		flag = new Flag(documentModel.getJcas());
-		flag.setKey(Constants.ENTITY_FLAG_HIDDEN);
-		flag.setLabel(Strings.ACTION_TOGGLE_ENTITY_VISIBILITY);
-		flag.setIcon("MDI_ACCOUNT_OUTLINE");
-		flag.setTargetClass(Entity.class.getName());
-		flag.addToIndexes();
-		keys.add(Constants.ENTITY_FLAG_HIDDEN);
+		return featureStructures.select(fs -> UimaUtil.isX(fs, flag));
 	}
 
 	public Class<?> getTargetClass(Flag f) throws ClassNotFoundException {
