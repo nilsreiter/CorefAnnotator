@@ -91,12 +91,13 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 				mention.setEntity(newEntity);
 			}
 			mention.setFlags(new EmptyFSList<Flag>(jcas));
-			for (String flagKey : oldMention.getFlags()) {
-				for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
-					if (oldFlag.getKey().equalsIgnoreCase(flagKey))
-						mention.getFlags().push(flagMap.get(oldFlag));
+			if (oldMention.getFlags() != null)
+				for (String flagKey : oldMention.getFlags()) {
+					for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
+						if (oldFlag.getKey().equalsIgnoreCase(flagKey))
+							mention.getFlags().push(flagMap.get(oldFlag));
+					}
 				}
-			}
 			if (oldMention.getDiscontinuous() != null) {
 				MentionSurface ms = AnnotationFactory.createAnnotation(jcas, oldMention.getDiscontinuous().getBegin(),
 						oldMention.getDiscontinuous().getEnd(), MentionSurface.class);
@@ -129,12 +130,13 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			if (oldEntity.getLabel() != null)
 				newEntity.setLabel(oldEntity.getLabel());
 			newEntity.setFlags(new EmptyFSList<Flag>(jcas));
-			for (String flagKey : oldEntity.getFlags()) {
-				for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
-					if (oldFlag.getKey().equalsIgnoreCase(flagKey))
-						newEntity.getFlags().push(flagMap.get(oldFlag));
+			if (oldEntity.getFlags() != null)
+				for (String flagKey : oldEntity.getFlags()) {
+					for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
+						if (oldFlag.getKey().equalsIgnoreCase(flagKey))
+							newEntity.getFlags().push(flagMap.get(oldFlag));
+					}
 				}
-			}
 			newEntity.setColor(oldEntity.getColor());
 			newEntity.setKey(oldEntity.getKey());
 			newEntity.setXmlId(oldEntity.getXmlId());
