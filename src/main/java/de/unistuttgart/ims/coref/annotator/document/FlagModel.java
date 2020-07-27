@@ -64,11 +64,6 @@ public class FlagModel extends SubModel implements Model {
 
 	public FlagModel(DocumentModel documentModel, Preferences preferences) {
 		super(documentModel);
-
-		if (preferences.getBoolean(Constants.CFG_CREATE_DEFAULT_FLAGS, Defaults.CFG_CREATE_DEFAULT_FLAGS)
-				&& !JCasUtil.exists(documentModel.getJcas(), Flag.class)) {
-			initialiseDefaultFlags();
-		}
 	}
 
 	@Deprecated
@@ -145,11 +140,6 @@ public class FlagModel extends SubModel implements Model {
 	protected void edit(DeleteFlag operation) {
 		Flag flag = operation.getFlag();
 
-		if (flag.getKey().equals(Constants.ENTITY_FLAG_GENERIC) || flag.getKey().equals(Constants.ENTITY_FLAG_HIDDEN)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_AMBIGUOUS)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_DIFFICULT)
-				|| flag.getKey().equals(Constants.MENTION_FLAG_NON_NOMINAL))
-			return;
 		ImmutableList<FeatureStructure> featureStructures = this.getFlaggedFeatureStructures(flag);
 		operation.setFeatureStructures(featureStructures);
 
