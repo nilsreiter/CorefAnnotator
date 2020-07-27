@@ -42,6 +42,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 
 public class UimaUtil {
 
+	@Deprecated
 	public static void addFlagKey(FeatureStructure fs, String flagKey) {
 		Feature feature = fs.getType().getFeatureByBaseName("Flags");
 		try {
