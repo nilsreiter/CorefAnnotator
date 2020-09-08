@@ -4,4 +4,5 @@ classpath*:types-v1.xml
 classpath*:types-v2.xml
 classpath*:types-format.xml
 classpath*:creta-coref.xml
+classpath*:types-quadrama.xml
 classpath*:sfb1391-types.xml
