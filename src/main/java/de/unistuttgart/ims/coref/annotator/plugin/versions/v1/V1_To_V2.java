@@ -20,6 +20,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.uima.TypeSystemVersionConverter;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
@@ -59,12 +60,25 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			getMention(jcas, oldMention);
 		}
 
+		for (de.unistuttgart.ims.coref.annotator.api.v1.Segment oldSegment : JCasUtil.select(jcas,
+				de.unistuttgart.ims.coref.annotator.api.v1.Segment.class)) {
+			getSegment(jcas, oldSegment);
+		}
+
 		for (TOP fs : toRemove) {
 			fs.removeFromIndexes();
 		}
 
 		Meta meta = UimaUtil.getMeta(jcas);
 		meta.setTypeSystemVersion(TypeSystemVersion.v2.name());
+	}
+
+	Segment getSegment(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Segment oldSegment) {
+		Segment segment = AnnotationFactory.createAnnotation(jcas, oldSegment.getBegin(), oldSegment.getEnd(),
+				Segment.class);
+		segment.setLabel(oldSegment.getLabel());
+		return segment;
+
 	}
 
 	Flag getFlag(JCas jcas, de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag) {
