@@ -206,8 +206,6 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 		menu_settings.add(
 				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TOC)));
 		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_CREATE_DEFAULT_FLAGS)));
-		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_COMPARE_BY_ENTITY_NAME)));
 		menu_settings.add(
 				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_STICKY_FLAGS)));
