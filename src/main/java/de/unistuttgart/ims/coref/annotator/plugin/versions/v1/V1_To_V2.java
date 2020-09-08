@@ -35,6 +35,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Entity, Entity> entityMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Mention, Mention> mentionMap = Maps.mutable.empty();
 	MutableMap<de.unistuttgart.ims.coref.annotator.api.v1.Flag, Flag> flagMap = Maps.mutable.empty();
+	MutableMap<String, Flag> flagKeyMap = Maps.mutable.empty();
 	MutableSet<TOP> toRemove = Sets.mutable.empty();
 
 	@Override
@@ -71,7 +72,10 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 		newFlag.setIcon(oldFlag.getIcon());
 		newFlag.setUuid(oldFlag.getKey());
 		newFlag.setLabel(oldFlag.getLabel());
+		newFlag.setTargetClass(oldFlag.getTargetClass().replace(".v1.", ".v2."));
+		newFlag.addToIndexes();
 		flagMap.put(oldFlag, newFlag);
+		flagKeyMap.put(oldFlag.getKey(), newFlag);
 		return newFlag;
 	}
 
@@ -93,10 +97,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			mention.setFlags(new EmptyFSList<Flag>(jcas));
 			if (oldMention.getFlags() != null)
 				for (String flagKey : oldMention.getFlags()) {
-					for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
-						if (oldFlag.getKey().equalsIgnoreCase(flagKey))
-							mention.getFlags().push(flagMap.get(oldFlag));
-					}
+					mention.getFlags().push(flagKeyMap.get(flagKey));
 				}
 			if (oldMention.getDiscontinuous() != null) {
 				MentionSurface ms = AnnotationFactory.createAnnotation(jcas, oldMention.getDiscontinuous().getBegin(),
@@ -132,10 +133,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			newEntity.setFlags(new EmptyFSList<Flag>(jcas));
 			if (oldEntity.getFlags() != null)
 				for (String flagKey : oldEntity.getFlags()) {
-					for (de.unistuttgart.ims.coref.annotator.api.v1.Flag oldFlag : flagMap.keySet()) {
-						if (oldFlag.getKey().equalsIgnoreCase(flagKey))
-							newEntity.getFlags().push(flagMap.get(oldFlag));
-					}
+					newEntity.getFlags().push(flagKeyMap.get(flagKey));
 				}
 			newEntity.setColor(oldEntity.getColor());
 			newEntity.setKey(oldEntity.getKey());
