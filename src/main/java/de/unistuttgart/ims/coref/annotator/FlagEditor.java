@@ -102,13 +102,6 @@ public class FlagEditor extends AbstractWindow {
 		flagMenu.add(new JMenuItem(addEntityFlagAction));
 		flagMenu.add(new JMenuItem(addMentionFlagAction));
 		flagMenu.add(new JMenuItem(deleteFlagAction));
-		flagMenu.addSeparator();
-		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP))));
-		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_2,
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP))));
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
 		helpMenu.add(Annotator.app.helpAction);
@@ -292,6 +285,7 @@ public class FlagEditor extends AbstractWindow {
 
 	}
 
+	@Deprecated
 	class CreateFlagsFromCollections extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		AddFlag[] flagCollection;

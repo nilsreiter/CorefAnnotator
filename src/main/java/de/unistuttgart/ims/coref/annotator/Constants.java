@@ -5,10 +5,6 @@ import java.util.Random;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
-import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
-
 public class Constants {
 	public static class Setting<T> {
 
@@ -195,32 +191,7 @@ public class Constants {
 	 */
 	public static final String CFG_UNDERLINE_SINGLETONS_IN_GRAY = "CFG_UNDERLINE_SINGLETONS_IN_GRAY";
 
-	@Deprecated
-	public static final String ENTITY_FLAG_GENERIC = "Generic";
-	@Deprecated
-	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
-
 	public static final int MAX_SEGMENTS_IN_SCROLLBAR = 15;
-
-	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
-			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
-			new AddFlag("male", "Male", MaterialDesign.MDI_GENDER_MALE, Entity.class),
-			new AddFlag("male-female", "Male/Female", MaterialDesign.MDI_GENDER_MALE_FEMALE, Entity.class),
-			new AddFlag("transgender", "Transgender", MaterialDesign.MDI_GENDER_TRANSGENDER, Entity.class) };
-
-	public static final AddFlag[] FLAG_COLLECTION_2 = new AddFlag[] {
-			new AddFlag("predicate", "Predicate", MaterialDesign.MDI_GAVEL, Mention.class),
-			new AddFlag("pronoun", "Pronoun", MaterialDesign.MDI_ARROW_TOP_LEFT, Mention.class),
-			new AddFlag("name", "Proper name", MaterialDesign.MDI_TAG, Mention.class) };
-
-	@Deprecated
-	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
-
-	@Deprecated
-	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
-
-	@Deprecated
-	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
 
 	public static final String PREF_RECENT = "recent_files";
 
