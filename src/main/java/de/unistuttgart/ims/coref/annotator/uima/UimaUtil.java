@@ -474,6 +474,8 @@ public class UimaUtil {
 			return null;
 		StringBuilder b = new StringBuilder();
 		while (tn != null) {
+			if (tn.get().getLabel().equalsIgnoreCase("document"))
+				break;
 			String s = tn.get().getLabel();
 			s = StringUtils.abbreviate(s, maxlength);
 			if (s != null && !s.isBlank()) {
