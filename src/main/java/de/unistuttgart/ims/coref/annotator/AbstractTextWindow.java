@@ -117,11 +117,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				setText(StringUtils.abbreviate(atn.get().getLabel(), 20));
 			}
 			if (leaf)
-				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS));
+				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS, Constants.UI_ICON_SIZE_IN_TREE));
 			else if (expanded)
-				setIcon(FontIcon.of(FontAwesome.FOLDER_OPEN_O));
+				setIcon(FontIcon.of(FontAwesome.FOLDER_OPEN_O, Constants.UI_ICON_SIZE_IN_TREE));
 			else
-				setIcon(FontIcon.of(FontAwesome.FOLDER_O));
+				setIcon(FontIcon.of(FontAwesome.FOLDER_O, Constants.UI_ICON_SIZE_IN_TREE));
 			return this;
 		}
 
@@ -275,6 +275,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		return textPane;
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		if (documentModels == null || documentModels.isEmpty())
 			return null;
