@@ -524,6 +524,9 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				textPanel.revalidate();
 				textPanel.repaint();
 			}
+		} else if (evt.getKey().equalsIgnoreCase(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			highlightManager.clearAllAnnotations();
+			entityEventInit(Event.get(getDocumentModel().getCoreferenceModel(), Event.Type.Init));
 		} else {
 			super.preferenceChange(evt);
 		}

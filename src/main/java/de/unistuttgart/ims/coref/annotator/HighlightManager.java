@@ -10,8 +10,6 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.LayeredHighlighter;
 
-import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
@@ -34,16 +32,10 @@ class HighlightManager {
 		textComponent.setHighlighter(hilit);
 	}
 
-	@Deprecated
-	public void clearAndDrawAllAnnotations(JCas jcas) {
+	public void clearAllAnnotations() {
 		hilit.removeAllHighlights();
 		underlineMap.clear();
 		spanCounter.clear();
-		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-			for (MentionSurface ms : m.getSurface())
-				highlight(ms, new Color(m.getEntity().getColor()), false, false, null);
-
-		}
 		textComponent.repaint();
 	}
 
