@@ -601,11 +601,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return mentions.toImmutable();
 	}
 
+	// TODO: adapt to non-continuous mentions
 	public ImmutableSet<Mention> getMatchingMentions(int start, int end) {
-		MutableSet<Annotation> mentions = Sets.mutable.empty();
-		mentions.addAll(
+		MutableSet<Annotation> mentionSurfaces = Sets.mutable.empty();
+		mentionSurfaces.addAll(
 				characterPosition2AnnotationMap.get(start).select(m -> m.getEnd() == end && m.getBegin() == start));
-		return mentions.selectInstancesOf(Mention.class).toImmutable();
+		return mentionSurfaces.selectInstancesOf(MentionSurface.class).collect(ms -> ms.getMention()).toImmutable();
 	}
 
 	public Preferences getPreferences() {
