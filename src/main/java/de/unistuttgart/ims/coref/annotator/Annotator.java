@@ -417,7 +417,7 @@ public class Annotator {
 		String[] fileNames = listOfFiles.split(File.pathSeparator);
 		for (String fileRef : fileNames) {
 			File file = new File(fileRef);
-			if (file.exists() && !files.contains(file)) {
+			if (file.exists() && !files.contains(file) && FileFilters.ca2.accept(file)) {
 				files.add(file);
 			}
 
