@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
@@ -298,12 +299,21 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		case FIXED:
 			tln = new FixedTextLineNumber(this, 5);
 			pcs.addPropertyChangeListener(tln);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, true);
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, false);
 			break;
 		case DYNAMIC:
 			tln = new TextLineNumber(this, 5);
 			pcs.addPropertyChangeListener(tln);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, true);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, false);
 			break;
 		default:
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, true);
 			tln = null;
 		}
 		textScrollPane.setRowHeaderView(tln);

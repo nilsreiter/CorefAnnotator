@@ -143,7 +143,6 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
-import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
@@ -152,12 +151,10 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.EntityPanel;
-import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.FlagMenu;
 import de.unistuttgart.ims.coref.annotator.comp.ImprovedMessageDialog;
 import de.unistuttgart.ims.coref.annotator.comp.SegmentedScrollBar;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
-import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
@@ -481,16 +478,16 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		grp = new ButtonGroup();
 		JMenu lineNumbersMenu = new JMenu(Annotator.getString(Strings.MENU_VIEW_LINE_NUMBERS));
-		radio = new JRadioButtonMenuItem(actions.lineNumberStyleNone);
+		radio = new JRadioButtonMenuItem(lineNumberStyleNone);
 		radio.setSelected(true);
 		grp.add(radio);
 		lineNumbersMenu.add(radio);
 
-		radio = new JRadioButtonMenuItem(actions.lineNumberStyleFixed);
+		radio = new JRadioButtonMenuItem(lineNumberStyleFixed);
 		grp.add(radio);
 		lineNumbersMenu.add(radio);
 
-		radio = new JRadioButtonMenuItem(actions.lineNumberStyleDynamic);
+		radio = new JRadioButtonMenuItem(lineNumberStyleDynamic);
 		grp.add(radio);
 		lineNumbersMenu.add(radio);
 
@@ -725,25 +722,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	}
 
-	@Override
-	public void setLineNumberStyle(LineNumberStyle lns) {
-		TextLineNumber tln;
-		switch (lns) {
-		case FIXED:
-			tln = new FixedTextLineNumber(this, 5);
-			pcs.addPropertyChangeListener(tln);
-			break;
-		case DYNAMIC:
-			tln = new TextLineNumber(this, 5);
-			pcs.addPropertyChangeListener(tln);
-			break;
-		default:
-			tln = null;
-		}
-		textScrollPane.setRowHeaderView(tln);
-		super.setLineNumberStyle(lns);
-	}
-
 	public void setWindowTitle() {
 		String fileName = (file != null ? file.getName() : Annotator.getString(Strings.WINDOWTITLE_NEW_FILE));
 
@@ -780,11 +758,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			tableOfContents.setModel(model.getSegmentModel());
 
 		if (model.hasLineNumbers()) {
-			actions.lineNumberStyleFixed.setEnabled(true);
-			this.setLineNumberStyle(actions.lineNumberStyleFixed.getStyle());
+			lineNumberStyleFixed.setEnabled(true);
+			lineNumberStyleFixed.actionPerformed(new ActionEvent(this, 0, null));
 		} else {
-			actions.lineNumberStyleDynamic.setEnabled(true);
-			this.setLineNumberStyle(actions.lineNumberStyleDynamic.getStyle());
+			lineNumberStyleDynamic.actionPerformed(new ActionEvent(this, 0, null));
 		}
 		actions.newEntityAction.setEnabled(true);
 		actions.changeColorAction.setEnabled(true);
@@ -1801,12 +1778,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		RemoveDuplicatesAction removeDuplicatesAction;
 		DuplicateMentions duplicateMentionsAction = new DuplicateMentions(DocumentWindow.this);
 		EntityStatisticsAction entityStatisticsAction;
-		ViewSetLineNumberStyle lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this,
-				LineNumberStyle.NONE);
-		ViewSetLineNumberStyle lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this,
-				LineNumberStyle.FIXED);
-		ViewSetLineNumberStyle lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
-				LineNumberStyle.DYNAMIC);
 
 	}
 
