@@ -292,7 +292,8 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 	protected void initContent() {
 		entityList.setModel(new EntityListModel());
 
-		openAnnotatorAction.setFile(documentModel.getFile());
+		if (documentModel.getFile() != null)
+			openAnnotatorAction.setFile(documentModel.getFile());
 
 		stopIndeterminateProgress();
 	}
