@@ -97,7 +97,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			mention.setFlags(new EmptyFSList<Flag>(jcas));
 			if (oldMention.getFlags() != null)
 				for (String flagKey : oldMention.getFlags()) {
-					mention.getFlags().push(flagKeyMap.get(flagKey));
+					mention.setFlags(mention.getFlags().push(flagKeyMap.get(flagKey)));
 				}
 			if (oldMention.getDiscontinuous() != null) {
 				MentionSurface ms = AnnotationFactory.createAnnotation(jcas, oldMention.getDiscontinuous().getBegin(),
@@ -133,7 +133,7 @@ public class V1_To_V2 extends TypeSystemVersionConverter {
 			newEntity.setFlags(new EmptyFSList<Flag>(jcas));
 			if (oldEntity.getFlags() != null)
 				for (String flagKey : oldEntity.getFlags()) {
-					newEntity.getFlags().push(flagKeyMap.get(flagKey));
+					newEntity.setFlags(newEntity.getFlags().push(flagKeyMap.get(flagKey)));
 				}
 			newEntity.setColor(oldEntity.getColor());
 			newEntity.setKey(oldEntity.getKey());

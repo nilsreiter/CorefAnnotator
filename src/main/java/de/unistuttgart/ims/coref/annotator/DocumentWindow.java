@@ -1163,18 +1163,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			panel.add(l);
 		}
 
-		@Deprecated
-		protected void addFlag(JPanel panel, String textLabel, Icon icon, Color color) {
-			JLabel l = new JLabel();
-			if (color != null)
-				l.setForeground(color);
-			if (showText)
-				l.setText(textLabel);
-			l.setIcon(icon);
-			panel.add(Box.createRigidArea(new Dimension(5, 5)));
-			panel.add(l);
-		}
-
 		protected JPanel handleEntity(JPanel panel, JLabel lab1, Entity entity) {
 			lab1.setText(entity.getLabel());
 
@@ -1234,7 +1222,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 					addFlag(panel, flag, Color.black);
 				}
 
-			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT));
+			lab1.setIcon(FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT, Constants.UI_ICON_SIZE_IN_TREE));
 			return panel;
 		}
 
@@ -1268,7 +1256,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				return this.handleMention(panel, mainLabel, treeNode.getFeatureStructure());
 			} else if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null
 					&& treeNode == tree.getModel().getRoot())
-				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS));
+				mainLabel.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_PLUS, Constants.UI_ICON_SIZE_IN_TREE));
 
 			return panel;
 		}
@@ -1295,11 +1283,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		}
 
 		public Icon getMentionIcon() {
-			return FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT);
+			return FontIcon.of(MaterialDesign.MDI_COMMENT_ACCOUNT, Constants.UI_ICON_SIZE_IN_TREE);
 		}
 
 		public Icon getEntityIcon() {
-			return FontIcon.of(MaterialDesign.MDI_ACCOUNT);
+			return FontIcon.of(MaterialDesign.MDI_ACCOUNT, Constants.UI_ICON_SIZE_IN_TREE);
 		}
 
 	}
