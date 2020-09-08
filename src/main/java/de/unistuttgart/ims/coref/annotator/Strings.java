@@ -12,6 +12,8 @@ public class Strings {
 	public static final String ACTION_ADD_FLAG_TOOLTIP = "action.add_flag.tooltip";
 	public static final String ACTION_ADD_MENTION_FLAG = "action.add_mention_flag";
 	public static final String ACTION_ADD_MENTION_FLAG_TOOLTIP = "action.add_mention_flag.tooltip";
+	public static final String ACTION_ANALYZER = "action.analyzer";
+	public static final String ACTION_ANALYZER_TOOLTIP = "action.analyzer.tooltip";
 	public static final String ACTION_CLEAR = "action.clear";
 	public static final String ACTION_CLEAR_TOOLTIP = "action.clear.tooltip";
 	public static final String ACTION_CLOSE = "action.close";
@@ -79,6 +81,8 @@ public class Strings {
 	public static final String ACTION_SET_SHORTCUT = "action.set_shortcut";
 	public static final String ACTION_SET_SHORTCUT_TOOLTIP = "action.set_shortcut.tooltip";
 	public static final String ACTION_SHOW_COMMENTS = "action.show.comments";
+	public static final String ACTION_SHOW_DOCUMENT_STATISTICS = "action.show_document_statistics";
+	public static final String ACTION_SHOW_DOCUMENT_STATISTICS_TOOLTIP = "action.show_document_statistics.tooltip";
 	public static final String ACTION_SHOW_HISTORY = "action.show.history";
 	public static final String ACTION_SHOW_LOG = "action.show.log";
 	public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
