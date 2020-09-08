@@ -1158,7 +1158,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				l.setForeground(color);
 			if (showText)
 				l.setText(Annotator.getStringWithDefault(flag.getLabel(), flag.getLabel()));
-			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), color));
+			l.setIcon(FontIcon.of(MaterialDesign.valueOf(flag.getIcon()), Constants.UI_ICON_SIZE_IN_TREE, color));
 			panel.add(Box.createRigidArea(new Dimension(5, 5)));
 			panel.add(l);
 		}
@@ -1183,10 +1183,11 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 			if (isGrey) {
 				lab1.setForeground(Color.GRAY);
-				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT_OUTLINE, Color.GRAY));
+				lab1.setIcon(
+						FontIcon.of(MaterialDesign.MDI_ACCOUNT_OUTLINE, Constants.UI_ICON_SIZE_IN_TREE, Color.GRAY));
 			} else {
 				lab1.setForeground(Color.BLACK);
-				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, entityColor));
+				lab1.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, Constants.UI_ICON_SIZE_IN_TREE, entityColor));
 			}
 
 			String visLabel = StringUtils.abbreviate(entity.getLabel(), "…", Constants.UI_MAX_STRING_WIDTH_IN_TREE);

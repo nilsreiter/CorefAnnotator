@@ -290,6 +290,7 @@ public class Constants {
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
 	public static final int UI_MAX_STRING_WIDTH_IN_MENU = 30;
 	public static final int UI_MAX_STRING_WIDTH_IN_STATUSBAR = 30;
+	public static final int UI_ICON_SIZE_IN_TREE = 16;
 
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 
