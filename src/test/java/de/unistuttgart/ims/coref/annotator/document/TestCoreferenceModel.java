@@ -16,7 +16,7 @@ import org.apache.uima.jcas.cas.EmptyFSList;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
-import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
 import org.junit.Before;
@@ -372,7 +372,7 @@ public class TestCoreferenceModel {
 		model.edit(new AddMentionsToEntity(e, new Span(4, 6)));
 		Mention m1 = UimaUtil.selectMentionByIndex(jcas, 0);
 		Mention m2 = UimaUtil.selectMentionByIndex(jcas, 1);
-		ImmutableSet<Mention> em = model.getCoreferenceModel().get(e);
+		ImmutableSortedSet<Mention> em = model.getCoreferenceModel().get(e);
 		assertEquals(2, em.size());
 		assertEquals(2, JCasUtil.select(jcas, Mention.class).size());
 

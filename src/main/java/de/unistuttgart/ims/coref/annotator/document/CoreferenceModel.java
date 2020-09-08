@@ -24,6 +24,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.api.multimap.sortedset.MutableSortedSetMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
@@ -82,7 +83,7 @@ import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 public class CoreferenceModel extends SubModel implements Model, PreferenceChangeListener {
 
 	public static enum EntitySorter {
-		LABEL, CHILDREN, COLOR
+		LABEL, CHILDREN, COLOR, ADDRESS
 	}
 
 	/**
@@ -102,7 +103,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 */
 	MutableList<CoreferenceModelListener> crModelListeners = Lists.mutable.empty();
 
-	MutableSetMultimap<Entity, Mention> entityMentionMap = Multimaps.mutable.set.empty();
+	MutableSortedSetMultimap<Entity, Mention> entityMentionMap = Multimaps.mutable.sortedSet
+			.of(new MentionComparator());
 
 	MutableSetMultimap<Entity, Entity> entityEntityGroupMap = Multimaps.mutable.set.empty();
 
@@ -420,7 +422,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MutableSet<Entity> entities = Sets.mutable.empty();
 		MutableSet<Mention> mentions = Sets.mutable.empty();
 		for (Entity entity : Lists.immutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class))) {
-			ImmutableSet<Mention> ms = getMentions(entity);
+			ImmutableSortedSet<Mention> ms = getMentions(entity);
 			switch (ms.size()) {
 			case 0:
 				remove(entity);
@@ -500,7 +502,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		crModelListeners.forEach(l -> l.entityEvent(event));
 	}
 
-	public ImmutableSet<Mention> get(Entity entity) {
+	public ImmutableSortedSet<Mention> get(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
@@ -526,8 +528,9 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 					return Integer.compare(entityMentionMap.get(o2).size(), entityMentionMap.get(o1).size());
 				case COLOR:
 					return Integer.compare(o1.getColor(), o2.getColor());
+				case ADDRESS:
 				default:
-					return o1.getLabel().compareTo(o2.getLabel());
+					return Integer.compare(o1.getAddress(), o2.getAddress());
 				}
 			}
 
@@ -553,7 +556,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return SortedSets.immutable.withAll(new MentionComparator(), JCasUtil.select(getJCas(), Mention.class));
 	}
 
-	public ImmutableSet<Mention> getMentions(Entity entity) {
+	public ImmutableSortedSet<Mention> getMentions(Entity entity) {
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
@@ -642,7 +645,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			entityMentionMap.put(mention.getEntity(), mention);
 			try {
 				// TODO: Why do we do that?
-				mention.getEntity().addToIndexes();
+				// mention.getEntity().addToIndexes();
 			} catch (CASRuntimeException e) {
 				Annotator.logger.catching(e);
 			}

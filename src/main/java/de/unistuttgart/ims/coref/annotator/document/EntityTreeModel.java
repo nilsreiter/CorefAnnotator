@@ -16,6 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
@@ -27,7 +28,9 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
@@ -215,15 +218,17 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	private void initialise() {
-		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
+		for (Entity e : coreferenceModel.getEntities(EntitySorter.ADDRESS)) {
 			entityEvent(Event.get(this, Event.Type.Add, null, e));
-		});
-		Annotator.logger.debug("Added all entities");
-
-		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
+		}
+		MentionComparator mc = new MentionComparator();
+		// this is needed for ascending sorting
+		mc.setDescending(true);
+		for (Mention m : SortedSets.immutable.withAll(mc, JCasUtil.select(coreferenceModel.getJCas(), Mention.class))) {
 			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		}
-		Annotator.logger.debug("Added all mentions");
+
+		Annotator.logger.debug("Added all entities and mentions.");
 	}
 
 	protected boolean matches(Pattern pattern, CATreeNode e) {

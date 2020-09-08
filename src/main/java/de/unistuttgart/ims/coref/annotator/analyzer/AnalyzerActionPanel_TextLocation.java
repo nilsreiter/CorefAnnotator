@@ -19,7 +19,7 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
@@ -158,7 +158,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		for (Entity e : entities) {
 			Color entityColor = new Color(e.getColor());
 
-			ImmutableSet<Mention> mentions = documentModel.getCoreferenceModel().getMentions(e);
+			ImmutableSortedSet<Mention> mentions = documentModel.getCoreferenceModel().getMentions(e);
 
 			double[] xData = new double[mentions.size()];
 			double[] yData = new double[mentions.size()];
