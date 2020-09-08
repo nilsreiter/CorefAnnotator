@@ -31,9 +31,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 		Annotator.logger.info("Saving ... ");
 		OutputStream os = null;
 		try {
-			if (file.getName().endsWith(".xmi")) {
-				os = new FileOutputStream(file);
-			} else if (file.getName().endsWith(".gz")) {
+			if (file.getName().endsWith(".ca2")) {
 				os = new GZIPOutputStream(new FileOutputStream(file));
 			}
 			if (os != null)
