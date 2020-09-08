@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
@@ -181,34 +182,51 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	}
 
 	public JMenu initialiseMenuSettings() {
+		JMenuItem mi;
+
 		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_ANNOTATION_BEHAVIOUR));
+		mi.setEnabled(false);
+
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_STICKY_FLAGS)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_USER_INTERFACE));
+		mi.setEnabled(false);
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TEXT_LABELS)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_LINE_NUMBER_IN_TREE)));
-		menu_settings.add(
-				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_KEEP_TREE_SORTED)));
-		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
-		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
-		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_COMPARE_VIEW));
+		mi.setEnabled(false);
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
 		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
-		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_UNDERLINE_SINGLETONS_IN_GRAY)));
-		menu_settings.add(
-				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TOC)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_COMPARE_BY_ENTITY_NAME)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_MISC));
+		mi.setEnabled(false);
 		menu_settings.add(
-				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_STICKY_FLAGS)));
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TOC)));
+		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
 
 		return menu_settings;
 

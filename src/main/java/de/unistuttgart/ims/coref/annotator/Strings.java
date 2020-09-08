@@ -223,6 +223,10 @@ public class Strings {
 	public static final String MENU_FLAGS = "menu.flags";
 	public static final String MENU_HELP = "menu.help";
 	public static final String MENU_SETTINGS = "menu.settings";
+	public static final String MENU_SETTINGS_CATEGORY_ANNOTATION_BEHAVIOUR = "menu.settings.category.annotation_behaviour";
+	public static final String MENU_SETTINGS_CATEGORY_COMPARE_VIEW = "menu.settings.category.compare_view";
+	public static final String MENU_SETTINGS_CATEGORY_MISC = "menu.settings.category.misc";
+	public static final String MENU_SETTINGS_CATEGORY_USER_INTERFACE = "menu.settings.category.user_interface";
 	public static final String MENU_TOOLS = "menu.tools";
 	public static final String MENU_TOOLS_PROC = "menu.tools.proc";
 	public static final String MENU_VIEW = "menu.view";
