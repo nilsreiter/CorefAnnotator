@@ -222,7 +222,7 @@ public class Constants {
 			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
 
 	public static final Setting<Boolean> SETTING_KEEP_TREE_SORTED = new Setting<Boolean>(CFG_KEEP_TREE_SORTED,
-			Strings.ACTION_TOGGLE_KEEP_TREE_SORTED, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
+			Strings.ACTION_TOGGLE_KEEP_TREE_SORTED, Strings.ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP, true,
 			MaterialDesign.MDI_SORT_VARIANT);
 
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
