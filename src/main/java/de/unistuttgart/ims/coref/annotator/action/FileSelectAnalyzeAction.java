@@ -7,6 +7,7 @@ import javax.swing.Action;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.analyzer.AnalyzerWindow;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
@@ -17,7 +18,7 @@ public class FileSelectAnalyzeAction extends IkonAction {
 
 	public FileSelectAnalyzeAction() {
 		super(MaterialDesign.MDI_CHART_LINE);
-		putValue(Action.NAME, Annotator.getString("action.analyze"));
+		putValue(Action.NAME, Annotator.getString(Strings.ACTION_ANALYZER));
 	}
 
 	@Override
