@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.4
+
+- Fixed a bug caused by old flags no longer being generated 
+  automatically #340
+
 ## 1.14.3
 
 - Added that wide-spaced text is now displayed with a serif font #315
