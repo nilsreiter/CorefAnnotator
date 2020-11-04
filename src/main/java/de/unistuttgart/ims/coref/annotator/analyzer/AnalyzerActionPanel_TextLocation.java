@@ -26,6 +26,7 @@ import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.LegendLayout;
 import org.knowm.xchart.style.Styler.LegendPosition;
+import org.knowm.xchart.style.markers.Rectangle;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
@@ -53,11 +54,12 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+
 			double x = chart.getChartXFromCoordinate(e.getX());
 			double y = chart.getChartYFromCoordinate(e.getY());
 			for (Mention m : documentModel.getCoreferenceModel().getMentions(entity)) {
-				int begin = UimaUtil.getBegin(m) - 10;
-				int end = UimaUtil.getEnd(m) + 10;
+				int begin = UimaUtil.getBegin(m) - 20;
+				int end = UimaUtil.getEnd(m) + 20;
 				if (begin <= x && end >= x /* && Math.abs(yLevel - y) < 0.1 */) {
 					jtable.clearSelection();
 					for (int r = 0; r < jtable.getRowCount(); r++) {
@@ -71,6 +73,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			}
 
 		}
+
 	}
 
 	public class MyTableModel extends DefaultTableModel {
@@ -93,6 +96,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 	private static final long serialVersionUID = 1L;
 	ListSelectionModel tableSelectionModel = new DefaultListSelectionModel();
+	XYSeries currentSelection = null;
+	final String currentSelectionName = "SELECTION";
 
 	public AnalyzerActionPanel_TextLocation(DocumentModel documentModel, Iterable<Entity> entity) {
 		super(documentModel, entity);
@@ -156,6 +161,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		MutableList<MouseListener> listeners = Lists.mutable.empty();
 		int y = 0;
 		int textLength = documentModel.getJcas().getDocumentText().length();
+
 		for (Entity e : entities) {
 			Color entityColor = new Color(e.getColor());
 
@@ -188,7 +194,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			series.setCustomToolTips(true);
 			series.setLineColor(entityColor);
 			series.setMarkerColor(entityColor);
-			listeners.add(new EntityMouseListener(chart, e, series, y));
+			// listeners.add(new EntityMouseListener(chart, e, series, y));
 			tableSelectionModel.addListSelectionListener(new ListSelectionListener() {
 
 				@Override
@@ -196,13 +202,14 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 					if (e.getValueIsAdjusting())
 						return;
 					// chart.resetFilter();
+					highlightMention(null, chart, series);
 					int row = e.getFirstIndex();
 					Mention m = (Mention) jtable.getValueAt(row, 0);
-					int seriesX = mentionIndex.get(m);
+
 					// chart.filterXByIndex(seriesX - 10, seriesX + 10);
 					// TODO: highlight data point or region in plot
-
-					// repaint();
+					highlightMention(m, chart, series);
+					repaint();
 				}
 
 			});
@@ -218,6 +225,20 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 
 		revalidate();
 
+	}
+
+	protected void highlightMention(Mention mention, XYChart chart, XYSeries series) {
+		if (mention == null) {
+			if (currentSelection != null)
+				chart.removeSeries(currentSelectionName);
+			currentSelection = null;
+			return;
+		}
+		currentSelection = chart.addSeries(currentSelectionName, new double[] { UimaUtil.getBegin(mention) },
+				new double[] { series.getYData()[0] });
+		currentSelection.setMarker(new Rectangle());
+		currentSelection.setShowInLegend(false);
+		currentSelection.setMarkerColor(Color.red);
 	}
 
 }
