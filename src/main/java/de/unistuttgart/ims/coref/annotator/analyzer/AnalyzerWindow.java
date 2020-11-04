@@ -224,13 +224,14 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		entityList.setCellRenderer(new MyTreeCellRenderer());
 		entityList.addListSelectionListener(new EntityListSelectionListener());
 		entityList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		entityList.setPreferredSize(new Dimension(200, 600));
+		entityList.setMaximumSize(new Dimension(200, 600));
+		// entityList.setPreferredSize(new Dimension(200, 600));
 
 		actionList = new JList<AnalysisAction>();
 		actionList.setModel(new ActionListModel());
 		actionList.addListSelectionListener(new ActionListSelectionListener());
 		actionList.setCellRenderer(new ActionListCellRenderer());
-		actionList.setPreferredSize(new Dimension(200, 600));
+		actionList.setMaximumSize(new Dimension(200, 600));
 
 		actionPanel = new AnalyzerActionPanel_Dummy(documentModel, null);
 
@@ -244,7 +245,6 @@ public class AnalyzerWindow extends AbstractWindow implements HasDocumentModel {
 		actionListPanel.setLayout(new BorderLayout(5, 5));
 		actionListPanel.add(new JScrollPane(actionList), BorderLayout.CENTER);
 		actionListPanel.add(new JLabel(Annotator.getString(Strings.ANALZYER_ACTIONS)), BorderLayout.NORTH);
-		actionListPanel.setPreferredSize(new Dimension(200, 600));
 
 		innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, actionListPanel, actionPanel);
 		outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entityListPanel, innerSplitPane);
