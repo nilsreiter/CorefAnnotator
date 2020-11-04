@@ -186,7 +186,8 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 			XYSeries series = chart.addSeries(e.getLabel(), xData, yData);
 			series.setToolTips(labels.toArray(new String[labels.size()]));
 			series.setCustomToolTips(true);
-			series.setFillColor(entityColor);
+			series.setLineColor(entityColor);
+			series.setMarkerColor(entityColor);
 			listeners.add(new EntityMouseListener(chart, e, series, y));
 			tableSelectionModel.addListSelectionListener(new ListSelectionListener() {
 
