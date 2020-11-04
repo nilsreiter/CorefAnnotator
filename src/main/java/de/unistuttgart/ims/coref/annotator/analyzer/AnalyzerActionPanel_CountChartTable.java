@@ -75,14 +75,15 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 
 		calculateCounts();
 
-		MutableMapIterable<String, Integer> smallest = cts
+		MutableMapIterable<String, Integer> entriesBelowThreshold = cts
 				.select((s, i) -> (double) i / (double) getTotalNumber() < limit);
 
-		MutableMapIterable<String, Integer> cts2 = cts.select((s, i) -> !smallest.containsKey(s));
+		MutableMapIterable<String, Integer> filteredCounts = cts
+				.select((s, i) -> !entriesBelowThreshold.containsKey(s));
 
-		if ((int) smallest.valuesView().sumOfInt(i -> i) > 0)
-			cts2.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
-					(int) smallest.valuesView().sumOfInt(i -> i));
+		if ((int) entriesBelowThreshold.valuesView().sumOfInt(i -> i) > 0)
+			filteredCounts.put(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY),
+					(int) entriesBelowThreshold.valuesView().sumOfInt(i -> i));
 
 		MutableMap<String, Series> seriesMap = Maps.mutable.empty();
 
@@ -101,8 +102,9 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 
 			// Series
 			int snum = 0;
-			for (String c : cts2.keySet()) {
-				CategorySeries series = categoryChart.addSeries(c, new int[] { snum++ }, new int[] { cts2.get(c) });
+			for (String c : filteredCounts.keySet()) {
+				CategorySeries series = categoryChart.addSeries(c, new int[] { snum++ },
+						new int[] { filteredCounts.get(c) });
 				if (c.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
 					series.setFillColor(Color.lightGray);
 				} else {
@@ -130,8 +132,8 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 
 			// Series
 			snum = 0;
-			for (String s : cts2.keySet()) {
-				PieSeries series = pieChart.addSeries(s, cts2.get(s));
+			for (String s : filteredCounts.keySet()) {
+				PieSeries series = pieChart.addSeries(s, filteredCounts.get(s));
 				if (s.contentEquals(Annotator.getString(Strings.ANALYZER_PLOT_REST_CATEGORY))) {
 					series.setFillColor(Color.lightGray);
 				} else {
@@ -148,7 +150,10 @@ public abstract class AnalyzerActionPanel_CountChartTable extends AnalyzerAction
 		}
 
 		// TABLE
-		Object[][] dv = cts.collect((s, i) -> Tuples.pair(new Object[] { seriesMap.get(s).getFillColor(), s, i }, null))
+		Object[][] dv = cts
+				.collect((s,
+						i) -> Tuples.pair(new Object[] { (entriesBelowThreshold.containsKey(s) ? Color.lightGray
+								: seriesMap.get(s).getFillColor()), s, i }, null))
 				.keysView().toArray(new Object[cts.size()][]);
 		tableModel.setDataVector(dv, this.getColumnNames());
 
