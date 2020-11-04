@@ -155,6 +155,7 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 		// Series
 		MutableList<MouseListener> listeners = Lists.mutable.empty();
 		int y = 0;
+		int textLength = documentModel.getJcas().getDocumentText().length();
 		for (Entity e : entities) {
 			Color entityColor = new Color(e.getColor());
 
@@ -170,9 +171,10 @@ public class AnalyzerActionPanel_TextLocation extends AnalyzerActionPanel_Generi
 				yData[i] = y;
 				labels.add(UimaUtil.getCoveredText(m));
 
-				String left = documentModel.getJcas().getDocumentText().substring(begin - width, begin);
+				String left = documentModel.getJcas().getDocumentText().substring(Integer.max(begin - width, 0), begin);
 				String center = UimaUtil.getCoveredText(m);
-				String right = documentModel.getJcas().getDocumentText().substring(end, end + width);
+				String right = documentModel.getJcas().getDocumentText().substring(end,
+						Integer.min(end + width, textLength));
 				mentionLines.add(new Object[] { m, begin, left, center, right });
 				mentionIndex.put(m, i);
 				i++;
