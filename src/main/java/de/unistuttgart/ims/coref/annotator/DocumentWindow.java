@@ -418,6 +418,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.sortByAlpha = SortTree.getSortByAlphabet(this);
 		this.actions.sortByMentions = SortTree.getSortByMention(this);
+		this.actions.sortByLastModified = SortTree.getSortByLastModified(this);
 		this.actions.fileSaveAction = new FileSaveAction(this);
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
 		this.actions.copyAction = new CopyAction(this);
@@ -604,13 +605,16 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
 		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
+		JRadioButtonMenuItem radio3 = new JRadioButtonMenuItem(this.actions.sortByLastModified);
 		radio2.setSelected(true);
 		ButtonGroup grp = new ButtonGroup();
+		grp.add(radio3);
 		grp.add(radio2);
 		grp.add(radio1);
 
 		sortMenu.add(radio1);
 		sortMenu.add(radio2);
+		sortMenu.add(radio3);
 		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
 
 		entityMenu.add(sortMenu);
@@ -800,6 +804,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortByAlpha);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortByMentions);
+		model.getTreeModel().addEntitySortOrderListener(actions.sortByLastModified);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortDescending);
 
 		// listeners to the flag model
@@ -1818,6 +1823,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		AbstractAction showDocumentStatistics = new ShowDocumentStatistics(DocumentWindow.this);
 		SortTree sortByAlpha;
 		SortTree sortByMentions;
+		SortTree sortByLastModified;
 		ToggleEntitySortOrder sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		MergeSelectedEntities mergeSelectedEntitiesAction = new MergeSelectedEntities(DocumentWindow.this);

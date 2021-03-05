@@ -47,6 +47,13 @@ public class SortTree extends TargetedIkonAction<DocumentWindow> implements Enti
 		return st;
 	}
 
+	public static SortTree getSortByLastModified(DocumentWindow win) {
+		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_NUMERIC, EntitySortOrder.LastModified, true);
+		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_LASTMODIFIED));
+		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_LASTMODIFIED_TOOLTIP));
+		return st;
+	}
+
 	@Override
 	public void entitySortEvent(EntitySortOrder newOrder, boolean descending) {
 		putValue(Action.SELECTED_KEY, newOrder == order);
