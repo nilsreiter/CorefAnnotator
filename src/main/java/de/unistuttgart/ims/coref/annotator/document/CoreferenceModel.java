@@ -693,7 +693,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	private boolean getSpecialHandlingForSingletons() {
-		return Annotator.app.getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
+		return getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
 				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY);
 	}
 
