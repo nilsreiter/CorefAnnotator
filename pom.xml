@@ -15,7 +15,7 @@
 		<version.eclipse>9.2.0</version.eclipse>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<version.javafx>13.0.2</version.javafx>
+		<version.javafx>14.0.2.1</version.javafx>
 	</properties>
 	<build>
 		<plugins>
