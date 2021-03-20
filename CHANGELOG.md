@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.14.5
+
+- Fixed behaviour of de-emphasising singletons #347
+- Fixed upating of status bar if selection changes #350
+
 ## 1.14.4
 
 - Fixed a bug caused by old flags no longer being generated 
