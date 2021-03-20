@@ -1,9 +1,9 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.time.Instant;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
-import java.time.Instant;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -157,7 +157,6 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 			children = new Vector<CATreeNode>();
 		}
 		children.insertElementAt((CATreeNode) child, index);
-		lastModified = Instant.now().toEpochMilli();
 	}
 
 	public boolean isEntity() {
@@ -229,6 +228,11 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 			}
 
 		};
+	}
+
+	public void modify() {
+		if (isEntity())
+			this.lastModified = Instant.now().toEpochMilli();
 	}
 
 	@Override
