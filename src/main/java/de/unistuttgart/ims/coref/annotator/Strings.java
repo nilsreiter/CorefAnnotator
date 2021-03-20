@@ -84,6 +84,8 @@ public class Strings {
 	public static final String ACTION_SORT_ALPHA_TOOLTIP = "action.sort_alpha.tooltip";
 	public static final String ACTION_SORT_MENTIONS = "action.sort_mentions";
 	public static final String ACTION_SORT_MENTIONS_TOOLTIP = "action.sort_mentions.tooltip";
+	public static final String ACTION_SORT_LASTMODIFIED = "action.sort_lastmodified";
+	public static final String ACTION_SORT_LASTMODIFIED_TOOLTIP = "action.sort_lastmodified.tooltip";
 	public static final String ACTION_SORT_REVERT = "action.sort_revert";
 	public static final String ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME = "action.toggle.compare_by_entity_name";
 	public static final String ACTION_TOGGLE_COMPARE_BY_ENTITY_NAME_TOOLTIP = "action.toggle.compare_by_entity_name.tooltip";

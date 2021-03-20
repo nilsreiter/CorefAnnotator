@@ -219,6 +219,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 			if (m.getDiscontinuous() != null)
 				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
+			// last modified should only represent user actions, so reset
+			get(m.getEntity()).resetLastModified();
 		}
 		Annotator.logger.debug("Added all mentions");
 	}
