@@ -465,6 +465,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
+		Entity e = op.getEntity();
+		if (entityMentionMap.get(e).isEmpty() && getPreferences().getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES,
+				Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+			remove(e);
+			op.setEntityAutoDeleted(true);
+		}
 		registerEdit(op);
 	}
 
@@ -969,6 +975,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	private void undo(RemoveMention op) {
+		if (op.isEntityAutoDeleted()) {
+			op.getEntity().addToIndexes();
+			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
+		}
+
 		// re-create all mentions and set them to the op
 		op.getFeatureStructures().forEach(m -> {
 			m.addToIndexes();
