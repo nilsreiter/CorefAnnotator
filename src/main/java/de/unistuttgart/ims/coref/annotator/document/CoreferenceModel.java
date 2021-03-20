@@ -320,6 +320,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				return addTo(op.getEntity(), sp);
 			}));
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
+			int newNumberOfMentions = getSize(op.getEntity());
+			// may trigger underlining in gray if singleton
+			if (getSpecialHandlingForSingletons() && newNumberOfMentions - op.getMentions().size() == 1
+					&& newNumberOfMentions > 1) {
+				fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
 		} else if (operation instanceof AttachPart) {
 			AttachPart op = (AttachPart) operation;
 			op.setPart(addTo(op.getMention(), op.getSpan()));
@@ -328,6 +335,21 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getMentions()));
+			// may trigger underlining in gray if singleton
+			if (getSpecialHandlingForSingletons()) {
+				int numberOfMentionsMoved = op.getMentions().size();
+				// handle the source
+				if (getSize(op.getSource()) == 1) {
+					fireEvent(Event.get(this, Event.Type.Update, op.getSource()));
+					fireEvent(Event.get(this, Event.Type.Update, get(op.getSource())));
+				}
+				// target
+				if (getSize(op.getTarget()) - numberOfMentionsMoved == 1) {
+					fireEvent(Event.get(this, Event.Type.Update, op.getTarget()));
+					fireEvent(Event.get(this, Event.Type.Update, get(op.getTarget())));
+				}
+			}
+
 		} else if (operation instanceof MoveMentionPartToMention) {
 			MoveMentionPartToMention op = (MoveMentionPartToMention) operation;
 			op.getObjects().forEach(d -> {
@@ -465,6 +487,14 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			}
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
+		// may trigger underlining in gray if singleton
+		if (getSpecialHandlingForSingletons()) {
+			if (getSize(op.getEntity()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
+
+		}
 		registerEdit(op);
 	}
 
@@ -560,6 +590,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				.select(e -> getMentions(e).size() == 1).toList().toImmutable();
 	}
 
+	protected int getSize(Entity e) {
+		return get(e).size();
+	}
+
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
 
 		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
@@ -648,6 +682,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	public Preferences getPreferences() {
 		return documentModel.getPreferences();
+	}
+
+	private boolean getSpecialHandlingForSingletons() {
+		return Annotator.app.getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
+				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY);
 	}
 
 	public String getToolTipText(FeatureStructure featureStructure) {
