@@ -8,6 +8,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Fixed behaviour of de-emphasising singletons. Thanks @andreasvc #347
 - Fixed upating of status bar if selection changes #350
 - Fixed the bug that prevented automatically removing empty entities #352
+- XMI files are now pretty printed, making them more git-friendly. 
+  Thanks @andreasvc #339
 
 ## 1.14.4
 
