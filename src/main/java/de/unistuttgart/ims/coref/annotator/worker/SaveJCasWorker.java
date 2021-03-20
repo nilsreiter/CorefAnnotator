@@ -37,7 +37,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 				os = new GZIPOutputStream(new FileOutputStream(file));
 			}
 			if (os != null)
-				XmiCasSerializer.serialize(jcas.getCas(), os);
+				XmiCasSerializer.serialize(jcas.getCas(), null, os, true, null);
 		} finally {
 			if (os != null)
 				os.close();

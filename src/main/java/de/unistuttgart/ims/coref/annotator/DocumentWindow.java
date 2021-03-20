@@ -1607,7 +1607,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						mi.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
+								if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+										&& getSelectedAnnotations(Mention.class).size() == 1) {
+									getDocumentModel().edit(new MoveMentionsToEntity(entity,
+											getSelectedAnnotations(Mention.class)));
+								} else {
+									getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
+								}
 							}
 						});
 						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
