@@ -9,6 +9,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 public class RemoveMention extends AbstractRemoveOperation<Mention> implements CoreferenceModelOperation {
 	Entity entity;
 	ImmutableList<Spans> spans;
+	boolean entityAutoDeleted = false;
 
 	public RemoveMention(Mention... mention) {
 		super(mention);
@@ -51,5 +52,19 @@ public class RemoveMention extends AbstractRemoveOperation<Mention> implements C
 	@Deprecated
 	public ImmutableList<Mention> getMentions() {
 		return getFeatureStructures();
+	}
+
+	/**
+	 * @return the entityAutoDeleted
+	 */
+	public boolean isEntityAutoDeleted() {
+		return entityAutoDeleted;
+	}
+
+	/**
+	 * @param entityAutoDeleted the entityAutoDeleted to set
+	 */
+	public void setEntityAutoDeleted(boolean entityAutoDeleted) {
+		this.entityAutoDeleted = entityAutoDeleted;
 	}
 }

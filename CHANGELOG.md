@@ -31,6 +31,19 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   
 
 
+## 1.14.5
+
+- Fixed behaviour of de-emphasising singletons. Thanks @andreasvc #347
+- Fixed upating of status bar if selection changes #350
+- Fixed the bug that prevented automatically removing empty entities #352
+- XMI files are now pretty printed, making them more git-friendly. 
+  Thanks @andreasvc #339
+
+## 1.14.4
+
+- Fixed a bug caused by old flags no longer being generated 
+  automatically #340
+
 ## 1.14.3
 
 - Added that wide-spaced text is now displayed with a serif font #315

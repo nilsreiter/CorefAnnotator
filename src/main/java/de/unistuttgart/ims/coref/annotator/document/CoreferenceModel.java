@@ -281,10 +281,32 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				return addTo(op.getEntity(), sp);
 			}));
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntity(), op.getMentions()));
+			int newNumberOfMentions = getSize(op.getEntity());
+			// may trigger underlining in gray if singleton
+			if (getSpecialHandlingForSingletons() && newNumberOfMentions - op.getMentions().size() == 1
+					&& newNumberOfMentions > 1) {
+				fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getTarget(), m));
 			fireEvent(Event.get(this, Event.Type.Move, op.getSource(), op.getTarget(), op.getMentions()));
+			// may trigger underlining in gray if singleton
+			if (getSpecialHandlingForSingletons()) {
+				int numberOfMentionsMoved = op.getMentions().size();
+				// handle the source
+				if (getSize(op.getSource()) == 1) {
+					fireEvent(Event.get(this, Event.Type.Update, op.getSource()));
+					fireEvent(Event.get(this, Event.Type.Update, get(op.getSource())));
+				}
+				// target
+				if (getSize(op.getTarget()) - numberOfMentionsMoved == 1) {
+					fireEvent(Event.get(this, Event.Type.Update, op.getTarget()));
+					fireEvent(Event.get(this, Event.Type.Update, get(op.getTarget())));
+				}
+			}
+
 		} else if (operation instanceof RemoveEntities) {
 			boolean keepTreeSortedSetting = getPreferences().getBoolean(Constants.CFG_KEEP_TREE_SORTED,
 					Defaults.CFG_KEEP_TREE_SORTED);
@@ -398,6 +420,22 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			// TODO: remove surfaces
 		});
 		fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getFeatureStructures()));
+
+		// may trigger underlining in gray if singleton
+		if (getSpecialHandlingForSingletons()) {
+			if (getSize(op.getEntity()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, op.getEntity()));
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
+		}
+
+		// remove entity if its empty
+		Entity e = op.getEntity();
+		if (entityMentionMap.get(e).isEmpty() && getPreferences().getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES,
+				Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
+			remove(e);
+			op.setEntityAutoDeleted(true);
+		}
 		registerEdit(op);
 	}
 
@@ -516,6 +554,10 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 				.select(e -> getMentions(e).size() == 1).toList().toImmutable();
 	}
 
+	protected int getSize(Entity e) {
+		return get(e).size();
+	}
+
 	public ImmutableList<Entity> getEntities(final EntitySorter entitySorter) {
 
 		MutableSet<Entity> eset = Sets.mutable.withAll(JCasUtil.select(documentModel.getJcas(), Entity.class));
@@ -616,11 +658,16 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return documentModel.getPreferences();
 	}
 
+	private boolean getSpecialHandlingForSingletons() {
+		return getPreferences().getBoolean(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY,
+				Defaults.CFG_UNDERLINE_SINGLETONS_IN_GRAY);
+	}
+
 	public String getToolTipText(FeatureStructure featureStructure) {
 		if (featureStructure instanceof Entity) {
 			Entity e = (Entity) featureStructure;
 			if (UimaUtil.isGroup(featureStructure)) {
-				StringBuilder b = new StringBuilder();
+			StringBuilder b = new StringBuilder();
 				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
 					b.append(e.getMembers(0).getLabel());
 				for (int i = 1; i < e.getMembers().size(); i++) {
@@ -925,6 +972,11 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	private void undo(RemoveMention op) {
+		if (op.isEntityAutoDeleted()) {
+			op.getEntity().addToIndexes();
+			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
+		}
+
 		// re-create all mentions and set them to the op
 		op.getFeatureStructures().forEach(m -> {
 			m.addToIndexes();
