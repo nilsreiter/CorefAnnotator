@@ -5,8 +5,9 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 ## 1.14.5
 
-- Fixed behaviour of de-emphasising singletons #347
+- Fixed behaviour of de-emphasising singletons. Thanks @andreasvc #347
 - Fixed upating of status bar if selection changes #350
+- Fixed the bug that prevented automatically removing empty entities #352
 
 ## 1.14.4
 
