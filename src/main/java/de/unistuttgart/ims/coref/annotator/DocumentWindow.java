@@ -761,12 +761,25 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	}
 
 	@Override
+	protected void entityEventAdd(FeatureStructureEvent event) {
+		super.entityEventAdd(event);
+		updateStatusBar();
+	}
+
+	@Override
+	protected void entityEventRemove(FeatureStructureEvent event) {
+		super.entityEventRemove(event);
+		updateStatusBar();
+	}
+
+	@Override
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event)
 			if (fs instanceof Mention) {
 				highlightManager.unUnderline((Annotation) fs);
 				highlightManager.underline((Mention) fs, new Color(((Entity) event.getArgument2()).getColor()));
 			}
+		updateStatusBar();
 	}
 
 	@Override
@@ -908,6 +921,33 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		baseStyle.addAttribute(constant, value);
 		pcs.firePropertyChange(constant.toString(), oldValue, value);
 		switchStyle(currentStyle);
+	}
+
+	protected void updateStatusBar() {
+		int low = Math.min(textPane.getSelectionStart(), textPane.getSelectionEnd());
+		int high = Math.max(textPane.getSelectionStart(), textPane.getSelectionEnd());
+
+		MutableSet<Mention> mentions = Sets.mutable.empty();
+		if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
+
+			// nothing is selected: show all mentions cursor is part of
+			MutableSet<? extends Annotation> annotations = Sets.mutable
+					.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
+			mentions = annotations.selectInstancesOf(Mention.class);
+
+			// something is selected
+			if (low != high) {
+				ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentionsBetween(low, high)
+						.selectInstancesOf(Mention.class);
+				mentions.addAllIterable(ms);
+			}
+			setCollectionPanel(mentions.collect(m -> {
+				EntityPanel ep = new EntityPanel(getDocumentModel(), m.getEntity());
+				Annotator.app.getPreferences().addPreferenceChangeListener(ep);
+				getDocumentModel().getCoreferenceModel().addCoreferenceModelListener(ep);
+				return ep;
+			}));
+		}
 	}
 
 	@Override
@@ -1480,34 +1520,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		@Override
 		public void caretUpdate(CaretEvent e) {
-			int dot = e.getDot();
-			int mark = e.getMark();
-			int low = Math.min(dot, mark);
-			int high = Math.max(dot, mark);
 
-			MutableSet<Mention> mentions = Sets.mutable.empty();
-			if (getDocumentModel() != null && getDocumentModel().getCoreferenceModel() != null) {
-
-				// nothing is selected: show all mentions cursor is part of
-				MutableSet<? extends Annotation> annotations = Sets.mutable
-						.withAll(getDocumentModel().getCoreferenceModel().getMentions(low));
-				mentions = annotations.selectInstancesOf(Mention.class);
-
-				// something is selected
-				if (dot != mark) {
-					ImmutableSet<Mention> ms = getDocumentModel().getCoreferenceModel().getMentionsBetween(low, high)
-							.selectInstancesOf(Mention.class);
-					mentions.addAllIterable(ms);
-				}
-				setCollectionPanel(mentions.collect(m -> {
-					EntityPanel ep = new EntityPanel(getDocumentModel(), m.getEntity());
-					Annotator.app.getPreferences().addPreferenceChangeListener(ep);
-					getDocumentModel().getCoreferenceModel().addCoreferenceModelListener(ep);
-					return ep;
-				}));
-			}
+			updateStatusBar();
 			if (getDocumentModel() != null)
-				highlightSegmentInTOC(dot);
+				highlightSegmentInTOC(e.getDot());
 
 		}
 
@@ -1609,8 +1625,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 							public void actionPerformed(ActionEvent e) {
 								if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
 										&& getSelectedAnnotations(Mention.class).size() == 1) {
-									getDocumentModel().edit(new MoveMentionsToEntity(entity,
-											getSelectedAnnotations(Mention.class)));
+									getDocumentModel().edit(
+											new MoveMentionsToEntity(entity, getSelectedAnnotations(Mention.class)));
 								} else {
 									getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
 								}
