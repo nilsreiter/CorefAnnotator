@@ -1,6 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.event.ActionEvent;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import javax.swing.Action;
 
@@ -8,12 +10,14 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.document.EntitySortOrderListener;
 
-public class SortTree extends TargetedIkonAction<DocumentWindow> implements EntitySortOrderListener {
+public class SortTree extends TargetedIkonAction<DocumentWindow>
+		implements EntitySortOrderListener, PreferenceChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	EntitySortOrder order = EntitySortOrder.Mentions;
@@ -57,6 +61,13 @@ public class SortTree extends TargetedIkonAction<DocumentWindow> implements Enti
 	@Override
 	public void entitySortEvent(EntitySortOrder newOrder, boolean descending) {
 		putValue(Action.SELECTED_KEY, newOrder == order);
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (getTarget().getDocumentModel().getTreeModel().getEntitySortOrder() == order
+				&& evt.getKey() == Constants.CFG_KEEP_TREE_SORTED && evt.getNewValue() == Boolean.TRUE.toString())
+			actionPerformed(null);
 	}
 
 }
