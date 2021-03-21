@@ -286,7 +286,7 @@ public class Constants {
 	public static final String[] SUPPORTED_LANGUAGES = new String[] { "x-unspecified", "de", "en", "es", "fr", "it",
 			"nl", "ru", "gmh" };
 
-	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 50;
+	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 100;
 	public static final int UI_MAX_STRING_WIDTH_IN_MENU = 30;
 	public static final int UI_MAX_STRING_WIDTH_IN_STATUSBAR = 30;
 
