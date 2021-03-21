@@ -9,7 +9,7 @@ import javax.swing.Action;
 import org.kordamp.ikonli.Ikon;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
+import de.unistuttgart.ims.coref.annotator.Setting;
 
 public abstract class TogglePreferenceAction extends IkonAction implements PreferenceChangeListener {
 	private static final long serialVersionUID = 1L;
@@ -46,7 +46,7 @@ public abstract class TogglePreferenceAction extends IkonAction implements Prefe
 		return action;
 	}
 
-	public static TogglePreferenceAction getAction(Annotator annotator, Constants.Setting<Boolean> setting) {
+	public static TogglePreferenceAction getAction(Annotator annotator, Setting<Boolean> setting) {
 		TogglePreferenceAction action = new TogglePreferenceAction(annotator, setting.ikon,
 				setting.toggleActionStringKey, setting.preferencesKey, setting.defaultValue) {
 			private static final long serialVersionUID = 1L;
