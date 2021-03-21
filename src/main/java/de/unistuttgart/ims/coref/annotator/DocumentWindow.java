@@ -128,6 +128,7 @@ import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowASelectedMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowDocumentStatistics;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowLogWindowAction;
@@ -378,6 +379,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
 				SelectPreviousMentionAction.class);
 
+		textPane.addCaretListener(actions.showASelectedMentionInTree);
+
 		highlightManager = new HighlightManager(textPane);
 
 		// scrollPane.setRowHeaderView(segmentIndicator);
@@ -589,6 +592,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
 		entityMenu.add(actions.deleteAllAction);
 		entityMenu.add(mentionFlagsInMenuBar);
+		entityMenu.add(actions.showASelectedMentionInTree);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(actions.newEntityAction));
@@ -1854,6 +1858,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				LineNumberStyle.FIXED);
 		ViewSetLineNumberStyle lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
 				LineNumberStyle.DYNAMIC);
+		ShowASelectedMentionInTreeAction showASelectedMentionInTree = new ShowASelectedMentionInTreeAction(
+				DocumentWindow.this);
 
 	}
 

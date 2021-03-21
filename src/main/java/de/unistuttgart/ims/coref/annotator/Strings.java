@@ -80,6 +80,8 @@ public class Strings {
 	public static final String ACTION_SHOW_HISTORY = "action.show.history";
 	public static final String ACTION_SHOW_LOG = "action.show.log";
 	public static final String ACTION_SHOW_MENTION_IN_TREE = "action.show_mention_in_tree";
+	public static final String ACTION_SHOW_A_SELECTED_MENTION_IN_TREE = "action.show_a_selected_mention_in_tree";
+	public static final String ACTION_SHOW_A_SELECTED_MENTION_IN_TREE_TOOLTIP = "action.show_a_selected_mention_in_tree.tooltip";
 	public static final String ACTION_SORT_ALPHA = "action.sort_alpha";
 	public static final String ACTION_SORT_ALPHA_TOOLTIP = "action.sort_alpha.tooltip";
 	public static final String ACTION_SORT_MENTIONS = "action.sort_mentions";
