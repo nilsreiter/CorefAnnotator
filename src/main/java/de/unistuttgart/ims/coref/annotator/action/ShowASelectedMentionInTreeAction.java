@@ -13,6 +13,7 @@ import javax.swing.tree.TreePath;
 import org.eclipse.collections.api.set.MutableSet;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
 import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
@@ -22,9 +23,10 @@ public class ShowASelectedMentionInTreeAction extends DocumentWindowAction imple
 	private static final long serialVersionUID = 1L;
 
 	public ShowASelectedMentionInTreeAction(DocumentWindow documentWindow) {
-		super(documentWindow, Strings.ACTION_SHOW_MENTION_IN_TREE, MaterialDesign.MDI_FILE_TREE);
+		super(documentWindow, Strings.ACTION_SHOW_A_SELECTED_MENTION_IN_TREE, MaterialDesign.MDI_FILE_TREE);
 		putValue(Action.ACCELERATOR_KEY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SHOW_A_SELECTED_MENTION_IN_TREE_TOOLTIP));
 		setEnabled(false);
 	}
 
