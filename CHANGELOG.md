@@ -11,7 +11,7 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   This is not a long-term solution though. #353
 - Pressing cmd-t now displays a mention in the tree, if a) the cursor is placed 
   in a single mention or b) a single mention is selected exactly. #351
-
+- Fixed (some) undo behaviour when de-emphasizing singletons #347
 
 ## 1.14.5
 
