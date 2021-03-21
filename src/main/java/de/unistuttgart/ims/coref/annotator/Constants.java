@@ -2,7 +2,6 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Random;
 
-import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
@@ -10,71 +9,6 @@ import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
 import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class Constants {
-	public static class Setting<T> {
-
-		public T defaultValue;
-		public Ikon[] ikon;
-		public String preferencesKey;
-		public String toggleActionStringKey;
-		public String toggleActionTooltipKey;
-
-		public Setting(String preferencesKey, String toggleActionKey, String toggleActionTooltipKey, T defaultValue,
-				Ikon... ikon) {
-			this.preferencesKey = preferencesKey;
-			this.toggleActionStringKey = toggleActionKey;
-			this.defaultValue = defaultValue;
-			this.toggleActionTooltipKey = toggleActionTooltipKey;
-			this.ikon = ikon;
-		}
-
-		public Setting(String preferencesKey, String toggleActionKey, T defaultValue, Ikon... ikon) {
-			this.preferencesKey = preferencesKey;
-			this.toggleActionStringKey = toggleActionKey;
-			this.defaultValue = defaultValue;
-			this.ikon = ikon;
-		}
-
-		public T getDefaultValue() {
-			return defaultValue;
-		}
-
-		public Ikon[] getIkon() {
-			return ikon;
-		}
-
-		public String getPreferencesKey() {
-			return preferencesKey;
-		}
-
-		public String getToggleActionStringKey() {
-			return toggleActionStringKey;
-		}
-
-		public String getToggleActionTooltipKey() {
-			return toggleActionTooltipKey;
-		}
-
-		public void setDefaultValue(T defaultValue) {
-			this.defaultValue = defaultValue;
-		}
-
-		public void setIkon(Ikon[] ikon) {
-			this.ikon = ikon;
-		}
-
-		public void setPreferencesKey(String preferencesKey) {
-			this.preferencesKey = preferencesKey;
-		}
-
-		public void setToggleActionStringKey(String toggleActionStringKey) {
-			this.toggleActionStringKey = toggleActionStringKey;
-		}
-
-		public void setToggleActionTooltipKey(String toggleActionTooltipKey) {
-			this.toggleActionTooltipKey = toggleActionTooltipKey;
-		}
-	}
-
 	/**
 	 * Annotator name or id
 	 */
@@ -256,9 +190,11 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
 			Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP, false,
 			MaterialDesign.MDI_FORMAT_TEXT);
+
 	public static final Setting<Boolean> SETTING_SHOW_LINE_NUMBER_IN_TREE = new Setting<Boolean>(
 			CFG_SHOW_LINE_NUMBER_IN_TREE, Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE,
 			Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE_TOOLTIP, false, MaterialDesign.MDI_FORMAT_TEXT);
+
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);

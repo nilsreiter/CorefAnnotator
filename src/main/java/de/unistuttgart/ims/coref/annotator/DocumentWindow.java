@@ -445,6 +445,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		documentStateListeners.add(actions.undoAction);
 		documentStateListeners.add(actions.fileSaveAction);
 
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByAlpha);
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByLastModified);
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByMentions);
+
 		Annotator.logger.trace("Actions initialised.");
 
 	}
