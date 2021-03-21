@@ -190,9 +190,11 @@ public class Constants {
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
 			Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS, Strings.ACTION_TOGGLE_SHOW_TEXT_LABELS_TOOLTIP, false,
 			MaterialDesign.MDI_FORMAT_TEXT);
+
 	public static final Setting<Boolean> SETTING_SHOW_LINE_NUMBER_IN_TREE = new Setting<Boolean>(
 			CFG_SHOW_LINE_NUMBER_IN_TREE, Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE,
 			Strings.ACTION_TOGGLE_SHOW_LINE_NUMBER_IN_TREE_TOOLTIP, false, MaterialDesign.MDI_FORMAT_TEXT);
+
 	public static final Setting<Boolean> SETTING_TRIM_WHITESPACE = new Setting<Boolean>(CFG_TRIM_WHITESPACE,
 			Strings.ACTION_TOGGLE_TRIM_WHITESPACE, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
 			MaterialDesign.MDI_ARROW_COMPRESS);

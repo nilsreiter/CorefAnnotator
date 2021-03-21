@@ -1,29 +1,35 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.util.function.Consumer;
+
 import org.kordamp.ikonli.Ikon;
 
 public class Setting<T> {
 
-	public T defaultValue;
-	public Ikon[] ikon;
-	public String preferencesKey;
-	public String toggleActionStringKey;
-	public String toggleActionTooltipKey;
+	T defaultValue;
+	Ikon[] ikon;
+	String preferencesKey;
+	String toggleActionStringKey;
+	String toggleActionTooltipKey;
+	Consumer<Annotator> toggleActionCode;
 
 	public Setting(String preferencesKey, String toggleActionKey, String toggleActionTooltipKey, T defaultValue,
-			Ikon... ikon) {
+			Consumer<Annotator> toggleAction, Ikon... ikon) {
 		this.preferencesKey = preferencesKey;
 		this.toggleActionStringKey = toggleActionKey;
 		this.defaultValue = defaultValue;
 		this.toggleActionTooltipKey = toggleActionTooltipKey;
 		this.ikon = ikon;
+		this.toggleActionCode = toggleAction;
+	}
+
+	public Setting(String preferencesKey, String toggleActionKey, String toggleActionTooltipKey, T defaultValue,
+			Ikon... ikon) {
+		this(preferencesKey, toggleActionKey, toggleActionTooltipKey, defaultValue, null, ikon);
 	}
 
 	public Setting(String preferencesKey, String toggleActionKey, T defaultValue, Ikon... ikon) {
-		this.preferencesKey = preferencesKey;
-		this.toggleActionStringKey = toggleActionKey;
-		this.defaultValue = defaultValue;
-		this.ikon = ikon;
+		this(preferencesKey, toggleActionKey, null, defaultValue, null, ikon);
 	}
 
 	public T getDefaultValue() {

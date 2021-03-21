@@ -47,12 +47,12 @@ public abstract class TogglePreferenceAction extends IkonAction implements Prefe
 	}
 
 	public static TogglePreferenceAction getAction(Annotator annotator, Setting<Boolean> setting) {
-		TogglePreferenceAction action = new TogglePreferenceAction(annotator, setting.ikon,
-				setting.toggleActionStringKey, setting.preferencesKey, setting.defaultValue) {
+		TogglePreferenceAction action = new TogglePreferenceAction(annotator, setting.getIkon(),
+				setting.getToggleActionStringKey(), setting.getPreferencesKey(), setting.getDefaultValue()) {
 			private static final long serialVersionUID = 1L;
 		};
 		if (setting.getToggleActionTooltipKey() != null)
-			action.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(setting.toggleActionTooltipKey));
+			action.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(setting.getToggleActionTooltipKey()));
 		return action;
 	}
 
