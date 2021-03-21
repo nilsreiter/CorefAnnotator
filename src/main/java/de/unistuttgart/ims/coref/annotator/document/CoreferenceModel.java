@@ -913,6 +913,9 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
 			fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
+			if (getSpecialHandlingForSingletons() && getSize(op.getEntity()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
 		} else if (operation instanceof AttachPart) {
 			AttachPart op = (AttachPart) operation;
 			remove(op.getPart());
@@ -929,6 +932,12 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
 			fireEvent(Event.get(this, Event.Type.Move, op.getTarget(), op.getSource(), op.getMentions()));
+			if (getSpecialHandlingForSingletons() && getSize(op.getTarget()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getTarget())));
+			}
+			if (getSpecialHandlingForSingletons() && getSize(op.getSource()) - op.getMentions().size() == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getSource())));
+			}
 
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
