@@ -4,25 +4,30 @@ import java.awt.event.ActionEvent;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
+import de.unistuttgart.ims.coref.annotator.AbstractTextWindow;
+import de.unistuttgart.ims.coref.annotator.CompareMentionsWindow;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
-import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 
-public class SelectNextMentionAction extends TargetedIkonAction<DocumentWindow> {
+public class SelectNextMentionAction extends TargetedIkonAction<AbstractTextWindow> {
 	private static final long serialVersionUID = 1L;
 
-	public SelectNextMentionAction(DocumentWindow dw) {
+	public SelectNextMentionAction(AbstractTextWindow dw) {
 		super(dw, MaterialDesign.MDI_ARROW_RIGHT);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int high = getTarget().getTextPane().getSelectionEnd();
+		int high = getTarget().getTextPane().getSelectionStart() + 1;
 
-		Mention nextMention = getTarget().getDocumentModel().getCoreferenceModel().getNextMention(high);
-
+		MentionSurface nextMention = null;
+		if (getTarget() instanceof DocumentWindow) {
+			nextMention = getTarget().getDocumentModel().getCoreferenceModel().getNextMentionSurface(high);
+		} else if (getTarget() instanceof CompareMentionsWindow) {
+			nextMention = ((CompareMentionsWindow) getTarget()).getNextMentionSurface(high);
+		}
 		if (nextMention != null)
-			getTarget().annotationSelected(nextMention.getSurface(0));
-
+			getTarget().annotationSelected(nextMention);
 	}
 
 }
