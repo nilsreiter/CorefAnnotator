@@ -638,7 +638,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.logger.info("Initialised menus");
 	}
 
-	protected void closeWindow(boolean quit) {
+	public void closeWindow(boolean quit) {
 		if (getDocumentModel().isSavable()) {
 			Annotator.logger.warn("Closing window with unsaved changes");
 		}
