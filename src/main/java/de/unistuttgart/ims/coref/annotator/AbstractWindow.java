@@ -80,6 +80,12 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
 
+		// activate for debug
+		// miscLabel.setBorder(BorderFactory.createLineBorder(Color.cyan));
+		// miscLabel2.setBorder(BorderFactory.createLineBorder(Color.cyan));
+		miscLabel.setPreferredSize(new Dimension(150, 20));
+		miscLabel2.setPreferredSize(new Dimension(150, 20));
+
 		// from east
 		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
 		springs.putConstraint(SpringLayout.EAST, miscLabel, 10, SpringLayout.WEST, versionLabel);
