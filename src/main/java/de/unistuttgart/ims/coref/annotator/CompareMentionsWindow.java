@@ -3,7 +3,8 @@ package de.unistuttgart.ims.coref.annotator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -297,7 +298,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		stats.setTotal(total);
 		stats.setAgreed(agreed);
 		stats.setTotalInOverlappingPart(totalInOverlappingPart);
-		this.mentionsInfoPane.add(getAgreementPanel(), -1);
+		mentionsInfoPane.add(Box.createVerticalGlue());
+
+		mentionsInfoPane.add(getAgreementPanel());
 	}
 
 	protected void ensureSameTexts() throws NotComparableException {
@@ -351,46 +354,77 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	protected JPanel getAgreementPanel() {
 		if (agreementPanel == null) {
 			JPanel panel = new JPanel();
-			panel.setLayout(new GridLayout(5, 2));
+
 			Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
 			panel.setBorder(border);
-			panel.setPreferredSize(new Dimension(200, 70));
+			panel.setPreferredSize(new Dimension(200, 100));
+			panel.setMinimumSize(new Dimension(200, 100));
+			panel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			c.fill = GridBagConstraints.NONE;
+			c.anchor = GridBagConstraints.NORTHWEST;
+			c.weighty = 0.1;
+			c.weightx = 0.1;
 
 			JLabel desc;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_TOTAL_TOOLTIP));
-			panel.add(desc);
+			c.gridy = 0;
+			c.gridx = 0;
+			c.gridwidth = 2;
+			panel.add(desc, c);
 			JLabel valueLabel = new BoundLabel(stats, "total", o -> o.toString(), stats.total());
-			panel.add(valueLabel);
+			c.gridx = 2;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			panel.add(valueLabel, c);
 
+			c.gridy++;
+			c.gridx = 0;
+			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_TOOLTIP));
-			panel.add(desc);
-			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()));
+			panel.add(desc, c);
+			c.gridx = 2;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()), c);
 
+			c.gridy++;
+			c.gridx = 0;
+			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
-			panel.add(desc);
+			panel.add(desc, c);
 			JLabel percTotalLabel = new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
 					SwingConstants.RIGHT);
+			c.gridx = 2;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			panel.add(percTotalLabel, c);
 
-			panel.add(percTotalLabel);
-
+			c.gridy++;
+			c.gridx = 0;
+			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
-			panel.add(desc);
+			panel.add(desc, c);
 			JLabel percOvrLabel = new JLabel(
 					String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
 					SwingConstants.RIGHT);
-			panel.add(percOvrLabel);
+			c.gridx = 2;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			panel.add(percOvrLabel, c);
 
+			c.gridy++;
+			c.gridx = 0;
+			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
-			panel.add(desc);
+			panel.add(desc, c);
 			JLabel selectedAgreementLabel = new BoundLabel(stats, "agreementInSpan",
 					o -> String.format("%1$3.1f%%", o));
 			selectedAgreementLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-			panel.add(selectedAgreementLabel);
+			c.gridx = 2;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			panel.add(selectedAgreementLabel, c);
 
 			stats.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -409,8 +443,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				}
 
 			});
-
-			this.agreementPanel = panel;
+			agreementPanel = panel;
 
 		}
 		return agreementPanel;
@@ -421,40 +454,60 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		AnnotatorStatistics stats = annotatorStats.get(index);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(5, 2));
+		panel.setLayout(new GridBagLayout());
 		Border border = BorderFactory.createTitledBorder(annotatorIds.get(index));
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(200, 75));
+		panel.setPreferredSize(new Dimension(200, 100));
+		panel.setMinimumSize(new Dimension(200, 100));
 		JLabel desc;
 
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridy = 0;
+		c.gridx = 0;
+		c.weightx = 1;
+		c.weighty = 1;
+		c.anchor = GridBagConstraints.NORTHWEST;
 		// color
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_COLOR_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT));
+		panel.add(desc, c);
+		c.gridx = 1;
+		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT), c);
 
+		c.gridy++;
+		c.gridx = 0;
 		// number of mentions
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_MENTIONS_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT));
+		panel.add(desc, c);
+		c.gridx = 1;
+		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT), c);
 
+		c.gridy++;
+		c.gridx = 0;
 		// number of entities
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_ENTITIES_TOOLTIP));
-		panel.add(desc);
-		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT));
+		panel.add(desc, c);
+		c.gridx = 1;
+		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT), c);
 
+		c.gridy++;
+		c.gridx = 0;
 		// annotation position
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_POSITION_TOOLTIP));
-		panel.add(desc);
+		panel.add(desc, c);
+		c.gridx = 1;
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
-				SwingConstants.RIGHT));
+				SwingConstants.RIGHT), c);
 
-		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
-		panel.add(new JButton(open.get(index)));
+		c.gridy++;
+		c.gridx = 0;
+		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT), c);
+		c.gridx = 1;
+		panel.add(new JButton(open.get(index)), c);
 
 		return panel;
 	}
@@ -524,15 +577,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.setLayout(new BoxLayout(mentionsInfoPane, BoxLayout.Y_AXIS));
 		mentionsInfoPane.setPreferredSize(new Dimension(210, 750));
 		mentionsInfoPane.setMaximumSize(new Dimension(250, 750));
-		mentionsInfoPane.add(new JLabel());
-		mentionsInfoPane.add(new JLabel());
-		mentionsInfoPane.add(new JLabel());
-
 		mentionsInfoPane.add(Box.createVerticalGlue());
-		mentionsInfoPane.add(Box.createVerticalGlue());
-		mentionsInfoPane.add(Box.createVerticalGlue());
-		mentionsInfoPane.add(Box.createVerticalGlue());
-
 		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, mentionsInfoPane);
 		mentionsPane.setDividerLocation(500);
 
@@ -598,8 +643,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		loadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
-		mentionsInfoPane.add(getAnnotatorPanel(index), index);
-		mentionsInfoPane.add(getAgreementPanel(), -1);
+		mentionsInfoPane.add(getAnnotatorPanel(index));
+		// mentionsInfoPane.add(getAgreementPanel(), -1);
 
 		DocumentModelLoader dml = new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas);
 		dml.setProfile(profile);
