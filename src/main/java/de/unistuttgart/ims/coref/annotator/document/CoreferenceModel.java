@@ -667,7 +667,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		if (featureStructure instanceof Entity) {
 			Entity e = (Entity) featureStructure;
 			if (UimaUtil.isGroup(featureStructure)) {
-			StringBuilder b = new StringBuilder();
+				StringBuilder b = new StringBuilder();
 				if (e.getMembers(0) != null && e.getMembers(0).getLabel() != null)
 					b.append(e.getMembers(0).getLabel());
 				for (int i = 1; i < e.getMembers().size(); i++) {
@@ -889,10 +889,19 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			AddMentionsToEntity op = (AddMentionsToEntity) operation;
 			op.getMentions().forEach(m -> remove(m, false));
 			fireEvent(Event.get(this, Event.Type.Remove, op.getEntity(), op.getMentions()));
+			if (getSpecialHandlingForSingletons() && getSize(op.getEntity()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getEntity())));
+			}
 		} else if (operation instanceof MoveMentionsToEntity) {
 			MoveMentionsToEntity op = (MoveMentionsToEntity) operation;
 			op.getMentions().forEach(m -> moveTo(op.getSource(), m));
 			fireEvent(Event.get(this, Event.Type.Move, op.getTarget(), op.getSource(), op.getMentions()));
+			if (getSpecialHandlingForSingletons() && getSize(op.getTarget()) == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getTarget())));
+			}
+			if (getSpecialHandlingForSingletons() && getSize(op.getSource()) - op.getMentions().size() == 1) {
+				fireEvent(Event.get(this, Event.Type.Update, get(op.getSource())));
+			}
 
 		} else if (operation instanceof RemoveDuplicateMentionsInEntities) {
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;

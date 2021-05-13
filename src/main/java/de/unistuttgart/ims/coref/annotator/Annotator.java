@@ -69,7 +69,7 @@ public class Annotator {
 
 	Set<DocumentWindow> openFiles = Sets.mutable.empty();
 
-	public MutableList<File> recentFiles;
+	MutableList<File> recentFiles;
 
 	TypeSystemDescription typeSystemDescription;
 
@@ -454,6 +454,8 @@ public class Annotator {
 					File f = recentFiles.get(i);
 					recentFilesPanel.add(new JButton(new SelectedFileOpenAction(Annotator.this, f)));
 				}
+				recentFilesPanel.repaint();
+				opening.validate();
 			}
 		});
 	}
@@ -495,5 +497,25 @@ public class Annotator {
 				javafx = false;
 			}
 		return javafx;
+	}
+
+	/**
+	 * Adds a file to the list of recent files. If the file is already in the list,
+	 * it is removed from the list and re-added at the front, effectively moving it
+	 * to the front.
+	 * 
+	 * @param f The file to be added
+	 * @return true, if the file was not already in the list, false otherwise.
+	 */
+	public boolean addRecentFile(File f) {
+		Annotator.logger.debug("File {} added to list of recent files", f);
+		if (!recentFiles.contains(f)) {
+			recentFiles.add(0, f);
+			return true;
+		}
+		recentFiles.remove(f);
+		recentFiles.add(0, f);
+		return false;
+
 	}
 }

@@ -52,7 +52,7 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 
 	public static BiConsumer<File, JCas> getConsumer(DocumentWindow target) {
 		return (file, jcas) -> {
-			Annotator.app.recentFiles.add(0, file);
+			Annotator.app.addRecentFile(file);
 			Annotator.app.refreshRecents();
 			Annotator.app.setCurrentDirectory(file.getParentFile());
 			target.getDocumentModel().getHistory().clear();

@@ -104,6 +104,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 					}
 				}
 			}
+			arg0.modify();
 			optResort();
 			break;
 		case Remove:
@@ -115,6 +116,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 					if (event.arguments.contains(members.get(i)))
 						removeNodeFromParent(gn.getChildAt(i));
 				}
+				gn.modify();
 			} else
 				for (int i = 1; i < event.getArity(); i++) {
 					CATreeNode etn = fsMap.get(event.getArgument(i));
@@ -123,22 +125,29 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 						removeNodeFromParent(etn);
 					}
 					fsMap.remove(event.getArgument(i));
+					etn.modify();
 				}
 			optResort();
 			break;
 		case Update:
-			for (int i = 0; i < event.getArity(); i++)
-				nodeChanged(get(event.getArgument(i)));
+			for (int i = 0; i < event.getArity(); i++) {
+				CATreeNode node = get(event.getArgument(i));
+				nodeChanged(node);
+				node.modify();
+			}
 			break;
 		case Move:
 			for (int i = 2; i < event.getArity(); i++) {
 				FeatureStructure fs = event.getArgument(i);
 				CATreeNode node = get(fs);
+				CATreeNode oldParent = node.getParent();
 				CATreeNode newParent = get(event.getArgument(1));
 				removeNodeFromParent(node);
 
 				int ind = getInsertPosition(newParent, fs);
 				insertNodeInto(node, newParent, ind);
+				oldParent.modify();
+				newParent.modify();
 			}
 			optResort();
 			break;

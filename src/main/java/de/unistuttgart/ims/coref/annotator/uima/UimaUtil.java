@@ -472,6 +472,8 @@ public class UimaUtil {
 	public static String toString(AnnotationTreeNode<Segment> tn, String sep, int maxlength) {
 		if (tn == null)
 			return null;
+		if (tn.getParent() == null)
+			return null;
 		StringBuilder b = new StringBuilder();
 		while (tn != null) {
 			if (tn.get().getLabel().equalsIgnoreCase("document"))

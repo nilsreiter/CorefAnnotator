@@ -30,6 +30,20 @@ https://github.com/nilsreiter/CorefAnnotator/issues
   - poi: 4.1.1 -> 4.1.2
   
 
+## 1.15.1
+
+- Files without segments no longer show empty parentheses in tree view #311
+- Save and close now works properly for imported files #357
+
+## 1.15.0
+
+- The entity tree can now also be sorted based on last change (to the entity). 
+  Thanks @andreasvc! #153 #349
+- The maximum length of displayed entity labels is increased to 100 characters. 
+  This is not a long-term solution though. #353
+- Pressing cmd-t now displays a mention in the tree, if a) the cursor is placed 
+  in a single mention or b) a single mention is selected exactly. #351
+- Fixed (some) undo behaviour when de-emphasizing singletons #347
 
 ## 1.14.5
 

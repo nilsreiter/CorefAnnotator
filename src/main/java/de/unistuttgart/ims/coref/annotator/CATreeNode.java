@@ -1,5 +1,6 @@
 package de.unistuttgart.ims.coref.annotator;
 
+import java.time.Instant;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
@@ -26,6 +27,8 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 	Vector<CATreeNode> children = new Vector<CATreeNode>();
 
 	CATreeNode parent = null;
+
+	long lastModified = 0;
 
 	public CATreeNode(Entity e) {
 		this(e, e.getLabel());
@@ -56,6 +59,14 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 	@Override
 	public int getChildCount() {
 		return children.size();
+	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	public void resetLastModified() {
+		lastModified = 0;
 	}
 
 	public Vector<CATreeNode> getChildren() {
@@ -217,10 +228,14 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 		};
 	}
 
+	public void modify() {
+		if (isEntity())
+			this.lastModified = Instant.now().toEpochMilli();
+	}
+
 	@Override
 	public void remove(int index) {
 		children.remove(index);
-
 	}
 
 	@Override

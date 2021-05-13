@@ -129,6 +129,7 @@ import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
+import de.unistuttgart.ims.coref.annotator.action.ShowASelectedMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowDocumentStatistics;
 import de.unistuttgart.ims.coref.annotator.action.ShowFlagEditor;
 import de.unistuttgart.ims.coref.annotator.action.ShowGuidelinesAction;
@@ -143,6 +144,7 @@ import de.unistuttgart.ims.coref.annotator.action.UndoAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
+import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
@@ -186,7 +188,6 @@ import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
-import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class DocumentWindow extends AbstractTextWindow implements CaretListener, CoreferenceModelListener, HasTextView,
 		DocumentStateListener, HasTreeView, HasDocumentModel {
@@ -375,6 +376,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
 				SelectPreviousMentionAction.class);
 
+		textPane.addCaretListener(actions.showASelectedMentionInTree);
+
 		highlightManager = new HighlightManager(textPane);
 
 		// scrollPane.setRowHeaderView(segmentIndicator);
@@ -415,6 +418,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.actions.deleteAction = new DeleteAction(this);
 		this.actions.sortByAlpha = SortTree.getSortByAlphabet(this);
 		this.actions.sortByMentions = SortTree.getSortByMention(this);
+		this.actions.sortByLastModified = SortTree.getSortByLastModified(this);
 		this.actions.fileSaveAction = new FileSaveAction(this);
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
 		this.actions.copyAction = new CopyAction(this);
@@ -438,6 +442,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// connect listeners
 		documentStateListeners.add(actions.undoAction);
 		documentStateListeners.add(actions.fileSaveAction);
+
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByAlpha);
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByLastModified);
+		Annotator.app.getPreferences().addPreferenceChangeListener(actions.sortByMentions);
 
 		Annotator.logger.trace("Actions initialised.");
 
@@ -563,7 +571,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		fileMenu.add(Annotator.app.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
-		fileMenu.add(new FileSaveAsAction(this));
+		fileMenu.add(actions.fileSaveAsAction);
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(actions.closeAction);
 		fileMenu.add(Annotator.app.quitAction);
@@ -586,6 +594,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleMentionNonNominal));
 		entityMenu.add(actions.deleteAllAction);
 		entityMenu.add(mentionFlagsInMenuBar);
+		entityMenu.add(actions.showASelectedMentionInTree);
 		entityMenu.addSeparator();
 		entityMenu.add(Annotator.getString(Strings.MENU_EDIT_ENTITIES));
 		entityMenu.add(new JMenuItem(actions.newEntityAction));
@@ -602,13 +611,16 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
 		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
 		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
+		JRadioButtonMenuItem radio3 = new JRadioButtonMenuItem(this.actions.sortByLastModified);
 		radio2.setSelected(true);
 		ButtonGroup grp = new ButtonGroup();
+		grp.add(radio3);
 		grp.add(radio2);
 		grp.add(radio1);
 
 		sortMenu.add(radio1);
 		sortMenu.add(radio2);
+		sortMenu.add(radio3);
 		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
 
 		entityMenu.add(sortMenu);
@@ -633,7 +645,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.logger.info("Initialised menus");
 	}
 
-	protected void closeWindow(boolean quit) {
+	public void closeWindow(boolean quit) {
 		if (getDocumentModel().isSavable()) {
 			Annotator.logger.warn("Closing window with unsaved changes");
 		}
@@ -790,6 +802,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		model.getTreeModel().addTreeModelListener((SortingTreeModelListener) modelHandler);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortByAlpha);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortByMentions);
+		model.getTreeModel().addEntitySortOrderListener(actions.sortByLastModified);
 		model.getTreeModel().addEntitySortOrderListener(actions.sortDescending);
 
 		// listeners to the flag model
@@ -1575,7 +1588,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						mi.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
+								if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)
+										&& getSelectedAnnotations(MentionSurface.class).size() == 1) {
+									getDocumentModel().edit(new MoveMentionsToEntity(entity,
+											getSelectedAnnotations(MentionSurface.class)
+													.collect(ms -> ms.getMention())));
+								} else {
+									getDocumentModel().edit(new AddMentionsToEntity(entity, getSelection()));
+								}
 							}
 						});
 						mi.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(entity.getColor())));
@@ -1778,6 +1798,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		DeleteAction deleteAction;
 		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
 		FileSaveAction fileSaveAction;
+		FileSaveAsAction fileSaveAsAction = new FileSaveAsAction(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
@@ -1786,6 +1807,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		AbstractAction showDocumentStatistics = new ShowDocumentStatistics(DocumentWindow.this);
 		SortTree sortByAlpha;
 		SortTree sortByMentions;
+		SortTree sortByLastModified;
 		ToggleEntitySortOrder sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);
 		MergeSelectedEntities mergeSelectedEntitiesAction = new MergeSelectedEntities(DocumentWindow.this);
@@ -1794,6 +1816,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		RemoveDuplicatesAction removeDuplicatesAction;
 		DuplicateMentions duplicateMentionsAction = new DuplicateMentions(DocumentWindow.this);
 		EntityStatisticsAction entityStatisticsAction;
+		ViewSetLineNumberStyle lineNumberStyleNone = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.NONE);
+		ViewSetLineNumberStyle lineNumberStyleFixed = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.FIXED);
+		ViewSetLineNumberStyle lineNumberStyleDynamic = new ViewSetLineNumberStyle(DocumentWindow.this,
+				LineNumberStyle.DYNAMIC);
+		ShowASelectedMentionInTreeAction showASelectedMentionInTree = new ShowASelectedMentionInTreeAction(
+				DocumentWindow.this);
 
 	}
 
@@ -1887,14 +1917,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				case 1:
 					// first save, then close the window
 					setIndeterminateProgress();
-					SaveJCasWorker worker = new SaveJCasWorker(getFile(), getDocumentModel().getJcas(),
-							(file, jcas) -> {
-								getDocumentModel().getHistory().clear();
-								setWindowTitle();
-								stopIndeterminateProgress();
-								closeWindow(false);
-							});
-					worker.execute();
+					if (getFile() == null) {
+						// if we don't have a file name yet, use the save as action
+						actions.fileSaveAsAction.setCloseAfterSaving(true);
+						actions.fileSaveAsAction.actionPerformed(new ActionEvent(DocumentWindow.this, 1001, ""));
+					} else {
+						actions.fileSaveAction.setCloseAfterSaving(true);
+						actions.fileSaveAction.actionPerformed(new ActionEvent(DocumentWindow.this, 1001, ""));
+					}
 					break;
 				case 0:
 					closeWindow(false);
