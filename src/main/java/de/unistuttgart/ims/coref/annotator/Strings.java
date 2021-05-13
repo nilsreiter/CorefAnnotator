@@ -180,6 +180,7 @@ public class Strings {
 	public static final String DIALOG_EXPORT_OPTIONS_TITLE_ = "dialog.export_options.title_";
 	public static final String DIALOG_EXPORT_OPTIONS_TRIM_WHITESPACE = "dialog.export_options.trim_whitespace";
 	public static final String DIALOG_EXPORT_OPTIONS_TRIM_WHITESPACE_TOOLTIP = "dialog.export_options.trim_whitespace.tooltip";
+	public static final String DIALOG_EXPORT_OPTIONS_WARNING_1 = "dialog.export_options.warning.1";
 	public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 	public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
 	public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
