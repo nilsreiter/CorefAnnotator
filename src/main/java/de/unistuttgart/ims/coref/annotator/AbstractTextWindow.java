@@ -511,6 +511,9 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
 
+		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
+		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
+
 		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		textScrollPane.getViewport().addChangeListener(new ChangeListener() {
