@@ -31,9 +31,12 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 		Annotator.logger.info("Saving ... ");
 		OutputStream os = null;
 		try {
-			if (file.getName().endsWith(".ca2")) {
+			if (file.getName().endsWith(".ca2z")) {
 				os = new GZIPOutputStream(new FileOutputStream(file));
+			} else if (file.getName().endsWith(".ca2")) {
+				os = new FileOutputStream(file);
 			}
+
 			if (os != null)
 				XmiCasSerializer.serialize(jcas.getCas(), null, os, true, null);
 		} finally {

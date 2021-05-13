@@ -9,12 +9,25 @@ public class FileFilters {
 
 		@Override
 		public boolean accept(File f) {
-			return f.isDirectory() || f.getName().endsWith(".ca2");
+			return f.isDirectory() || f.getName().endsWith(".ca2") || f.getName().endsWith(".ca2z");
 		}
 
 		@Override
 		public String getDescription() {
-			return "CorefAnnotator files";
+			return "CorefAnnotator";
+		}
+	};
+
+	static public FileFilter ca2z = new FileFilter() {
+
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().endsWith(".ca2z");
+		}
+
+		@Override
+		public String getDescription() {
+			return "CorefAnnotator (compressed)";
 		}
 	};
 

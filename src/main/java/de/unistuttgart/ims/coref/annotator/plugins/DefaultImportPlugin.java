@@ -62,7 +62,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.ca2;
+		return FileFilters.ca2z;
 	}
 
 	@Override
@@ -74,7 +74,11 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 	public JCas getJCas(File f) throws IOException, UIMAException {
 		InputStream is = null;
 		try {
-			is = new GZIPInputStream(new FileInputStream(f));
+			if (f.getName().endsWith(getSuffix())) {
+				is = new GZIPInputStream(new FileInputStream(f));
+			} else if (f.getName().endsWith(".ca2")) {
+				is = new FileInputStream(f);
+			}
 
 			JCas jcas = JCasFactory.createJCas();
 			XmiCasDeserializer.deserialize(is, jcas.getCas());
@@ -89,7 +93,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.ca2;
+		return ExtensionFilters.ca2z;
 	}
 
 	@Override
@@ -99,7 +103,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public String getSuffix() {
-		return ".ca2";
+		return ".ca2z";
 	}
 
 }

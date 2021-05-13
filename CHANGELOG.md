@@ -15,15 +15,17 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - New: Annotation guidelines can now be linked via a profile. They
   appear directly in the Help menu. #12
 - Files are now saved with a specific file extension to avoid confusion
-  and accidental decompression. The file extension is .ca2 #335
+  and accidental decompression. The file extension is .ca2 for uncompressed, 
+  git-friendly files and .ca2z for gzip compressed files. Compression  
+  makes the files roughly ten times smaller. #335
 - Search is now case-insensitive by default #320
 - Updated Dependencies
   - log4j: 2.12.1 -> 2.13.3
-  - guava: 28.1-jre -> 29.0-jre
+  - guava: 28.1-jre -> 30.1-jre
   - reflections: 0.9.11 -> 0.9.12
   - mockito: 3.1.0 -> 3.4.4
   - dkpro: 1.9.0 -> 2.1.0
-  - uima: 2.10.2 -> 3.1.0
+  - uima: 2.10.2 -> 3.1.1
   - eclipse collections: 9.2.0 -> 10.2.0
   - javafx: 13.0.1 -> 14.0.2.1
   - ikonli: 2.1.1 -> 11.5.0
