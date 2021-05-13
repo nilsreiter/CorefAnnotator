@@ -5,12 +5,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.BiConsumer;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
+import org.apache.uima.jcas.JCas;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -28,6 +32,8 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 	Timer timer = null;
 
 	int period = Annotator.app.getPreferences().getInt(Constants.CFG_AUTOSAVE_TIMER, Defaults.CFG_AUTOSAVE_TIMER);
+
+	boolean closeAfterSaving = false;
 
 	public FileSaveAction(DocumentWindow dw) {
 		super(dw, MaterialDesign.MDI_CONTENT_SAVE);
@@ -50,7 +56,10 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		timer = new Timer();
 		SaveTimerTask tt = new SaveTimerTask();
 		getTarget().addWindowListener(tt);
-		timer.schedule(tt, when, period);
+		if (closeAfterSaving) {
+			SwingUtilities.invokeLater(tt);
+		} else
+			timer.schedule(tt, when, period);
 	}
 
 	@Override
@@ -65,12 +74,16 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		public void run() {
 			target.setIndeterminateProgress();
 
-			SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(),
-					(file, jcas) -> {
-						target.getDocumentModel().saved();
-						target.setWindowTitle();
-						target.stopIndeterminateProgress();
-					});
+			BiConsumer<File, JCas> bicons;
+			if (closeAfterSaving) {
+				bicons = (file, jcas) -> {
+					SaveJCasWorker.getConsumer(getTarget()).accept(file, jcas);
+					getTarget().closeWindow(false);
+				};
+			} else {
+				bicons = SaveJCasWorker.getConsumer(getTarget());
+			}
+			SaveJCasWorker worker = new SaveJCasWorker(target.getFile(), target.getDocumentModel().getJcas(), bicons);
 			worker.execute();
 		}
 
@@ -104,6 +117,20 @@ public class FileSaveAction extends TargetedIkonAction<DocumentWindow> implement
 		public void windowDeactivated(WindowEvent e) {
 		}
 
+	}
+
+	/**
+	 * @return the closeAfterSaving
+	 */
+	public boolean isCloseAfterSaving() {
+		return closeAfterSaving;
+	}
+
+	/**
+	 * @param closeAfterSaving the closeAfterSaving to set
+	 */
+	public void setCloseAfterSaving(boolean closeAfterSaving) {
+		this.closeAfterSaving = closeAfterSaving;
 	}
 
 }

@@ -4,11 +4,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.function.BiConsumer;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 
+import org.apache.uima.jcas.JCas;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
@@ -20,6 +22,8 @@ import javafx.application.Platform;
 public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 
 	private static final long serialVersionUID = 1L;
+
+	boolean closeAfterSaving = false;
 
 	public FileSaveAsAction(DocumentWindow documentWindow) {
 		super(documentWindow, Strings.ACTION_SAVE_AS, MaterialDesign.MDI_CONTENT_SAVE_SETTINGS);
@@ -44,8 +48,17 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 						if (!f.getName().endsWith(".xmi") && !f.getName().endsWith(".xmi.gz"))
 							f = new File(f.getAbsolutePath() + ".xmi.gz");
 
-						SaveJCasWorker worker = new SaveJCasWorker(f, target.getDocumentModel().getJcas(),
-								SaveJCasWorker.getConsumer(getTarget()));
+						BiConsumer<File, JCas> bicons;
+						if (closeAfterSaving) {
+							bicons = (file, jcas) -> {
+								SaveJCasWorker.getConsumer(getTarget()).accept(file, jcas);
+								getTarget().closeWindow(false);
+							};
+						} else {
+							bicons = SaveJCasWorker.getConsumer(getTarget());
+						}
+
+						SaveJCasWorker worker = new SaveJCasWorker(f, target.getDocumentModel().getJcas(), bicons);
 						worker.execute();
 					}
 
@@ -77,5 +90,19 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			}
 		}
 
+	}
+
+	/**
+	 * @return the closeAfterSaving
+	 */
+	public boolean isCloseAfterSaving() {
+		return closeAfterSaving;
+	}
+
+	/**
+	 * @param closeAfterSaving the closeAfterSaving to set
+	 */
+	public void setCloseAfterSaving(boolean closeAfterSaving) {
+		this.closeAfterSaving = closeAfterSaving;
 	}
 }
