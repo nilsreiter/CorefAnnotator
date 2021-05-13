@@ -103,7 +103,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public String getSuffix() {
-		return ".xmi";
+		return ".xmi.gz";
 	}
 
 }
