@@ -7,7 +7,6 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 
 - Files without segments no longer show empty parentheses in tree view #311
 - Save and close now works properly for imported files #357
-- 
 
 ## 1.15.0
 
