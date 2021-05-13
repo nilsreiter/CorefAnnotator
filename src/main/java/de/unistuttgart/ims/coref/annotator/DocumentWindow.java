@@ -565,7 +565,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		fileMenu.add(Annotator.app.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
-		fileMenu.add(new FileSaveAsAction(this));
+		fileMenu.add(actions.fileSaveAsAction);
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(actions.closeAction);
 		fileMenu.add(Annotator.app.quitAction);
@@ -1826,6 +1826,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		DeleteAction deleteAction;
 		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
 		FileSaveAction fileSaveAction;
+		FileSaveAsAction fileSaveAsAction = new FileSaveAsAction(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
