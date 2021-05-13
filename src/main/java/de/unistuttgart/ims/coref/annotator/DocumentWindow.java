@@ -88,7 +88,6 @@ import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.TOP;
-import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -124,8 +123,6 @@ import de.unistuttgart.ims.coref.annotator.action.RemoveForeignAnnotationsAction
 import de.unistuttgart.ims.coref.annotator.action.RemoveSingletons;
 import de.unistuttgart.ims.coref.annotator.action.RenameAllEntitiesAction;
 import de.unistuttgart.ims.coref.annotator.action.RenameEntityAction;
-import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
-import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.SetLanguageAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowASelectedMentionInTreeAction;
 import de.unistuttgart.ims.coref.annotator.action.ShowDocumentStatistics;
@@ -354,8 +351,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		textPane.getActionMap().put(DeleteAction.class, actions.deleteAction);
 		textPane.getActionMap().put(CopyAction.class, new CopyAction(this));
 		textPane.getActionMap().put(DeleteAllMentionsInSelection.class, actions.deleteAllAction);
-		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
-		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				CopyAction.class);
@@ -363,10 +358,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		textPane.getInputMap().put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
 				DeleteAllMentionsInSelection.class);
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
-				SelectNextMentionAction.class);
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
-				SelectPreviousMentionAction.class);
 
 		textPane.addCaretListener(actions.showASelectedMentionInTree);
 
@@ -982,17 +973,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		});
 
-	}
-
-	public void annotationSelected(Annotation m) {
-		if (m != null) {
-			textPane.setSelectionStart(m.getBegin());
-			textPane.setSelectionEnd(m.getEnd());
-			// textPane.setCaretPosition(m.getEnd());
-			textPane.getCaret().setSelectionVisible(true);
-		} else {
-			textPane.getCaret().setSelectionVisible(false);
-		}
 	}
 
 	class MyTreeTransferHandler extends TransferHandler {

@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.PreferenceChangeEvent;
@@ -832,6 +833,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		ImmutableList<DocumentModel> documentModels;
 		MutableSet<Spans> spanIntersection = null;
 		MutableMap<DocumentModel, MutableMap<Spans, Mention>> spanMentionMap = Maps.mutable.empty();
+		MutableSetMultimap<Span, Mention> spanAllMentionsMap = Multimaps.mutable.set.empty();
 		Span annotatedRange = new Span(Integer.MAX_VALUE, Integer.MIN_VALUE);
 		Span overlappingPart = new Span(Integer.MIN_VALUE, Integer.MAX_VALUE);
 
@@ -852,6 +854,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 						span = new ExtendedSpan(m);
 					else
 						span = new Spans(m);
+					for (Span sp : span)
+						spanAllMentionsMap.put(sp, m);
 
 					spanMentionMap.get(dm).put(span, m);
 					spans.add(span);
@@ -901,6 +905,26 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 		private static final long serialVersionUID = 1L;
 
+	}
+
+	public MentionSurface getNextMentionSurface(int position) {
+		try {
+			return documentModels.collect(dm -> dm.getCoreferenceModel())
+					.collect(cm -> cm.getNextMentionSurface(position)).reject(ms -> ms == null)
+					.minBy(m -> m.getBegin());
+		} catch (NoSuchElementException e) {
+			return null;
+		}
+	}
+
+	public MentionSurface getPreviousMentionSurface(int position) {
+		try {
+			return documentModels.collect(dm -> dm.getCoreferenceModel())
+					.collect(cm -> cm.getPreviousMentionSurface(position)).reject(ms -> ms == null)
+					.maxBy(m -> m.getEnd());
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Enumeration;
@@ -25,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -52,6 +54,8 @@ import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
@@ -174,6 +178,17 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	@Override
 	public JCas getJCas() {
 		return getDocumentModel().getJcas();
+	}
+
+	public void annotationSelected(Annotation m) {
+		if (m != null) {
+			textPane.setSelectionStart(m.getBegin());
+			textPane.setSelectionEnd(m.getEnd());
+			// textPane.setCaretPosition(m.getEnd());
+			textPane.getCaret().setSelectionVisible(true);
+		} else {
+			textPane.getCaret().setSelectionVisible(false);
+		}
 	}
 
 	@Override
@@ -510,6 +525,12 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		textPane = new JTextPane();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
+		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
+		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
+				SelectNextMentionAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
+				SelectPreviousMentionAction.class);
 
 		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
 		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
