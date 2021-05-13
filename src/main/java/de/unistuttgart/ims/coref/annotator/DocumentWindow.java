@@ -191,7 +191,6 @@ import de.unistuttgart.ims.coref.annotator.profile.Profile;
 import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.coref.annotator.worker.DocumentModelLoader;
 import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
-import de.unistuttgart.ims.coref.annotator.worker.SaveJCasWorker;
 
 public class DocumentWindow extends AbstractTextWindow implements CaretListener, CoreferenceModelListener, HasTextView,
 		DocumentStateListener, HasTreeView, HasDocumentModel {
@@ -573,7 +572,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		fileMenu.add(Annotator.app.getRecentFilesMenu());
 		fileMenu.add(fileImportMenu);
 		fileMenu.add(actions.fileSaveAction);
-		fileMenu.add(new FileSaveAsAction(this));
+		fileMenu.add(actions.fileSaveAsAction);
 		fileMenu.add(fileExportMenu);
 		fileMenu.add(actions.closeAction);
 		fileMenu.add(Annotator.app.quitAction);
@@ -650,7 +649,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		Annotator.logger.info("Initialised menus");
 	}
 
-	protected void closeWindow(boolean quit) {
+	public void closeWindow(boolean quit) {
 		if (getDocumentModel().isSavable()) {
 			Annotator.logger.warn("Closing window with unsaved changes");
 		}
@@ -1839,6 +1838,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		DeleteAction deleteAction;
 		DeleteAllMentionsInSelection deleteAllAction = new DeleteAllMentionsInSelection(DocumentWindow.this);
 		FileSaveAction fileSaveAction;
+		FileSaveAsAction fileSaveAsAction = new FileSaveAsAction(DocumentWindow.this);
 		AbstractAction toggleShowTextInTreeLabels;
 		AbstractAction toggleTrimWhitespace;
 		UndoAction undoAction;
@@ -1957,14 +1957,14 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				case 1:
 					// first save, then close the window
 					setIndeterminateProgress();
-					SaveJCasWorker worker = new SaveJCasWorker(getFile(), getDocumentModel().getJcas(),
-							(file, jcas) -> {
-								getDocumentModel().getHistory().clear();
-								setWindowTitle();
-								stopIndeterminateProgress();
-								closeWindow(false);
-							});
-					worker.execute();
+					if (getFile() == null) {
+						// if we don't have a file name yet, use the save as action
+						actions.fileSaveAsAction.setCloseAfterSaving(true);
+						actions.fileSaveAsAction.actionPerformed(new ActionEvent(DocumentWindow.this, 1001, ""));
+					} else {
+						actions.fileSaveAction.setCloseAfterSaving(true);
+						actions.fileSaveAction.actionPerformed(new ActionEvent(DocumentWindow.this, 1001, ""));
+					}
 					break;
 				case 0:
 					closeWindow(false);

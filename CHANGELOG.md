@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.15.1
+
+- Files without segments no longer show empty parentheses in tree view #311
+- Save and close now works properly for imported files #357
+
 ## 1.15.0
 
 - The entity tree can now also be sorted based on last change (to the entity). 
