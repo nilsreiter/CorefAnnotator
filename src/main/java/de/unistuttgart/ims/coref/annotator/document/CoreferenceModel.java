@@ -376,7 +376,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	protected void edit(DuplicateMentions op) {
 		op.setNewMentions(op.getSourceMentions().collect(oldMention -> {
 			Mention newMention = addTo(oldMention.getEntity(), new Span(oldMention.getSurface(0)));
-			// TODO: re-create additional surfaces
+			for (int i = 1; i < oldMention.getSurface().size(); i++) {
+				MentionSurface oMS = oldMention.getSurface(i);
+				MentionSurface ms = AnnotationFactory.createAnnotation(getJCas(), oMS.getBegin(), oMS.getEnd(),
+						MentionSurface.class);
+				UimaUtil.addMentionSurface(newMention, ms);
+				characterPosition2AnnotationMap.add(ms);
+			}
 			try {
 				if (oldMention.getFlags() != null)
 					newMention.setFlags(UimaUtil.clone(oldMention.getFlags()));
