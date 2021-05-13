@@ -42,6 +42,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 					fileChooser.setInitialDirectory(Annotator.app.getCurrentDirectory());
 					fileChooser.getExtensionFilters()
 							.add(Annotator.app.getPluginManager().getDefaultIOPlugin().getExtensionFilter());
+					fileChooser.setInitialFileName(getTarget().getProposedFilename());
 					File f = fileChooser.showSaveDialog(null);
 
 					if (f != null) {
@@ -75,6 +76,11 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 			saveDialog.setFileFilter(Annotator.app.getPluginManager().getDefaultIOPlugin().getFileFilter());
 			saveDialog.setDialogTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
 			saveDialog.setCurrentDirectory(Annotator.app.getCurrentDirectory());
+			if (getTarget().getProposedFilename() != null) {
+				File proposedFile = new File(Annotator.app.getCurrentDirectory(),
+						getTarget().getProposedFilename() + ".xmi.gz");
+				saveDialog.setSelectedFile(proposedFile);
+			}
 			int r = saveDialog.showSaveDialog(getTarget());
 			switch (r) {
 			case JFileChooser.APPROVE_OPTION:

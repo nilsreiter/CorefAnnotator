@@ -196,6 +196,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 	File file;
 
+	String proposedFilename;
+
 	String segmentAnnotation = null;
 
 	// storing and caching
@@ -660,6 +662,8 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	public void loadFile(File file, ImportPlugin flavor, String language) {
 		if (flavor instanceof DefaultImportPlugin)
 			this.file = file;
+		else
+			this.proposedFilename = file.getName().replaceAll("\\.[^\\.]+$", "");
 
 		JCasLoader lai;
 		setMessage(Annotator.getString(Strings.MESSAGE_LOADING));
@@ -1942,5 +1946,19 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			dispose();
 		}
 
+	}
+
+	/**
+	 * @return the proposedFilename
+	 */
+	public String getProposedFilename() {
+		return proposedFilename;
+	}
+
+	/**
+	 * @param proposedFilename the proposedFilename to set
+	 */
+	public void setProposedFilename(String proposedFilename) {
+		this.proposedFilename = proposedFilename;
 	}
 }
