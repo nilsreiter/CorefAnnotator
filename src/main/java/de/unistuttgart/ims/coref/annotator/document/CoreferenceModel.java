@@ -608,24 +608,44 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		return entityMentionMap.get(entity).toImmutable();
 	}
 
-	public Mention getNextMention(int position) {
-		for (int i = position; i < getDocumentModel().getJcas().getDocumentText().length(); i++) {
-			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i)
-					.selectInstancesOf(MentionSurface.class).collect(ms -> ms.getMention());
-			if (!mentions.isEmpty())
-				return mentions.iterator().next();
+	@SuppressWarnings("resource")
+	public MentionSurface getNextMentionSurface(int position) {
+		try {
+			return getJCas().select(MentionSurface.class).following(position).get();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+			return null;
 		}
-		return null;
 	}
 
-	public Mention getPreviousMention(int position) {
-		for (int i = position - 1; i >= 0; i--) {
-			MutableSet<Mention> mentions = characterPosition2AnnotationMap.get(i)
-					.selectInstancesOf(MentionSurface.class).collect(ms -> ms.getMention());
-			if (!mentions.isEmpty())
-				return mentions.iterator().next();
+	@SuppressWarnings("resource")
+	public Mention getNextMention(int position) {
+		try {
+			return getJCas().select(MentionSurface.class).following(position).get().getMention();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+			return null;
 		}
-		return null;
+	}
+
+	@SuppressWarnings("resource")
+	public MentionSurface getPreviousMentionSurface(int position) {
+		try {
+			return getJCas().select(MentionSurface.class).preceding(position).backwards().get();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("resource")
+	public Mention getPreviousMention(int position) {
+		try {
+			return getJCas().select(MentionSurface.class).preceding(position).get().getMention();
+		} catch (Exception e) {
+			Annotator.logger.catching(e);
+			return null;
+		}
 	}
 
 	/**
