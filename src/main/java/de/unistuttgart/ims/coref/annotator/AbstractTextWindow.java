@@ -45,6 +45,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Sets;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -267,11 +268,24 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	}
 
 	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
-		MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
-				.getMentions(getTextPane().getSelectionStart())
-				.select(a -> a.getBegin() == getTextPane().getSelectionStart()
-						&& a.getEnd() == getTextPane().getSelectionEnd());
-		return annotations.selectInstancesOf(clazz);
+		try {
+			MutableSet<T> annotations = getTouchedAnnotations(clazz)
+					.select(a -> a.getBegin() == getTextPane().getSelectionStart()
+							&& a.getEnd() == getTextPane().getSelectionEnd());
+			return annotations.selectInstancesOf(clazz);
+		} catch (NullPointerException e) {
+			return Sets.mutable.empty();
+		}
+	}
+
+	public <T extends Annotation> MutableSet<T> getTouchedAnnotations(Class<T> clazz) {
+		try {
+			MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
+					.getMentions(getTextPane().getSelectionStart());
+			return annotations.selectInstancesOf(clazz);
+		} catch (NullPointerException e) {
+			return Sets.mutable.empty();
+		}
 	}
 
 	public JTextPane getTextPane() {
