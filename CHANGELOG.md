@@ -3,6 +3,16 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.15.0
+
+- The entity tree can now also be sorted based on last change (to the entity). 
+  Thanks @andreasvc! #153 #349
+- The maximum length of displayed entity labels is increased to 100 characters. 
+  This is not a long-term solution though. #353
+- Pressing cmd-t now displays a mention in the tree, if a) the cursor is placed 
+  in a single mention or b) a single mention is selected exactly. #351
+- Fixed (some) undo behaviour when de-emphasizing singletons #347
+
 ## 1.14.5
 
 - Fixed behaviour of de-emphasising singletons. Thanks @andreasvc #347
