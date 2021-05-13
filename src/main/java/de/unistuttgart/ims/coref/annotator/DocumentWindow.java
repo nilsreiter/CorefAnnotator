@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -76,7 +75,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.StyleContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -209,7 +207,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	// Window components
 	JToolBar controls = new JToolBar();
 	JTree tree;
-	StyleContext styleContext = new StyleContext();
 	JLabel selectionDetailPanel;
 	JSplitPane splitPane;
 	JTextField treeSearchField;
@@ -222,11 +219,9 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 	JMenu windowsMenu;
 	JPopupMenu treePopupMenu;
 	JPopupMenu textPopupMenu;
-	Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new HashMap<StylePlugin, JRadioButtonMenuItem>();
+	// Map<StylePlugin, JRadioButtonMenuItem> styleMenuItem = new
+	// HashMap<StylePlugin, JRadioButtonMenuItem>();
 	FlagMenu mentionFlagsInTreePopup, entityFlagsInTreePopup, mentionFlagsInMenuBar, entityFlagsInMenuBar;
-
-	// Settings
-	StylePlugin currentStyle;
 
 	// sub windows
 	SearchDialog searchPanel;
@@ -339,11 +334,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		for (Component comp : controls.getComponents())
 			comp.setFocusable(false);
-
-		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
-		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
-		getMiscLabel().setPreferredSize(new Dimension(150, 20));
-		miscLabel2.setPreferredSize(new Dimension(150, 20));
 
 		// initialise text view
 		Caret caret = new Caret();
@@ -949,11 +939,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 				return ep;
 			}));
 		}
-	}
-
-	@Override
-	public void switchStyle(StylePlugin sv) {
-		switchStyle(sv, sv.getBaseStyle());
 	}
 
 	@Override
