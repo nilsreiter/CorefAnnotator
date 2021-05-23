@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 1.15.2
+
+- Command line tool ExportMultipleFiles no longer tries to descend into 
+  sub directories #367
+
 ## 1.15.1
 
 - Files without segments no longer show empty parentheses in tree view #311
