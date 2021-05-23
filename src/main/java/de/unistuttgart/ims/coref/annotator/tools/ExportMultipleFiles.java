@@ -67,6 +67,8 @@ public class ExportMultipleFiles {
 				for (File f : file.listFiles(new FileFilter() {
 					@Override
 					public boolean accept(File pathname) {
+						if (pathname.isDirectory())
+							return false;
 						return pluginManager.getDefaultIOPlugin().getFileFilter().accept(pathname);
 					}
 
