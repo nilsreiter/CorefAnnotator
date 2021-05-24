@@ -211,8 +211,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	MutableList<JCas> jcas;
 	MutableList<File> files;
-	int loadedJCas = 0;
-	int loadedCModels = 0;
+	int numberOfLoadedJCas = 0;
+	int numberOfLoadedDocumentModels = 0;
 	Annotator mainApplication;
 	JPanel mentionsInfoPane;
 	JPanel agreementPanel = null;
@@ -263,7 +263,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	protected void drawAllAnnotations() {
-		if (loadedCModels < size)
+		if (numberOfLoadedDocumentModels < size)
 			return;
 		ism.documentModels = documentModels.toImmutable();
 		ism.calculateIntersection();
@@ -591,7 +591,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	protected void finishLoading() {
-		if (loadedCModels >= files.size()) {
+		if (numberOfLoadedDocumentModels >= files.size()) {
 			// Style
 			StylePlugin sPlugin = null;
 			try {
@@ -624,7 +624,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		documentModels.set(index, cm);
 		if (tableOfContents != null)
 			tableOfContents.setModel(cm.getSegmentModel());
-		loadedCModels++;
+		numberOfLoadedDocumentModels++;
 		finishLoading();
 		drawAllAnnotations();
 	}
@@ -641,7 +641,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		this.annotatorStats.get(index).analyze(jcas, m -> {
 			entityMentionMaps.get(index).put(m.getEntity(), m);
 		});
-		loadedJCas++;
+		numberOfLoadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
 		mentionsInfoPane.add(getAnnotatorPanel(index));
