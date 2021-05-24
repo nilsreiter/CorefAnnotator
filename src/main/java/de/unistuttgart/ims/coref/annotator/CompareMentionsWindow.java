@@ -63,6 +63,7 @@ import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
@@ -444,6 +445,13 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 			});
 			agreementPanel = panel;
+
+			c.gridy++;
+			HelpAction ha = new HelpAction(HelpWindow.Topic.COMPARE);
+			ha.putValue(Action.NAME, Annotator.getString(Strings.COMPARE_SHOW_AGREEMENT_HELP));
+			JButton helpButton = new JButton(ha);
+
+			panel.add(helpButton);
 
 		}
 		return agreementPanel;

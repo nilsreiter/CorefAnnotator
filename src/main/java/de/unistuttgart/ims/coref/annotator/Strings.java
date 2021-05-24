@@ -149,6 +149,7 @@ public class Strings {
 	public static final String ANALZYER_ENTITIES = "analyzer.entities";
 	public static final String COMPARE_CONTEXTMENU_INTERSECTION = "compare.contextmenu.intersection";
 	public static final String COMPARE_NOT_COMPARABLE = "compare.not_comparable";
+	public static final String COMPARE_SHOW_AGREEMENT_HELP = "compare.show_agreement_help";
 	public static final String DIALOG_ANNOTATOR_LABEL = "dialog.annotator_label";
 	public static final String DIALOG_ANNOTATOR_LABEL_TOOLTIP = "dialog.annotator_label.tooltip";
 	public static final String DIALOG_CANCEL = "dialog.cancel";
