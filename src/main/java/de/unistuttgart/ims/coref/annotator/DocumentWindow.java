@@ -402,6 +402,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		this.actions.sortByAlpha = SortTree.getSortByAlphabet(this);
 		this.actions.sortByMentions = SortTree.getSortByMention(this);
 		this.actions.sortByLastModified = SortTree.getSortByLastModified(this);
+		this.actions.sortByPosition = SortTree.getSortByPosition(this);
 		this.actions.fileSaveAction = new FileSaveAction(this);
 		this.actions.showSearchPanelAction = new ShowSearchPanelAction(Annotator.app, this);
 		this.actions.copyAction = new CopyAction(this);
@@ -510,8 +511,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		JRadioButtonMenuItem sortRadio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
 		JRadioButtonMenuItem sortRadio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
 		JRadioButtonMenuItem sortRadio3 = new JRadioButtonMenuItem(this.actions.sortByLastModified);
+		JRadioButtonMenuItem sortRadio4 = new JRadioButtonMenuItem(this.actions.sortByPosition);
 		sortRadio2.setSelected(true);
 		ButtonGroup sortGrp = new ButtonGroup();
+		sortGrp.add(sortRadio4);
 		sortGrp.add(sortRadio3);
 		sortGrp.add(sortRadio2);
 		sortGrp.add(sortRadio1);
@@ -519,6 +522,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		sortMenu.add(sortRadio1);
 		sortMenu.add(sortRadio2);
 		sortMenu.add(sortRadio3);
+		sortMenu.add(sortRadio4);
 		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
 
 		viewMenu.add(sortMenu);
@@ -1778,6 +1782,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		AbstractAction showDocumentStatistics = new ShowDocumentStatistics(DocumentWindow.this);
 		SortTree sortByAlpha;
 		SortTree sortByMentions;
+		SortTree sortByPosition;
 		SortTree sortByLastModified;
 		ToggleEntitySortOrder sortDescending = new ToggleEntitySortOrder(DocumentWindow.this);
 		FormEntityGroup formGroupAction = new FormEntityGroup(DocumentWindow.this);

@@ -2,8 +2,10 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.util.Comparator;
 
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+
 public enum EntitySortOrder {
-	Mentions, Alphabet, LastModified, None;
+	Mentions, Alphabet, LastModified, Position, None;
 
 	public boolean descending = true;
 
@@ -19,6 +21,17 @@ public enum EntitySortOrder {
 				@Override
 				public int compare(CATreeNode o1, CATreeNode o2) {
 					return 0;
+				}
+			};
+		case Position:
+			return new Comparator<CATreeNode>() {
+				@Override
+				public int compare(CATreeNode o1, CATreeNode o2) {
+					Mention m1 = o1.getChildAt(0).getFeatureStructure();
+					Mention m2 = o2.getChildAt(0).getFeatureStructure();
+					int l1 = m1.getSurface(0).getBegin();
+					int l2 = m2.getSurface(0).getBegin();
+					return (isDescending() ? -1 : 1) * Integer.compare(l1, l2);
 				}
 			};
 		case Mentions:

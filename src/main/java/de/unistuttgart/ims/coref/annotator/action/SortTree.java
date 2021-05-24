@@ -7,7 +7,7 @@ import java.util.prefs.PreferenceChangeListener;
 import javax.swing.Action;
 
 import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Constants;
@@ -38,23 +38,31 @@ public class SortTree extends TargetedIkonAction<DocumentWindow>
 	}
 
 	public static SortTree getSortByAlphabet(DocumentWindow win) {
-		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_ALPHABETICAL, EntitySortOrder.Alphabet, false);
+		SortTree st = new SortTree(win, MaterialDesignS.SORT_ALPHABETICAL_ASCENDING, EntitySortOrder.Alphabet, false);
 		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_ALPHA));
 		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_ALPHA_TOOLTIP));
 		return st;
 	}
 
 	public static SortTree getSortByMention(DocumentWindow win) {
-		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_NUMERIC, EntitySortOrder.Mentions, true);
+		SortTree st = new SortTree(win, MaterialDesignS.SORT_ASCENDING, EntitySortOrder.Mentions, true);
 		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_MENTIONS));
 		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_MENTIONS_TOOLTIP));
 		return st;
 	}
 
 	public static SortTree getSortByLastModified(DocumentWindow win) {
-		SortTree st = new SortTree(win, MaterialDesign.MDI_SORT_NUMERIC, EntitySortOrder.LastModified, true);
+		SortTree st = new SortTree(win, MaterialDesignS.SORT_CLOCK_ASCENDING_OUTLINE, EntitySortOrder.LastModified,
+				true);
 		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_LASTMODIFIED));
 		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_LASTMODIFIED_TOOLTIP));
+		return st;
+	}
+
+	public static SortTree getSortByPosition(DocumentWindow win) {
+		SortTree st = new SortTree(win, MaterialDesignS.SORT_NUMERIC_ASCENDING, EntitySortOrder.Position, true);
+		st.putValue(Action.NAME, Annotator.getString(Strings.ACTION_SORT_POSITION));
+		st.putValue(Action.SHORT_DESCRIPTION, Annotator.getString(Strings.ACTION_SORT_POSITION_TOOLTIP));
 		return st;
 	}
 
