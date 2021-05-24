@@ -505,6 +505,24 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 
 		}
 		viewMenu.add(viewStyleMenu);
+
+		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
+		JRadioButtonMenuItem sortRadio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
+		JRadioButtonMenuItem sortRadio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
+		JRadioButtonMenuItem sortRadio3 = new JRadioButtonMenuItem(this.actions.sortByLastModified);
+		sortRadio2.setSelected(true);
+		ButtonGroup sortGrp = new ButtonGroup();
+		sortGrp.add(sortRadio3);
+		sortGrp.add(sortRadio2);
+		sortGrp.add(sortRadio1);
+
+		sortMenu.add(sortRadio1);
+		sortMenu.add(sortRadio2);
+		sortMenu.add(sortRadio3);
+		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
+
+		viewMenu.add(sortMenu);
+
 		return viewMenu;
 
 	}
@@ -591,22 +609,6 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 		// entityMenu.add(new JCheckBoxMenuItem(actions.toggleEntityDisplayed));
 		entityMenu.add(actions.entityStatisticsAction);
 
-		JMenu sortMenu = new JMenu(Annotator.getString(Strings.MENU_EDIT_ENTITIES_SORT));
-		JRadioButtonMenuItem radio1 = new JRadioButtonMenuItem(this.actions.sortByAlpha);
-		JRadioButtonMenuItem radio2 = new JRadioButtonMenuItem(this.actions.sortByMentions);
-		JRadioButtonMenuItem radio3 = new JRadioButtonMenuItem(this.actions.sortByLastModified);
-		radio2.setSelected(true);
-		ButtonGroup grp = new ButtonGroup();
-		grp.add(radio3);
-		grp.add(radio2);
-		grp.add(radio1);
-
-		sortMenu.add(radio1);
-		sortMenu.add(radio2);
-		sortMenu.add(radio3);
-		sortMenu.add(new JCheckBoxMenuItem(this.actions.sortDescending));
-
-		entityMenu.add(sortMenu);
 		return entityMenu;
 	}
 
