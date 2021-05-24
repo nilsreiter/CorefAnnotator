@@ -553,8 +553,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
-
-		drawAllAnnotations();
 	}
 
 	@Override
