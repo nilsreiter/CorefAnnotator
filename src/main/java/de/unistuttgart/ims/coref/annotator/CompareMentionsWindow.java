@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -434,9 +432,9 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			// empty label in the bottom right
 			panel.add(new JLabel());
 
-			SpringUtilities.makeGrid(panel, 6, 2, // rows, cols
+			SpringUtilities.makeCompactGrid(panel, 6, 2, // rows, cols
 					5, 5, // initialX, initialY
-					5, 3);// xPad, yPad
+					15, 3);// xPad, yPad
 
 			agreementPanel = panel;
 
@@ -449,60 +447,45 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		AnnotatorStatistics stats = annotatorStats.get(index);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
 		Border border = BorderFactory.createTitledBorder(annotatorIds.get(index));
 		panel.setBorder(border);
 		// panel.setPreferredSize(new Dimension(200, 100));
 		// panel.setMinimumSize(new Dimension(200, 100));
 		JLabel desc;
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridy = 0;
-		c.gridx = 0;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.anchor = GridBagConstraints.NORTHWEST;
 		// color
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_COLOR_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// number of mentions
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_MENTIONS_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// number of entities
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_ENTITIES_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// annotation position
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_POSITION_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
+		panel.add(desc);
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
-				SwingConstants.RIGHT), c);
+				SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
-		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT), c);
-		c.gridx = 1;
-		panel.add(new JButton(openActions.get(index)), c);
+		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
+		panel.add(new JButton(openActions.get(index)));
+
+		// layout
+		SpringUtilities.makeCompactGrid(panel, 5, 2, 5, 5, 15, 3);
 
 		return panel;
 	}
