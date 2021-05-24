@@ -590,7 +590,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		pack();
 	}
 
-	private void finishLoading() {
+	protected void finishLoading() {
 		if (loadedCModels >= files.size()) {
 			// Style
 			StylePlugin sPlugin = null;
