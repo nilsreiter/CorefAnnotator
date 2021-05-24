@@ -10,7 +10,6 @@ public class ExtensionFilters {
 	static public ExtensionFilter tei = new ExtensionFilter("TEI", "*.xml", "*.tei");
 	static public ExtensionFilter json = new ExtensionFilter("JSON", "*.json");
 	static public ExtensionFilter csv = new ExtensionFilter("CSV", "*.csv");
-	static public ExtensionFilter ca2 = new ExtensionFilter("CorefAnnotator", "*.ca2");
-	static public ExtensionFilter ca2z = new ExtensionFilter("CorefAnnotator (compressed)", "*.ca2z");
+	static public ExtensionFilter ca2 = new ExtensionFilter("CorefAnnotator", "*.ca2", "*.ca2z");
 
 }

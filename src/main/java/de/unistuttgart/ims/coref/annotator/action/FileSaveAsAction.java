@@ -44,7 +44,6 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 					fileChooser.setTitle(Annotator.getString(Strings.DIALOG_SAVE_AS_TITLE));
 					fileChooser.setInitialDirectory(Annotator.app.getCurrentDirectory());
 					fileChooser.getExtensionFilters().add(ExtensionFilters.ca2);
-					fileChooser.getExtensionFilters().add(ExtensionFilters.ca2z);
 					fileChooser.setInitialFileName(getTarget().getProposedFilename());
 					File f = fileChooser.showSaveDialog(null);
 
