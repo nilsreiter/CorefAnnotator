@@ -300,9 +300,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		stats.setTotal(total);
 		stats.setAgreed(agreed);
 		stats.setTotalInOverlappingPart(totalInOverlappingPart);
-		mentionsInfoPane.add(Box.createVerticalGlue());
 
-		mentionsInfoPane.add(getAgreementPanel());
 	}
 
 	protected void ensureSameTexts() throws NotComparableException {
@@ -626,6 +624,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		numberOfLoadedDocumentModels++;
 		finishLoading();
 		drawAllAnnotations();
+		mentionsInfoPane.add(Box.createVerticalGlue());
+		mentionsInfoPane.add(getAgreementPanel());
 	}
 
 	public void setJCas(JCas jcas, String annotatorId, int index) throws NotComparableException {
@@ -707,12 +707,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 			drawAllAnnotations();
 		} else if (evt.getKey() == Constants.CFG_COMPARE_BY_ENTITY_NAME) {
 			entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
-			mentionsInfoPane.remove(mentionsInfoPane.getComponentCount() - 1);
-			mentionsInfoPane.remove(mentionsInfoPane.getComponentCount() - 1);
-			agreementPanel = null;
 			highlightManager.hilit.removeAllHighlights();
 			drawAllAnnotations();
-			mentionsInfoPane.validate();
 		} else
 			super.preferenceChange(evt);
 	}
