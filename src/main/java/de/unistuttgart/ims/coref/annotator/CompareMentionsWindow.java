@@ -151,7 +151,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				JPopupMenu pMenu = new JPopupMenu();
 				int offset = textPane.viewToModel2D(e.getPoint());
 
-				ImmutableSet<Mention> intersectMentions = ism.getIntersection(documentModels.getFirst());
+				ImmutableSet<Mention> intersectMentions = intersectModel.getIntersection(documentModels.getFirst());
 				intersectMentions = intersectMentions
 						.select(m -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m));
 
@@ -165,8 +165,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				for (int i = 0; i < documentModels.size(); i++) {
 					DocumentModel dm = documentModels.get(i);
 
-					RichIterable<Mention> mentions = ism.spanMentionMap.get(dm)
-							.reject((s, m) -> ism.getSpanIntersection().contains(s))
+					RichIterable<Mention> mentions = intersectModel.spanMentionMap.get(dm)
+							.reject((s, m) -> intersectModel.getSpanIntersection().contains(s))
 							.select((s, m) -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m))
 							.valuesView();
 					if (!mentions.isEmpty()) {
@@ -232,7 +232,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	int size = 0;
 	Color[] colors;
 	JMenu fileMenu;
-	IntersectModel ism = new IntersectModel();
+	IntersectModel intersectModel;
 
 	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
@@ -265,14 +265,15 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	protected void drawAllAnnotations() {
 		if (numberOfLoadedDocumentModels < size)
 			return;
-		ism.documentModels = documentModels.toImmutable();
-		ism.calculateIntersection();
+		intersectModel = new IntersectModel();
+		intersectModel.documentModels = documentModels.toImmutable();
+		intersectModel.calculateIntersection();
 
-		Span overlapping = ism.getOverlappingPart();
+		Span overlapping = intersectModel.getOverlappingPart();
 
-		ImmutableSet<Spans> intersection = ism.getSpanIntersection();
+		ImmutableSet<Spans> intersection = intersectModel.getSpanIntersection();
 
-		for (Mention m : ism.getIntersection(documentModels.getFirst())) {
+		for (Mention m : intersectModel.getIntersection(documentModels.getFirst())) {
 			highlightManager.underline(m, Color.gray.brighter());
 		}
 		int agreed = intersection.size();
@@ -280,14 +281,14 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		int totalInOverlappingPart = agreed;
 		int index = 0;
 		for (DocumentModel dm : documentModels) {
-			Set<Spans> spans = ism.spanMentionMap.get(dm).keySet();
+			Set<Spans> spans = intersectModel.spanMentionMap.get(dm).keySet();
 			for (Spans s : spans) {
 				if (!intersection.contains(s)) {
 					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
 							Defaults.CFG_COMPARE_BY_ENTITY_NAME))
-						highlightManager.underline(ism.spanMentionMap.get(dm).get(s));
+						highlightManager.underline(intersectModel.spanMentionMap.get(dm).get(s));
 					else
-						highlightManager.underline(ism.spanMentionMap.get(dm).get(s), colors[index]);
+						highlightManager.underline(intersectModel.spanMentionMap.get(dm).get(s), colors[index]);
 					total++;
 					if (overlapping.contains(s))
 						totalInOverlappingPart++;
