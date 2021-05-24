@@ -205,7 +205,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	private static final long serialVersionUID = 1L;
 	MutableList<String> annotatorIds;
-	MutableList<Action> open;
+	MutableList<Action> openActions;
 
 	AbstractAction copyAction;
 
@@ -239,7 +239,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		this.jcas = Lists.mutable.withNValues(size, () -> null);
 		this.files = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorIds = Lists.mutable.withNValues(size, () -> null);
-		this.open = Lists.mutable.withNValues(size, () -> null);
+		this.openActions = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
 		this.documentModels = Lists.mutable.withNValues(size, () -> null);
 		this.entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
@@ -508,7 +508,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		c.gridx = 0;
 		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT), c);
 		c.gridx = 1;
-		panel.add(new JButton(open.get(index)), c);
+		panel.add(new JButton(openActions.get(index)), c);
 
 		return panel;
 	}
@@ -689,15 +689,15 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	public void setFile(File file, int index) {
 		this.files.set(index, file);
-		this.open.set(index, new SelectedFileOpenAction(Annotator.app, file));
+		this.openActions.set(index, new SelectedFileOpenAction(Annotator.app, file));
 
 	}
 
 	public void setFiles(Iterable<File> files) {
 		this.files = Lists.mutable.withAll(files);
-		this.open = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
+		this.openActions = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
 		JMenu currentFilesMenu = new JMenu(Annotator.getString(Strings.ACTION_OPEN));
-		this.open.forEach(a -> currentFilesMenu.add(a));
+		this.openActions.forEach(a -> currentFilesMenu.add(a));
 		fileMenu.add(currentFilesMenu, 1);
 	}
 
