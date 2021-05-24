@@ -93,7 +93,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.ca2z;
+		return ExtensionFilters.ca2;
 	}
 
 	@Override

@@ -161,7 +161,7 @@ public class HelpWindow extends JFrame {
 			hw.topicList.setSelectedIndex(0);
 		else
 			for (int i = 0; i < topics.length; i++)
-				if (topics[i].getTitle().equalsIgnoreCase(topic.getKey()))
+				if (topics[i].getKey().equalsIgnoreCase(topic.getKey()))
 					hw.topicList.setSelectedIndex(i);
 		return hw;
 	}

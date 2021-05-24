@@ -78,7 +78,7 @@ public final class DefaultExportPlugin extends AbstractExportPlugin implements D
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.ca2z;
+		return ExtensionFilters.ca2;
 	}
 
 	@Override

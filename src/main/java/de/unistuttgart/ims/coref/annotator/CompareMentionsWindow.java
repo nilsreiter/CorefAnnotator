@@ -2,9 +2,8 @@ package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -31,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -63,6 +63,7 @@ import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.CopyAction;
 import de.unistuttgart.ims.coref.annotator.action.FileImportAction;
 import de.unistuttgart.ims.coref.annotator.action.FileSelectOpenAction;
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SelectedFileOpenAction;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
@@ -71,6 +72,7 @@ import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.BoundLabel;
 import de.unistuttgart.ims.coref.annotator.comp.ColorIcon;
 import de.unistuttgart.ims.coref.annotator.comp.EntityLabel;
+import de.unistuttgart.ims.coref.annotator.comp.SpringUtilities;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModelListener;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.Event;
@@ -151,7 +153,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				JPopupMenu pMenu = new JPopupMenu();
 				int offset = textPane.viewToModel2D(e.getPoint());
 
-				ImmutableSet<Mention> intersectMentions = ism.getIntersection(documentModels.getFirst());
+				ImmutableSet<Mention> intersectMentions = intersectModel.getIntersection(documentModels.getFirst());
 				intersectMentions = intersectMentions
 						.select(m -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m));
 
@@ -165,8 +167,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				for (int i = 0; i < documentModels.size(); i++) {
 					DocumentModel dm = documentModels.get(i);
 
-					RichIterable<Mention> mentions = ism.spanMentionMap.get(dm)
-							.reject((s, m) -> ism.getSpanIntersection().contains(s))
+					RichIterable<Mention> mentions = intersectModel.spanMentionMap.get(dm)
+							.reject((s, m) -> intersectModel.getSpanIntersection().contains(s))
 							.select((s, m) -> UimaUtil.getBegin(m) <= offset && offset <= UimaUtil.getEnd(m))
 							.valuesView();
 					if (!mentions.isEmpty()) {
@@ -205,16 +207,17 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	private static final long serialVersionUID = 1L;
 	MutableList<String> annotatorIds;
-	MutableList<Action> open;
+	MutableList<Action> openActions;
 
 	AbstractAction copyAction;
 
 	MutableList<JCas> jcas;
 	MutableList<File> files;
-	int loadedJCas = 0;
-	int loadedCModels = 0;
+	int numberOfLoadedJCas = 0;
+	int numberOfLoadedDocumentModels = 0;
 	Annotator mainApplication;
-	JPanel mentionsInfoPane;
+	JPanel rSidebar;
+	JLabel modeDescription;
 	JPanel agreementPanel = null;
 
 	MutableList<AnnotatorStatistics> annotatorStats;
@@ -232,14 +235,20 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	int size = 0;
 	Color[] colors;
 	JMenu fileMenu;
-	IntersectModel ism = new IntersectModel();
+	IntersectModel intersectModel;
+	Mode mode;
+	protected SpringLayout rSidebarlayout;
+
+	enum Mode {
+		Span, Span_EntityName
+	}
 
 	public CompareMentionsWindow(Annotator mainApplication, int size) throws UIMAException {
 		this.mainApplication = mainApplication;
 		this.jcas = Lists.mutable.withNValues(size, () -> null);
 		this.files = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorIds = Lists.mutable.withNValues(size, () -> null);
-		this.open = Lists.mutable.withNValues(size, () -> null);
+		this.openActions = Lists.mutable.withNValues(size, () -> null);
 		this.annotatorStats = Lists.mutable.withNValues(size, () -> null);
 		this.documentModels = Lists.mutable.withNValues(size, () -> null);
 		this.entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
@@ -248,6 +257,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		for (int i = 0; i < colors.length; i++) {
 			this.colors[i] = cp.getNextColor();
 		}
+		this.mode = (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
+				Defaults.CFG_COMPARE_BY_ENTITY_NAME) ? Mode.Span_EntityName : Mode.Span);
 		this.size = size;
 		this.initialiseMenu();
 		this.initializeWindow();
@@ -263,16 +274,17 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	}
 
 	protected void drawAllAnnotations() {
-		if (loadedCModels < size)
+		if (numberOfLoadedDocumentModels < size)
 			return;
-		ism.documentModels = documentModels.toImmutable();
-		ism.calculateIntersection();
+		intersectModel = new IntersectModel();
+		intersectModel.documentModels = documentModels.toImmutable();
+		intersectModel.calculateIntersection();
 
-		Span overlapping = ism.getOverlappingPart();
+		Span overlapping = intersectModel.getOverlappingPart();
 
-		ImmutableSet<Spans> intersection = ism.getSpanIntersection();
+		ImmutableSet<Spans> intersection = intersectModel.getSpanIntersection();
 
-		for (Mention m : ism.getIntersection(documentModels.getFirst())) {
+		for (Mention m : intersectModel.getIntersection(documentModels.getFirst())) {
 			highlightManager.underline(m, Color.gray.brighter());
 		}
 		int agreed = intersection.size();
@@ -280,14 +292,13 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		int totalInOverlappingPart = agreed;
 		int index = 0;
 		for (DocumentModel dm : documentModels) {
-			Set<Spans> spans = ism.spanMentionMap.get(dm).keySet();
+			Set<Spans> spans = intersectModel.spanMentionMap.get(dm).keySet();
 			for (Spans s : spans) {
 				if (!intersection.contains(s)) {
-					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
-							Defaults.CFG_COMPARE_BY_ENTITY_NAME))
-						highlightManager.underline(ism.spanMentionMap.get(dm).get(s));
+					if (mode == Mode.Span_EntityName)
+						highlightManager.underline(intersectModel.spanMentionMap.get(dm).get(s));
 					else
-						highlightManager.underline(ism.spanMentionMap.get(dm).get(s), colors[index]);
+						highlightManager.underline(intersectModel.spanMentionMap.get(dm).get(s), colors[index]);
 					total++;
 					if (overlapping.contains(s))
 						totalInOverlappingPart++;
@@ -299,9 +310,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		stats.setTotal(total);
 		stats.setAgreed(agreed);
 		stats.setTotalInOverlappingPart(totalInOverlappingPart);
-		mentionsInfoPane.add(Box.createVerticalGlue());
 
-		mentionsInfoPane.add(getAgreementPanel());
 	}
 
 	protected void ensureSameTexts() throws NotComparableException {
@@ -355,77 +364,47 @@ public class CompareMentionsWindow extends AbstractTextWindow
 	protected JPanel getAgreementPanel() {
 		if (agreementPanel == null) {
 			JPanel panel = new JPanel();
+			SpringLayout layout = new SpringLayout();
+			panel.setLayout(layout);
 
 			Border border = BorderFactory.createTitledBorder(Annotator.getString(Strings.STAT_AGR_TITLE));
 			panel.setBorder(border);
-			panel.setPreferredSize(new Dimension(200, 100));
-			panel.setMinimumSize(new Dimension(200, 100));
-			panel.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			c.fill = GridBagConstraints.NONE;
-			c.anchor = GridBagConstraints.NORTHWEST;
-			c.weighty = 0.1;
-			c.weightx = 0.1;
 
 			JLabel desc;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_TOTAL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_TOTAL_TOOLTIP));
-			c.gridy = 0;
-			c.gridx = 0;
-			c.gridwidth = 2;
-			panel.add(desc, c);
+			panel.add(desc);
 			JLabel valueLabel = new BoundLabel(stats, "total", o -> o.toString(), stats.total());
-			c.gridx = 2;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			panel.add(valueLabel, c);
 
-			c.gridy++;
-			c.gridx = 0;
-			c.gridwidth = 2;
+			panel.add(valueLabel);
+
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_TOOLTIP));
-			panel.add(desc, c);
-			c.gridx = 2;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()), c);
+			panel.add(desc);
+			panel.add(new BoundLabel(stats, "agreed", o -> String.format("%1$,3d", o), stats.getAgreed()));
 
-			c.gridy++;
-			c.gridx = 0;
-			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_OVERALL_TOOLTIP));
-			panel.add(desc, c);
+			panel.add(desc);
 			JLabel percTotalLabel = new JLabel(String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.total),
 					SwingConstants.RIGHT);
-			c.gridx = 2;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			panel.add(percTotalLabel, c);
+			panel.add(percTotalLabel);
 
-			c.gridy++;
-			c.gridx = 0;
-			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_PARALLEL_TOOLTIP));
-			panel.add(desc, c);
+			panel.add(desc);
 			JLabel percOvrLabel = new JLabel(
 					String.format("%1$3.1f%%", 100 * stats.agreed / (double) stats.totalInOverlappingPart),
 					SwingConstants.RIGHT);
-			c.gridx = 2;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			panel.add(percOvrLabel, c);
+			panel.add(percOvrLabel);
 
-			c.gridy++;
-			c.gridx = 0;
-			c.gridwidth = 2;
 			desc = new JLabel(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED) + ":", SwingConstants.RIGHT);
 			desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_AGREED_SELECTED_TOOLTIP));
-			panel.add(desc, c);
+			panel.add(desc);
 			JLabel selectedAgreementLabel = new BoundLabel(stats, "agreementInSpan",
 					o -> String.format("%1$3.1f%%", o));
 			selectedAgreementLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-			c.gridx = 2;
-			c.gridwidth = GridBagConstraints.REMAINDER;
-			panel.add(selectedAgreementLabel, c);
+			panel.add(selectedAgreementLabel);
 
 			stats.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -444,6 +423,19 @@ public class CompareMentionsWindow extends AbstractTextWindow
 				}
 
 			});
+
+			HelpAction ha = new HelpAction(HelpWindow.Topic.COMPARE);
+			ha.putValue(Action.NAME, Annotator.getString(Strings.COMPARE_SHOW_AGREEMENT_HELP));
+			JButton helpButton = new JButton(ha);
+			panel.add(helpButton);
+
+			// empty label in the bottom right
+			panel.add(new JLabel());
+
+			SpringUtilities.makeCompactGrid(panel, 6, 2, // rows, cols
+					5, 5, // initialX, initialY
+					15, 3);// xPad, yPad
+
 			agreementPanel = panel;
 
 		}
@@ -455,60 +447,45 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		AnnotatorStatistics stats = annotatorStats.get(index);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
 		Border border = BorderFactory.createTitledBorder(annotatorIds.get(index));
 		panel.setBorder(border);
-		panel.setPreferredSize(new Dimension(200, 100));
-		panel.setMinimumSize(new Dimension(200, 100));
+		// panel.setPreferredSize(new Dimension(200, 100));
+		// panel.setMinimumSize(new Dimension(200, 100));
 		JLabel desc;
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridy = 0;
-		c.gridx = 0;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.anchor = GridBagConstraints.NORTHWEST;
 		// color
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_COLOR) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_COLOR_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(new ColorIcon(30, 10, colors[index]), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// number of mentions
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_MENTIONS) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_MENTIONS_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(String.valueOf(stats.mentions), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// number of entities
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_ENTITIES) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_ENTITIES_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
-		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT), c);
+		panel.add(desc);
+		panel.add(new JLabel(String.valueOf(stats.entities), SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
 		// annotation position
 		desc = new JLabel(Annotator.getString(Strings.STAT_KEY_POSITION) + ":", SwingConstants.RIGHT);
 		desc.setToolTipText(Annotator.getString(Strings.STAT_KEY_POSITION_TOOLTIP));
-		panel.add(desc, c);
-		c.gridx = 1;
+		panel.add(desc);
 		panel.add(new JLabel(
 				String.format("%1$,3d (%2$3.1f%%)", stats.lastMention, 100 * stats.lastMention / (double) stats.length),
-				SwingConstants.RIGHT), c);
+				SwingConstants.RIGHT));
 
-		c.gridy++;
-		c.gridx = 0;
-		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT), c);
-		c.gridx = 1;
-		panel.add(new JButton(open.get(index)), c);
+		panel.add(new JLabel(Annotator.getString(Strings.ACTION_OPEN) + ":", SwingConstants.RIGHT));
+		panel.add(new JButton(openActions.get(index)));
+
+		// layout
+		SpringUtilities.makeCompactGrid(panel, 5, 2, 5, 5, 15, 3);
 
 		return panel;
 	}
@@ -552,8 +529,6 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 		StyleManager.styleCharacter(textPane.getStyledDocument(), StyleManager.getDefaultCharacterStyle());
 		StyleManager.styleParagraph(textPane.getStyledDocument(), StyleManager.getDefaultParagraphStyle());
-
-		drawAllAnnotations();
 	}
 
 	@Override
@@ -574,12 +549,28 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		textPane.addCaretListener(new TextCaretListener());
 		textPane.addMouseListener(new TextMouseListener());
 
-		mentionsInfoPane = new JPanel();
-		mentionsInfoPane.setLayout(new BoxLayout(mentionsInfoPane, BoxLayout.Y_AXIS));
-		mentionsInfoPane.setPreferredSize(new Dimension(210, 750));
-		mentionsInfoPane.setMaximumSize(new Dimension(250, 750));
-		mentionsInfoPane.add(Box.createVerticalGlue());
-		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, mentionsInfoPane);
+		modeDescription = new JLabel();
+		switch (mode) {
+		case Span_EntityName:
+			modeDescription.setText(Annotator.getString(Strings.COMPARE_MODE_DESCRIPTION_SPAN_ENTITYNAME));
+			break;
+		default:
+			modeDescription.setText(Annotator.getString(Strings.COMPARE_MODE_DESCRIPTION_SPAN));
+			break;
+		}
+		rSidebarlayout = new SpringLayout();
+
+		rSidebar = new JPanel();
+		rSidebar.setLayout(rSidebarlayout);
+		rSidebar.setPreferredSize(new Dimension(210, 750));
+		rSidebar.setMaximumSize(new Dimension(250, 750));
+		rSidebar.add(modeDescription);
+
+		rSidebarlayout.putConstraint(SpringLayout.NORTH, modeDescription, 5, SpringLayout.NORTH, rSidebar);
+		rSidebarlayout.putConstraint(SpringLayout.WEST, modeDescription, 5, SpringLayout.WEST, rSidebar);
+		rSidebarlayout.putConstraint(SpringLayout.EAST, modeDescription, -5, SpringLayout.EAST, rSidebar);
+
+		JSplitPane mentionsPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textPanel, rSidebar);
 		mentionsPane.setDividerLocation(500);
 
 		// tabbedPane.add("Mentions", mentionsPane);
@@ -590,8 +581,8 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		pack();
 	}
 
-	private void finishLoading() {
-		if (loadedCModels >= files.size()) {
+	protected void finishLoading() {
+		if (numberOfLoadedDocumentModels >= files.size()) {
 			// Style
 			StylePlugin sPlugin = null;
 			try {
@@ -620,13 +611,23 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		}
 	}
 
-	public void setCoreferenceModel(DocumentModel cm, int index) {
+	public void setDocumentModel(DocumentModel cm, int index) {
 		documentModels.set(index, cm);
 		if (tableOfContents != null)
 			tableOfContents.setModel(cm.getSegmentModel());
-		loadedCModels++;
+		numberOfLoadedDocumentModels++;
 		finishLoading();
 		drawAllAnnotations();
+
+		getAgreementPanel();
+		rSidebar.add(agreementPanel);
+		rSidebarlayout.putConstraint(SpringLayout.SOUTH, agreementPanel, -5, SpringLayout.SOUTH, rSidebar);
+		rSidebarlayout.putConstraint(SpringLayout.WEST, agreementPanel, 5, SpringLayout.WEST, rSidebar);
+		rSidebarlayout.putConstraint(SpringLayout.EAST, agreementPanel, -5, SpringLayout.EAST, rSidebar);
+		// rSidebarlayout.putConstraint(SpringLayout.NORTH, agreementPanel, -50,
+		// SpringLayout.SOUTH,
+		// rSidebar.getComponent(rSidebar.getComponentCount() - 1));
+		rSidebar.validate();
 	}
 
 	public void setJCas(JCas jcas, String annotatorId, int index) throws NotComparableException {
@@ -641,13 +642,17 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		this.annotatorStats.get(index).analyze(jcas, m -> {
 			entityMentionMaps.get(index).put(m.getEntity(), m);
 		});
-		loadedJCas++;
+		numberOfLoadedJCas++;
 		if (!textIsSet)
 			initialiseText(jcas);
-		mentionsInfoPane.add(getAnnotatorPanel(index));
-		// mentionsInfoPane.add(getAgreementPanel(), -1);
+		JPanel annotatorPanel = getAnnotatorPanel(index);
+		Component previousComponent = rSidebar.getComponent(rSidebar.getComponentCount() - 1);
+		rSidebar.add(annotatorPanel);
+		rSidebarlayout.putConstraint(SpringLayout.NORTH, annotatorPanel, 5, SpringLayout.SOUTH, previousComponent);
+		rSidebarlayout.putConstraint(SpringLayout.EAST, annotatorPanel, -5, SpringLayout.EAST, rSidebar);
+		rSidebarlayout.putConstraint(SpringLayout.WEST, annotatorPanel, 5, SpringLayout.WEST, rSidebar);
 
-		DocumentModelLoader dml = new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas);
+		DocumentModelLoader dml = new DocumentModelLoader(cm -> setDocumentModel(cm, index), jcas);
 		dml.setProfile(profile);
 		dml.execute();
 		revalidate();
@@ -689,15 +694,15 @@ public class CompareMentionsWindow extends AbstractTextWindow
 
 	public void setFile(File file, int index) {
 		this.files.set(index, file);
-		this.open.set(index, new SelectedFileOpenAction(Annotator.app, file));
+		this.openActions.set(index, new SelectedFileOpenAction(Annotator.app, file));
 
 	}
 
 	public void setFiles(Iterable<File> files) {
 		this.files = Lists.mutable.withAll(files);
-		this.open = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
+		this.openActions = this.files.collect(f -> new SelectedFileOpenAction(Annotator.app, f));
 		JMenu currentFilesMenu = new JMenu(Annotator.getString(Strings.ACTION_OPEN));
-		this.open.forEach(a -> currentFilesMenu.add(a));
+		this.openActions.forEach(a -> currentFilesMenu.add(a));
 		fileMenu.add(currentFilesMenu, 1);
 	}
 
@@ -706,6 +711,23 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		if (evt.getKey() == Constants.CFG_IGNORE_SINGLETONS_WHEN_COMPARING) {
 			highlightManager.hilit.removeAllHighlights();
 			drawAllAnnotations();
+		} else if (evt.getKey() == Constants.CFG_COMPARE_BY_ENTITY_NAME) {
+			this.mode = (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
+					Defaults.CFG_COMPARE_BY_ENTITY_NAME) ? Mode.Span_EntityName : Mode.Span);
+
+			switch (mode) {
+			case Span_EntityName:
+				modeDescription.setText(Annotator.getString(Strings.COMPARE_MODE_DESCRIPTION_SPAN_ENTITYNAME));
+				break;
+			default:
+				modeDescription.setText(Annotator.getString(Strings.COMPARE_MODE_DESCRIPTION_SPAN));
+				break;
+			}
+
+			entityMentionMaps = Lists.mutable.withNValues(size, () -> Multimaps.mutable.set.empty());
+			highlightManager.hilit.removeAllHighlights();
+			drawAllAnnotations();
+
 		} else
 			super.preferenceChange(evt);
 	}
@@ -829,7 +851,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		}
 	}
 
-	public static class IntersectModel {
+	public class IntersectModel {
 		ImmutableList<DocumentModel> documentModels;
 		MutableSet<Spans> spanIntersection = null;
 		MutableMap<DocumentModel, MutableMap<Spans, Mention>> spanMentionMap = Maps.mutable.empty();
@@ -849,8 +871,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 							&& dm.getCoreferenceModel().getSingletons().contains(m.getEntity()))
 						continue;
 					Spans span;
-					if (Annotator.app.getPreferences().getBoolean(Constants.CFG_COMPARE_BY_ENTITY_NAME,
-							Defaults.CFG_COMPARE_BY_ENTITY_NAME))
+					if (mode == Mode.Span_EntityName)
 						span = new ExtendedSpan(m);
 					else
 						span = new Spans(m);
