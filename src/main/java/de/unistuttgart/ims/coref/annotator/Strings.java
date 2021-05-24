@@ -148,6 +148,8 @@ public class Strings {
 	public static final String ANALZYER_ACTIONS_ = "analyzer.actions.";
 	public static final String ANALZYER_ENTITIES = "analyzer.entities";
 	public static final String COMPARE_CONTEXTMENU_INTERSECTION = "compare.contextmenu.intersection";
+	public static final String COMPARE_MODE_DESCRIPTION_SPAN = "compare.mode_description.span";
+	public static final String COMPARE_MODE_DESCRIPTION_SPAN_ENTITYNAME = "compare.mode_description.span_entityname";
 	public static final String COMPARE_NOT_COMPARABLE = "compare.not_comparable";
 	public static final String COMPARE_SHOW_AGREEMENT_HELP = "compare.show_agreement_help";
 	public static final String DIALOG_ANNOTATOR_LABEL = "dialog.annotator_label";
