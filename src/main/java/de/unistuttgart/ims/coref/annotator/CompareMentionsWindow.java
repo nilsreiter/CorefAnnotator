@@ -620,7 +620,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		}
 	}
 
-	public void setCoreferenceModel(DocumentModel cm, int index) {
+	public void setDocumentModel(DocumentModel cm, int index) {
 		documentModels.set(index, cm);
 		if (tableOfContents != null)
 			tableOfContents.setModel(cm.getSegmentModel());
@@ -647,7 +647,7 @@ public class CompareMentionsWindow extends AbstractTextWindow
 		mentionsInfoPane.add(getAnnotatorPanel(index));
 		// mentionsInfoPane.add(getAgreementPanel(), -1);
 
-		DocumentModelLoader dml = new DocumentModelLoader(cm -> setCoreferenceModel(cm, index), jcas);
+		DocumentModelLoader dml = new DocumentModelLoader(cm -> setDocumentModel(cm, index), jcas);
 		dml.setProfile(profile);
 		dml.execute();
 		revalidate();
