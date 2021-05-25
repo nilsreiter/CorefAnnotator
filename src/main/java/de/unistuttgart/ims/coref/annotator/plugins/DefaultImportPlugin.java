@@ -18,11 +18,11 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.dkpro.core.io.xmi.XmiReader;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.xml.sax.SAXException;
 
-import de.tudarmstadt.ukp.dkpro.core.io.xmi.XmiReader;
 import de.unistuttgart.ims.coref.annotator.ExtensionFilters;
 import de.unistuttgart.ims.coref.annotator.FileFilters;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -62,7 +62,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.xmi_gz;
+		return FileFilters.ca2;
 	}
 
 	@Override
@@ -74,10 +74,10 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 	public JCas getJCas(File f) throws IOException, UIMAException {
 		InputStream is = null;
 		try {
-			if (f.getName().endsWith(".xmi")) {
-				is = new FileInputStream(f);
-			} else if (f.getName().endsWith(".xmi.gz")) {
+			if (f.getName().endsWith(getSuffix())) {
 				is = new GZIPInputStream(new FileInputStream(f));
+			} else if (f.getName().endsWith(".ca2")) {
+				is = new FileInputStream(f);
 			}
 
 			JCas jcas = JCasFactory.createJCas();
@@ -93,7 +93,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public ExtensionFilter getExtensionFilter() {
-		return ExtensionFilters.xmi_gz;
+		return ExtensionFilters.ca2;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public String getSuffix() {
-		return ".xmi";
+		return ".ca2z";
 	}
 
 }

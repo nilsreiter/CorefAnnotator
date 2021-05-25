@@ -11,11 +11,10 @@ import javax.swing.tree.TreeNode;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.Tooltipable;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Tooltipable {
 
@@ -107,27 +106,30 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	@Override
 	public String getToolTip() {
-		if (getUserObject() instanceof EntityGroup) {
-			StringBuilder b = new StringBuilder();
-			EntityGroup entityGroup = (EntityGroup) getUserObject();
-			if (entityGroup.getMembers().size() > 0) {
-				if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
-					b.append(entityGroup.getMembers(0).getLabel());
-				else {
-					System.out.println();
+		if (getUserObject() instanceof Entity) {
+			if (UimaUtil.isGroup(getUserObject())) {
+				StringBuilder b = new StringBuilder();
+				Entity entityGroup = (Entity) getUserObject();
+				if (entityGroup.getMembers().size() > 0) {
+					if (entityGroup.getMembers(0) != null && entityGroup.getMembers(0).getLabel() != null)
+						b.append(entityGroup.getMembers(0).getLabel());
+					else {
+						System.out.println();
+					}
+					for (int i = 1; i < entityGroup.getMembers().size(); i++) {
+						b.append(", ");
+						Entity member = entityGroup.getMembers(i);
+						if (member != null)
+							b.append(member.getLabel());
+					}
+					return b.toString();
+				} else {
+					return null;
 				}
-				for (int i = 1; i < entityGroup.getMembers().size(); i++) {
-					b.append(", ");
-					Entity member = entityGroup.getMembers(i);
-					if (member != null)
-						b.append(member.getLabel());
-				}
-				return b.toString();
 			} else {
-				return null;
+				return getEntity().getLabel();
 			}
-		} else if (getUserObject() instanceof Entity) {
-			return getEntity().getLabel();
+
 		}
 		return null;
 	}
@@ -170,10 +172,6 @@ public class CATreeNode implements MutableTreeNode, Iterable<CATreeNode>, Toolti
 
 	public boolean isMention() {
 		return userObject instanceof Mention;
-	}
-
-	public boolean isMentionPart() {
-		return userObject instanceof DetachedMentionPart;
 	}
 
 	/**

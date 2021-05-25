@@ -10,10 +10,9 @@ import javax.swing.event.ListSelectionListener;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag;
 
 public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow> implements ListSelectionListener {
@@ -51,19 +50,6 @@ public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		if (!e.getValueIsAdjusting()) {
-			int row = table.getSelectedRow();
-			try {
-				String key = (String) table.getModel().getValueAt(row, 1);
-				setEnabled(!(key.equals(Constants.ENTITY_FLAG_GENERIC) || key.equals(Constants.ENTITY_FLAG_HIDDEN)
-						|| key.equals(Constants.MENTION_FLAG_AMBIGUOUS) || key.equals(Constants.MENTION_FLAG_DIFFICULT)
-						|| key.equals(Constants.MENTION_FLAG_NON_NOMINAL)));
-			} catch (IndexOutOfBoundsException ex) {
-				setEnabled(false);
-			}
-
-		}
-
 	}
 
 }

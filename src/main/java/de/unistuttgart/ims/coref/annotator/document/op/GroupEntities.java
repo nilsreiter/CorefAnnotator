@@ -3,12 +3,11 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 
 public class GroupEntities implements CoreferenceModelOperation {
 	ImmutableList<Entity> entities;
-	EntityGroup entityGroup;
+	Entity entityGroup;
 
 	public GroupEntities(Entity... entities) {
 		this.entities = Lists.immutable.of(entities);
@@ -22,7 +21,7 @@ public class GroupEntities implements CoreferenceModelOperation {
 		return entities;
 	}
 
-	public EntityGroup getEntityGroup() {
+	public Entity getEntityGroup() {
 		return entityGroup;
 	}
 
@@ -30,7 +29,7 @@ public class GroupEntities implements CoreferenceModelOperation {
 		this.entities = entities;
 	}
 
-	public void setEntityGroup(EntityGroup entityGroup) {
+	public void setEntityGroup(Entity entityGroup) {
 		this.entityGroup = entityGroup;
 	}
 

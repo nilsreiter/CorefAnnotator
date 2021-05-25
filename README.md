@@ -11,15 +11,16 @@ This is an annotation tool for coreference. It's built on top of [Apache's UIMA]
 ## Features
 
 - Supports annotation of long texts with many discourse entities
+- Mentions can be non-continuous
 - Intuitive drag and drop operations
 - Fully operable by keyboard for fast annotation
 - Annotation texts can be formatted
 - Search function to navigate in long texts
 - Localisable in other languages (currently: English and German)
-- Import and export in a few file formats
+- Import and export in a few file formats, including Excel for easy analysis
 - Automatically generated candidates
 - Search terms (including regular expressions) can be annotated en bloc
-
+- Visualization and some simple quantitative analysis of the annotations
 
 ## Requirements and Installation
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profile xmlns="https://nilsreiter.de/code/corefannotator-1.12.0/profile" name="NER">
+<forbidden>
+	<!-- flags -->
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.AddFlag" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.DeleteFlag" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag" />
+
+	<!-- entities -->
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntities" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveSingletons" />
+	
+	<!-- entity groups -->
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.AddEntityToEntityGroup" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.RemoveEntitiesFromEntityGroup" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.GroupEntities" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.MergeEntities" />
+
+	<!-- misc -->
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.RenameAllEntities" />
+	<operation class="de.unistuttgart.ims.coref.annotator.document.op.Clear" />
+</forbidden>
+<entities>
+    <entity label="PER" color="red" shortcut="p" flags="" />
+    <entity label="LOC" color="green" shortcut="l" flags="" />
+    <entity label="ORG" color="blue" shortcut="o" flags="" />
+    <entity label="OTH" color="yellow" shortcut="x" flags="" />
+</entities>
+<flags>
+	<flag label="deriv" uuid="deriv" icon="MDI_FLAG" targetClass="Mention" />
+    <flag label="part" uuid="part" icon="MDI_FLAG" targetClass="Mention" />
+    <flag label="virtual" uuid="virtual" icon="MDI_FLAG" targetClass="Mention" />
+</flags>
+<preferences>
+	<!-- Default setting is sort entities alphabetically -->
+	<preference key="CFG_ENTITY_SORT_ORDER" value="Alphabet" />
+	<!-- Default setting is sort entities alphabetically -->
+	<preference key="CFG_ENTITY_SORT_DESCENDING" value="false" />
+	<!-- The entity tree is kept in alphabetical order -->
+	<preference key="CFG_KEEP_TREE_SORTED" value="true" />
+	<!--  Flags for coreference should not be created -->
+	<preference key="CFG_CREATE_DEFAULT_FLAGS" value="false" />
+</preferences>
+<guidelines url="https://www.linguistik.hu-berlin.de/de/institut/professuren/korpuslinguistik/forschung/nosta-d/nosta-d-ner-1.5" />
+</profile>

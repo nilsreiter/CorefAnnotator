@@ -4,13 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -35,13 +33,11 @@ import de.unistuttgart.ims.coref.annotator.action.AddFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.CloseAction;
 import de.unistuttgart.ims.coref.annotator.action.DeleteFlagAction;
 import de.unistuttgart.ims.coref.annotator.action.UndoAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.comp.DefaultTableHeaderCellRenderer;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagTableModel;
-import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
 
 public class FlagEditor extends AbstractWindow {
 
@@ -72,7 +68,6 @@ public class FlagEditor extends AbstractWindow {
 		JComboBox<Class<?>> combobox = new JComboBox<Class<?>>();
 		combobox.addItem(Mention.class);
 		combobox.addItem(Entity.class);
-		combobox.addItem(DetachedMentionPart.class);
 		combobox.setRenderer(new TargetClassListCellRenderer());
 
 		JComboBox<Ikon> iconBox = new JComboBox<Ikon>();
@@ -104,13 +99,6 @@ public class FlagEditor extends AbstractWindow {
 		flagMenu.add(new JMenuItem(addEntityFlagAction));
 		flagMenu.add(new JMenuItem(addMentionFlagAction));
 		flagMenu.add(new JMenuItem(deleteFlagAction));
-		flagMenu.addSeparator();
-		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_1,
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1),
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_1_TOOLTIP))));
-		flagMenu.add(new JMenuItem(new CreateFlagsFromCollections(Constants.FLAG_COLLECTION_2,
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2),
-				Annotator.getString(Strings.FLAG_EDITOR_FLAG_COLLECTION_2_TOOLTIP))));
 
 		JMenu helpMenu = new JMenu(Annotator.getString(Strings.MENU_HELP));
 		helpMenu.add(Annotator.app.helpAction);
@@ -224,7 +212,7 @@ public class FlagEditor extends AbstractWindow {
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			if (value != null)
-				setIcon(FontIcon.of((Ikon) value));
+				setIcon(FontIcon.of((Ikon) value, Constants.UI_ICON_SIZE_IN_TREE));
 
 			return this;
 		}
@@ -239,7 +227,7 @@ public class FlagEditor extends AbstractWindow {
 				boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value != null)
-				setIcon(FontIcon.of((Ikon) value));
+				setIcon(FontIcon.of((Ikon) value, Constants.UI_ICON_SIZE_IN_TREE));
 
 			return this;
 		}
@@ -294,23 +282,8 @@ public class FlagEditor extends AbstractWindow {
 
 	}
 
-	class CreateFlagsFromCollections extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		AddFlag[] flagCollection;
-
-		public CreateFlagsFromCollections(AddFlag[] flagCollection, String label, String tooltip) {
-			super(label, FontIcon.of(MaterialDesign.MDI_FOLDER));
-			this.flagCollection = flagCollection;
-			putValue(Action.SHORT_DESCRIPTION, tooltip);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			for (AddFlag af : flagCollection) {
-				documentModel.edit(af);
-			}
-		}
-
+	@Override
+	public DocumentModel getDocumentModel() {
+		return documentModel;
 	}
 }

@@ -1,10 +1,12 @@
 package de.unistuttgart.ims.coref.annotator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Enumeration;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
@@ -23,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -36,8 +40,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationTreeNode;
 import org.apache.uima.jcas.JCas;
@@ -50,16 +54,18 @@ import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import de.unistuttgart.ims.coref.annotator.action.SelectNextMentionAction;
+import de.unistuttgart.ims.coref.annotator.action.SelectPreviousMentionAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontFamilySelectAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeDecreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewFontSizeIncreaseAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineNumberStyle;
 import de.unistuttgart.ims.coref.annotator.action.ViewSetLineSpacingAction;
 import de.unistuttgart.ims.coref.annotator.action.ViewStyleSelectAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.CommentAnchor;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.CommentAnchor;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.comp.FixedTextLineNumber;
 import de.unistuttgart.ims.coref.annotator.comp.TextLineNumber;
 import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel;
@@ -117,11 +123,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				setText(StringUtils.abbreviate(atn.get().getLabel(), 20));
 			}
 			if (leaf)
-				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS));
+				setIcon(FontIcon.of(MaterialDesign.MDI_MINUS, Constants.UI_ICON_SIZE_IN_TREE));
 			else if (expanded)
-				setIcon(FontIcon.of(FontAwesome.FOLDER_OPEN_O));
+				setIcon(FontIcon.of(FontAwesome.FOLDER_OPEN_O, Constants.UI_ICON_SIZE_IN_TREE));
 			else
-				setIcon(FontIcon.of(FontAwesome.FOLDER_O));
+				setIcon(FontIcon.of(FontAwesome.FOLDER_O, Constants.UI_ICON_SIZE_IN_TREE));
 			return this;
 		}
 
@@ -174,6 +180,17 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		return getDocumentModel().getJcas();
 	}
 
+	public void annotationSelected(Annotation m) {
+		if (m != null) {
+			textPane.setSelectionStart(m.getBegin());
+			textPane.setSelectionEnd(m.getEnd());
+			// textPane.setCaretPosition(m.getEnd());
+			textPane.getCaret().setSelectionVisible(true);
+		} else {
+			textPane.getCaret().setSelectionVisible(false);
+		}
+	}
+
 	@Override
 	public void entityEvent(FeatureStructureEvent event) {
 		Event.Type eventType = event.getType();
@@ -206,8 +223,11 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		Iterator<FeatureStructure> iter = event.iterator(1);
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
-			if (fs instanceof Mention || fs instanceof DetachedMentionPart) {
-				highlightManager.underline((Annotation) fs);
+			if (fs instanceof MentionSurface) {
+				highlightManager.underline((Annotation) fs,
+						new Color(((Mention) event.getArgument(0)).getEntity().getColor()));
+			} else if (fs instanceof Mention) {
+				highlightManager.underline((Mention) fs);
 			} else if (fs instanceof CommentAnchor) {
 				highlightManager.highlight((Annotation) fs);
 			}
@@ -219,9 +239,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		while (iter.hasNext()) {
 			FeatureStructure fs = iter.next();
 			if (fs instanceof Mention) {
-				if (((Mention) fs).getDiscontinuous() != null)
-					highlightManager.unUnderline(((Mention) fs).getDiscontinuous());
-				highlightManager.unUnderline((Annotation) fs);
+
+				highlightManager.unUnderline((Mention) fs);
 			} else if (fs instanceof Annotation)
 				highlightManager.unUnderline((Annotation) fs);
 
@@ -231,10 +250,13 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventUpdate(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
-					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
+				Mention m = (Mention) fs;
+				if (((Mention) fs).getEntity().getHidden())
+					highlightManager.unUnderline(m);
+				else {
+					highlightManager.unUnderline(m);
+					highlightManager.underline(m);
+				}
 			}
 		}
 	}
@@ -242,10 +264,8 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 	protected void entityEventMove(FeatureStructureEvent event) {
 		for (FeatureStructure fs : event) {
 			if (fs instanceof Mention) {
-				if (Util.isX(((Mention) fs).getEntity(), Constants.ENTITY_FLAG_HIDDEN))
+				if (((Mention) fs).getEntity().getHidden())
 					highlightManager.unUnderline((Annotation) fs);
-				else
-					highlightManager.underline((Annotation) fs);
 			}
 		}
 	}
@@ -262,26 +282,21 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		CoreferenceModel cm = (CoreferenceModel) event.getSource();
 		for (Mention m : cm.getMentions()) {
 			highlightManager.underline(m);
-			if (m.getDiscontinuous() != null)
-				highlightManager.underline(m.getDiscontinuous());
 		}
 	}
 
 	public <T extends Annotation> MutableSet<T> getSelectedAnnotations(Class<T> clazz) {
-		try {
-			MutableSet<T> annotations = getTouchedAnnotations(clazz)
-					.select(a -> a.getBegin() == getTextPane().getSelectionStart()
-							&& a.getEnd() == getTextPane().getSelectionEnd());
-			return annotations.selectInstancesOf(clazz);
-		} catch (NullPointerException e) {
-			return Sets.mutable.empty();
-		}
+		MutableSet<Mention> annotations = getDocumentModel().getCoreferenceModel()
+				.getMentions(getTextPane().getSelectionStart())
+				.select(a -> UimaUtil.getBegin(a) == getTextPane().getSelectionStart()
+						&& UimaUtil.getEnd(a) == getTextPane().getSelectionEnd());
+		return annotations.selectInstancesOf(clazz);
 	}
 
 	public <T extends Annotation> MutableSet<T> getTouchedAnnotations(Class<T> clazz) {
 		try {
 			MutableSet<Annotation> annotations = getDocumentModel().getCoreferenceModel()
-					.getMentions(getTextPane().getSelectionStart());
+					.getMentionSurfaces(getTextPane().getSelectionStart());
 			return annotations.selectInstancesOf(clazz);
 		} catch (NullPointerException e) {
 			return Sets.mutable.empty();
@@ -292,6 +307,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		return textPane;
 	}
 
+	@Override
 	public DocumentModel getDocumentModel() {
 		if (documentModels == null || documentModels.isEmpty())
 			return null;
@@ -309,12 +325,21 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		case FIXED:
 			tln = new FixedTextLineNumber(this, 5);
 			pcs.addPropertyChangeListener(tln);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, true);
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, false);
 			break;
 		case DYNAMIC:
 			tln = new TextLineNumber(this, 5);
 			pcs.addPropertyChangeListener(tln);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, true);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, false);
 			break;
 		default:
+			lineNumberStyleDynamic.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleFixed.putValue(Action.SELECTED_KEY, false);
+			lineNumberStyleNone.putValue(Action.SELECTED_KEY, true);
 			tln = null;
 		}
 		textScrollPane.setRowHeaderView(tln);
@@ -430,7 +455,7 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 								styles.get(style));
 						getProgressBar().setValue(getProgressBar().getValue() + 10);
 					}
-				Util.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
+				UimaUtil.getMeta(getDocumentModel().getJcas()).setStylePlugin(sv.getClass().getName());
 				currentStyle = sv;
 				styleMenuItem.get(sv).setSelected(true);
 				getMiscLabel().setText(Annotator.getString(Strings.STATUS_STYLE) + ": " + sv.getName());
@@ -500,6 +525,15 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 		textPane = new JTextPane();
 		textPane.setDragEnabled(true);
 		textPane.setEditable(false);
+		textPane.getActionMap().put(SelectNextMentionAction.class, new SelectNextMentionAction(this));
+		textPane.getActionMap().put(SelectPreviousMentionAction.class, new SelectPreviousMentionAction(this));
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK),
+				SelectNextMentionAction.class);
+		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK),
+				SelectPreviousMentionAction.class);
+
+		getMiscLabel().setText("Style: " + Annotator.app.getPluginManager().getDefaultStylePlugin().getName());
+		getMiscLabel().setToolTipText(Annotator.app.getPluginManager().getDefaultStylePlugin().getDescription());
 
 		textScrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -540,6 +574,9 @@ public abstract class AbstractTextWindow extends AbstractWindow implements HasTe
 				textPanel.revalidate();
 				textPanel.repaint();
 			}
+		} else if (evt.getKey().equalsIgnoreCase(Constants.CFG_UNDERLINE_SINGLETONS_IN_GRAY)) {
+			highlightManager.clearAllAnnotations();
+			entityEventInit(Event.get(getDocumentModel().getCoreferenceModel(), Event.Type.Init));
 		} else {
 			super.preferenceChange(evt);
 		}

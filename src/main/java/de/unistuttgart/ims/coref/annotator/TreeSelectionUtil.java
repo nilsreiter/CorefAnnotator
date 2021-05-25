@@ -11,10 +11,9 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class TreeSelectionUtil {
 	TreeSelectionEvent currentEvent = null;
@@ -72,16 +71,12 @@ public class TreeSelectionUtil {
 		return featureStructures.allSatisfy(f -> f instanceof Entity);
 	}
 
-	public boolean isDetachedMentionPart() {
-		return featureStructures.allSatisfy(f -> f instanceof DetachedMentionPart);
-	}
-
 	public boolean isMention() {
 		return featureStructures.allSatisfy(f -> f instanceof Mention);
 	}
 
 	public boolean isEntityGroup() {
-		return featureStructures.allSatisfy(f -> f instanceof EntityGroup);
+		return featureStructures.allSatisfy(f -> UimaUtil.isGroup(f));
 	}
 
 	public boolean isLeaf() {

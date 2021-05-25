@@ -1,7 +1,8 @@
 package de.unistuttgart.ims.coref.annotator.plugins;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
@@ -11,6 +12,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -21,16 +23,26 @@ import de.unistuttgart.ims.coref.annotator.Strings;
 public class PluginConfigurationDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
+	JPanel optionPanel;
+	GridBagConstraints optionPanelConstraints;
 
 	public PluginConfigurationDialog(Window parent, ConfigurableExportPlugin plugin,
 			Consumer<ConfigurableExportPlugin> callback, Iterable<PluginOption> options) {
 		super(parent, Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_TITLE_, plugin.getName()));
 
-		JPanel optionPanel = new JPanel(new GridLayout(0, 2));
+		optionPanel = new JPanel(new GridBagLayout());
+		optionPanelConstraints = new GridBagConstraints();
+		optionPanelConstraints.anchor = GridBagConstraints.WEST;
 
+		optionPanelConstraints.gridy = 0;
 		for (PluginOption option : options) {
-			optionPanel.add(option.getLabel());
-			optionPanel.add(option.getComponent());
+			optionPanelConstraints.gridx = 0;
+			optionPanelConstraints.weightx = 2;
+			optionPanel.add(option.getLabel(), optionPanelConstraints);
+			optionPanelConstraints.gridx = 1;
+			optionPanelConstraints.weightx = 1;
+			optionPanel.add(option.getComponent(), optionPanelConstraints);
+			optionPanelConstraints.gridy++;
 		}
 
 		optionPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -81,5 +93,15 @@ public class PluginConfigurationDialog extends JDialog {
 		setLocationRelativeTo(parent);
 		SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	}
+
+	public void setDescription(String string) {
+		optionPanelConstraints.ipady = 10;
+		optionPanelConstraints.gridx = 0;
+		optionPanelConstraints.gridwidth = 2;
+		optionPanel.add(new JLabel(string), optionPanelConstraints);
+
+		pack();
+		validate();
 	}
 }

@@ -4,10 +4,6 @@ import java.util.Random;
 
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.document.op.AddFlag;
-
 public class Constants {
 	/**
 	 * Annotator name or id
@@ -47,6 +43,7 @@ public class Constants {
 	 * 
 	 * @since 1.13
 	 */
+	@Deprecated
 	public static final String CFG_CREATE_DEFAULT_FLAGS = "CFG_CREATE_DEFAULT_FLAGS";
 
 	/**
@@ -128,34 +125,11 @@ public class Constants {
 	 */
 	public static final String CFG_UNDERLINE_SINGLETONS_IN_GRAY = "CFG_UNDERLINE_SINGLETONS_IN_GRAY";
 
-	@Deprecated
-	public static final String ENTITY_FLAG_GENERIC = "Generic";
-	@Deprecated
-	public static final String ENTITY_FLAG_HIDDEN = "Hidden";
-
 	public static final int MAX_SEGMENTS_IN_SCROLLBAR = 15;
 
-	public static final AddFlag[] FLAG_COLLECTION_1 = new AddFlag[] {
-			new AddFlag("female", "Female", MaterialDesign.MDI_GENDER_FEMALE, Entity.class),
-			new AddFlag("male", "Male", MaterialDesign.MDI_GENDER_MALE, Entity.class),
-			new AddFlag("male-female", "Male/Female", MaterialDesign.MDI_GENDER_MALE_FEMALE, Entity.class),
-			new AddFlag("transgender", "Transgender", MaterialDesign.MDI_GENDER_TRANSGENDER, Entity.class) };
-
-	public static final AddFlag[] FLAG_COLLECTION_2 = new AddFlag[] {
-			new AddFlag("predicate", "Predicate", MaterialDesign.MDI_GAVEL, Mention.class),
-			new AddFlag("pronoun", "Pronoun", MaterialDesign.MDI_ARROW_TOP_LEFT, Mention.class),
-			new AddFlag("name", "Proper name", MaterialDesign.MDI_TAG, Mention.class) };
-
-	@Deprecated
-	public static final String MENTION_FLAG_AMBIGUOUS = "Ambiguous";
-
-	@Deprecated
-	public static final String MENTION_FLAG_DIFFICULT = "Difficult";
-
-	@Deprecated
-	public static final String MENTION_FLAG_NON_NOMINAL = "Non Nominal";
-
 	public static final String PREF_RECENT = "recent_files";
+
+	public static final String PREF_LAST_VERSION = "last_closed_version";
 
 	public static final Random RANDOM = new Random();
 
@@ -184,7 +158,7 @@ public class Constants {
 			Strings.ACTION_TOGGLE_IGNORE_SINGLETONS_WHEN_COMPARING_TOOLTIP, true, MaterialDesign.MDI_SETTINGS);
 
 	public static final Setting<Boolean> SETTING_KEEP_TREE_SORTED = new Setting<Boolean>(CFG_KEEP_TREE_SORTED,
-			Strings.ACTION_TOGGLE_KEEP_TREE_SORTED, Strings.ACTION_TOGGLE_TRIM_WHITESPACE_TOOLTIP, true,
+			Strings.ACTION_TOGGLE_KEEP_TREE_SORTED, Strings.ACTION_TOGGLE_KEEP_TREE_SORTED_TOOLTIP, true,
 			MaterialDesign.MDI_SORT_VARIANT);
 
 	public static final Setting<Boolean> SETTING_SHOW_TEXT_LABELS = new Setting<Boolean>(CFG_SHOW_TEXT_LABELS,
@@ -225,6 +199,7 @@ public class Constants {
 	public static final int UI_MAX_STRING_WIDTH_IN_TREE = 100;
 	public static final int UI_MAX_STRING_WIDTH_IN_MENU = 30;
 	public static final int UI_MAX_STRING_WIDTH_IN_STATUSBAR = 30;
+	public static final int UI_ICON_SIZE_IN_TREE = 16;
 
 	public static final String URL_LATEST_RELEASE_API = "https://api.github.com/repos/nilsreiter/CorefAnnotator/releases/latest";
 

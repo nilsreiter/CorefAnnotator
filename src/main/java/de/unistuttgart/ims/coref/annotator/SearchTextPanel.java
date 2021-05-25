@@ -39,10 +39,11 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
 import de.unistuttgart.ims.coref.annotator.action.TargetedOperationIkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 import de.unistuttgart.ims.coref.annotator.document.DocumentModel;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class SearchTextPanel extends SearchPanel<SearchResult>
 		implements DocumentListener, WindowListener, HasDocumentModel {
@@ -98,9 +99,11 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			JList<SearchResult> list = (JList<SearchResult>) comp;
 
 			if (Annotator.app.getPreferences().getBoolean(Constants.CFG_REPLACE_MENTION, false)) {
-				return new AnnotationTransfer(Lists.immutable.ofAll(list.getSelectedValuesList())
-						.collect(sr -> sr.getSpan()).flatCollect(span -> searchContainer.getDocumentWindow()
-								.getDocumentModel().getCoreferenceModel().getMentionsBetween(span.begin, span.end)));
+				return new MentionTransfer(
+						Lists.immutable.ofAll(list.getSelectedValuesList()).collect(sr -> sr.getSpan())
+								.flatCollect(span -> searchContainer.getDocumentWindow().getDocumentModel()
+										.getCoreferenceModel().getMentionsBetween(span.begin, span.end))
+								.selectInstancesOf(Mention.class));
 
 			} else
 				return new PotentialAnnotationTransfer(searchContainer.getDocumentWindow().getTextPane(),
@@ -177,6 +180,7 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 	private static final long serialVersionUID = 1L;
 	JTextField textField;
 	JCheckBox restrictToMentions;
+	JCheckBox caseInsensitive;
 	JList<SearchResult> text_list;
 	AbstractAction annotateSelectedFindings = new AnnotateSelectedFindings(), runSearch = new RunSearch(),
 			annotateSelectedFindingsAsNew = new AnnotateSelectedFindingsAsNewEntity();
@@ -206,11 +210,25 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			}
 
 		});
+
+		caseInsensitive = new JCheckBox(Annotator.getString(Strings.SEARCH_WINDOW_CASE_INSENSITIVE));
+		caseInsensitive.setSelected(true);
+		caseInsensitive.setToolTipText(Annotator.getString(Strings.SEARCH_WINDOW_CASE_INSENSITIVE_TOOLTIP));
+		caseInsensitive.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				search(textField.getText());
+			}
+
+		});
+
 		JToolBar behaviourBar = new JToolBar();
 		behaviourBar.setFloatable(false);
 		behaviourBar.add(runSearch);
 		behaviourBar.add(new HelpAction(HelpWindow.Topic.SEARCH));
 		behaviourBar.add(restrictToMentions);
+		behaviourBar.add(caseInsensitive);
 
 		JToolBar actionBar = new JToolBar();
 		actionBar.setLayout(new BoxLayout(actionBar, BoxLayout.Y_AXIS));
@@ -335,16 +353,18 @@ public class SearchTextPanel extends SearchPanel<SearchResult>
 			annotateSelectedFindingsAsNew.setEnabled(false);
 			clearResults();
 			if (searchString.length() > 0) {
-				Pattern p = Pattern.compile(searchString);
+				Pattern p = Pattern.compile(searchString,
+						(caseInsensitive.isSelected() ? Pattern.CASE_INSENSITIVE : 0));
 
 				if (restrictToMentions.isSelected()) {
 					for (Mention m : searchContainer.getDocumentWindow().getDocumentModel().getCoreferenceModel()
 							.getMentions()) {
-						Matcher matcher = p.matcher(m.getCoveredText());
+						Matcher matcher = p.matcher(UimaUtil.getCoveredText(m));
 						if (matcher.find()) {
 							try {
-								listModel.addElement(new SearchResult(searchContainer, m.getBegin(), m.getEnd()));
-								highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+								listModel.addElement(
+										new SearchResult(searchContainer, UimaUtil.getBegin(m), UimaUtil.getEnd(m)));
+								highlights.add(hilit.addHighlight(UimaUtil.getBegin(m), UimaUtil.getEnd(m), painter));
 							} catch (BadLocationException e) {
 								Annotator.logger.catching(e);
 							}

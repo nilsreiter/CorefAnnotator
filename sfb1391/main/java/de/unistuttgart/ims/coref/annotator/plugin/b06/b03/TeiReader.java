@@ -9,28 +9,30 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
+import org.dkpro.core.api.io.ResourceCollectionReaderBase;
+import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.tudarmstadt.ukp.dkpro.core.api.io.ResourceCollectionReaderBase;
 import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
-import de.tudarmstadt.ukp.dkpro.core.api.resources.CompressionUtils;
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
-import de.unistuttgart.ims.coref.annotator.Util;
 import de.unistuttgart.ims.coref.annotator.api.format.Bold;
 import de.unistuttgart.ims.coref.annotator.api.format.Head;
 import de.unistuttgart.ims.coref.annotator.api.format.Italic;
 import de.unistuttgart.ims.coref.annotator.api.format.WideSpacing;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.LineBreak;
 import de.unistuttgart.ims.coref.annotator.api.sfb1391.Milestone;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.tei.TeiStylePlugin;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 import de.unistuttgart.ims.uima.io.xml.GenericXmlReader;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
@@ -60,6 +62,7 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		}
 
 		MutableMap<String, Entity> entityMap = Maps.mutable.empty();
+		MutableMap<String, Mention> mentionMap = Maps.mutable.empty();
 
 		GenericXmlReader<DocumentMetaData> gxr = new GenericXmlReader<DocumentMetaData>(DocumentMetaData.class);
 		gxr.setTextRootSelector(null);
@@ -70,16 +73,40 @@ public class TeiReader extends ResourceCollectionReaderBase {
 
 		gxr.addGlobalRule("langUsage[usage=100]", (d, e) -> jcas.setDocumentLanguage(e.attr("ident")));
 
-		gxr.addRule("[ref]", Mention.class, (m, e) -> {
-			String id = e.attr("ref").substring(1);
-			Entity entity = entityMap.get(id);
+		gxr.addRule("[ref]", MentionSurface.class, (ms, e) -> {
+			// retrieve mention id
+			String mentionId = null;
+			if (e.hasAttr("prev"))
+				mentionId = e.attr("prev");
+			else if (e.hasAttr("id"))
+				mentionId = e.attr("id");
+
+			// create or retrieve mention
+			Mention m = null;
+			if (mentionId != null)
+				m = mentionMap.get(mentionId);
+			if (m == null) {
+				m = new Mention(jcas);
+				m.addToIndexes();
+				m.setSurface(new FSArray<MentionSurface>(jcas, 0));
+				mentionMap.put(mentionId, m);
+			}
+			ms.setMention(m);
+			m.setSurface(UimaUtil.addTo(jcas, m.getSurface(), ms));
+
+			// retrieve entity id
+			String entityId = e.attr("ref").substring(1);
+
+			// create or retrieve entity
+			Entity entity = entityMap.get(entityId);
 			if (entity == null) {
 				entity = new Entity(jcas);
 				entity.addToIndexes();
 				entity.setColor(colorProvider.getNextColor().getRGB());
-				entity.setLabel(m.getCoveredText());
-				entity.setXmlId(id);
-				entityMap.put(id, entity);
+				// TODO: read old label from XML
+				entity.setLabel(UimaUtil.getCoveredText(m));
+				entity.setXmlId(entityId);
+				entityMap.put(entityId, entity);
 			}
 			m.setEntity(entity);
 		});
@@ -91,7 +118,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("[rend*=wide-spacing]", WideSpacing.class);
 		gxr.addRule("lb", LineBreak.class, (lineBreak, element) -> lineBreak.setN(element.attr("n")));
 		gxr.addRule("milestone", Milestone.class, (ms, element) -> {
-			ms.setN(element.attr(N));
+			if (element.hasAttr(N))
+				ms.setN(element.attr(N));
 			ms.setMilestoneType(element.attr(TYPE));
 		});
 		gxr.addRule("teiCorpus > TEI", Segment.class, (segment, element) -> {
@@ -112,8 +140,8 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		else
 			DocumentMetaData.create(jcas).setDocumentId(documentId);
 
-		Util.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
-		Util.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
+		UimaUtil.getMeta(jcas).setStylePlugin(TeiStylePlugin.class.getName());
+		UimaUtil.getMeta(jcas).setTypeSystemVersion(TypeSystemVersion.getCurrent().toString());
 
 		for (XMLElement element : Sets.immutable.withAll(JCasUtil.select(jcas, XMLElement.class))) {
 			if (element.getTag().equalsIgnoreCase(RS))

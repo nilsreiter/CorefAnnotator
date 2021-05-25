@@ -9,16 +9,16 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnnotationFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.jcas.cas.StringArray;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.xml.sax.SAXException;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 
 public class MergeAnnotations extends JCasAnnotator_ImplBase {
 
@@ -40,54 +40,49 @@ public class MergeAnnotations extends JCasAnnotator_ImplBase {
 			// handle entities
 			for (Entity oldEntity : JCasUtil.select(jcas2, Entity.class)) {
 				Entity newEntity;
-				if (oldEntity instanceof EntityGroup) {
-					newEntity = new EntityGroup(jcas);
-				} else {
-					newEntity = new Entity(jcas);
-				}
+
+				newEntity = new Entity(jcas);
 				newEntity.setLabel(oldEntity.getLabel());
 				newEntity.setColor(oldEntity.getColor());
 				newEntity.addToIndexes();
 				entityMap.put(oldEntity, newEntity);
+				newEntity.setFlags(new EmptyFSList<Flag>(jcas));
 
 				if (oldEntity.getFlags() != null) {
-					StringArray flags = new StringArray(jcas, oldEntity.getFlags().size());
-					newEntity.setFlags(flags);
-					for (int i = 0; i < oldEntity.getFlags().size(); i++) {
-						newEntity.setFlags(i, oldEntity.getFlags(i));
+					for (Flag flag : oldEntity.getFlags())
+						newEntity.getFlags().push(flag);
+				}
+
+				if (UimaUtil.isGroup(oldEntity)) {
+					FSArray<Entity> arr = new FSArray<Entity>(jcas, oldEntity.getMembers().size());
+					arr.addToIndexes();
+					newEntity.setMembers(arr);
+					for (int i = 0; i < oldEntity.getMembers().size(); i++) {
+						newEntity.setMembers(i, entityMap.get(oldEntity.getMembers(i)));
 					}
 				}
 
-			}
-
-			// handle entity groups
-			for (EntityGroup oldEntity : JCasUtil.select(jcas2, EntityGroup.class)) {
-				EntityGroup newEntity = (EntityGroup) entityMap.get(oldEntity);
-				FSArray arr = new FSArray(jcas, oldEntity.getMembers().size());
-				arr.addToIndexes();
-				newEntity.setMembers(arr);
-				for (int i = 0; i < oldEntity.getMembers().size(); i++) {
-					newEntity.setMembers(i, entityMap.get(oldEntity.getMembers(i)));
-				}
 			}
 
 			// handle mentions
 			for (Mention m : JCasUtil.select(jcas2, Mention.class)) {
-				Mention newMention = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(), Mention.class);
-				newMention.setEntity(entityMap.get(m.getEntity()));
-				if (m.getDiscontinuous() != null) {
-					DetachedMentionPart dmp = AnnotationFactory.createAnnotation(jcas, m.getDiscontinuous().getBegin(),
-							m.getDiscontinuous().getEnd(), DetachedMentionPart.class);
-					newMention.setDiscontinuous(dmp);
-					dmp.setMention(newMention);
+				Mention newMention = new Mention(jcas);
+				newMention.setSurface(new FSArray<MentionSurface>(jcas, m.getSurface().size()));
+				int i = 0;
+				for (MentionSurface ms : m.getSurface()) {
+					MentionSurface newMS = AnnotationFactory.createAnnotation(jcas, ms.getBegin(), ms.getEnd(),
+							MentionSurface.class);
+					newMS.setMention(newMention);
+					newMention.setSurface(i++, newMS);
 				}
+				newMention.setEntity(entityMap.get(m.getEntity()));
+				newMention.addToIndexes();
+				newMention.setFlags(new EmptyFSList<Flag>(jcas));
 
 				if (m.getFlags() != null) {
-					StringArray flags = new StringArray(jcas, m.getFlags().size());
-					newMention.setFlags(flags);
-					for (int i = 0; i < m.getFlags().size(); i++) {
-						newMention.setFlags(i, m.getFlags(i));
-					}
+					for (Flag flag : m.getFlags())
+						newMention.getFlags().push(flag);
+
 				}
 			}
 

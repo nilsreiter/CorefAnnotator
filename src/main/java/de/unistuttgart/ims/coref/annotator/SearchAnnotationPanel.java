@@ -27,17 +27,18 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.action.IkonAction;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> implements WindowListener {
 
 	class SearchFlaggedMentions extends IkonAction {
 		private static final long serialVersionUID = 1L;
 
-		String flag;
+		Flag flag;
 
-		public SearchFlaggedMentions(String s, String key, Ikon ik) {
+		public SearchFlaggedMentions(Flag s, String key, Ikon ik) {
 			super(key, ik);
 			this.flag = s;
 		}
@@ -47,10 +48,10 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 			clearResults();
 			JCas jcas = searchContainer.getDocumentWindow().getDocumentModel().getJcas();
 			for (Mention m : JCasUtil.select(jcas, Mention.class)) {
-				if (Util.isX(m, flag)) {
+				if (UimaUtil.isX(m, flag)) {
 					listModel.addElement(new SearchResultMention(searchContainer, m));
 					try {
-						highlights.add(hilit.addHighlight(m.getBegin(), m.getEnd(), painter));
+						highlights.add(hilit.addHighlight(UimaUtil.getBegin(m), UimaUtil.getEnd(m), painter));
 					} catch (BadLocationException e1) {
 						e1.printStackTrace();
 					}
@@ -105,7 +106,7 @@ public class SearchAnnotationPanel extends SearchPanel<SearchResultMention> impl
 
 		for (Flag flag : sd.getDocumentWindow().getDocumentModel().getFlagModel().getFlags()) {
 			if (flag.getTargetClass().equalsIgnoreCase(Mention.class.getName())) {
-				AbstractAction action = new SearchFlaggedMentions(flag.getKey(), flag.getLabel(),
+				AbstractAction action = new SearchFlaggedMentions(flag, flag.getLabel(),
 						MaterialDesign.valueOf(flag.getIcon()));
 				JToggleButton b = new JToggleButton(action);
 				bg.add(b);

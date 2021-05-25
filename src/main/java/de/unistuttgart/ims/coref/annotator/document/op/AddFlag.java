@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 import org.apache.uima.cas.FeatureStructure;
 import org.kordamp.ikonli.Ikon;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 
 public class AddFlag implements FlagModelOperation, RedoableOperation {
 

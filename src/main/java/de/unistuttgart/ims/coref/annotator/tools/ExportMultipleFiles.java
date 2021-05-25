@@ -67,6 +67,8 @@ public class ExportMultipleFiles {
 				for (File f : file.listFiles(new FileFilter() {
 					@Override
 					public boolean accept(File pathname) {
+						if (pathname.isDirectory())
+							return false;
 						return pluginManager.getDefaultIOPlugin().getFileFilter().accept(pathname);
 					}
 
@@ -135,7 +137,14 @@ public class ExportMultipleFiles {
 			case tei:
 				return de.unistuttgart.ims.coref.annotator.plugin.tei.TeiExportPlugin.class;
 			case qdtei:
-				return de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei.QuadramaTeiExportPlugin.class;
+				// This is a temporary workaround
+				try {
+					return (Class<? extends ExportPlugin>) Class
+							.forName("de.unistuttgart.ims.coref.annotator.plugin.quadrama.tei.QuadramaTeiExportPlugin");
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+					return null;
+				}
 			default:
 				return null;
 			}
