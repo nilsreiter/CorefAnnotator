@@ -156,16 +156,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>release</id>
-			<activation>
-				<property>
-					<name>release</name>
-					<value>release</value>
-				</property>
-			</activation>
-			<properties>
-				<release>release</release>
-			</properties>
+			<id>mac</id>
 			<build>
 				<plugins>
 					<plugin>
