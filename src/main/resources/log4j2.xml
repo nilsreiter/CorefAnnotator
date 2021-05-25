@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
 	<Properties>
-		<Property name="filename">${user.home}/.CorefAnnotator.log</Property>
-		<Property name="loggername">de.unistuttgart.ims.coref.annotator.Annotator</Property>
+		<Property name="loggername">de.unistuttgart.ims.coref.annotator.Annotator
+		</Property>
 	</Properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
+			<PatternLayout
+				pattern="%d{ISO8601} %M %-5level %logger{36} - %msg%n" />
 		</Console>
-		<File fileName="${sys:user.home}/.CorefAnnotator.log" append="true" name="File" createOnDemand="true">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} %M %-5level %logger{36} - %msg%n" />
-		</File>
+		<RollingFile
+			filePattern="${sys:user.home}/.CorefAnnotator-%i.log.gz"
+			name="RollingFile" fileName="${sys:user.home}/.CorefAnnotator.log"
+			createOnDemand="true">
+			<PatternLayout
+				pattern="%d{ISO8601} %M %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
 	</Appenders>
 	<Loggers>
-		<Logger name="${loggername}">
-			<AppenderRef ref="File"    level="WARN" />
-			<AppenderRef ref="Console" level="ERROR"/>	
-		</Logger>
-		<Root level="ALL">
-		</Root>
+        <Root level="ERROR">
+            <AppenderRef ref="RollingFile" />
+            <AppenderRef ref="Console" />
+        </Root>
+        <Logger name="${loggername}">
+            <AppenderRef ref="RollingFile" level="INFO" />
+            <AppenderRef ref="Console" level="ALL" />
+        </Logger>
 	</Loggers>
 </Configuration>

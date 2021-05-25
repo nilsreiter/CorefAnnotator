@@ -102,6 +102,7 @@
 						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
+								<exclude>**/log4j2.properties</exclude>
 								<exclude>META-INF/*.SF</exclude>
 								<exclude>META-INF/*.DSA</exclude>
 								<exclude>META-INF/*.RSA</exclude>
@@ -232,8 +233,8 @@
 									<target>
 										<mkdir dir="target/generated-resources/docs" />
 										<exec executable="/usr/local/bin/pandoc">
-										    <arg value="-f" />
-										    <arg value="gfm" />
+											<arg value="-f" />
+											<arg value="gfm" />
 											<arg value="CHANGELOG.md" />
 											<arg value="-o" />
 											<arg
