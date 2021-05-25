@@ -261,7 +261,7 @@ public class Strings {
 	public static final String MESSAGE_MENTION_CREATED = "message.mention_created";
 	public static final String MESSAGE_MENTION_PART_CREATED = "message.mention_part_created";
 	public static final String MESSAGE_SAVING = "message.saving";
-	public static final String NAME_MS_EXCEL = "name.ms.excel";
+	public static final String NAME_MS_EXCEL = "name.ms_excel";
 	public static final String SEARCH_WINDOW_CASE_INSENSITIVE = "search.window.case_insensitive";
 	public static final String SEARCH_WINDOW_CASE_INSENSITIVE_TOOLTIP = "search.window.case_insensitive.tooltip";
 	public static final String SEARCH_WINDOW_RESTRICT_TO_MENTIONS = "search.window.restrict_to_mentions";
