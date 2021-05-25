@@ -73,9 +73,13 @@ public class SortTree extends TargetedIkonAction<DocumentWindow>
 
 	@Override
 	public void preferenceChange(PreferenceChangeEvent evt) {
-		if (getTarget().getDocumentModel().getTreeModel().getEntitySortOrder() == order
-				&& evt.getKey() == Constants.CFG_KEEP_TREE_SORTED && evt.getNewValue() == Boolean.TRUE.toString())
-			actionPerformed(null);
+		try {
+			if (getTarget().getDocumentModel().getTreeModel().getEntitySortOrder() == order
+					&& evt.getKey() == Constants.CFG_KEEP_TREE_SORTED && evt.getNewValue() == Boolean.TRUE.toString())
+				actionPerformed(null);
+		} catch (NullPointerException e) {
+			Annotator.logger.catching(e);
+		}
 	}
 
 }
