@@ -22,13 +22,11 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
-        <Root level="ERROR">
-            <AppenderRef ref="RollingFile" />
-            <AppenderRef ref="Console" />
-        </Root>
-        <Logger name="${loggername}">
-            <AppenderRef ref="RollingFile" level="INFO" />
-            <AppenderRef ref="Console" level="ALL" />
-        </Logger>
+		<Logger name="${loggername}">
+			<AppenderRef ref="RollingFile" level="WARN" />
+			<AppenderRef ref="Console" level="ERROR" />
+		</Logger>
+		<Root level="ALL">
+		</Root>
 	</Loggers>
 </Configuration>

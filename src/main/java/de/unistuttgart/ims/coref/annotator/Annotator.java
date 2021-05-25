@@ -92,6 +92,9 @@ public class Annotator implements PreferenceChangeListener {
 	static Boolean javafx = null;
 
 	public static void main(String[] args) {
+//		Annotator.logger.error("error");
+//		Annotator.logger.warn("warn");
+//		Annotator.logger.info("info");
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -115,7 +118,7 @@ public class Annotator implements PreferenceChangeListener {
 
 	@SuppressWarnings("unused")
 	public Annotator() throws ResourceInitializationException {
-		logger.trace("Application startup. Version " + Version.get().toString());
+		logger.info("Application startup. Version " + Version.get().toString());
 		if (Annotator.javafx())
 			new JFXPanel();
 		this.pluginManager.init();
@@ -128,6 +131,9 @@ public class Annotator implements PreferenceChangeListener {
 				else
 					preferences.put(Constants.CFG_ANNOTATOR_ID, Defaults.CFG_ANNOTATOR_ID);
 
+			for (String key : preferences.keys()) {
+				Annotator.logger.info("Preference {} set to {}", key, preferences.get(key, null));
+			}
 		} catch (BackingStoreException e) {
 			Annotator.logger.catching(e);
 		}
@@ -332,6 +338,7 @@ public class Annotator implements PreferenceChangeListener {
 		} catch (BackingStoreException e1) {
 			logger.catching(e1);
 		}
+		Annotator.logger.info("Shutting down.");
 		System.exit(0);
 	}
 
