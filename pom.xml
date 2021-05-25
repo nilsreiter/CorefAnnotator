@@ -194,7 +194,69 @@
 								</configuration>
 							</execution>
 						</executions>
-						</plugin>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>release</value>
+				</property>
+			</activation>
+			<properties>
+				<release>release</release>
+			</properties>
+			<build>
+				<resources>
+					<resource>
+						<directory>target/generated-resources</directory>
+					</resource>
+				</resources>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>generate-changelog</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<mkdir dir="target/generated-resources/docs" />
+										<mkdir dir="target/classes/docs" />
+										<exec executable="/usr/local/bin/pandoc">
+											<arg value="CHANGELOG.md" />
+											<arg value="-o" />
+											<arg
+												value="target/generated-resources/docs/changelog.html" />
+										</exec>
+										<exec executable="tail"
+											output="target/generated-resources/docs/changelog.html">
+											<arg value="-n" />
+											<arg value="+3" />
+											<arg
+												value="target/generated-resources/docs/changelog.html" />
+										</exec>
+										<exec executable="cat"
+											output="target/generated-resources/docs/whatsnew.html">
+											<arg value="target/classes/docs/whatsnew.head.html" />
+											<arg
+												value="target/generated-resources/docs/changelog.html" />
+											<arg value="target/classes/docs/whatsnew.foot.html" />
+										</exec>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -349,11 +411,11 @@
 			<artifactId>ikonli-materialdesign-pack</artifactId>
 			<version>${version.ikonli}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-materialdesign2-pack</artifactId>
-            <version>${version.ikonli}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.kordamp.ikonli</groupId>
+			<artifactId>ikonli-materialdesign2-pack</artifactId>
+			<version>${version.ikonli}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-fontawesome-pack</artifactId>

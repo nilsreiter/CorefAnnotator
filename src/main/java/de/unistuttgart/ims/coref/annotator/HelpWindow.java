@@ -38,6 +38,7 @@ public class HelpWindow extends JFrame {
 		public static final HelpTopic IO = topics[5];
 		public static final HelpTopic SEARCH = topics[6];
 		public static final HelpTopic PREFERENCES = topics[7];
+		public static final HelpTopic WHATSNEW = topics[8];
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -48,7 +49,7 @@ public class HelpWindow extends JFrame {
 			new HelpTopic("Automatic processing", "processing"), new HelpTopic("Flag editing", "flags"),
 			new HelpTopic("Input/Output", "io", s -> new JScrollPane(loadIOPlugins())),
 			new HelpTopic("Search", "search"), new HelpTopic("Preferences", "preferences"),
-			new HelpTopic("Profiles", "profile") };
+			new HelpTopic("Profiles", "profile"), new HelpTopic("What's new?", "whatsnew") };
 
 	JList<String> topicList;
 
