@@ -18,17 +18,16 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -75,7 +74,7 @@ public class Annotator {
 
 	PluginManager pluginManager = new PluginManager();
 
-	protected JFrame opening;
+	JFrame opening;
 	JPanel statusBar;
 	JPanel recentFilesPanel;
 
@@ -165,9 +164,13 @@ public class Annotator {
 				handleQuitRequestWith();
 			}
 		});
+		opening.setContentPane(new JPanel());
+		opening.getContentPane().setLayout(new BorderLayout());
 
 		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setPreferredSize(new Dimension(width, 700));
+		SpringLayout mainPanelLayout = new SpringLayout();
+		mainPanel.setLayout(mainPanelLayout);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.default")));
@@ -180,14 +183,18 @@ public class Annotator {
 		panel.add(new JButton(new FileMergeOpenAction()));
 		panel.add(new JButton(new FileSelectAnalyzeAction()));
 		mainPanel.add(panel);
+		mainPanelLayout.putConstraint(SpringLayout.NORTH, panel, 5, SpringLayout.NORTH, mainPanel);
+		mainPanelLayout.putConstraint(SpringLayout.WEST, panel, 5, SpringLayout.WEST, mainPanel);
+		mainPanelLayout.putConstraint(SpringLayout.EAST, panel, -5, SpringLayout.EAST, mainPanel);
 
-		mainPanel.add(Box.createVerticalStrut(10));
 		recentFilesPanel = new JPanel();
 		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
 		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
 		refreshRecents();
 		mainPanel.add(recentFilesPanel);
-		mainPanel.add(Box.createVerticalStrut(10));
+		mainPanelLayout.putConstraint(SpringLayout.NORTH, recentFilesPanel, 15, SpringLayout.SOUTH, panel);
+		mainPanelLayout.putConstraint(SpringLayout.WEST, recentFilesPanel, 5, SpringLayout.WEST, mainPanel);
+		mainPanelLayout.putConstraint(SpringLayout.EAST, recentFilesPanel, -5, SpringLayout.EAST, mainPanel);
 
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
@@ -198,9 +205,33 @@ public class Annotator {
 		}, panel);
 
 		mainPanel.add(panel);
+		mainPanelLayout.putConstraint(SpringLayout.NORTH, panel, 15, SpringLayout.SOUTH, recentFilesPanel);
+		mainPanelLayout.putConstraint(SpringLayout.WEST, panel, 5, SpringLayout.WEST, mainPanel);
+		mainPanelLayout.putConstraint(SpringLayout.EAST, panel, -5, SpringLayout.EAST, mainPanel);
 
-		for (Component c : mainPanel.getComponents())
-			((JComponent) c).setAlignmentX(Component.CENTER_ALIGNMENT);
+		if (isFirstLaunch()) {
+			JPanel lastPanel = panel;
+			panel = new JPanel();
+			panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString(Strings.DIALOG_SPLASH_FIRSTTIME)));
+			panel.setPreferredSize(new Dimension(width, 200));
+			JLabel label = new JLabel();
+			label.setIcon(FontIcon.of(MaterialDesign.MDI_INFORMATION_OUTLINE, 24));
+			label.setText(Annotator.getString(Strings.DIALOG_SPLASH_FIRSTTIME_TEXT, Version.get()));
+			panel.add(label);
+			HelpAction ha = new HelpAction(HelpWindow.Topic.WHATSNEW);
+			ha.putValue(Action.NAME, Annotator.getString(Strings.DIALOG_SPLASH_FIRSTTIME_BUTTON));
+			ha.putValue(Action.LARGE_ICON_KEY, null);
+			ha.putValue(Action.SMALL_ICON, null);
+			panel.add(new JButton(ha));
+			mainPanel.add(panel);
+
+			mainPanelLayout.putConstraint(SpringLayout.NORTH, panel, 15, SpringLayout.SOUTH, lastPanel);
+			mainPanelLayout.putConstraint(SpringLayout.WEST, panel, 5, SpringLayout.WEST, mainPanel);
+			mainPanelLayout.putConstraint(SpringLayout.EAST, panel, -5, SpringLayout.EAST, mainPanel);
+		}
+		mainPanelLayout.putConstraint(SpringLayout.SOUTH, panel, -5, SpringLayout.SOUTH, mainPanel);
+
+		mainPanel.validate();
 
 		JLabel versionLabel = new JLabel(Version.get().toString());
 
@@ -520,4 +551,13 @@ public class Annotator {
 		return false;
 
 	}
+
+	public boolean isFirstLaunch() {
+		Version currentVersion = Version.get();
+		String lastVersionString = preferences.get(Constants.PREF_LAST_VERSION, currentVersion.toString());
+		Version lastVersion = Version.get(lastVersionString);
+		return true;
+		// return lastVersion != currentVersion;
+	}
+
 }

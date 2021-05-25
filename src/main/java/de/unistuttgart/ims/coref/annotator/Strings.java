@@ -194,6 +194,9 @@ public class Strings {
 	public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
 	public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
 	public static final String DIALOG_SELECT_FILE = "dialog.select_file";
+	public static final String DIALOG_SPLASH_FIRSTTIME = "dialog.splash.firsttime";
+	public static final String DIALOG_SPLASH_FIRSTTIME_TEXT = "dialog.splash.firsttime.text";
+	public static final String DIALOG_SPLASH_FIRSTTIME_BUTTON = "dialog.splash.firsttime.button";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL = "dialog.unsaved_changes.message.cancel";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE = "dialog.unsaved_changes.message.dont_save";

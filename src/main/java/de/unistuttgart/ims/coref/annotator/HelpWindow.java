@@ -38,7 +38,8 @@ public class HelpWindow extends JFrame {
 		public static final HelpTopic IO = topics[5];
 		public static final HelpTopic SEARCH = topics[6];
 		public static final HelpTopic PREFERENCES = topics[7];
-		public static final HelpTopic WHATSNEW = topics[8];
+		public static final HelpTopic PROFILE = topics[8];
+		public static final HelpTopic WHATSNEW = topics[9];
 	}
 
 	private static final long serialVersionUID = 1L;
