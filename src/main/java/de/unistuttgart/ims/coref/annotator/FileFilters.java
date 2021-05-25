@@ -17,20 +17,6 @@ public class FileFilters {
 			return "CorefAnnotator";
 		}
 	};
-
-	static public FileFilter ca2z = new FileFilter() {
-
-		@Override
-		public boolean accept(File f) {
-			return f.isDirectory() || f.getName().endsWith(".ca2z");
-		}
-
-		@Override
-		public String getDescription() {
-			return "CorefAnnotator (compressed)";
-		}
-	};
-
 	static public FileFilter xmi = new FileFilter() {
 
 		@Override

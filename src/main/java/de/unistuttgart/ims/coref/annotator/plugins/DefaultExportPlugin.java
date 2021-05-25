@@ -50,7 +50,7 @@ public final class DefaultExportPlugin extends AbstractExportPlugin implements D
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.ca2z;
+		return FileFilters.ca2;
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public final class DefaultImportPlugin extends AbstractImportPlugin implements D
 
 	@Override
 	public FileFilter getFileFilter() {
-		return FileFilters.ca2z;
+		return FileFilters.ca2;
 	}
 
 	@Override

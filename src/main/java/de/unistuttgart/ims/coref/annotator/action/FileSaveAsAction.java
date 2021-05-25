@@ -79,7 +79,7 @@ public class FileSaveAsAction extends TargetedIkonAction<DocumentWindow> {
 
 				@Override
 				public boolean accept(File f) {
-					return FileFilters.ca2.accept(f) || FileFilters.ca2z.accept(f);
+					return FileFilters.ca2.accept(f);
 				}
 
 				@Override
