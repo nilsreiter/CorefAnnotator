@@ -294,6 +294,8 @@ public class Annotator {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
 		storeRecentFiles();
+		preferences.put(Constants.PREF_RECENT, Version.get().toString());
+
 		try {
 			preferences.sync();
 		} catch (BackingStoreException e1) {

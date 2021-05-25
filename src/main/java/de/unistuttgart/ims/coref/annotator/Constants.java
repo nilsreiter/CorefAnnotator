@@ -129,6 +129,8 @@ public class Constants {
 
 	public static final String PREF_RECENT = "recent_files";
 
+	public static final String PREF_LAST_VERSION = "last_closed_version";
+
 	public static final Random RANDOM = new Random();
 
 	public static final Setting<Boolean> SETTING_ASK_BEFORE_FILE_OVERWRITE = new Setting<Boolean>(
