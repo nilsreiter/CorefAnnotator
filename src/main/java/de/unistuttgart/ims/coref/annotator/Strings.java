@@ -189,14 +189,18 @@ public class Strings {
 	public static final String DIALOG_FILE_EXISTS_OVERWRITE = "dialog.file_exists.overwrite";
 	public static final String DIALOG_LANGUAGE_PROMPT = "dialog.language.prompt";
 	public static final String DIALOG_LANGUAGE_TITLE = "dialog.language.title";
+	public static final String DIALOG_OPEN_WITH_TITLE = "dialog.open.with.title";
 	public static final String DIALOG_RENAME_ALL_SELECT_STRATEGY_PROMPT = "dialog.rename_all.prompt";
 	public static final String DIALOG_RENAME_ALL_SELECT_STRATEGY_TITLE = "dialog.rename_all.title";
 	public static final String DIALOG_RENAME_ENTITY_PROMPT = "dialog.rename_entity.prompt";
 	public static final String DIALOG_SAVE_AS_TITLE = "dialog.save_as.title";
 	public static final String DIALOG_SELECT_FILE = "dialog.select_file";
+	public static final String DIALOG_SPLASH_DEFAULT = "dialog.splash.default";
+	public static final String DIALOG_SPLASH_IMPORT = "dialog.splash.import";
 	public static final String DIALOG_SPLASH_FIRSTTIME = "dialog.splash.firsttime";
 	public static final String DIALOG_SPLASH_FIRSTTIME_TEXT = "dialog.splash.firsttime.text";
 	public static final String DIALOG_SPLASH_FIRSTTIME_BUTTON = "dialog.splash.firsttime.button";
+	public static final String DIALOG_SPLASH_RECENT = "dialog.splash.recent";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE = "dialog.unsaved_changes.message";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_CANCEL = "dialog.unsaved_changes.message.cancel";
 	public static final String DIALOG_UNSAVED_CHANGES_MESSAGE_DONT_SAVE = "dialog.unsaved_changes.message.dont_save";
@@ -233,6 +237,7 @@ public class Strings {
 	public static final String MENU_FILE = "menu.file";
 	public static final String MENU_FILE_EXPORT_AS = "menu.file.export_as";
 	public static final String MENU_FILE_IMPORT_FROM = "menu.file.import_from";
+	public static final String MENU_FILE_RECENT = "menu.file.recent";
 	public static final String MENU_FLAGS = "menu.flags";
 	public static final String MENU_HELP = "menu.help";
 	public static final String MENU_SETTINGS = "menu.settings";

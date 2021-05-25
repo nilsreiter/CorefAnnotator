@@ -38,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Sets;
@@ -69,8 +70,6 @@ public class Annotator implements PreferenceChangeListener {
 	static ResourceBundle rbundle;
 
 	Set<DocumentWindow> openFiles = Sets.mutable.empty();
-
-	private MutableList<File> recentFiles;
 
 	TypeSystemDescription typeSystemDescription;
 
@@ -120,7 +119,6 @@ public class Annotator implements PreferenceChangeListener {
 		if (Annotator.javafx())
 			new JFXPanel();
 		this.pluginManager.init();
-		this.recentFiles = getRecentFilesFromPreferences();
 		this.preferences.addPreferenceChangeListener(this);
 
 		try {
@@ -176,7 +174,7 @@ public class Annotator implements PreferenceChangeListener {
 		mainPanel.setLayout(mainPanelLayout);
 
 		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.default")));
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString(Strings.DIALOG_SPLASH_DEFAULT)));
 		panel.setPreferredSize(new Dimension(width, 130));
 		panel.add(new JButton(openAction));
 		panel.add(new JButton(quitAction));
@@ -191,7 +189,7 @@ public class Annotator implements PreferenceChangeListener {
 		mainPanelLayout.putConstraint(SpringLayout.EAST, panel, -5, SpringLayout.EAST, mainPanel);
 
 		recentFilesPanel = new JPanel();
-		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
+		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString(Strings.DIALOG_SPLASH_RECENT)));
 		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
 		preferenceChange(new PreferenceChangeEvent(preferences, Constants.PREF_RECENT, null));
 		mainPanel.add(recentFilesPanel);
@@ -200,7 +198,7 @@ public class Annotator implements PreferenceChangeListener {
 		mainPanelLayout.putConstraint(SpringLayout.EAST, recentFilesPanel, -5, SpringLayout.EAST, mainPanel);
 
 		panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.import")));
+		panel.setBorder(BorderFactory.createTitledBorder(Annotator.getString(Strings.DIALOG_SPLASH_IMPORT)));
 		panel.setPreferredSize(new Dimension(width, 200));
 		pluginManager.getIOPluginObjects().selectInstancesOf(ImportPlugin.class).forEachWith((p, pan) -> {
 			AbstractAction importAction = new FileImportAction(this, p);
@@ -327,7 +325,6 @@ public class Annotator implements PreferenceChangeListener {
 	public void handleQuitRequestWith() {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
-		recentFiles2Preferences();
 		preferences.put(Constants.PREF_LAST_VERSION, Version.get().toString());
 
 		try {
@@ -406,7 +403,7 @@ public class Annotator implements PreferenceChangeListener {
 
 	public void fileOpenDialog(Component parent, ImportPlugin flavor) {
 		fileOpenDialog(parent, flavor, false, f -> open(f[0], flavor, Constants.X_UNSPECIFIED), o -> showOpening(),
-				"Open files using " + flavor.getName() + " scheme");
+				Annotator.getString(Strings.DIALOG_OPEN_WITH_TITLE, flavor.getName()));
 	}
 
 	public static String getString(String key, Object... parameters) {
@@ -449,7 +446,6 @@ public class Annotator implements PreferenceChangeListener {
 	private MutableList<File> getRecentFilesFromPreferences() {
 		MutableList<File> files = Lists.mutable.empty();
 		String listOfFiles = preferences.get(Constants.PREF_RECENT, "");
-		logger.debug(listOfFiles);
 		String[] fileNames = listOfFiles.split(File.pathSeparator);
 		for (String fileRef : fileNames) {
 			File file = new File(fileRef);
@@ -460,7 +456,7 @@ public class Annotator implements PreferenceChangeListener {
 		return files;
 	}
 
-	private void recentFiles2Preferences() {
+	private void recentFiles2Preferences(MutableList<File> recentFiles) {
 		StringBuilder sb = new StringBuilder();
 		for (int index = 0; index < recentFiles.size(); index++) {
 			File file = recentFiles.get(index);
@@ -473,7 +469,8 @@ public class Annotator implements PreferenceChangeListener {
 	}
 
 	public JMenu getRecentFilesMenu() {
-		JMenu m = new JMenu(Annotator.getString("menu.file.recent"));
+		ImmutableList<File> recentFiles = getRecentFilesFromPreferences().toImmutable();
+		JMenu m = new JMenu(Annotator.getString(Strings.MENU_FILE_RECENT));
 		for (int i = 0; i < Math.min(20, recentFiles.size()); i++)
 			m.add(new SelectedFileOpenAction(this, recentFiles.get(i)));
 		return m;
@@ -528,6 +525,7 @@ public class Annotator implements PreferenceChangeListener {
 	 * @return true, if the file was not already in the list, false otherwise.
 	 */
 	public boolean addRecentFile(File f) {
+		MutableList<File> recentFiles = getRecentFilesFromPreferences();
 		Annotator.logger.debug("File {} added to list of recent files", f);
 
 		boolean contains = recentFiles.contains(f);
@@ -535,7 +533,7 @@ public class Annotator implements PreferenceChangeListener {
 			recentFiles.remove(f);
 		}
 		recentFiles.add(0, f);
-		recentFiles2Preferences();
+		recentFiles2Preferences(recentFiles);
 		return !contains;
 
 	}
@@ -553,7 +551,7 @@ public class Annotator implements PreferenceChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					recentFiles = getRecentFilesFromPreferences();
+					ImmutableList<File> recentFiles = getRecentFilesFromPreferences().toImmutable();
 					recentFilesPanel.removeAll();
 					for (int i = 0; i < Math.min(recentFiles.size(), 10); i++) {
 						File f = recentFiles.get(i);
