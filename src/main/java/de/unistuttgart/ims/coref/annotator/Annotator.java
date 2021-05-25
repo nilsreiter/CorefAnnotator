@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -60,7 +62,7 @@ import de.unistuttgart.ims.coref.annotator.plugins.ImportPlugin;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
-public class Annotator {
+public class Annotator implements PreferenceChangeListener {
 
 	public static final Logger logger = LogManager.getLogger(Annotator.class);
 
@@ -68,7 +70,7 @@ public class Annotator {
 
 	Set<DocumentWindow> openFiles = Sets.mutable.empty();
 
-	MutableList<File> recentFiles;
+	private MutableList<File> recentFiles;
 
 	TypeSystemDescription typeSystemDescription;
 
@@ -118,7 +120,8 @@ public class Annotator {
 		if (Annotator.javafx())
 			new JFXPanel();
 		this.pluginManager.init();
-		this.recentFiles = loadRecentFiles();
+		this.recentFiles = getRecentFilesFromPreferences();
+		this.preferences.addPreferenceChangeListener(this);
 
 		try {
 			if (!preferences.nodeExists(Constants.CFG_ANNOTATOR_ID))
@@ -190,7 +193,7 @@ public class Annotator {
 		recentFilesPanel = new JPanel();
 		recentFilesPanel.setBorder(BorderFactory.createTitledBorder(Annotator.getString("dialog.splash.recent")));
 		recentFilesPanel.setPreferredSize(new Dimension(width, 200));
-		refreshRecents();
+		preferenceChange(new PreferenceChangeEvent(preferences, Constants.PREF_RECENT, null));
 		mainPanel.add(recentFilesPanel);
 		mainPanelLayout.putConstraint(SpringLayout.NORTH, recentFilesPanel, 15, SpringLayout.SOUTH, panel);
 		mainPanelLayout.putConstraint(SpringLayout.WEST, recentFilesPanel, 5, SpringLayout.WEST, mainPanel);
@@ -288,7 +291,7 @@ public class Annotator {
 					public void run() {
 						openFiles.add(v);
 						if (flavor instanceof DefaultImportPlugin)
-							recentFiles.add(0, file);
+							addRecentFile(file);
 						v.initialise();
 
 					}
@@ -303,7 +306,7 @@ public class Annotator {
 				public void run() {
 					openFiles.add(v);
 					if (flavor instanceof DefaultImportPlugin)
-						recentFiles.add(0, file);
+						addRecentFile(file);
 					v.initialise();
 
 				}
@@ -324,8 +327,8 @@ public class Annotator {
 	public void handleQuitRequestWith() {
 		for (DocumentWindow v : openFiles)
 			this.close(v);
-		storeRecentFiles();
-		preferences.put(Constants.PREF_RECENT, Version.get().toString());
+		recentFiles2Preferences();
+		preferences.put(Constants.PREF_LAST_VERSION, Version.get().toString());
 
 		try {
 			preferences.sync();
@@ -443,7 +446,7 @@ public class Annotator {
 		return pluginManager;
 	}
 
-	private MutableList<File> loadRecentFiles() {
+	private MutableList<File> getRecentFilesFromPreferences() {
 		MutableList<File> files = Lists.mutable.empty();
 		String listOfFiles = preferences.get(Constants.PREF_RECENT, "");
 		logger.debug(listOfFiles);
@@ -453,12 +456,11 @@ public class Annotator {
 			if (file.exists() && !files.contains(file) && FileFilters.ca2.accept(file)) {
 				files.add(file);
 			}
-
 		}
 		return files;
 	}
 
-	private void storeRecentFiles() {
+	private void recentFiles2Preferences() {
 		StringBuilder sb = new StringBuilder();
 		for (int index = 0; index < recentFiles.size(); index++) {
 			File file = recentFiles.get(index);
@@ -476,21 +478,6 @@ public class Annotator {
 			m.add(new SelectedFileOpenAction(this, recentFiles.get(i)));
 		return m;
 
-	}
-
-	public void refreshRecents() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				recentFilesPanel.removeAll();
-				for (int i = 0; i < Math.min(recentFiles.size(), 10); i++) {
-					File f = recentFiles.get(i);
-					recentFilesPanel.add(new JButton(new SelectedFileOpenAction(Annotator.this, f)));
-				}
-				recentFilesPanel.repaint();
-				opening.validate();
-			}
-		});
 	}
 
 	public Preferences getPreferences() {
@@ -542,13 +529,14 @@ public class Annotator {
 	 */
 	public boolean addRecentFile(File f) {
 		Annotator.logger.debug("File {} added to list of recent files", f);
-		if (!recentFiles.contains(f)) {
-			recentFiles.add(0, f);
-			return true;
+
+		boolean contains = recentFiles.contains(f);
+		if (contains) {
+			recentFiles.remove(f);
 		}
-		recentFiles.remove(f);
 		recentFiles.add(0, f);
-		return false;
+		recentFiles2Preferences();
+		return !contains;
 
 	}
 
@@ -556,8 +544,29 @@ public class Annotator {
 		Version currentVersion = Version.get();
 		String lastVersionString = preferences.get(Constants.PREF_LAST_VERSION, currentVersion.toString());
 		Version lastVersion = Version.get(lastVersionString);
-		return true;
-		// return lastVersion != currentVersion;
+		return lastVersion.compareTo(currentVersion) < 0;
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if (evt.getKey() == Constants.PREF_RECENT) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					recentFiles = getRecentFilesFromPreferences();
+					recentFilesPanel.removeAll();
+					for (int i = 0; i < Math.min(recentFiles.size(), 10); i++) {
+						File f = recentFiles.get(i);
+						recentFilesPanel.add(new JButton(new SelectedFileOpenAction(Annotator.this, f)));
+					}
+					recentFilesPanel.repaint();
+					recentFilesPanel.validate();
+					opening.validate();
+				}
+			});
+
+		}
+
 	}
 
 }
