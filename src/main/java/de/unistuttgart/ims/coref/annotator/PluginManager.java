@@ -79,7 +79,7 @@ public class PluginManager {
 		if (!instances.containsKey(cl)) {
 			T p;
 			try {
-				Annotator.logger.info("Creating new instance of plugin {}", cl.getName());
+				Annotator.logger.debug("Creating new instance of {}", cl.getSimpleName());
 				p = cl.getDeclaredConstructor().newInstance();
 				instances.put(cl, p);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException

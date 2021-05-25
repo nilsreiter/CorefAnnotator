@@ -6,14 +6,14 @@
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout
-				pattern="%d{ISO8601} %-5level %logger{1.} %class{2}.%method - %msg%n" />
+				pattern="%d{ISO8601} %-5level %logger{1.} %class{1}.%method - %msg%n" />
 		</Console>
 		<RollingFile
 			filePattern="${sys:user.home}/.CorefAnnotator-%i.log.gz"
 			name="RollingFile" fileName="${sys:user.home}/.CorefAnnotator.log"
 			createOnDemand="true">
 			<PatternLayout
-				pattern="%d{ISO8601} %M %-5level %logger{36} - %msg%n" />
+				pattern="%d{ISO8601} %-5level %logger{1.} %class{1}.%method - %msg%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="250 MB" />
 			</Policies>
