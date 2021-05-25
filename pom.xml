@@ -231,8 +231,9 @@
 								<configuration>
 									<target>
 										<mkdir dir="target/generated-resources/docs" />
-										<mkdir dir="target/classes/docs" />
 										<exec executable="/usr/local/bin/pandoc">
+										    <arg value="-f" />
+										    <arg value="gfm" />
 											<arg value="CHANGELOG.md" />
 											<arg value="-o" />
 											<arg
@@ -247,10 +248,10 @@
 										</exec>
 										<exec executable="cat"
 											output="target/generated-resources/docs/whatsnew.html">
-											<arg value="target/classes/docs/whatsnew.head.html" />
+											<arg value="src/main/resources/docs/whatsnew.head.html" />
 											<arg
 												value="target/generated-resources/docs/changelog.html" />
-											<arg value="target/classes/docs/whatsnew.foot.html" />
+											<arg value="src/main/resources/docs/whatsnew.foot.html" />
 										</exec>
 									</target>
 								</configuration>
