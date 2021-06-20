@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -79,7 +79,7 @@ public class PluginManager {
 		if (!instances.containsKey(cl)) {
 			T p;
 			try {
-				Annotator.logger.info("Creating new instance of plugin {}", cl.getName());
+				Annotator.logger.debug("Creating new instance of {}", cl.getSimpleName());
 				p = cl.getDeclaredConstructor().newInstance();
 				instances.put(cl, p);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException

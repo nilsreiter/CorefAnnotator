@@ -11,7 +11,7 @@ import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateFlag;
 
 public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListener {
@@ -79,7 +79,7 @@ public class FlagTableModel implements TableModel, ModelAdapter, FlagModelListen
 		case 0:
 			return MaterialDesign.valueOf(f.getIcon());
 		case 1:
-			return f.getKey();
+			return f.getUuid();
 		case 2:
 			return f.getLabel();
 		case 3:

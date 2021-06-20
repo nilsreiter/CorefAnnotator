@@ -8,14 +8,14 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.dkpro.core.io.text.TextReader;
+import org.dkpro.core.stanfordnlp.StanfordCoreferenceResolver;
+import org.dkpro.core.stanfordnlp.StanfordParser;
+import org.dkpro.core.stanfordnlp.StanfordPosTagger;
+import org.dkpro.core.stanfordnlp.StanfordSegmenter;
 
-import de.tudarmstadt.ukp.dkpro.core.io.text.TextReader;
-import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordCoreferenceResolver;
-import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordParser;
-import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordPosTagger;
-import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordSegmenter;
 import de.unistuttgart.ims.coref.annotator.plugin.dkpro.ImportDKpro;
-import de.unistuttgart.ims.uimautil.SetJCasLanguage;
+import de.unistuttgart.ims.coref.annotator.uima.SetJCasLanguage;
 
 public class StanfordCoref extends de.unistuttgart.ims.coref.annotator.plugin.plaintext.Plugin {
 

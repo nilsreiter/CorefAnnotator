@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
@@ -24,10 +25,11 @@ import javax.swing.SwingUtilities;
 import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.UpdateCheck.Version;
+import de.unistuttgart.ims.coref.annotator.action.HelpAction;
 import de.unistuttgart.ims.coref.annotator.action.SetAnnotatorNameAction;
 import de.unistuttgart.ims.coref.annotator.action.TogglePreferenceAction;
 
-public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener {
+public abstract class AbstractWindow extends JFrame implements PreferenceChangeListener, HasDocumentModel {
 
 	private static final long serialVersionUID = 1L;
 	JPanel statusBar = new JPanel();
@@ -37,8 +39,8 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	JLabel miscLabel2 = new JLabel();
 	JPanel entityPanel = new JPanel();
 	Thread messageVoider;
-	JMenuBar menuBar = new JMenuBar();
-
+	protected JMenuBar menuBar = new JMenuBar();
+	JMenu menu_help = new JMenu(Annotator.getString(Strings.MENU_HELP));
 	JMenu menu_settings = null;
 
 	public AbstractWindow() {
@@ -46,6 +48,8 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	}
 
 	protected void initializeWindow() {
+		menu_help.add(new HelpAction());
+
 		SpringLayout springs = new SpringLayout();
 		statusBar = new JPanel();
 		statusBar.setPreferredSize(new Dimension(800, 20));
@@ -75,6 +79,12 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 		JLabel versionLabel = new JLabel(Annotator.getAppName() + " " + Version.get().toString());
 		versionLabel.setPreferredSize(new Dimension(220, 20));
 		statusBar.add(versionLabel);
+
+		// activate for debug
+		// miscLabel.setBorder(BorderFactory.createLineBorder(Color.cyan));
+		// miscLabel2.setBorder(BorderFactory.createLineBorder(Color.cyan));
+		miscLabel.setPreferredSize(new Dimension(150, 20));
+		miscLabel2.setPreferredSize(new Dimension(150, 20));
 
 		// from east
 		springs.putConstraint(SpringLayout.EAST, versionLabel, 10, SpringLayout.EAST, statusBar);
@@ -178,36 +188,51 @@ public abstract class AbstractWindow extends JFrame implements PreferenceChangeL
 	}
 
 	public JMenu initialiseMenuSettings() {
+		JMenuItem mi;
+
 		menu_settings = new JMenu(Annotator.getString(Strings.MENU_SETTINGS));
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_ANNOTATION_BEHAVIOUR));
+		mi.setEnabled(false);
+
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_TRIM_WHITESPACE)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
+		menu_settings.add(new JCheckBoxMenuItem(
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
+		menu_settings.add(
+				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_STICKY_FLAGS)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_USER_INTERFACE));
+		mi.setEnabled(false);
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TEXT_LABELS)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_LINE_NUMBER_IN_TREE)));
-		menu_settings.add(
-				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_FULL_TOKENS)));
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_KEEP_TREE_SORTED)));
 		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_DELETE_EMPTY_ENTITIES)));
-		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
-		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_UNDERLINE_SINGLETONS_IN_GRAY)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_COMPARE_VIEW));
+		mi.setEnabled(false);
 		menu_settings.add(new JCheckBoxMenuItem(
 				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_IGNORE_SINGLETONS_WHEN_COMPARING)));
 		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_REPLACE_MENTION)));
-		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_UNDERLINE_SINGLETONS_IN_GRAY)));
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_COMPARE_BY_ENTITY_NAME)));
+
+		menu_settings.addSeparator();
+		mi = menu_settings.add(Annotator.getString(Strings.MENU_SETTINGS_CATEGORY_MISC));
+		mi.setEnabled(false);
 		menu_settings.add(
 				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_SHOW_TOC)));
+		menu_settings.add(new SetAnnotatorNameAction(Annotator.app));
 		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_CREATE_DEFAULT_FLAGS)));
-		menu_settings.add(new JCheckBoxMenuItem(
-				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_COMPARE_BY_ENTITY_NAME)));
-		menu_settings.add(
-				new JCheckBoxMenuItem(TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_STICKY_FLAGS)));
+				TogglePreferenceAction.getAction(Annotator.app, Constants.SETTING_ASK_BEFORE_FILE_OVERWRITE)));
 
 		return menu_settings;
 

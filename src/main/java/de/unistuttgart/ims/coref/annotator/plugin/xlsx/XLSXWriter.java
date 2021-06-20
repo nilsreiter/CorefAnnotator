@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -25,17 +25,16 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.RangedHashSetValuedHashMap;
-import de.unistuttgart.ims.coref.annotator.Util;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Flag;
-import de.unistuttgart.ims.coref.annotator.api.v1.Line;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
-import de.unistuttgart.ims.coref.annotator.api.v1.Segment;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Line;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.ContextUnit;
 import de.unistuttgart.ims.coref.annotator.plugins.SingleFileStream;
-import de.unistuttgart.ims.coref.annotator.uima.AnnotationComparator;
 import de.unistuttgart.ims.coref.annotator.uima.AnnotationLengthComparator;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class XLSXWriter extends SingleFileStream {
 
@@ -94,7 +93,7 @@ public class XLSXWriter extends SingleFileStream {
 	public void write(JCas jcas, OutputStream os) throws IOException {
 
 		ImmutableList<Mention> allMentions = Lists.mutable.withAll(JCasUtil.select(jcas, Mention.class))
-				.sortThis(new AnnotationComparator()).toImmutable();
+				.sortThis(new MentionComparator()).toImmutable();
 		ImmutableList<Flag> allFlags = Lists.immutable.withAll(JCasUtil.select(jcas, Flag.class));
 
 		ImmutableList<Flag> mentionFlags = allFlags
@@ -141,38 +140,39 @@ public class XLSXWriter extends SingleFileStream {
 			for (Mention mention : allMentions.select(m -> m.getEntity() == entity)) {
 				row = sheet.createRow(rowNum++);
 				cellNum = 0;
-				String surface = mention.getCoveredText();
-				if (mention.getDiscontinuous() != null)
-					surface += " " + mention.getDiscontinuous().getCoveredText();
+				String surface = UimaUtil.getCoveredText(mention);
 				if (optionReplaceNewlines)
 					surface = surface.replaceAll(" ?[\n\r\f]+ ?", replacementForNewlines);
-				row.createCell(cellNum++).setCellValue(mention.getBegin());
-				row.createCell(cellNum++).setCellValue(mention.getEnd());
+				row.createCell(cellNum++).setCellValue(UimaUtil.getBegin(mention));
+				row.createCell(cellNum++).setCellValue(UimaUtil.getEnd(mention));
 				if (optionIncludeLineNumbers) {
 					if (segmentIndex.notEmpty()) {
-						Segment segment = Lists.mutable.ofAll(segmentIndex.get(mention.getBegin()))
+						Segment segment = Lists.mutable.ofAll(segmentIndex.get(UimaUtil.getBegin(mention)))
 								.min(new AnnotationLengthComparator<Segment>());
 						row.createCell(cellNum++).setCellValue(segment.getLabel());
-						segment = Lists.mutable.ofAll(segmentIndex.get(mention.getEnd()))
+						segment = Lists.mutable.ofAll(segmentIndex.get(UimaUtil.getEnd(mention)))
 								.min(new AnnotationLengthComparator<Segment>());
 						row.createCell(cellNum++).setCellValue(segment.getLabel());
 					}
+
+					int lineNumberBegin = -1, lineNumberEnd = -1;
 					try {
-						row.createCell(cellNum++)
-								.setCellValue(JCasUtil.selectPreceding(Line.class, mention, 1).get(0).getNumber());
+						lineNumberBegin = JCasUtil.selectPreceding(Line.class, mention.getSurface(0), 1).get(0)
+								.getNumber();
 					} catch (Exception e) {
-						row.createCell(cellNum++).setCellValue(-1);
+						// catch silently
 					}
+					row.createCell(cellNum++).setCellValue(lineNumberBegin);
 					try {
 						Annotation a = new Annotation(jcas);
-						a.setBegin(mention.getEnd());
-						a.setEnd(mention.getEnd());
+						a.setBegin(UimaUtil.getEnd(mention));
+						a.setEnd(UimaUtil.getEnd(mention));
 
-						row.createCell(cellNum++)
-								.setCellValue(JCasUtil.selectPreceding(Line.class, a, 1).get(0).getNumber());
+						lineNumberEnd = JCasUtil.selectFollowing(Line.class, a, 1).get(0).getNumber();
 					} catch (Exception e) {
-						row.createCell(cellNum++).setCellValue(-1);
+						// catch silently
 					}
+					row.createCell(cellNum++).setCellValue(lineNumberEnd);
 				}
 				if (optionContextWidth > 0) {
 					try {
@@ -203,12 +203,12 @@ public class XLSXWriter extends SingleFileStream {
 				}
 				row.createCell(cellNum++).setCellValue(entityNum);
 				row.createCell(cellNum++).setCellValue(entity.getLabel());
-				row.createCell(cellNum++).setCellValue((entity instanceof EntityGroup));
+				row.createCell(cellNum++).setCellValue(UimaUtil.isGroup(entity));
 				for (Flag flag : entityFlags) {
-					row.createCell(cellNum++).setCellValue(Util.isX(entity, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(entity, flag));
 				}
 				for (Flag flag : mentionFlags) {
-					row.createCell(cellNum++).setCellValue(Util.isX(mention, flag.getKey()));
+					row.createCell(cellNum++).setCellValue(UimaUtil.isX(mention, flag));
 				}
 			}
 			entityNum++;
@@ -273,32 +273,33 @@ public class XLSXWriter extends SingleFileStream {
 		switch (optionContextUnit) {
 		case LINE:
 			if (backward) {
-				int leftEnd = Lists.immutable.withAll(JCasUtil.selectPreceding(Line.class, mention, optionContextWidth))
+				int leftEnd = Lists.immutable
+						.withAll(JCasUtil.selectPreceding(Line.class, mention.getSurface(0), optionContextWidth))
 						.collect(l -> l.getBegin()).min();
 				if (optionTrimWhitespace) {
-					return text.substring(leftEnd, mention.getBegin()).trim();
+					return text.substring(leftEnd, UimaUtil.getBegin(mention)).trim();
 				} else {
-					return text.substring(leftEnd, mention.getBegin());
+					return text.substring(leftEnd, UimaUtil.getBegin(mention));
 				}
 			} else {
 				int rightEnd = Lists.immutable
-						.withAll(JCasUtil.selectFollowing(Line.class, mention, optionContextWidth))
+						.withAll(JCasUtil.selectFollowing(Line.class, UimaUtil.getLast(mention), optionContextWidth))
 						.collect(l -> l.getEnd()).max();
 				if (optionTrimWhitespace) {
-					return text.substring(mention.getEnd(), rightEnd).trim();
+					return text.substring(UimaUtil.getEnd(mention), rightEnd).trim();
 				} else {
-					return text.substring(mention.getEnd(), rightEnd);
+					return text.substring(UimaUtil.getEnd(mention), rightEnd);
 				}
 			}
 		default:
 			if (backward)
 				if (optionTrimWhitespace) {
-					return StringUtils.right(text.substring(0, mention.getBegin()).trim(), optionContextWidth);
+					return StringUtils.right(text.substring(0, UimaUtil.getBegin(mention)).trim(), optionContextWidth);
 				} else {
 					return StringUtils.right(text, optionContextWidth);
 				}
 			else if (optionTrimWhitespace) {
-				return StringUtils.left(text.substring(mention.getEnd()).trim(), optionContextWidth);
+				return StringUtils.left(text.substring(UimaUtil.getEnd(mention)).trim(), optionContextWidth);
 			} else {
 				return StringUtils.left(text, optionContextWidth);
 			}

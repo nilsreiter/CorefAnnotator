@@ -21,12 +21,14 @@ public abstract class IkonAction extends AbstractAction {
 	MutableList<Ikon> ikon;
 	Color enabledColor = Color.BLACK;
 	Color disabledColor = Color.GRAY;
+	static int smallIkonSize = 12;
+	static int largeIkonSize = 16;
 
 	public IkonAction(Ikon... icon) {
 		this.ikon = Lists.mutable.of(icon);
 		try {
-			putValue(Action.LARGE_ICON_KEY, FontIcon.of(ikon.get(0), enabledColor));
-			putValue(Action.SMALL_ICON, FontIcon.of(ikon.get(0), enabledColor));
+			putValue(Action.LARGE_ICON_KEY, getLargeIcon(ikon.get(0)));
+			putValue(Action.SMALL_ICON, getSmallIcon(ikon.get(0)));
 		} catch (UnsupportedOperationException e) {
 			Annotator.logger.catching(e);
 		}
@@ -37,8 +39,8 @@ public abstract class IkonAction extends AbstractAction {
 		putValue(Action.NAME, Annotator.getString(stringKey));
 		try {
 			if (icon != null) {
-				putValue(Action.LARGE_ICON_KEY, getIcon());
-				putValue(Action.SMALL_ICON, getIcon());
+				putValue(Action.LARGE_ICON_KEY, getLargeIcon());
+				putValue(Action.SMALL_ICON, getSmallIcon());
 			}
 		} catch (UnsupportedOperationException e) {
 			Annotator.logger.catching(e);
@@ -53,8 +55,8 @@ public abstract class IkonAction extends AbstractAction {
 			putValue(Action.NAME, Annotator.getStringWithDefault(stringKey, stringKey));
 		try {
 			if (icon != null) {
-				putValue(Action.LARGE_ICON_KEY, getIcon());
-				putValue(Action.SMALL_ICON, getIcon());
+				putValue(Action.LARGE_ICON_KEY, getLargeIcon());
+				putValue(Action.SMALL_ICON, getSmallIcon());
 			}
 		} catch (UnsupportedOperationException e) {
 			Annotator.logger.catching(e);
@@ -65,8 +67,8 @@ public abstract class IkonAction extends AbstractAction {
 	public void setEnabled(boolean b) {
 		super.setEnabled(b);
 		try {
-			putValue(Action.LARGE_ICON_KEY, getIcon());
-			putValue(Action.SMALL_ICON, getIcon());
+			putValue(Action.LARGE_ICON_KEY, getLargeIcon());
+			putValue(Action.SMALL_ICON, getSmallIcon());
 		} catch (UnsupportedOperationException e) {
 			Annotator.logger.catching(e);
 		}
@@ -78,16 +80,24 @@ public abstract class IkonAction extends AbstractAction {
 
 	public void addIkon(Ikon ik) {
 		ikon.add(ik);
-		putValue(Action.LARGE_ICON_KEY, getIcon());
-		putValue(Action.SMALL_ICON, getIcon());
+		putValue(Action.LARGE_ICON_KEY, getLargeIcon());
+		putValue(Action.SMALL_ICON, getSmallIcon());
 
 	}
 
-	protected Icon getIcon(Ikon ik) {
-		return FontIcon.of(ik, (isEnabled() ? enabledColor : disabledColor));
+	protected Icon getSmallIcon(Ikon ik) {
+		return FontIcon.of(ik, smallIkonSize, (isEnabled() ? enabledColor : disabledColor));
 	}
 
-	public Icon getIcon() {
-		return new CompoundIcon(ikon.collect(ik -> getIcon(ik)).toArray(new Icon[ikon.size()]));
+	protected Icon getLargeIcon(Ikon ik) {
+		return FontIcon.of(ik, largeIkonSize, (isEnabled() ? enabledColor : disabledColor));
+	}
+
+	public Icon getSmallIcon() {
+		return new CompoundIcon(ikon.collect(ik -> getSmallIcon(ik)).toArray(new Icon[ikon.size()]));
+	}
+
+	public Icon getLargeIcon() {
+		return new CompoundIcon(ikon.collect(ik -> getLargeIcon(ik)).toArray(new Icon[ikon.size()]));
 	}
 }

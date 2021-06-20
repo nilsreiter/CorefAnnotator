@@ -31,11 +31,12 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 		Annotator.logger.info("Saving ... ");
 		OutputStream os = null;
 		try {
-			if (file.getName().endsWith(".xmi")) {
-				os = new FileOutputStream(file);
-			} else if (file.getName().endsWith(".gz")) {
+			if (file.getName().endsWith(".ca2z")) {
 				os = new GZIPOutputStream(new FileOutputStream(file));
+			} else if (file.getName().endsWith(".ca2")) {
+				os = new FileOutputStream(file);
 			}
+
 			if (os != null)
 				XmiCasSerializer.serialize(jcas.getCas(), null, os, true, null);
 		} finally {
@@ -55,7 +56,6 @@ public class SaveJCasWorker extends SwingWorker<Object, Object> {
 	public static BiConsumer<File, JCas> getConsumer(DocumentWindow target) {
 		return (file, jcas) -> {
 			Annotator.app.addRecentFile(file);
-			Annotator.app.refreshRecents();
 			Annotator.app.setCurrentDirectory(file.getParentFile());
 			target.getDocumentModel().getHistory().clear();
 			target.setFile(file);

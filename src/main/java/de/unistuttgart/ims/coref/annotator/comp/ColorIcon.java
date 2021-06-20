@@ -90,4 +90,18 @@ public class ColorIcon implements Icon {
 		g.setColor(color);
 		g.fillRect(x, y, w, h);
 	}
+
+	/**
+	 * @return the insets
+	 */
+	public Insets getInsets() {
+		return insets;
+	}
+
+	/**
+	 * @param insets the insets to set
+	 */
+	public void setInsets(Insets insets) {
+		this.insets = insets;
+	}
 }

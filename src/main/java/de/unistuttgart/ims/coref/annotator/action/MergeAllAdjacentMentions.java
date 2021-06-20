@@ -1,14 +1,16 @@
 package de.unistuttgart.ims.coref.annotator.action;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 
-import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
+import org.eclipse.collections.impl.factory.SortedSets;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Strings;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 public class MergeAllAdjacentMentions extends TargetedIkonAction<DocumentWindow> {
 
@@ -21,7 +23,10 @@ public class MergeAllAdjacentMentions extends TargetedIkonAction<DocumentWindow>
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JCas jcas = getTarget().getJCas();
-		FSIterator<Mention> mentionIterator = jcas.getAnnotationIndex(Mention.class).iterator();
+
+		ImmutableSortedSet<Mention> mentions = SortedSets.immutable.withAll(jcas.getIndexedFSs(Mention.class));
+
+		Iterator<Mention> mentionIterator = mentions.iterator();
 
 		Mention current = null, previous = null;
 		while (mentionIterator.hasNext()) {

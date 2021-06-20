@@ -15,9 +15,13 @@ public class SelectedFileOpenAction extends IkonAction {
 
 	public SelectedFileOpenAction(Annotator mApplication, File file) {
 		super(MaterialDesign.MDI_OPEN_IN_APP);
-		putValue(Action.NAME, file.getName());
-		putValue(Action.SHORT_DESCRIPTION, file.getPath());
-		this.file = file;
+		if (file != null) {
+			putValue(Action.NAME, file.getName());
+			putValue(Action.SHORT_DESCRIPTION, file.getPath());
+			this.file = file;
+		} else {
+			this.setEnabled(false);
+		}
 	}
 
 	@Override
@@ -30,6 +34,17 @@ public class SelectedFileOpenAction extends IkonAction {
 
 			}
 		}.run();
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		putValue(Action.NAME, file.getName());
+		putValue(Action.SHORT_DESCRIPTION, file.getPath());
+		this.file = file;
+		this.setEnabled(true);
 	}
 
 }

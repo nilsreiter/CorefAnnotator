@@ -3,7 +3,7 @@ package de.unistuttgart.ims.coref.annotator.document.op;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 
 public class RenameAllEntities implements CoreferenceModelOperation {
 	public static enum Strategy {

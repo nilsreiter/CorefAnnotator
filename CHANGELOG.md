@@ -3,6 +3,47 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 2.0.0
+
+- New: Discontinuous annotations. A single mention can now 
+  consist of multiple spans. Mention parts, that have been used for 
+  relative clauses and such are gone. Add a new span to a mention by
+  dragging it onto the mention in the tree. #293, #104
+- New: Analysis functions. From the main window, files can 
+  now be opened in the analyzer view, which offers 
+  visualizations and some statistics for the annotations. #292
+- New: Annotation guidelines can now be linked via a profile. They
+  appear directly in the Help menu. #12
+- Files are now saved with a specific file extension to avoid confusion
+  and accidental decompression. The file extension is .ca2 for uncompressed, 
+  git-friendly files and .ca2z for gzip compressed files. Compression  
+  makes the files roughly ten times smaller. #335
+- Search is now case-insensitive by default #320
+- Various UI tweaks 
+- Main window now shows a section if a version is opened for the first time
+- Updated Dependencies
+  - log4j: 2.12.1 -> 2.13.3
+  - guava: 28.1-jre -> 30.1-jre
+  - reflections: 0.9.11 -> 0.9.12
+  - mockito: 3.1.0 -> 3.4.4
+  - dkpro: 1.9.0 -> 2.1.0
+  - uima: 2.10.2 -> 3.1.1
+  - eclipse collections: 9.2.0 -> 10.2.0
+  - javafx: 13.0.1 -> 14.0.2.1
+  - ikonli: 2.1.1 -> 11.5.0
+  - poi: 4.1.1 -> 4.1.2
+  
+
+## 1.15.2
+
+- Command line tool ExportMultipleFiles no longer tries to descend into 
+  sub directories #367
+
+## 1.15.1
+
+- Files without segments no longer show empty parentheses in tree view #311
+- Save and close now works properly for imported files #357
+
 ## 1.15.0
 
 - The entity tree can now also be sorted based on last change (to the entity). 

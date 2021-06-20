@@ -143,7 +143,9 @@ public class Plugin extends de.unistuttgart.ims.coref.annotator.plugin.csv.CsvEx
 						Defaults.CFG_OPTION_AUTO_OPEN, Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN,
 						Strings.DIALOG_EXPORT_OPTIONS_AUTO_OPEN_TOOLTIP));
 
-		new PluginConfigurationDialog(parent, this, callback, options).setVisible(true);
+		PluginConfigurationDialog pcd = new PluginConfigurationDialog(parent, this, callback, options);
+		pcd.setDescription(Annotator.getString(Strings.DIALOG_EXPORT_OPTIONS_WARNING_1));
+		pcd.setVisible(true);
 
 	}
 

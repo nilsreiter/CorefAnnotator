@@ -37,6 +37,9 @@ public class HelpWindow extends JFrame {
 		public static final HelpTopic FLAGS = topics[4];
 		public static final HelpTopic IO = topics[5];
 		public static final HelpTopic SEARCH = topics[6];
+		public static final HelpTopic PREFERENCES = topics[7];
+		public static final HelpTopic PROFILE = topics[8];
+		public static final HelpTopic WHATSNEW = topics[9];
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -46,7 +49,8 @@ public class HelpWindow extends JFrame {
 			new HelpTopic("How to annotate", "howto"), new HelpTopic("Compare annotations", "compare"),
 			new HelpTopic("Automatic processing", "processing"), new HelpTopic("Flag editing", "flags"),
 			new HelpTopic("Input/Output", "io", s -> new JScrollPane(loadIOPlugins())),
-			new HelpTopic("Search", "search") };
+			new HelpTopic("Search", "search"), new HelpTopic("Preferences", "preferences"),
+			new HelpTopic("Profiles", "profile"), new HelpTopic("What's new?", "whatsnew") };
 
 	JList<String> topicList;
 
@@ -80,7 +84,7 @@ public class HelpWindow extends JFrame {
 
 	}
 
-	protected static JEditorPane load(String path) {
+	protected static Component load(String path) {
 		JEditorPane textArea;
 		try {
 			if (!path.endsWith(".html"))
@@ -107,7 +111,7 @@ public class HelpWindow extends JFrame {
 					}
 				}
 			});
-			return textArea;
+			return new JScrollPane(textArea);
 		} catch (IOException e) {
 			Annotator.logger.catching(e);
 		}
@@ -159,7 +163,7 @@ public class HelpWindow extends JFrame {
 			hw.topicList.setSelectedIndex(0);
 		else
 			for (int i = 0; i < topics.length; i++)
-				if (topics[i].getTitle().equalsIgnoreCase(topic.getKey()))
+				if (topics[i].getKey().equalsIgnoreCase(topic.getKey()))
 					hw.topicList.setSelectedIndex(i);
 		return hw;
 	}

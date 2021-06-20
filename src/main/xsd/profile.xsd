@@ -43,6 +43,14 @@
     					</sequence>
     				</complexType>
     			</element>
+    			<element name="guidelines" maxOccurs="1"
+    				minOccurs="0">
+    				<complexType>
+    					<attribute name="url" type="anyURI" use="required"></attribute>
+    					<attribute name="title" type="string" use="optional"></attribute>
+    					<attribute name="version" type="string" use="optional"></attribute>
+    				</complexType>
+    			</element>
     		</all>
     		<attribute name="name" type="string" use="required"></attribute>
     	</complexType>
@@ -50,7 +58,7 @@
 
     <complexType name="entityType">
     	<attribute name="label" type="string"></attribute>
-    	<attribute name="color" type="int"></attribute>
+    	<attribute name="color" type="string"></attribute>
     	<attribute name="shortcut">
     		<simpleType>
     			<restriction base="string">
@@ -63,10 +71,10 @@
     </complexType>
 
     <complexType name="flagType">
-    	<attribute name="label" type="string"></attribute>
-    	<attribute name="icon" type="string"></attribute>
-    	<attribute name="uuid" type="string"></attribute>
-    	<attribute name="targetClass" type="Q1:targetClassType"></attribute>
+    	<attribute name="label" type="string" use="required"></attribute>
+    	<attribute name="icon" type="string" use="optional"></attribute>
+    	<attribute name="uuid" type="string" use="required"></attribute>
+    	<attribute name="targetClass" type="Q1:targetClassType" use="required"></attribute>
     </complexType>
 
     <simpleType name="targetClassType">

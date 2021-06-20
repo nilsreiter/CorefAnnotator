@@ -11,7 +11,7 @@ import javax.swing.ListCellRenderer;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import  de.unistuttgart.ims.coref.annotator.api.v2.Mention;
 
 class SearchResultRenderer<T extends SearchResult> implements ListCellRenderer<T> {
 

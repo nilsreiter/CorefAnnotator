@@ -11,23 +11,27 @@ import javax.swing.tree.TreePath;
 
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
-import org.apache.uima.jcas.cas.StringArray;
+import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.factory.SortedSets;
 
 import de.unistuttgart.ims.coref.annotator.Annotator;
 import de.unistuttgart.ims.coref.annotator.CATreeNode;
 import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.Defaults;
 import de.unistuttgart.ims.coref.annotator.EntitySortOrder;
-import de.unistuttgart.ims.coref.annotator.api.v1.DetachedMentionPart;
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.EntityGroup;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.comp.SortingTreeModelListener;
+import de.unistuttgart.ims.coref.annotator.document.CoreferenceModel.EntitySorter;
 import de.unistuttgart.ims.coref.annotator.document.op.UpdateEntityName;
+import de.unistuttgart.ims.coref.annotator.uima.MentionComparator;
+import de.unistuttgart.ims.coref.annotator.uima.UimaUtil;
 
 public class EntityTreeModel extends DefaultTreeModel implements CoreferenceModelListener, Model, ModelAdapter {
 	private static final long serialVersionUID = 1L;
@@ -68,6 +72,8 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			node = new CATreeNode(fs, ((Entity) fs).getLabel());
 		} else if (fs instanceof Annotation) {
 			node = new CATreeNode(fs, ((Annotation) fs).getCoveredText());
+		} else if (fs instanceof Mention) {
+			node = new CATreeNode(fs, UimaUtil.getCoveredText((Mention) fs));
 		}
 		if (node != null)
 			fsMap.put(fs, node);
@@ -82,11 +88,13 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 		case Add:
 			CATreeNode arg0 = get(event.getArgument(0));
 			for (FeatureStructure fs : event.iterable(1)) {
-				if (fs instanceof Mention || fs instanceof Entity || fs instanceof DetachedMentionPart) {
+				if (fs instanceof MentionSurface) {
+					nodeChanged(arg0);
+				} else if (fs instanceof Mention || fs instanceof Entity) {
 					CATreeNode tn = createNode(fs);
 					insertNodeInto(tn, arg0, getInsertPosition(arg0, fs));
-					if (fs instanceof EntityGroup) {
-						EntityGroup eg = (EntityGroup) fs;
+					if (fs instanceof Entity && UimaUtil.isGroup(fs)) {
+						Entity eg = (Entity) fs;
 						for (int j = 0; j < eg.getMembers().size(); j++)
 							try {
 								insertNodeInto(new CATreeNode(eg.getMembers(j)), tn, 0);
@@ -100,7 +108,7 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			optResort();
 			break;
 		case Remove:
-			if (event.getArgument1() instanceof EntityGroup) {
+			if (UimaUtil.isGroup(event.getArgument1())) {
 				CATreeNode gn = fsMap.get(event.getArgument1());
 				MutableList<FeatureStructure> members = Lists.mutable.withAll(gn.getChildren())
 						.collect(n -> n.getFeatureStructure());
@@ -219,19 +227,17 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 	}
 
 	private void initialise() {
-		Lists.immutable.withAll(JCasUtil.select(coreferenceModel.getJCas(), Entity.class)).forEach(e -> {
+		for (Entity e : coreferenceModel.getEntities(EntitySorter.ADDRESS)) {
 			entityEvent(Event.get(this, Event.Type.Add, null, e));
-		});
-		Annotator.logger.debug("Added all entities");
-
-		for (Mention m : JCasUtil.select(coreferenceModel.getJCas(), Mention.class)) {
-			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
-			if (m.getDiscontinuous() != null)
-				entityEvent(Event.get(this, Event.Type.Add, m, m.getDiscontinuous()));
-			// last modified should only represent user actions, so reset
-			get(m.getEntity()).resetLastModified();
 		}
-		Annotator.logger.debug("Added all mentions");
+		MentionComparator mc = new MentionComparator();
+		// this is needed for ascending sorting
+		mc.setDescending(true);
+		for (Mention m : SortedSets.immutable.withAll(mc, JCasUtil.select(coreferenceModel.getJCas(), Mention.class))) {
+			entityEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
+		}
+
+		Annotator.logger.debug("Added all entities and mentions.");
 	}
 
 	protected boolean matches(Pattern pattern, CATreeNode e) {
@@ -244,10 +250,10 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 			if (m.find())
 				return true;
 		}
-		StringArray flags = e.getEntity().getFlags();
+		FSList<Flag> flags = e.getEntity().getFlags();
 		if (flags != null)
-			for (int i = 0; i < e.getEntity().getFlags().size(); i++) {
-				m = pattern.matcher(e.getEntity().getFlags(i));
+			for (int i = 0; i < e.getEntity().getFlags().getLength(); i++) {
+				m = pattern.matcher(flags.getNthElement(i).getLabel());
 				if (m.find())
 					return true;
 			}

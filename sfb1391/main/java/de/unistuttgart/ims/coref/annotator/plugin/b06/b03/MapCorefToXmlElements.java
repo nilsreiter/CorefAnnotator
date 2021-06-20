@@ -1,8 +1,10 @@
 package de.unistuttgart.ims.coref.annotator.plugin.b06.b03;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.factory.AnnotationFactory;
@@ -10,11 +12,13 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Sets;
 
-import de.unistuttgart.ims.coref.annotator.api.v1.Entity;
-import de.unistuttgart.ims.coref.annotator.api.v1.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
+import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.uima.io.xml.type.XMLElement;
 
 public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
@@ -44,10 +48,31 @@ public class MapCorefToXmlElements extends JCasAnnotator_ImplBase {
 		for (Mention m : JCasUtil.select(jcas, Mention.class)) {
 			Entity e = m.getEntity();
 			String xid = toXmlId(e);
-			XMLElement newElement = AnnotationFactory.createAnnotation(jcas, m.getBegin(), m.getEnd(),
-					XMLElement.class);
-			newElement.setTag(RS);
-			newElement.setAttributes(" ref=\"#" + xid + "\"");
+
+			boolean first = true;
+			String mentionId = UUID.randomUUID().toString();
+			for (MentionSurface ms : m.getSurface()) {
+				XMLElement newElement = AnnotationFactory.createAnnotation(jcas, ms.getBegin(), ms.getEnd(),
+						XMLElement.class);
+				newElement.setTag("rs");
+
+				StringBuilder b = new StringBuilder();
+				b.append(' ').append("ref=\"#").append(xid).append('"');
+				if (first) {
+					if (m.getSurface().size() > 1)
+						b.append(" id=\"").append(mentionId).append('"');
+					if (m.getFlags() != null && !m.getFlags().isEmpty())
+						b.append(" ana=\"")
+								.append(StringUtils
+										.join(Lists.immutable.withAll(m.getFlags()).collect(f -> f.getUuid()), ","))
+								.append('"');
+					first = false;
+				} else {
+					b.append(' ').append("prev=\"").append(mentionId).append("\"");
+				}
+				newElement.setAttributes(b.toString());
+			}
+
 		}
 	}
 

@@ -13,8 +13,8 @@ import org.eclipse.collections.impl.factory.Multimaps;
 import org.kordamp.ikonli.materialdesign.MaterialDesign;
 
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity;
+import de.unistuttgart.ims.coref.annotator.AbstractWindow;
 import de.unistuttgart.ims.coref.annotator.Annotator;
-import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.Span;
 import de.unistuttgart.ims.coref.annotator.document.DocumentState;
 import de.unistuttgart.ims.coref.annotator.document.DocumentStateListener;
@@ -22,13 +22,13 @@ import de.unistuttgart.ims.coref.annotator.document.op.AddMentionsToNewEntity;
 import de.unistuttgart.ims.coref.annotator.document.op.Operation;
 import de.unistuttgart.ims.coref.annotator.plugins.ProcessingPlugin;
 
-public class ProcessAction extends DocumentWindowAction implements DocumentStateListener {
+public class ProcessAction extends TargetedIkonAction<AbstractWindow> implements DocumentStateListener {
 
 	private static final long serialVersionUID = 1L;
 
 	ProcessingPlugin plugin;
 
-	public ProcessAction(DocumentWindow dw, ProcessingPlugin plugin) {
+	public ProcessAction(AbstractWindow dw, ProcessingPlugin plugin) {
 		super(dw, plugin.getName(), false, MaterialDesign.MDI_AUTO_FIX);
 		this.plugin = plugin;
 	}
