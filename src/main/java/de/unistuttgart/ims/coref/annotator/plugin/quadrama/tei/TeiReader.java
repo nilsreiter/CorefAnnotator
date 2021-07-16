@@ -8,6 +8,7 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
 import org.dkpro.core.api.io.ResourceCollectionReaderBase;
 import org.dkpro.core.api.resources.CompressionUtils;
 import org.eclipse.collections.api.map.MutableMap;
@@ -21,6 +22,7 @@ import de.unistuttgart.ims.coref.annotator.ColorProvider;
 import de.unistuttgart.ims.coref.annotator.TypeSystemVersion;
 import de.unistuttgart.ims.coref.annotator.api.v2.Entity;
 import de.unistuttgart.ims.coref.annotator.api.v2.Mention;
+import de.unistuttgart.ims.coref.annotator.api.v2.MentionSurface;
 import de.unistuttgart.ims.coref.annotator.api.v2.Segment;
 import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIBody;
 import de.unistuttgart.ims.coref.annotator.api.v2.tei.TEIHeader;
@@ -60,23 +62,37 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addGlobalRule("titleStmt > title:first-child", (d, e) -> d.setDocumentTitle(e.text()));
 
 		// characters declared in the header (GerDraCor)
-		gxr.addGlobalRule("profileDesc [xml:id]", Mention.class, (m, e) -> {
+		gxr.addGlobalRule("profileDesc [xml:id]", MentionSurface.class, (ms, e) -> {
 			Entity cf = new Entity(jcas);
 			cf.addToIndexes();
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
+			Mention m = new Mention(jcas);
+			m.addToIndexes();
+
+			m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+			m.setSurface(0, ms);
+			m.getSurface().addToIndexes();
 			m.setEntity(cf);
+			ms.setMention(m);
 		});
 
 		// other entities declared in the text (QuaDramA legacy)
-		gxr.addGlobalRule("text [xml:id]", Mention.class, (m, e) -> {
+		gxr.addGlobalRule("text [xml:id]", MentionSurface.class, (ms, e) -> {
 			Entity cf = new Entity(jcas);
 			cf.addToIndexes();
 			cf.setLabel(e.attr("xml:id"));
 			cf.setColor(colorProvider.getNextColor().getRGB());
 			entityMap.put(e.attr("xml:id"), cf);
+			Mention m = new Mention(jcas);
+			m.addToIndexes();
+
+			m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+			m.setSurface(0, ms);
+			m.getSurface().addToIndexes();
 			m.setEntity(cf);
+			ms.setMention(m);
 		});
 
 		gxr.addRule("text speaker", Speaker.class);
@@ -85,7 +101,13 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		gxr.addRule("TEI > text > body", TEIBody.class);
 
 		// entity references
-		gxr.addRule("text rs[ref]", Mention.class, (m, e) -> {
+		gxr.addRule("text rs[ref]", MentionSurface.class, (ms, e) -> {
+			Mention m = new Mention(jcas);
+			m.addToIndexes();
+			m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+			m.setSurface(0, ms);
+			m.getSurface().addToIndexes();
+			ms.setMention(m);
 			String id = e.attr("ref").substring(1);
 			Entity entity = entityMap.get(id);
 			if (entity == null) {
@@ -100,8 +122,14 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		});
 
 		// entity references (QuaDramA legacy)
-		gxr.addRule("text name[ref]", Mention.class, (m, e) -> {
+		gxr.addRule("text name[ref]", MentionSurface.class, (ms, e) -> {
 			String id = e.attr("ref").substring(1);
+			Mention m = new Mention(jcas);
+			m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+			m.setSurface(0, ms);
+			m.getSurface().addToIndexes();
+			m.addToIndexes();
+			ms.setMention(m);
 			Entity entity = entityMap.get(id);
 			if (entity == null) {
 				entity = new Entity(jcas);
@@ -115,8 +143,15 @@ public class TeiReader extends ResourceCollectionReaderBase {
 		});
 
 		// identify speaker tags
-		gxr.addRule("text speaker", Mention.class, (m, e) -> {
+		gxr.addRule("text speaker", MentionSurface.class, (ms, e) -> {
 			Element parent = e.parent();
+			Mention m = new Mention(jcas);
+			m.setSurface(new FSArray<MentionSurface>(jcas, 1));
+			m.setSurface(0, ms);
+			m.getSurface().addToIndexes();
+			m.addToIndexes();
+			ms.setMention(m);
+
 			if (parent.hasAttr("who")) {
 				String id = parent.attr("who").substring(1);
 				Entity entity = entityMap.get(id);
