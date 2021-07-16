@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 2.0.1
+
+- Fixes an issue that prevented expanding the tree properly in some imported files #373
+- Fixes an issue in the QuaDramA/TEI importer #374
+
 ## 2.0.0
 
 - New: Discontinuous annotations. A single mention can now 
