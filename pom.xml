@@ -86,6 +86,7 @@
 							<manifestEntries>
 								<Main-Class>de.unistuttgart.ims.coref.annotator.Annotator</Main-Class>
 								<Build-Number>${project.version}</Build-Number>
+								<Multi-Release>true</Multi-Release>
 							</manifestEntries>
 						</transformer>
 						<transformer
