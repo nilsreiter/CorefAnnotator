@@ -3,6 +3,13 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 2.1.0
+
+- New: Multiple files can be exported at once into CSV format #370
+- Fixes an issue that made deleted annotations to re-appear if the file is re-opened #380
+- Fixes an issue that caused a freeze when deleting an annotation #381
+- Updated some dependencies
+
 ## 2.0.1
 
 - Fixes an issue that prevented expanding the tree properly in some imported files #373
