@@ -10,6 +10,8 @@ https://github.com/nilsreiter/CorefAnnotator/issues
 - Fixes an issue that caused a freeze when deleting an annotation #381
 - Updated some dependencies
 
+Thanks Börge for taking care of these!
+
 ## 2.0.1
 
 - Fixes an issue that prevented expanding the tree properly in some imported files #373
