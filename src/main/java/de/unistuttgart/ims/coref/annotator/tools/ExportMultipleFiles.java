@@ -36,13 +36,12 @@ import de.unistuttgart.ims.coref.annotator.worker.JCasLoader;
  *
  */
 public class ExportMultipleFiles {
+	
 	static Options options;
-
 	static ExportPlugin outputPlugin;
-
 	static Pattern filenamePattern = Pattern.compile("^(.*)\\.xmi(\\.gz)?");
-
 	static PluginManager pluginManager;
+	
 
 	public static void main(String[] args)
 			throws ResourceInitializationException, ClassNotFoundException, InterruptedException, ExecutionException {
@@ -80,6 +79,7 @@ public class ExportMultipleFiles {
 		}
 	}
 
+	
 	/**
 	 * This function processes a single file.
 	 * 
@@ -123,9 +123,12 @@ public class ExportMultipleFiles {
 		w.get();
 	}
 
+	
 	public enum OutputFormat {
-		tei, conll2012, json, qdtei, stats;
+		
+		tei, conll2012, json, csv, qdtei, stats;
 
+		@SuppressWarnings("unchecked")
 		Class<? extends ExportPlugin> getPluginClass() {
 			switch (this) {
 			case stats:
@@ -136,6 +139,8 @@ public class ExportMultipleFiles {
 				return de.unistuttgart.ims.coref.annotator.plugin.json.Plugin.class;
 			case tei:
 				return de.unistuttgart.ims.coref.annotator.plugin.tei.TeiExportPlugin.class;
+			case csv:
+				return de.unistuttgart.ims.coref.annotator.plugin.csv.CsvExportPlugin.class;
 			case qdtei:
 				// This is a temporary workaround
 				try {
@@ -152,16 +157,18 @@ public class ExportMultipleFiles {
 
 	}
 
+	
 	public enum OutputFilename {
 		input, documentId
 	}
 
+	
 	@CommandLineInterface(application = "ExportMultipleFiles")
 	public interface Options {
 		@Option(description = "Input file or directory.", shortName = "i")
 		List<File> getInput();
 
-		@Option(defaultValue = "tei", description = "Target format. One of [tei, conll2012, json].")
+		@Option(defaultValue = "tei", description = "Target format. One of [tei, conll2012, json, csv, stats].")
 		OutputFormat getOutputFormat();
 
 		@Option(defaultValue = ".", description = "Output directory. Defaults to current.", shortName = "o")
@@ -173,4 +180,5 @@ public class ExportMultipleFiles {
 		@Option(helpRequest = true, shortName = "h", description = "Show help")
 		boolean getHelp();
 	}
+	
 }
