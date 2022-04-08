@@ -1610,27 +1610,33 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
-			String surf = UimaUtil.getCoveredText(m);
-			surf = StringUtils.abbreviateMiddle(surf, "...", 20);
+			String mention = StringUtils
+					.abbreviateMiddle(UimaUtil.getCoveredText(m), "...", 20);
 
-			if (m.getEntity().getLabel() != null)
-				b.append(": ")
-						.append(StringUtils.abbreviateMiddle(
-								getDocumentModel().getCoreferenceModel().getLabel(m.getEntity()), "...",
-								Constants.UI_MAX_STRING_WIDTH_IN_MENU));
-
+			if (m.getEntity().getLabel() != null) {
+				String entity = StringUtils.abbreviateMiddle(
+						getDocumentModel().getCoreferenceModel().getLabel(m.getEntity()), "...",
+						Constants.UI_MAX_STRING_WIDTH_IN_MENU / 2);
+				b.append(String.format(": %s (%s)", mention, entity));
+			}
+			
 			JMenu mentionMenu = new JMenu(b.toString());
 			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
 			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
-			mentionMenu.add('"' + surf + '"');
+			mentionMenu.add(String.format("\"%s\"", mention));
+			mentionMenu.getItem(mentionMenu.getItemCount() - 1).setEnabled(false);
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteAction(DocumentWindow.this, m));
-			if (m.getSurface().size() > 0)
+			
+			if (m.getSurface().size() > 1) {
 				for (MentionSurface ms : m.getSurface()) {
-					JMenu mentionSurfaceMenu = new JMenu(StringUtils.abbreviateMiddle(ms.getCoveredText(), "...", 20));
+					JMenu mentionSurfaceMenu = new JMenu(StringUtils.abbreviateMiddle(
+							ms.getCoveredText(), "...",
+							Constants.UI_MAX_STRING_WIDTH_IN_MENU));
 					mentionSurfaceMenu.add(new DeleteAction(DocumentWindow.this, ms));
 					mentionMenu.add(mentionSurfaceMenu);
 				}
+			}
 
 			return mentionMenu;
 		}

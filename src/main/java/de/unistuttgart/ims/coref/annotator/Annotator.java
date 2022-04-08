@@ -465,8 +465,7 @@ public class Annotator implements PreferenceChangeListener {
 
 	private void recentFiles2Preferences(MutableList<File> recentFiles) {
 		StringBuilder sb = new StringBuilder();
-		for (int index = 0; index < recentFiles.size(); index++) {
-			File file = recentFiles.get(index);
+		for (File file : recentFiles) {
 			if (sb.length() > 0) {
 				sb.append(File.pathSeparator);
 			}
@@ -481,7 +480,6 @@ public class Annotator implements PreferenceChangeListener {
 		for (int i = 0; i < Math.min(20, recentFiles.size()); i++)
 			m.add(new SelectedFileOpenAction(this, recentFiles.get(i)));
 		return m;
-
 	}
 
 	public Preferences getPreferences() {
