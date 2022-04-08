@@ -153,7 +153,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		e.setLabel(l);
 		e.setFlags(new EmptyFSList<Flag>(documentModel.getJcas()));
 		e.setMembers(new FSArray<Entity>(documentModel.getJcas(), 0));
-		e.addToIndexes();
+		e.addToIndexes(getJCas());
 		return e;
 	}
 
@@ -257,8 +257,8 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			for (; i < arr.size(); i++) {
 				arr.set(i, newMembers.get(i - oldSize));
 			}
-			arr.addToIndexes();
-			op.getEntityGroup().removeFromIndexes();
+			arr.addToIndexes(getJCas());
+			op.getEntityGroup().removeFromIndexes(getJCas());
 			op.getEntityGroup().setMembers(arr);
 			updateEntityGroupLabel(op.getEntityGroup());
 			fireEvent(Event.get(this, Event.Type.Add, op.getEntityGroup(), op.getEntities()));
@@ -454,7 +454,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			fireEvent(Event.get(this, Type.Remove, m, ms));
 			mentions.add(m);
 			spans.add(new Span(ms));
-			ms.removeFromIndexes();
+			ms.removeFromIndexes(getJCas());
 			characterPosition2AnnotationMap.remove(ms);
 		});
 		op.setMention(mentions.toImmutable());
@@ -737,7 +737,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		}
 		for (Mention mention : JCasUtil.select(documentModel.getJcas(), Mention.class)) {
 			entityMentionMap.put(mention.getEntity(), mention);
-			mention.getEntity().addToIndexes();
+			mention.getEntity().addToIndexes(getJCas());
 			registerAnnotation(mention);
 			fireEvent(Event.get(this, Event.Type.Add, mention.getEntity(), mention));
 
@@ -763,7 +763,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 					entityMentionMap.get(n).toSet().forEach(m -> moveTo(tgt, m));
 
 					entityMentionMap.removeAll(n);
-					n.removeFromIndexes();
+					n.removeFromIndexes(getJCas());
 				}
 			}
 		return biggest;
@@ -809,7 +809,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		for (Mention m : entityMentionMap.get(entity)) {
 			for (MentionSurface ms : m.getSurface())
 				characterPosition2AnnotationMap.remove(ms);
-			m.removeFromIndexes();
+			m.removeFromIndexes(getJCas());
 			// TODO: remove parts
 		}
 		for (Entity group : entityEntityGroupMap.get(entity)) {
@@ -822,7 +822,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 		fireEvent(Event.get(this, Event.Type.Remove, null, entity));
 		entityMentionMap.removeAll(entity);
-		entity.removeFromIndexes();
+		entity.removeFromIndexes(getJCas());
 		Annotator.logger.traceExit();
 	}
 
@@ -831,7 +831,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		for (MentionSurface ms : m.getSurface())
 			characterPosition2AnnotationMap.remove(ms);
 		entityMentionMap.remove(entity, m);
-		m.removeFromIndexes();
+		m.removeFromIndexes(getJCas());
 		if (autoRemove && entityMentionMap.get(entity).isEmpty() && getPreferences()
 				.getBoolean(Constants.CFG_DELETE_EMPTY_ENTITIES, Defaults.CFG_DELETE_EMPTY_ENTITIES)) {
 			remove(entity);
@@ -869,7 +869,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		MentionSurface ms = op.getMentionSurface();
 		UimaUtil.removeMentionSurface(ms.getMention(), ms);
 		fireEvent(Event.get(this, Event.Type.Remove, ms.getMention(), ms));
-		ms.removeFromIndexes();
+		ms.removeFromIndexes(getJCas());
 		characterPosition2AnnotationMap.remove(ms);
 	}
 
@@ -933,7 +933,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			RemoveDuplicateMentionsInEntities op = (RemoveDuplicateMentionsInEntities) operation;
 
 			op.getFeatureStructures().forEach(m -> {
-				m.addToIndexes();
+				m.addToIndexes(getJCas());
 				entityMentionMap.put(m.getEntity(), m);
 				registerAnnotation(m);
 				fireEvent(Event.get(this, Type.Add, m.getEntity(), m));
@@ -943,7 +943,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 		} else if (operation instanceof RemoveEntities) {
 			RemoveEntities op = (RemoveEntities) operation;
 			op.getFeatureStructures().forEach(e -> {
-				e.addToIndexes();
+				e.addToIndexes(getJCas());
 				if (op.entityEntityGroupMap.containsKey(e)) {
 					for (Entity group : op.entityEntityGroupMap.get(e)) {
 						group.setMembers(UimaUtil.addTo(documentModel.getJcas(), group.getMembers(), e));
@@ -967,15 +967,15 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 			}
 			op.getEntityGroup().setMembers(newArr);
 			updateEntityGroupLabel(op.getEntityGroup());
-			newArr.addToIndexes();
-			oldArr.removeFromIndexes();
+			newArr.addToIndexes(getJCas());
+			oldArr.removeFromIndexes(getJCas());
 		} else if (operation instanceof RemoveSingletons) {
 			undo((RemoveSingletons) operation);
 		} else if (operation instanceof MergeEntities) {
 			MergeEntities op = (MergeEntities) operation;
 			for (Entity oldEntity : op.getEntities()) {
 				if (op.getEntity() != oldEntity) {
-					oldEntity.addToIndexes();
+					oldEntity.addToIndexes(getJCas());
 					fireEvent(Event.get(this, Event.Type.Add, null, oldEntity));
 					for (Mention m : op.getPreviousState().get(oldEntity)) {
 						moveTo(oldEntity, m);
@@ -1008,13 +1008,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 
 	private void undo(RemoveMention op) {
 		if (op.isEntityAutoDeleted()) {
-			op.getEntity().addToIndexes();
+			op.getEntity().addToIndexes(getJCas());
 			fireEvent(Event.get(this, Event.Type.Add, null, op.getEntity()));
 		}
 
 		// re-create all mentions and set them to the op
 		op.getFeatureStructures().forEach(m -> {
-			m.addToIndexes();
+			m.addToIndexes(getJCas());
 			m.setEntity(op.getEntity());
 			entityMentionMap.put(op.getEntity(), m);
 			for (MentionSurface ms : m.getSurface())
@@ -1038,13 +1038,13 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	}
 
 	private void undo(RemoveSingletons op) {
-		op.getFeatureStructures().forEach(e -> e.addToIndexes());
+		op.getFeatureStructures().forEach(e -> e.addToIndexes(getJCas()));
 		op.getMentions().forEach(m -> {
 			entityMentionMap.put(m.getEntity(), m);
 			for (MentionSurface ms : m.getSurface())
 				characterPosition2AnnotationMap.add(ms);
-			m.addToIndexes();
-			m.getEntity().addToIndexes();
+			m.addToIndexes(getJCas());
+			m.getEntity().addToIndexes(getJCas());
 			fireEvent(Event.get(this, Event.Type.Add, null, m.getEntity()));
 			fireEvent(Event.get(this, Event.Type.Add, m.getEntity(), m));
 		});
@@ -1076,7 +1076,7 @@ public class CoreferenceModel extends SubModel implements Model, PreferenceChang
 	 */
 	protected void undo(MergeMentions operation) {
 		operation.getMentions().forEach(m -> {
-			m.addToIndexes();
+			m.addToIndexes(getJCas());
 			entityMentionMap.put(operation.getNewMention().getEntity(), m);
 			fireEvent(Event.get(this, Type.Add, m.getEntity(), m));
 		});

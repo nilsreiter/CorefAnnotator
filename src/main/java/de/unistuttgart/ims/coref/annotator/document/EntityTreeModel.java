@@ -123,9 +123,9 @@ public class EntityTreeModel extends DefaultTreeModel implements CoreferenceMode
 					if (etn != null) {
 						etn.removeAllChildren();
 						removeNodeFromParent(etn);
+						etn.modify();
 					}
 					fsMap.remove(event.getArgument(i));
-					etn.modify();
 				}
 			optResort();
 			break;
