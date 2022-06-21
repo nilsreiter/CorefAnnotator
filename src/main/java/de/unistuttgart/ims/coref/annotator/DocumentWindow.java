@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Map;
@@ -809,7 +810,13 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			segmentIndicator.setLastCharacterPosition(model.getJcas().getDocumentText().length());
 		}
 
-		for (Flag f : model.getFlagModel().getFlags()) {
+		for (Flag f : model.getFlagModel().getFlags().toSortedList(new Comparator<Flag>() {
+
+			@Override
+			public int compare(Flag o1, Flag o2) {
+				return o1.getLabel().compareTo(o2.getLabel());
+			}
+		})) {
 			ToggleFlagAction a = new ToggleFlagAction(DocumentWindow.this, model.getFlagModel(), f);
 			tree.addTreeSelectionListener(a);
 			try {
@@ -1610,8 +1617,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			StringBuilder b = new StringBuilder();
 			b.append(m.getAddress());
 
-			String mention = StringUtils
-					.abbreviateMiddle(UimaUtil.getCoveredText(m), "...", 20);
+			String mention = StringUtils.abbreviateMiddle(UimaUtil.getCoveredText(m), "...", 20);
 
 			if (m.getEntity().getLabel() != null) {
 				String entity = StringUtils.abbreviateMiddle(
@@ -1619,7 +1625,7 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 						Constants.UI_MAX_STRING_WIDTH_IN_MENU / 2);
 				b.append(String.format(": %s (%s)", mention, entity));
 			}
-			
+
 			JMenu mentionMenu = new JMenu(b.toString());
 			mentionMenu.setIcon(FontIcon.of(MaterialDesign.MDI_ACCOUNT, new Color(m.getEntity().getColor())));
 			Action a = new ShowMentionInTreeAction(DocumentWindow.this, m);
@@ -1627,11 +1633,10 @@ public class DocumentWindow extends AbstractTextWindow implements CaretListener,
 			mentionMenu.getItem(mentionMenu.getItemCount() - 1).setEnabled(false);
 			mentionMenu.add(a);
 			mentionMenu.add(new DeleteAction(DocumentWindow.this, m));
-			
+
 			if (m.getSurface().size() > 1) {
 				for (MentionSurface ms : m.getSurface()) {
-					JMenu mentionSurfaceMenu = new JMenu(StringUtils.abbreviateMiddle(
-							ms.getCoveredText(), "...",
+					JMenu mentionSurfaceMenu = new JMenu(StringUtils.abbreviateMiddle(ms.getCoveredText(), "...",
 							Constants.UI_MAX_STRING_WIDTH_IN_MENU));
 					mentionSurfaceMenu.add(new DeleteAction(DocumentWindow.this, ms));
 					mentionMenu.add(mentionSurfaceMenu);
