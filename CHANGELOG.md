@@ -3,6 +3,11 @@
 Issue numbers (e.g., #43) refer to GitHub issues:
 https://github.com/nilsreiter/CorefAnnotator/issues
 
+## 2.1.1
+
+- Fixed a bug that prevented flags from visible if there are a lot of them #387
+- Fixed a bug that made flags undeletable #388
+
 ## 2.1.0
 
 - New: Multiple files can be exported at once into CSV format #370
