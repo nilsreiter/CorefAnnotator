@@ -8,9 +8,10 @@ import org.apache.uima.cas.FeatureStructure;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 
+import de.unistuttgart.ims.coref.annotator.Constants;
 import de.unistuttgart.ims.coref.annotator.DocumentWindow;
 import de.unistuttgart.ims.coref.annotator.action.ToggleFlagAction;
-import  de.unistuttgart.ims.coref.annotator.api.v2.Flag;
+import de.unistuttgart.ims.coref.annotator.api.v2.Flag;
 import de.unistuttgart.ims.coref.annotator.document.FeatureStructureEvent;
 import de.unistuttgart.ims.coref.annotator.document.FlagModel;
 import de.unistuttgart.ims.coref.annotator.document.FlagModelListener;
@@ -25,12 +26,16 @@ public class FlagMenu extends JMenu implements FlagModelListener {
 	public FlagMenu(String s, DocumentWindow dw) {
 		super(s);
 		this.dw = dw;
+		MenuScroller.setScrollerFor(this, 20, 125, Constants.CFG_FLAGSCROLLER_TOP_FIXED_COUNT,
+				Constants.CFG_FLAGSCROLLER_BOTTOM_FIXED_COUNT);
 	}
 
 	public FlagMenu(String s, DocumentWindow dw, Class<? extends FeatureStructure> tClass) {
 		super(s);
 		this.dw = dw;
 		this.targetClass = tClass;
+		MenuScroller.setScrollerFor(this, 20, 125, Constants.CFG_FLAGSCROLLER_TOP_FIXED_COUNT,
+				Constants.CFG_FLAGSCROLLER_BOTTOM_FIXED_COUNT);
 	}
 
 	public JMenuItem add(Flag f, JMenuItem mi) {

@@ -31,13 +31,9 @@ public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int row = table.getSelectedRow();
-		table.clearSelection();
-		if (row != -1) {
-			String key = (String) table.getModel().getValueAt(row, 1);
-			Flag f = getTarget().getDocumentModel().getFlagModel().getFlag(key);
+		Flag f = getSelectedFlag();
+		if (f != null)
 			getTarget().getDocumentModel().edit(new DeleteFlag(f));
-		}
 	}
 
 	public JTable getTable() {
@@ -48,8 +44,27 @@ public class DeleteFlagAction extends TargetedOperationIkonAction<DocumentWindow
 		this.table = table;
 	}
 
+	private Flag getSelectedFlag() {
+		int row = table.getSelectedRow();
+		table.clearSelection();
+		if (row != -1) {
+			String key = (String) table.getModel().getValueAt(row, 1);
+			Flag f = getTarget().getDocumentModel().getFlagModel().getFlag(key);
+			return f;
+		} else
+			return null;
+	}
+
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
+		Flag f = getSelectedFlag();
+
+		if (f == null) {
+			this.setEnabled(false);
+			return;
+		}
+		// TODO: Check wether the flag is used
+		this.setEnabled(true);
 	}
 
 }
