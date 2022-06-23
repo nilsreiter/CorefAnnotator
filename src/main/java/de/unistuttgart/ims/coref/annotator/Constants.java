@@ -121,6 +121,16 @@ public class Constants {
 	public static final String CFG_ENTITY_SORT_DESCENDING = "CFG_ENTITY_SORT_DESCENDING";
 
 	/**
+	 * Flag scroller: How many flags are displayed fixed at the top?
+	 */
+	public static final int CFG_FLAGSCROLLER_TOP_FIXED_COUNT = 10;
+
+	/**
+	 * Flag scroller: How many flags are displayed fixed at the bottom?
+	 */
+	public static final int CFG_FLAGSCROLLER_BOTTOM_FIXED_COUNT = 3;
+
+	/**
 	 * 
 	 */
 	public static final String CFG_UNDERLINE_SINGLETONS_IN_GRAY = "CFG_UNDERLINE_SINGLETONS_IN_GRAY";
