@@ -39,7 +39,7 @@ public class ExportMultipleFiles {
 	
 	static Options options;
 	static ExportPlugin outputPlugin;
-	static Pattern filenamePattern = Pattern.compile("^(.*)\\.xmi(\\.gz)?");
+	static Pattern filenamePattern = Pattern.compile("^(.*?)\\.(?:xmi(?:\\.gz)?|ca2z)");
 	static PluginManager pluginManager;
 	
 
@@ -97,7 +97,7 @@ public class ExportMultipleFiles {
 		if (m.find()) {
 			namePart = m.group(1);
 		}
-
+		
 		// load jcas from file
 		JCasLoader loader = new JCasLoader(file, pluginManager.getDefaultIOPlugin(), "xx-unspecified", null, ex -> {
 			ex.printStackTrace();
